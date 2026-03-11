@@ -1,23 +1,38 @@
 #pragma once
 #include "writer_vtk.h"
+#include <future>
+#include <mutex>
 #include <string>
+#include <vector>
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkXMLUnstructuredGridWriter.h>
 
 // ===================================================================
-//  Concrete VTK XML Unstructured Grid writer.
+//  Concrete VTK XML Unstructured Grid writer with async I/O.
 //
 //  Writes .vtu files using binary VTK XML encoding with raw-appended
 //  data (SetEncodeAppendedData(false)).  This format provides the
 //  highest throughput for large-scale meshes because it avoids
 //  base64 encoding overhead and ASCII conversion.
 //
+//  Async I/O strategy
+//  ------------------
+//  When write() is called, all field data attached to the current
+//  grid is snapshotted into an independent vtkUnstructuredGrid +
+//  vtkXMLUnstructuredGridWriter pair, which is then flushed to disk
+//  on a background thread via std::async.  The main thread returns
+//  immediately and can continue computation.  The next call to
+//  write() or finalize() waits for the previous background write to
+//  complete before proceeding.
+//
 //  Memory strategy
 //  ---------------
 //  * Point coordinates: zero-copy via vtkDoubleArray::SetArray()
 //    (the caller-owned buffer is never freed by VTK).
-//  * Field arrays (scalar / vector): zero-copy via SetArray().
+//  * Field arrays (scalar / vector): data is memcpy'd into
+//    VTK-owned arrays so the Fortran buffer can be safely reused
+//    while the background write is in flight.
 //  * Cell connectivity: one copy of the index array is required to
 //    construct the vtkCellArray offset representation.
 // ===================================================================
@@ -29,9 +44,9 @@
  * @c vtkUnstructuredGrid to a .vtu file in binary VTK XML format
  * with raw appended data encoding.
  *
- * RAII semantics are enforced via @c vtkSmartPointer.
- * A single instance writes one file: call `initialize()` → populate
- * mesh/fields → `write()` → `finalize()`.
+ * Supports non-blocking writes via a background thread: while the
+ * previous time-step's data is being flushed to disk, the main
+ * thread can continue adding field data for the next time-step.
  */
 class VtuWriter : public VtkWriterBase
 {
@@ -73,7 +88,8 @@ public:
     /*!
      * @brief Attach a named scalar point-data array (float64).
      *
-     * The caller-owned buffer is referenced zero-copy.
+     * Data is copied into a VTK-owned buffer so the caller's array
+     * can be safely reused immediately.
      *
      * @param[in] name        Array name written to the VTU file.
      * @param[in] num_points  Number of mesh vertices.
@@ -86,7 +102,8 @@ public:
     /*!
      * @brief Attach a named 3-component vector point-data array (float64).
      *
-     * The caller-owned buffer is referenced zero-copy.
+     * Data is copied into a VTK-owned buffer so the caller's array
+     * can be safely reused immediately.
      *
      * @param[in] name        Array name written to the VTU file.
      * @param[in] num_points  Number of mesh vertices.
@@ -99,7 +116,8 @@ public:
     /*!
      * @brief Attach a named scalar cell-data array (float64).
      *
-     * The caller-owned buffer is referenced zero-copy.
+     * Data is copied into a VTK-owned buffer so the caller's array
+     * can be safely reused immediately.
      *
      * @param[in] name       Array name written to the VTU file.
      * @param[in] num_cells  Number of cells.
@@ -112,7 +130,8 @@ public:
     /*!
      * @brief Attach a named 3-component vector cell-data array (float64).
      *
-     * The caller-owned buffer is referenced zero-copy.
+     * Data is copied into a VTK-owned buffer so the caller's array
+     * can be safely reused immediately.
      *
      * @param[in] name       Array name written to the VTU file.
      * @param[in] num_cells  Number of cells.
@@ -123,20 +142,35 @@ public:
                            const double *data) override;
 
     /*!
-     * @brief Flush the grid to disk.
+     * @brief Flush the grid to disk asynchronously.
      *
-     * Invokes the VTK pipeline update and writes the .vtu file.
-     * After writing, all point- and cell-data arrays are cleared so
-     * the grid is ready for the next time-step without reinitialising
-     * the mesh topology.
+     * Snapshots the current grid state and launches a background
+     * thread to perform the actual VTK Write().  The main thread
+     * returns immediately.  If a previous async write is still in
+     * progress, this call blocks until it finishes before launching
+     * the new one.
+     *
+     * After launching, all point- and cell-data arrays on the
+     * staging grid are cleared so fields can be re-attached for
+     * the next time-step.
      */
     void write() override;
 
     /*!
+     * @brief Block until any in-flight async write completes.
+     *
+     * Call this from the main thread when you need to guarantee
+     * that the most recent write() has finished (e.g. before
+     * reading back the output file).
+     */
+    void waitForWrite();
+
+    /*!
      * @brief Release all VTK pipeline resources.
      *
-     * Sets internal @c vtkSmartPointer members to @c nullptr,
-     * decrementing reference counts and freeing memory.
+     * Waits for any in-flight async write, then sets internal
+     * @c vtkSmartPointer members to @c nullptr, decrementing
+     * reference counts and freeing memory.
      */
     void finalize() override;
 
@@ -147,4 +181,6 @@ private:
     vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer_;
     //> Target file path set by initialize().
     std::string filename_;
+    //> Future for the in-flight background write (if any).
+    std::future<void> write_future_;
 };

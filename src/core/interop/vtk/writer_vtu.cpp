@@ -1,6 +1,8 @@
 #include "writer_vtu.h"
+#include <algorithm>
 #include <cfenv>
 #include <cstring>
+#include <future>
 #include <iostream>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
@@ -11,16 +13,18 @@
 #include <vtkUnsignedCharArray.h>
 
 // ===================================================================
-//  VtuWriter — Implementation
+//  VtuWriter — Implementation  (async I/O edition)
 //
 //  Performance notes
 //  -----------------
-//  * vtkDoubleArray::SetArray(ptr, n, 1) — the third argument ("save")
-//    tells VTK NOT to free the caller-owned buffer.  This gives
-//    zero-copy access to Fortran-managed coordinate and field arrays.
-//  * vtkCellArray is populated by copying connectivity indices once.
-//    The index array is typically O(num_cells) while field data is
-//    O(num_points), so the copy cost is negligible.
+//  * Field arrays are memcpy'd into VTK-owned buffers at addScalar*/
+//    addVector* time.  This decouples the Fortran buffer lifetime
+//    from the background write operation.
+//  * write() snapshots the entire vtkUnstructuredGrid into a
+//    self-contained writer+grid pair and launches it on a background
+//    thread via std::async.  The main thread returns immediately.
+//  * The next write() or finalize() call joins the previous future
+//    before proceeding, ensuring serial write completion order.
 //  * Binary VTK XML with SetEncodeAppendedData(false) writes a raw
 //    appended data block, bypassing base64 encoding entirely.
 // ===================================================================
@@ -35,7 +39,11 @@ VtuWriter::VtuWriter()
 {
 }
 
-VtuWriter::~VtuWriter() = default;
+VtuWriter::~VtuWriter()
+{
+    // Ensure any in-flight background write completes before destruction.
+    waitForWrite();
+}
 
 // ------------------------------------------------------------
 // initialize
@@ -61,6 +69,10 @@ void VtuWriter::setMesh(int num_points, const double *points,
                         const int *connectivity, const int *offsets,
                         const int *cell_types)
 {
+    // Ensure any in-flight background write completes before
+    // modifying the staging grid.
+    waitForWrite();
+
     // --- Points: zero-copy via SetArray ----------------------------
     // Fortran column-major layout for points(3, num_points) gives
     // memory order (x1,y1,z1, x2,y2,z2, ...) which VTK expects.
@@ -75,12 +87,11 @@ void VtuWriter::setMesh(int num_points, const double *points,
     vtk_points->SetData(coords);
     grid_->SetPoints(vtk_points);
 
-    // --- Connectivity ----------------------------------------------
-    // Convert the flat connectivity array to vtkIdTypeArray.
+    // --- Connectivity: bulk copy int→vtkIdType ----------------------
     auto cell_conn = vtkSmartPointer<vtkIdTypeArray>::New();
     cell_conn->SetNumberOfTuples(conn_size);
-    for (int i = 0; i < conn_size; ++i)
-        cell_conn->SetValue(i, static_cast<vtkIdType>(connectivity[i]));
+    vtkIdType *conn_ptr = cell_conn->GetPointer(0);
+    std::copy(connectivity, connectivity + conn_size, conn_ptr);
 
     // VTK CellArray (9.x API) expects (num_cells+1) offsets where
     // offsets_vtk[0] = 0 and offsets_vtk[i+1] = offsets[i].
@@ -88,18 +99,18 @@ void VtuWriter::setMesh(int num_points, const double *points,
     // end of cell i), so we prepend 0.
     auto cell_offsets = vtkSmartPointer<vtkIdTypeArray>::New();
     cell_offsets->SetNumberOfTuples(num_cells + 1);
-    cell_offsets->SetValue(0, 0);
-    for (int i = 0; i < num_cells; ++i)
-        cell_offsets->SetValue(i + 1, static_cast<vtkIdType>(offsets[i]));
+    vtkIdType *off_ptr = cell_offsets->GetPointer(0);
+    off_ptr[0] = 0;
+    std::copy(offsets, offsets + num_cells, off_ptr + 1);
 
     auto cell_array = vtkSmartPointer<vtkCellArray>::New();
     cell_array->SetData(cell_offsets, cell_conn);
 
-    // --- Cell types ------------------------------------------------
+    // --- Cell types: bulk copy int→unsigned char -------------------
     auto types_arr = vtkSmartPointer<vtkUnsignedCharArray>::New();
     types_arr->SetNumberOfTuples(num_cells);
-    for (int i = 0; i < num_cells; ++i)
-        types_arr->SetValue(i, static_cast<unsigned char>(cell_types[i]));
+    unsigned char *types_ptr = types_arr->GetPointer(0);
+    std::copy(cell_types, cell_types + num_cells, types_ptr);
 
     grid_->SetCells(types_arr, cell_array);
 }
@@ -173,27 +184,80 @@ void VtuWriter::addVectorCellData(const std::string &name,
 }
 
 // ------------------------------------------------------------
-// write
+// write  (async: snapshot grid → background thread)
 // ------------------------------------------------------------
 
 void VtuWriter::write()
 {
-    // Keep strict Fortran FPE settings outside this library boundary.
-    // VTK may raise FP exception flags internally even on successful writes.
-    fenv_t env;
-    feholdexcept(&env);
-    const int ok = writer_->Write();
-    fesetenv(&env);
+    // Wait for any previous background write to finish first.
+    waitForWrite();
 
-    if (ok <= 0)
+    // Build a lightweight snapshot that shares the mesh topology
+    // (points + cells) with the staging grid — no copy of coordinates
+    // or connectivity.  Only the field data arrays (which are already
+    // VTK-owned via memcpy in addScalar*/addVector*) are moved into
+    // the snapshot so write() owns them exclusively.
+    auto snapshot = vtkSmartPointer<vtkUnstructuredGrid>::New();
+
+    // Share mesh topology (zero-copy — reference-counted).
+    snapshot->SetPoints(grid_->GetPoints());
+    snapshot->SetCells(grid_->GetCellTypesArray(),
+                       grid_->GetCells());
+
+    // Transfer field data arrays to the snapshot (reference-counted
+    // move, not a deep copy).  Each vtkDataArray was freshly created
+    // in addScalar*/addVector* and is now exclusively owned by the
+    // snapshot after we clear the staging grid.
+    vtkPointData *pd = grid_->GetPointData();
+    for (int i = 0; i < pd->GetNumberOfArrays(); ++i)
+        snapshot->GetPointData()->AddArray(pd->GetArray(i));
+
+    vtkCellData *cd = grid_->GetCellData();
+    for (int i = 0; i < cd->GetNumberOfArrays(); ++i)
+        snapshot->GetCellData()->AddArray(cd->GetArray(i));
+
+    // Clear field arrays on the staging grid immediately so the
+    // Fortran side can start attaching new fields for the next step.
+    pd->Initialize();
+    cd->Initialize();
+
+    // Capture filename by value for the lambda.
+    std::string fname = filename_;
+
+    // Launch background write.
+    write_future_ = std::async(std::launch::async,
+                               [snapshot, fname]()
+                               {
+                                   auto bg_writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+                                   bg_writer->SetFileName(fname.c_str());
+                                   bg_writer->SetDataModeToBinary();
+                                   bg_writer->SetEncodeAppendedData(false);
+                                   bg_writer->SetCompressorTypeToNone();
+                                   bg_writer->SetInputData(snapshot);
+
+                                   // Keep strict Fortran FPE settings outside this library boundary.
+                                   fenv_t env;
+                                   feholdexcept(&env);
+                                   const int ok = bg_writer->Write();
+                                   fesetenv(&env);
+
+                                   if (ok <= 0)
+                                   {
+                                       std::cerr << "Error: VTK failed to write file: " << fname << std::endl;
+                                   }
+                               });
+}
+
+// ------------------------------------------------------------
+// waitForWrite
+// ------------------------------------------------------------
+
+void VtuWriter::waitForWrite()
+{
+    if (write_future_.valid())
     {
-        std::cerr << "Error: VTK failed to write file: " << filename_ << std::endl;
+        write_future_.get();
     }
-
-    // Clear field arrays so the next call starts with a clean slate.
-    // The mesh topology (points + cells) is preserved for reuse.
-    grid_->GetPointData()->Initialize();
-    grid_->GetCellData()->Initialize();
 }
 
 // ------------------------------------------------------------
@@ -202,6 +266,7 @@ void VtuWriter::write()
 
 void VtuWriter::finalize()
 {
+    waitForWrite();
     grid_ = nullptr;
     writer_ = nullptr;
 }

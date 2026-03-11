@@ -68,7 +68,6 @@ contains
 
         type(type_vtu_writer) :: writer
         real(c_double), allocatable :: water_flux_vec(:, :)
-        real(c_double), allocatable :: scalar_buffer(:)
         integer(int32) :: i
         character(256) :: output_name
 
@@ -89,39 +88,27 @@ contains
             select case (self%variables(i)%ID)
             case (OUTPUT_VARIABLE_TYPES%TEMPERATURE%ID)
                 if (present(temperature)) then
-                    allocate (scalar_buffer(self%num_points))
-                    scalar_buffer = temperature
-                    call assert_finite_real64_array(scalar_buffer, 'Temperature')
+                    call assert_finite_real64_array(temperature, 'Temperature')
                     call writer%write_scalar_point_data( &
-                        'Temperature', int(self%num_points, kind=c_int), scalar_buffer)
-                    deallocate (scalar_buffer)
+                        'Temperature', int(self%num_points, kind=c_int), temperature)
                 end if
             case (OUTPUT_VARIABLE_TYPES%WATER_CONTENT%ID)
                 if (present(water_content)) then
-                    allocate (scalar_buffer(self%num_points))
-                    scalar_buffer = water_content
-                    call assert_finite_real64_array(scalar_buffer, 'WaterContent')
+                    call assert_finite_real64_array(water_content, 'WaterContent')
                     call writer%write_scalar_point_data( &
-                        'WaterContent', int(self%num_points, kind=c_int), scalar_buffer)
-                    deallocate (scalar_buffer)
+                        'WaterContent', int(self%num_points, kind=c_int), water_content)
                 end if
             case (OUTPUT_VARIABLE_TYPES%ICE_CONTENT%ID)
                 if (present(ice_content)) then
-                    allocate (scalar_buffer(self%num_points))
-                    scalar_buffer = ice_content
-                    call assert_finite_real64_array(scalar_buffer, 'IceContent')
+                    call assert_finite_real64_array(ice_content, 'IceContent')
                     call writer%write_scalar_point_data( &
-                        'IceContent', int(self%num_points, kind=c_int), scalar_buffer)
-                    deallocate (scalar_buffer)
+                        'IceContent', int(self%num_points, kind=c_int), ice_content)
                 end if
             case (OUTPUT_VARIABLE_TYPES%VAPOR_CONTENT%ID)
                 if (present(vapor_content)) then
-                    allocate (scalar_buffer(self%num_points))
-                    scalar_buffer = vapor_content
-                    call assert_finite_real64_array(scalar_buffer, 'VaporContent')
+                    call assert_finite_real64_array(vapor_content, 'VaporContent')
                     call writer%write_scalar_point_data( &
-                        'VaporContent', int(self%num_points, kind=c_int), scalar_buffer)
-                    deallocate (scalar_buffer)
+                        'VaporContent', int(self%num_points, kind=c_int), vapor_content)
                 end if
             case (OUTPUT_VARIABLE_TYPES%THERMAL_CONDUCTIVITY%ID)
                 print *, "Warning: 'thermal_conductivity' is not implemented in VTK output."
@@ -129,12 +116,9 @@ contains
                 print *, "Warning: 'volumetric_heat_capacity' is not implemented in VTK output."
             case (OUTPUT_VARIABLE_TYPES%PRESSURE%ID)
                 if (present(pressure)) then
-                    allocate (scalar_buffer(self%num_points))
-                    scalar_buffer = pressure
-                    call assert_finite_real64_array(scalar_buffer, 'Pressure')
+                    call assert_finite_real64_array(pressure, 'Pressure')
                     call writer%write_scalar_point_data( &
-                        'Pressure', int(self%num_points, kind=c_int), scalar_buffer)
-                    deallocate (scalar_buffer)
+                        'Pressure', int(self%num_points, kind=c_int), pressure)
                 end if
             case (OUTPUT_VARIABLE_TYPES%WATER_FLUX%ID)
                 if (present(water_flux)) then
@@ -161,7 +145,7 @@ contains
     contains
 
         subroutine assert_finite_real64_array(values, label)
-            real(c_double), intent(in) :: values(:)
+            real(real64), intent(in) :: values(:)
             character(*), intent(in) :: label
 
             integer(int32) :: k

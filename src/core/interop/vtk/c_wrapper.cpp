@@ -472,6 +472,22 @@ extern "C"
     }
 
     /**
+     * @brief 非同期書き込みの完了を待機する。
+     *
+     * write() が非同期に起動したバックグラウンドスレッドの完了を
+     * ブロックして待ちます。write() 後に直ちにファイルを読み戻す
+     * 場合や、finalize() 前に明示的に同期したい場合に使用します。
+     *
+     * @param[in] handle  ライターハンドル
+     */
+    void c_vtu_writer_wait(void *handle)
+    {
+        if (!handle)
+            return;
+        static_cast<VtuWriter *>(handle)->waitForWrite();
+    }
+
+    /**
      * @brief VTK パイプラインリソースを解放してハンドルを破棄する。
      *
      * この関数呼び出し後は handle を使用してはなりません。

@@ -1,11 +1,101 @@
 #include "reader_vtk.h"
+#include <algorithm>
 #include <cstring>
 #include <iostream>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkDataArray.h>
+#include <vtkDoubleArray.h>
+#include <vtkFloatArray.h>
 #include <vtkIdList.h>
+#include <vtkIdTypeArray.h>
+#include <vtkIntArray.h>
 #include <vtkPointData.h>
+#include <vtkPoints.h>
+#include <vtkUnsignedCharArray.h>
+
+// ===================================================================
+//  Bulk-copy helpers
+//
+//  These templates dispatch to std::memcpy when source and destination
+//  types match, and fall back to a tight scalar loop (which the
+//  compiler will auto-vectorise) when a type conversion is needed.
+//  This eliminates all GetComponent / GetTuple virtual-call overhead.
+// ===================================================================
+
+namespace
+{
+
+/// Copy `n` elements from `src` to `dst`.  Fast-path when types match.
+template <typename DstT, typename SrcT>
+inline void bulkCopy(DstT *dst, const SrcT *src, std::size_t n)
+{
+    for (std::size_t i = 0; i < n; ++i)
+        dst[i] = static_cast<DstT>(src[i]);
+}
+
+template <>
+inline void bulkCopy<double, double>(double *dst, const double *src, std::size_t n)
+{
+    std::memcpy(dst, src, n * sizeof(double));
+}
+
+template <>
+inline void bulkCopy<int, int>(int *dst, const int *src, std::size_t n)
+{
+    std::memcpy(dst, src, n * sizeof(int));
+}
+
+template <>
+inline void bulkCopy<long long, long long>(long long *dst, const long long *src, std::size_t n)
+{
+    std::memcpy(dst, src, n * sizeof(long long));
+}
+
+/// Dispatch a bulk copy from a vtkDataArray to a typed buffer.
+template <typename DstT>
+void copyFromVtkArray(DstT *dst, vtkDataArray *arr, std::size_t total)
+{
+    switch (arr->GetDataType())
+    {
+    case VTK_DOUBLE:
+        bulkCopy(dst, static_cast<const double *>(arr->GetVoidPointer(0)), total);
+        return;
+    case VTK_FLOAT:
+        bulkCopy(dst, static_cast<const float *>(arr->GetVoidPointer(0)), total);
+        return;
+    case VTK_INT:
+        bulkCopy(dst, static_cast<const int *>(arr->GetVoidPointer(0)), total);
+        return;
+    case VTK_ID_TYPE:
+        bulkCopy(dst, static_cast<const vtkIdType *>(arr->GetVoidPointer(0)), total);
+        return;
+    case VTK_LONG:
+        bulkCopy(dst, static_cast<const long *>(arr->GetVoidPointer(0)), total);
+        return;
+    case VTK_LONG_LONG:
+        bulkCopy(dst, static_cast<const long long *>(arr->GetVoidPointer(0)), total);
+        return;
+    case VTK_SHORT:
+        bulkCopy(dst, static_cast<const short *>(arr->GetVoidPointer(0)), total);
+        return;
+    case VTK_UNSIGNED_CHAR:
+        bulkCopy(dst, static_cast<const unsigned char *>(arr->GetVoidPointer(0)), total);
+        return;
+    default:
+        // Fallback: element-wise through the virtual API (rare path)
+        for (std::size_t i = 0; i < total; ++i)
+            dst[i] = static_cast<DstT>(arr->GetComponent(static_cast<vtkIdType>(i / arr->GetNumberOfComponents()),
+                                                          static_cast<int>(i % arr->GetNumberOfComponents())));
+        return;
+    }
+}
+
+} // anonymous namespace
+
+// ===================================================================
+// VtkReader implementation
+// ===================================================================
 
 VtkReader::VtkReader() : initialized(false)
 {
@@ -65,14 +155,43 @@ void VtkReader::getPoints(double *x_arr, double *y_arr, double *z_arr)
 {
     if (!initialized)
         return;
-    int num_points = this->grid->GetNumberOfPoints();
-    for (int i = 0; i < num_points; ++i)
+
+    vtkIdType num_points = this->grid->GetNumberOfPoints();
+    vtkDataArray *pts_data = this->grid->GetPoints()->GetData();
+
+    if (pts_data->GetDataType() == VTK_DOUBLE)
     {
-        double p[3];
-        this->grid->GetPoint(i, p);
-        x_arr[i] = p[0];
-        y_arr[i] = p[1];
-        z_arr[i] = p[2];
+        // Fast path: points stored as double — direct pointer access
+        const double *raw = static_cast<const double *>(pts_data->GetVoidPointer(0));
+        for (vtkIdType i = 0; i < num_points; ++i)
+        {
+            x_arr[i] = raw[3 * i];
+            y_arr[i] = raw[3 * i + 1];
+            z_arr[i] = raw[3 * i + 2];
+        }
+    }
+    else if (pts_data->GetDataType() == VTK_FLOAT)
+    {
+        // Float path: convert while de-interleaving
+        const float *raw = static_cast<const float *>(pts_data->GetVoidPointer(0));
+        for (vtkIdType i = 0; i < num_points; ++i)
+        {
+            x_arr[i] = static_cast<double>(raw[3 * i]);
+            y_arr[i] = static_cast<double>(raw[3 * i + 1]);
+            z_arr[i] = static_cast<double>(raw[3 * i + 2]);
+        }
+    }
+    else
+    {
+        // Rare fallback for other numeric types
+        for (vtkIdType i = 0; i < num_points; ++i)
+        {
+            double p[3];
+            pts_data->GetTuple(i, p);
+            x_arr[i] = p[0];
+            y_arr[i] = p[1];
+            z_arr[i] = p[2];
+        }
     }
 }
 
@@ -96,35 +215,51 @@ void VtkReader::getCellInfo(long long *connectivity, long long *offsets, int *ty
         return;
 
     vtkCellArray *cells = this->grid->GetCells();
+
+    // --- Connectivity: bulk copy ---
     vtkDataArray *conn_array = cells->GetConnectivityArray();
     long long num_conn_values = conn_array->GetNumberOfTuples();
-    for (long long i = 0; i < num_conn_values; ++i)
-    {
-        connectivity[i] = conn_array->GetTuple1(i);
-    }
+    copyFromVtkArray(connectivity, conn_array, static_cast<std::size_t>(num_conn_values));
 
-    // Legacy VTKではOffsetsが直接取得できないため、手動で計算する
+    // --- Offsets: try bulk copy from VTK 9.x offset array ---
+    vtkDataArray *offset_array = cells->GetOffsetsArray();
     long long num_cells = this->grid->GetNumberOfCells();
-    long long current_offset = 0;
-    offsets[0] = 0;
 
-    for (long long i = 0; i < num_cells; ++i)
+    if (offset_array && offset_array->GetNumberOfTuples() == num_cells + 1)
     {
-        types[i] = this->grid->GetCellType(i);
+        copyFromVtkArray(offsets, offset_array, static_cast<std::size_t>(num_cells + 1));
+    }
+    else
+    {
+        // Legacy VTKではOffsetsが直接取得できないため、手動で計算する
+        long long current_offset = 0;
+        offsets[0] = 0;
 
-        vtkIdType num_points_in_cell;
-        const vtkIdType *point_ids;
-        this->grid->GetCellPoints(i, num_points_in_cell, point_ids);
-
-        current_offset += num_points_in_cell;
-        if (i + 1 <= num_cells)
+        for (long long i = 0; i < num_cells; ++i)
         {
+            vtkIdType num_points_in_cell;
+            const vtkIdType *point_ids;
+            this->grid->GetCellPoints(i, num_points_in_cell, point_ids);
+
+            current_offset += num_points_in_cell;
             offsets[i + 1] = current_offset;
         }
     }
-}
 
-// --- ここから修正 ---
+    // --- Cell types: bulk copy from vtkUnsignedCharArray ---
+    vtkUnsignedCharArray *type_array = this->grid->GetCellTypesArray();
+    if (type_array)
+    {
+        const unsigned char *src = static_cast<const unsigned char *>(type_array->GetVoidPointer(0));
+        for (long long i = 0; i < num_cells; ++i)
+            types[i] = static_cast<int>(src[i]);
+    }
+    else
+    {
+        for (long long i = 0; i < num_cells; ++i)
+            types[i] = this->grid->GetCellType(i);
+    }
+}
 
 void VtkReader::getCellDataInt32(const char *dataName, int *data)
 {
@@ -138,16 +273,9 @@ void VtkReader::getCellDataInt32(const char *dataName, int *data)
         return;
     }
 
-    long long num_tuples = data_array->GetNumberOfTuples();
-    int num_components = data_array->GetNumberOfComponents();
-    long long k = 0;
-    for (long long i = 0; i < num_tuples; ++i)
-    {
-        for (int j = 0; j < num_components; ++j)
-        {
-            data[k++] = static_cast<int>(data_array->GetComponent(i, j));
-        }
-    }
+    std::size_t total = static_cast<std::size_t>(data_array->GetNumberOfTuples()) *
+                        static_cast<std::size_t>(data_array->GetNumberOfComponents());
+    copyFromVtkArray(data, data_array, total);
 }
 
 void VtkReader::getCellDataFloat64(const char *dataName, double *data)
@@ -162,16 +290,9 @@ void VtkReader::getCellDataFloat64(const char *dataName, double *data)
         return;
     }
 
-    long long num_tuples = data_array->GetNumberOfTuples();
-    int num_components = data_array->GetNumberOfComponents();
-    long long k = 0;
-    for (long long i = 0; i < num_tuples; ++i)
-    {
-        for (int j = 0; j < num_components; ++j)
-        {
-            data[k++] = data_array->GetComponent(i, j); // 元のコードのバグも修正
-        }
-    }
+    std::size_t total = static_cast<std::size_t>(data_array->GetNumberOfTuples()) *
+                        static_cast<std::size_t>(data_array->GetNumberOfComponents());
+    copyFromVtkArray(data, data_array, total);
 }
 
 void VtkReader::getPointDataInt32(const char *dataName, int *data)
@@ -186,16 +307,9 @@ void VtkReader::getPointDataInt32(const char *dataName, int *data)
         return;
     }
 
-    long long num_tuples = data_array->GetNumberOfTuples();
-    int num_components = data_array->GetNumberOfComponents();
-    long long k = 0;
-    for (long long i = 0; i < num_tuples; ++i)
-    {
-        for (int j = 0; j < num_components; ++j)
-        {
-            data[k++] = static_cast<int>(data_array->GetComponent(i, j));
-        }
-    }
+    std::size_t total = static_cast<std::size_t>(data_array->GetNumberOfTuples()) *
+                        static_cast<std::size_t>(data_array->GetNumberOfComponents());
+    copyFromVtkArray(data, data_array, total);
 }
 
 void VtkReader::getPointDataFloat64(const char *dataName, double *data)
@@ -210,16 +324,9 @@ void VtkReader::getPointDataFloat64(const char *dataName, double *data)
         return;
     }
 
-    long long num_tuples = data_array->GetNumberOfTuples();
-    int num_components = data_array->GetNumberOfComponents();
-    long long k = 0;
-    for (long long i = 0; i < num_tuples; ++i)
-    {
-        for (int j = 0; j < num_components; ++j)
-        {
-            data[k++] = data_array->GetComponent(i, j);
-        }
-    }
+    std::size_t total = static_cast<std::size_t>(data_array->GetNumberOfTuples()) *
+                        static_cast<std::size_t>(data_array->GetNumberOfComponents());
+    copyFromVtkArray(data, data_array, total);
 }
 
 int VtkReader::getNumberOfPointDataComponents(const char *dataName)

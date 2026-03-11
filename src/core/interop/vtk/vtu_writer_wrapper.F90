@@ -142,6 +142,14 @@ module core_interop_vtu_writer_wrapper
             type(c_ptr), value, intent(in) :: handle
         end subroutine vtu_writer_write
 
+        !> @brief Block until any in-flight async write completes.
+        subroutine vtu_writer_wait(handle) &
+                bind(c, name='c_vtu_writer_wait')
+            import :: c_ptr
+            !> Writer handle.
+            type(c_ptr), value, intent(in) :: handle
+        end subroutine vtu_writer_wait
+
         !> @brief Release all VTK resources and destroy the writer object.
         subroutine vtu_writer_destroy(handle) &
                 bind(c, name='c_vtu_writer_destroy')
@@ -185,6 +193,8 @@ module core_interop_vtu_writer_wrapper
         procedure :: write_mesh => write_mesh_type_vtu_writer
         !> Flush all accumulated data to disk.
         procedure :: write      => write_type_vtu_writer
+        !> Block until any in-flight async write completes.
+        procedure :: wait_for_write => wait_for_write_type_vtu_writer
         !> Release all VTK resources.
         procedure :: finalize   => finalize_type_vtu_writer
         ! --- Field attachment ---
@@ -376,6 +386,25 @@ contains
 
         call vtu_writer_write(self%writer_handle)
     end subroutine write_type_vtu_writer
+
+    ! ----------------------------------------------------------------
+    ! wait_for_write
+    ! ----------------------------------------------------------------
+
+    !> @brief Block until any in-flight async write completes.
+    !>
+    !> Call this when you need to guarantee that the most recent
+    !> write() has finished (e.g. before reading back the output file
+    !> or before finalize()).
+    !>
+    !> - Arithmetic complexity: O(1) — just a thread join
+    subroutine wait_for_write_type_vtu_writer(self)
+        class(type_vtu_writer), intent(inout) :: self
+
+        if (c_associated(self%writer_handle)) then
+            call vtu_writer_wait(self%writer_handle)
+        end if
+    end subroutine wait_for_write_type_vtu_writer
 
     ! ----------------------------------------------------------------
     ! finalize

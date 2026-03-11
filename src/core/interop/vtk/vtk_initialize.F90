@@ -34,12 +34,6 @@ contains
         integer(int64), allocatable :: raw_offsets(:)
         integer(int32), allocatable :: raw_cell_types(:)
         integer(int32), allocatable :: raw_cell_entity_ids(:)
-        real(real64), allocatable :: raw_point_field_values(:, :)
-        integer(int32), allocatable :: raw_global_node_ids(:)
-        integer(int32), allocatable :: raw_node_types(:)
-        integer(int32), allocatable :: raw_num_sharing_ranks(:)
-        integer(int32), allocatable :: raw_owner_ranks(:, :)
-        integer(int32), allocatable :: raw_communication_partners(:, :)
         integer(int32), allocatable :: raw_ranks(:)
         integer(int32) :: local_max_node_id, global_max_node_id
         integer(int32), allocatable :: raw_colors(:)
@@ -84,49 +78,43 @@ contains
             call vtk_get_points(self%handle, self%points%x, self%points%y, self%points%z)
 
             if (present(global_node_id_key)) then
-                call allocate_array(raw_global_node_ids, self%num_points)
+                call allocate_array(self%global_node_ids, self%num_points)
                 c_array_name = strip(global_node_id_key)//c_null_char
-                call vtk_get_point_data_int32(self%handle, c_array_name, raw_global_node_ids)
-                raw_global_node_ids = raw_global_node_ids + 1 ! 0-based to 1-based
-                allocate (self%global_node_ids, source=raw_global_node_ids)
+                call vtk_get_point_data_int32(self%handle, c_array_name, self%global_node_ids)
+                self%global_node_ids = self%global_node_ids + 1 ! 0-based to 1-based
             end if
 
             if (present(node_type_key)) then
-                call allocate_array(raw_node_types, self%num_points)
+                call allocate_array(self%node_type, self%num_points)
                 c_array_name = strip(node_type_key)//c_null_char
-                call vtk_get_point_data_int32(self%handle, c_array_name, raw_node_types)
-                allocate (self%node_type, source=raw_node_types)
+                call vtk_get_point_data_int32(self%handle, c_array_name, self%node_type)
             end if
 
             if (present(num_sharing_ranks_key)) then
-                call allocate_array(raw_num_sharing_ranks, self%num_points)
+                call allocate_array(self%num_sharing_ranks, self%num_points)
                 c_array_name = strip(num_sharing_ranks_key)//c_null_char
-                call vtk_get_point_data_int32(self%handle, c_array_name, raw_num_sharing_ranks)
-                allocate (self%num_sharing_ranks, source=raw_num_sharing_ranks)
+                call vtk_get_point_data_int32(self%handle, c_array_name, self%num_sharing_ranks)
             end if
 
             if (present(owner_ranks_key)) then
-                call allocate_array(raw_owner_ranks, self%num_procs, self%num_points)
+                call allocate_array(self%owner_rank, self%num_procs, self%num_points)
                 c_array_name = strip(owner_ranks_key)//c_null_char
-                call vtk_get_point_data_int32(self%handle, c_array_name, raw_owner_ranks)
-                allocate (self%owner_rank, source=raw_owner_ranks)
+                call vtk_get_point_data_int32(self%handle, c_array_name, self%owner_rank)
             end if
 
             if (present(communication_partners_key)) then
-                call allocate_array(raw_communication_partners, self%num_procs, self%num_points)
+                call allocate_array(self%communication_partners, self%num_procs, self%num_points)
                 c_array_name = strip(communication_partners_key)//c_null_char
-                call vtk_get_point_data_int32(self%handle, c_array_name, raw_communication_partners)
-                allocate (self%communication_partners, source=raw_communication_partners)
+                call vtk_get_point_data_int32(self%handle, c_array_name, self%communication_partners)
             end if
 
             if (present(point_field_names)) then
                 if (size(point_field_names) > 0) then
-                    call allocate_array(raw_point_field_values, self%num_points, size(point_field_names))
+                    call allocate_array(self%point_field_values, self%num_points, size(point_field_names))
                     do i = 1, size(point_field_names)
                         c_array_name = strip(point_field_names(i))//c_null_char
-                        call vtk_get_point_data_float64(self%handle, c_array_name, raw_point_field_values(:, i))
+                        call vtk_get_point_data_float64(self%handle, c_array_name, self%point_field_values(:, i))
                     end do
-                    allocate (self%point_field_values, source=raw_point_field_values)
                 end if
             end if
         end if
@@ -203,12 +191,6 @@ contains
         call deallocate_array(raw_offsets)
         call deallocate_array(raw_cell_types)
         call deallocate_array(raw_cell_entity_ids)
-        call deallocate_array(raw_point_field_values)
-        call deallocate_array(raw_global_node_ids)
-        call deallocate_array(raw_node_types)
-        call deallocate_array(raw_num_sharing_ranks)
-        call deallocate_array(raw_owner_ranks)
-        call deallocate_array(raw_communication_partners)
         call deallocate_array(raw_ranks)
         call deallocate_array(raw_colors)
 
