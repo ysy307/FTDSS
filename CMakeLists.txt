@@ -37,11 +37,11 @@ add_subdirectory(src/app/ftdss)
 # 4. Executable
 # ====================================================================
 # プロジェクト直下の app ディレクトリにあるエントリーポイント
-add_executable(ftdss app/ftdss.f90)
+add_executable(FTDSS app/ftdss.f90)
 
 # 実行ファイルに必要な最上位ライブラリターゲットをリンクする（名称は仮）
 # 必要なフラグ（インクルードパスやOpenMP等）もターゲット経由で自動伝搬する
-target_link_libraries(ftdss PRIVATE SOLVER::FTDSS)
+target_link_libraries(FTDSS PRIVATE SOLVER::FTDSS)
 
 if(ENABLE_MPI AND MPI_Fortran_FOUND)
     target_link_libraries(FTDSS PRIVATE MPI::MPI_Fortran)

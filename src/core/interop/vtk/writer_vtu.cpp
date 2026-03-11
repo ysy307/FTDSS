@@ -1,4 +1,7 @@
 #include "writer_vtu.h"
+#include <cfenv>
+#include <cstring>
+#include <iostream>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkDoubleArray.h>
@@ -6,9 +9,6 @@
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkUnsignedCharArray.h>
-#include <cfenv>
-#include <cstring>
-#include <iostream>
 
 // ===================================================================
 //  VtuWriter — Implementation
@@ -202,6 +202,6 @@ void VtuWriter::write()
 
 void VtuWriter::finalize()
 {
-    grid_   = nullptr;
+    grid_ = nullptr;
     writer_ = nullptr;
 }

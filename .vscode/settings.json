@@ -60,14 +60,14 @@
     ],
     "fortran.linter.compiler": "ifx",
     "fortran.linter.compilerPath": "/opt/intel/oneapi/compiler/latest/bin/ifx",
-    "fortran.linter.modOutput": "/workspaces/FTDSS/CMakeBuild/.mod/",
+    "fortran.linter.modOutput": "/workspaces/FTDSS/CMakeBuild_intel/.mod/",
     "fortran.fortls.nthreads": 8,
     "fortran.fortls.preprocessor.suffixes": [
         ".F90"
     ],
     "fortran.fortls.directories": [
         "${workspaceFolder}/src",
-        "${workspaceFolder}/CMakeBuild/src",
+        "${workspaceFolder}/CMakeBuild_intel/src",
         "${workspaceFolder}/third_party/fortran_stdlib/IntelLLVM-2025.2.0/src",
         "${workspaceFolder}/third_party/json-fortran/src",
         "${workspaceFolder}/third_party/VTKFortran/src/"
@@ -88,7 +88,7 @@
     "fortran.fortls.notifyInit": true,
     "fortran.fortls.sortKeywords": true,
     "fortran.linter.includePaths": [
-        "/workspaces/FTDSS/CMakeBuild/.mod",
+        "/workspaces/FTDSS/CMakeBuild_intel/.mod",
         "/opt/intel/oneapi/mkl/latest/include",
         "/opt/intel/oneapi/mpi/latest/include/mpi",
         "/workspaces/FTDSS/third_party/.local/intel/include/fortran_stdlib/IntelLLVM-2025.3.2",
@@ -149,13 +149,14 @@
         "**/.devcontainer": true,
         "**/.github": true,
         "**/.vscode": true,
-        "**/CMakeBuild": true,
+        "**/CMakeBuild*": true,
         "**/build": true,
         "**/docs": true,
         "**/fpm": true,
         "**/bin": true,
         "**/include": false,
         "**/third_party/": true,
+        "**/__pycache__": true,
     },
     "workbench.colorCustomizations": {
         "editor.background": "#2e282c"
@@ -186,5 +187,5 @@
     ],
     "chat.tools.terminal.autoApprove": {
         "./bin/test_main": true
-    },
+    }
 }

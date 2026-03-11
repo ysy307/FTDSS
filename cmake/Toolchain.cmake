@@ -28,7 +28,7 @@ include(FindPkgConfig REQUIRED)
 find_package(MPI REQUIRED)
 find_package(OpenMP REQUIRED)
 
-# MKL Configuration
+# 4. MKL Configuration
 set(MKL_LINK static)
 set(MKL_INTERFACE lp64)
 set(MKL_MPI "intelmpi")
@@ -50,7 +50,23 @@ endif()
 
 find_package(MKL CONFIG REQUIRED COMPONENTS ${MKL_COMPONENTS_LIST})
 
-# Third-party libraries
+# 5. Create ALIAS targets for BLAS/LAPACK to satisfy fortran_stdlib requirements
+if(NOT TARGET BLAS::BLAS)
+    add_library(BLAS::BLAS INTERFACE IMPORTED)
+    target_link_libraries(BLAS::BLAS INTERFACE MKL::MKL)
+endif()
+
+if(NOT TARGET LAPACK::LAPACK)
+    add_library(LAPACK::LAPACK INTERFACE IMPORTED)
+    target_link_libraries(LAPACK::LAPACK INTERFACE MKL::MKL)
+endif()
+
+if(ENABLE_MPI AND NOT TARGET SCALAPACK::SCALAPACK)
+    add_library(SCALAPACK::SCALAPACK INTERFACE IMPORTED)
+    target_link_libraries(SCALAPACK::SCALAPACK INTERFACE MKL::MKL_SCALAPACK)
+endif()
+
+# 6. Find third-party libraries
 find_package(fortran_stdlib REQUIRED)
 find_package(${JSON_FORTRAN_PKG} REQUIRED)
 find_package(X11 REQUIRED)

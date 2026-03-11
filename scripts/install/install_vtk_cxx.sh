@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 set -e
 set -o pipefail
@@ -13,14 +13,11 @@ fi
 command -v cmake >/dev/null || { echo "Error: You must install CMake"; exit 1; }
 command -v ninja >/dev/null || { echo "Error: You must install ninja"; exit 1; }
 
-apt update
-apt install -y \
-  build-essential cmake g++ git \
-  libgl1-mesa-dev libxt-dev \
-  libxrender-dev libxext-dev \
-  qtbase5-dev libeigen3-dev \
-  zlib1g-dev libjpeg-dev libpng-dev \
-  libtiff-dev libtheora-dev libogg-dev \
+# Removed GUI/Rendering related dependencies
+sudo apt update
+sudo apt install -y \
+  build-essential cmake g++ git ninja-build \
+  zlib1g-dev libjpeg-dev libpng-dev libtiff-dev \
   libdouble-conversion-dev libblas-dev liblapack-dev
 
 # Directory configurations
@@ -39,7 +36,6 @@ VTK_URL="https://www.vtk.org/files/release/$VTK_MAJOR_MINOR/$VTK_TAR"
 
 if [ ! -d "$VTK_SRC_DIR" ]; then
   if [ ! -f "$VTK_TAR" ]; then
-    echo "Downloading $VTK_TAR from $VTK_URL"
     wget -O "$VTK_TAR" "$VTK_URL"
   fi
   tar xf "$VTK_TAR"
@@ -48,8 +44,6 @@ fi
 
 # Loop through each specified compiler
 for COMPILER in "${COMPILERS[@]}"; do
-  echo "--- Building VTK for $COMPILER ---"
-
   case "$COMPILER" in
     intel)
       FC_COMP="ifx"
@@ -70,7 +64,6 @@ for COMPILER in "${COMPILERS[@]}"; do
       export FFLAGS="-O3 -fast"
       ;;
     *)
-      echo "Error: Unknown compiler '$COMPILER'. Skipping."
       continue
       ;;
   esac
@@ -85,7 +78,7 @@ for COMPILER in "${COMPILERS[@]}"; do
   mkdir -p "$VTK_BUILD_DIR"
   cd "$VTK_BUILD_DIR"
 
-  # CMake configuration
+  # CMake configuration: Build ONLY necessary modules
   cmake .. \
     -DCMAKE_Fortran_COMPILER=$FC_COMP \
     -DCMAKE_C_COMPILER=$CC_COMP \
@@ -94,13 +87,15 @@ for COMPILER in "${COMPILERS[@]}"; do
     -DCMAKE_INSTALL_PREFIX="$VTK_INSTALL_DIR" \
     -DBUILD_SHARED_LIBS=OFF \
     -DVTK_BUILD_TESTING=OFF \
-    -DVTK_GROUP_ENABLE_Rendering=YES \
-    -DVTK_GROUP_ENABLE_StandAlone=YES \
+    -DVTK_GROUP_ENABLE_Rendering=DONT_WANT \
+    -DVTK_GROUP_ENABLE_StandAlone=DONT_WANT \
+    -DVTK_MODULE_ENABLE_VTK_CommonCore=YES \
+    -DVTK_MODULE_ENABLE_VTK_CommonDataModel=YES \
+    -DVTK_MODULE_ENABLE_VTK_IOLegacy=YES \
+    -DVTK_MODULE_ENABLE_VTK_IOXML=YES \
     -G Ninja
 
   # Build and Install
   ninja
   ninja install
-
-  echo "VTK Installed to: $VTK_INSTALL_DIR"
 done

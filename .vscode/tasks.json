@@ -2,66 +2,32 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build cmake",
+            "label": "FTDSS Build & Analyze",
             "type": "shell",
+            "command": "python3",
+            "args": [
+                "scripts/compile/compile.py",
+                "-c",
+                "intel",
+                "-t",
+                "main"
+            ],
             "options": {
-                "cwd": "${workspaceRoot}/",
+                "cwd": "${workspaceRoot}"
             },
             "group": {
                 "kind": "build",
-                "isDefault": false
+                "isDefault": true
             },
-            "command": "zsh",
-            "args": [
-                "scripts/Compile-Cmake-test.sh",
-                ">|",
-                "log/compile.log"
-            ],
             "presentation": {
-                "echo": false,
+                "echo": true,
                 "reveal": "always",
                 "focus": true,
                 "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
-            }
-        },
-        {
-            "label": "cmake build & run",
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceRoot}/CMakeBuild",
+                "showReuseMessage": false,
+                "clear": true
             },
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "command": "cmake",
-            "args": [
-                "-S",
-                "..",
-                "-DBUILD_APP=ysy_fc",
-                "-B",
-                ".",
-                "&&",
-                "cmake",
-                "--build",
-                ".",
-                "&&",
-                "cmake",
-                "--build",
-                ".",
-                "--target",
-                "run_ysy_fc"
-            ],
-            "presentation": {
-                "echo": false,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
-            }
+            "problemMatcher": []
         },
         {
             "label": "Reset cmake build",
