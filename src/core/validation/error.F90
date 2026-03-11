@@ -2,7 +2,7 @@
 !> Module for error handling implementation
 !> Uses error constants defined in core_constants_error
 !>
-module core_error
+module core_validation_error
     use, intrinsic :: iso_fortran_env, only: int32
     use :: stdlib_strings, only:to_string, strip
     use :: core_constants, only:ERROR_CODES, type_constant_error
@@ -35,42 +35,43 @@ contains
 
         ! 1. Base Message Construction
         if (present(opt)) then
-            ! replace_placeholder now handles trimming correctly
+            ! replace_placeholder now handles stripming correctly
             msg_body = replace_placeholder(err%message, opt)
         else
-            msg_body = trim(err%message)
+            msg_body = strip(err%message)
         end if
 
         ! 2. Start constructing the full message
         ! Format: "# 901(INPUT_DIR_MISSING): Message body"
-        full_msg = "# "//trim(to_string(err%ID))// &
-                   "("//trim(strip(err%name))//"): "//msg_body
+        full_msg = "# "//strip(to_string(err%ID))// &
+                   "("//strip(strip(err%name))//"): "//msg_body
 
         ! 3. Add Scope and Line info
         ! Format: " [scope:line]" or " [scope]" or " [Line:line]"
         if (present(scope) .or. present(line)) then
-            full_msg = trim(full_msg)//" ["
+            full_msg = strip(full_msg)//" ["
 
             if (present(scope)) then
-                full_msg = trim(full_msg)//strip(scope)
+                full_msg = strip(full_msg)//strip(scope)
                 if (present(line)) then
-                    full_msg = trim(full_msg)//":"
+                    full_msg = strip(full_msg)//":"
                 end if
             end if
 
             if (present(line)) then
                 if (.not. present(scope)) then
-                    full_msg = trim(full_msg)//"Line:"
+                    full_msg = strip(full_msg)//"Line:"
                 end if
                 line_str = to_string(line)
-                full_msg = trim(full_msg)//trim(line_str)
+                full_msg = strip(full_msg)//strip(line_str)
             end if
 
-            full_msg = trim(full_msg)//"]"
+            full_msg = strip(full_msg)//"]"
         end if
 
         ! 4. STOP Execution
-        error stop trim(full_msg)
+        error stop err%ID
+        ! error stop strip(full_msg)
 
     end subroutine raise_error
 
@@ -89,11 +90,11 @@ contains
         idx = index(tmpl, PH)
         if (idx > 0) then
             ! Replace first occurrence of {}
-            ! Critical: trim(tmpl(idx+2:)) prevents including huge trailing spaces from fixed-length strings
-            res = tmpl(1:idx - 1)//strip(val)//trim(tmpl(idx + 2:))
+            ! Critical: strip(tmpl(idx+2:)) prevents including huge trailing spaces from fixed-length strings
+            res = tmpl(1:idx - 1)//strip(val)//strip(tmpl(idx + 2:))
         else
-            res = trim(tmpl)
+            res = strip(tmpl)
         end if
     end function replace_placeholder
 
-end module core_error
+end module core_validation_error

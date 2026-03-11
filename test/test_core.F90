@@ -10,33 +10,33 @@ program test_core
     real(real64) :: el, az, rise, set, t_noon, alt_noon
     integer(int32) :: status
 
-    ! 初期化
+    ! Initialize
     el = 0.0d0; az = 0.0d0
     rise = 0.0d0; set = 0.0d0
     t_noon = 0.0d0; alt_noon = 0.0d0
     status = 0
 
-    ! 1. 場所の初期化 (NAOJ Tokyo)
+    ! 1. Initialize location (NAOJ Tokyo)
     print *, "=== Initialization ==="
     call tokyo%initialize(35.6581d0, 139.7414d0, 0.0d0)
     print *, "Location set to Tokyo (NAOJ)."
 
-    ! 2. Datetime型を用いた位置計算
+    ! 2. Position calculation using type_datetime
     print *, "=== 1. Position from type_datetime ==="
     call dt%set_now()
     call tokyo%get_position(dt, el, az)
     print *, "Current Time: ", dt%format()
     print '(A, F7.2, A, F7.2)', "Elevation   : ", el, " deg / Azimuth: ", az
 
-    ! 3. 数値指定を用いた位置計算
+    ! 3. Position calculation using raw numeric values
     print *, "=== 2. Position from raw values (2025/6/21 12:00) ==="
     call tokyo%get_position(2025, 6, 21, 12.0d0, 9.0d0, el, az)
     print '(A, F7.2, A, F7.2)', "Elevation   : ", el, " deg / Azimuth: ", az
 
-    ! 4. 日の出・日没・南中計算 (Datetime型引数)
+    ! 4. Sunrise/sunset/transit calculation (datetime argument)
     print *, "=== 3. Day Events using Datetime (Today) ==="
     call dt%set_now()
-    ! generic get_day_events を datetime で呼び出し
+    ! Call generic get_day_events with datetime
     call tokyo%get_day_events(dt, rise, set, t_noon, alt_noon, status)
 
     if (status == 0) then
@@ -48,9 +48,9 @@ program test_core
         print *, "Polar day or night."
     end if
 
-    ! 5. 日の出・日没・南中計算 (数値引数)
+    ! 5. Sunrise/sunset/transit calculation (numeric arguments)
     print *, "=== 4. Day Events using Raw Values (2025/12/31) ==="
-    ! generic get_day_events を数値で呼び出し
+    ! Call generic get_day_events with raw values
     call tokyo%get_day_events(2025, 12, 31, 9.0d0, rise, set, t_noon, alt_noon, status)
 
     if (status == 0) then
@@ -382,7 +382,7 @@ end program test_core
 ! !         ! 6. Copy Test
 ! !         call v_copy%copy(v)
 
-! !         ! ステータスチェック (正常系なのでエラーが出ないことを確認)
+! !         ! Status check (verify no errors in normal case)
 ! !         call v_copy%check()
 
 ! !         if (v_copy%get_status() == VECTOR_STATUS_SUCCESS) then
@@ -411,7 +411,7 @@ end program test_core
 ! !         print *, "  Trying to set value at index", n + 1
 ! !         call v%set(OP_INS, n + 1, 10.0d0)
 
-! !         ! check() でエラーメッセージを表示し、get_status() で判定
+! !         ! check() displays error messages, get_status() determines result
 ! !         call v%check()
 ! !         if (v%get_status() /= VECTOR_STATUS_SUCCESS) then
 ! !             print *, "  [PASS] Error correctly detected (Index out of bounds)."
@@ -496,14 +496,14 @@ end program test_core
 
 ! !         call v%initialize(n) ! Default 1 Block
 
-! !         ! Test 1: 存在しないブロックへのアクセス
+! !         ! Test 1: Access to non-existent block
 ! !         print *, "  Trying to set Block 2 (Allocated only 1)..."
 ! !         call v%set(OP_INS, [(0, i=1, n)], row_block=2)
 
-! !         ! check() でエラーメッセージを表示
+! !         ! check() displays error messages
 ! !         call v%check()
 
-! !         ! get_status() で判定
+! !         ! get_status() determines result
 ! !         if (v%get_status() /= VECTOR_STATUS_SUCCESS) then
 ! !             print *, "  [PASS] Status correctly indicates error."
 ! !         else
@@ -535,9 +535,9 @@ end program test_core
 ! contains
 
 !     ! ------------------------------------------------------------------
-!     ! ケース1: 基本的な三角形グラフ
-!     ! ノード数: 3
-!     ! 辺: (1-2), (2-3), (3-1)
+!     ! Case 1: Basic triangle graph
+!     ! Nodes: 3
+!     ! Edges: (1-2), (2-3), (3-1)
 !     ! ------------------------------------------------------------------
 !     subroutine test_case_basic()
 !         type(type_graph) :: g
@@ -554,7 +554,7 @@ end program test_core
 !         call g%build(pairs, num_nodes)
 !         call print_graph_info(g)
 
-!         ! 簡易チェック
+!         ! Simple check
 !         if (g%num_edges == 3) then
 !             print *, "[PASS] Edge count is correct (3)."
 !         else
@@ -563,16 +563,16 @@ end program test_core
 !     end subroutine test_case_basic
 
 !     ! ------------------------------------------------------------------
-!     ! ケース2: 重複・自己ループ・逆順定義を含む「汚れた」データ
-!     ! ノード数: 4
-!     ! 入力データ:
-!     !  (1, 2) -> 有効
-!     !  (1, 2) -> 重複 (無視されるべき)
-!     !  (2, 1) -> 逆順の重複 (無視されるべき)
-!     !  (3, 3) -> 自己ループ (無視されるべき)
-!     !  (1, 4) -> 有効
-!     ! 期待される結果:
-!     !  辺は {1,2} と {1,4} の 2本のみ
+!     ! Case 2: Dirty data with duplicates, self-loops, and reverse-order edges
+!     ! Nodes: 4
+!     ! Input data:
+!     !  (1, 2) -> Valid
+!     !  (1, 2) -> Duplicate (should be ignored)
+!     !  (2, 1) -> Reverse duplicate (should be ignored)
+!     !  (3, 3) -> Self-loop (should be ignored)
+!     !  (1, 4) -> Valid
+!     ! Expected result:
+!     !  Only 2 edges: {1,2} and {1,4}
 !     ! ------------------------------------------------------------------
 !     subroutine test_case_complex()
 !         type(type_graph) :: g
@@ -591,15 +591,15 @@ end program test_core
 !         call g%build(pairs, num_nodes)
 !         call print_graph_info(g)
 
-!         ! チェック
+!         ! Check
 !         if (g%num_edges == 2) then
 !             print *, "[PASS] Edge count is correct (2). Duplicates/Loops removed."
 !         else
 !             print *, "[FAIL] Edge count is wrong. Expected 2, got ", g%num_edges
 !         end if
 
-!         ! 隣接リストの確認 (Node 1 は 2 と 4 につながっているはず)
-!         ! ソートされているので col_ind の最初は 2, 次は 4 のはず
+!         ! Verify adjacency list (Node 1 should be connected to 2 and 4)
+!         ! Since sorted, col_ind should have 2 first, then 4
 !         if (g%col_ind(g%row_ptr(1)) == 2 .and. g%col_ind(g%row_ptr(1) + 1) == 4) then
 !             print *, "[PASS] Node 1 neighbors are sorted and correct: [2, 4]"
 !         else
@@ -608,9 +608,9 @@ end program test_core
 !     end subroutine test_case_complex
 
 !     ! ------------------------------------------------------------------
-!     ! ケース3: 孤立ノードを含むグラフ
-!     ! ノード数: 5
-!     ! 辺: (1, 5) のみ。ノード 2, 3, 4 は孤立。
+!     ! Case 3: Graph with isolated nodes
+!     ! Nodes: 5
+!     ! Edges: (1, 5) only. Nodes 2, 3, 4 are isolated.
 !     ! ------------------------------------------------------------------
 !     subroutine test_case_disconnected()
 !         type(type_graph) :: g
@@ -625,8 +625,8 @@ end program test_core
 !         call g%build(pairs, num_nodes)
 !         call print_graph_info(g)
 
-!         ! row_ptr の整合性チェック
-!         ! 孤立しているノード i については、row_ptr(i) == row_ptr(i+1) になるはず
+!         ! row_ptr consistency check
+!         ! For isolated node i, row_ptr(i) == row_ptr(i+1)
 !         if (g%row_ptr(2) == g%row_ptr(3) .and. g%row_ptr(3) == g%row_ptr(4)) then
 !             print *, "[PASS] Isolated nodes (2,3) handled correctly (empty range)."
 !         else
@@ -635,7 +635,7 @@ end program test_core
 !     end subroutine test_case_disconnected
 
 !     ! ------------------------------------------------------------------
-!     ! ユーティリティ: グラフの中身を表示
+!     ! Utility: Display graph contents
 !     ! ------------------------------------------------------------------
 !     subroutine print_graph_info(g)
 !         type(type_graph), intent(in) :: g

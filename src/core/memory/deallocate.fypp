@@ -1,11 +1,11 @@
-#:include "common.fypp"
+#:include "kinds.fypp"
 
 !> Module providing generic deallocation routines with error handling.
 !> Uses fypp preprocessor to generate procedures for various types and ranks.
 module core_deallocate
     use, intrinsic :: iso_fortran_env
     use :: core_constants, only:ERROR_CODES
-    use :: core_error, only:raise_error
+    use :: core_validation_error, only:raise_error
     implicit none
     private
 

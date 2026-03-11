@@ -7,10 +7,14 @@ submodule(domain_fe_element) domain_fe_element_triangle_second
 
 contains
 
+    !>
+    !> Creates and initializes a second-order triangular (6-node) element object.
+    !>
     module function construct_triangle_second(integration_order) result(fe)
         implicit none
         !> The integration order for the element.
         integer(int32), intent(in) :: integration_order
+        !> The newly created element object.
         class(abst_fe), allocatable :: fe
 
         character(len=*), parameter :: cell_name = "QuadraticTriangle"

@@ -5,19 +5,19 @@ program test_physics_models
         HCF_BASE, HCF_BC, HCF_VG, HCF_KO, HCF_MVG, HCF_DURNER, HCF_DVGCH
     use :: physics_models_wrf, only:holder_wrfs, type_wrf_params
     use :: physics_models_hcf, only:holder_hcfs, type_hcf_params
-    use :: iapws, only:type_iapws97 ! HCFの初期化に必要
+    use :: iapws, only:type_iapws97 ! Required for HCF initialization
     implicit none
 
-    ! --- 変数定義 ---
+    ! --- Variable definitions ---
     type(holder_wrfs) :: wrf
     type(type_wrf_params) :: wrf_params
     type(holder_hcfs) :: hcf
     type(type_hcf_params) :: hcf_params
 
-    ! HCF計算用のダミー水オブジェクト（初期化インターフェースに必要）
+    ! Dummy water object for HCF initialization interface
     type(type_iapws97) :: water_dummy
 
-    ! HCF計算用の状態変数（圧力を渡すために使用）
+    ! State variable for HCF (used to pass pressure)
     type(type_state) :: state
 
     integer(int32) :: i, j
@@ -26,23 +26,23 @@ program test_physics_models
     real(real64) :: h_val, log_h
     real(real64) :: val_theta, val_kr
 
-    ! 結果格納用配列
+    ! Result arrays
     real(real64) :: h_values(num_steps)
     real(real64) :: results_theta(num_steps, num_models)
     real(real64) :: results_kr(num_steps, num_models)
 
-    ! --- 共通パラメータ (Pythonコード準拠) ---
+    ! --- Common parameters (matching Python reference code) ---
     real(real64), parameter :: ts = 0.5d0 ! theta_s
     real(real64), parameter :: tr = 0.1d0 ! theta_r
     real(real64), parameter :: l_param = 0.5d0
 
     ! ========================================================================
-    ! 1. 水分保持曲線 (WRF) の計算
+    ! 1. Water Retention Function (WRF) Calculation
     ! ========================================================================
     print *, "Calculating WRF (Water Retention Functions)..."
 
     do j = 1, num_models
-        ! パラメータのリセット
+        ! Reset parameters
         call wrf_params%reset()
         wrf_params%unit_id = PHYSICS_UNIT_PA
         wrf_params%theta_s = ts
@@ -94,36 +94,36 @@ program test_physics_models
             wrf_params%w2 = 0.6d0
         end select
 
-        ! モデルの初期化
+        ! Initialize model
         call wrf%initialize(1, wrf_params)
 
-        ! 計算ループ (h: -0.01 -> -10000)
+        ! Computation loop (h: -0.01 -> -10000)
         do i = 1, num_steps
-            ! ログスケールで h を生成 (-0.01 ~ -10000)
+            ! Generate h on log scale (-0.01 to -10000)
             log_h = -2.0d0 + (6.0d0 * real(i - 1, real64) / real(num_steps - 1, real64))
             h_val = -(10.0d0**log_h)
 
-            if (j == 1) h_values(i) = h_val ! 初回のみhを保存
+            if (j == 1) h_values(i) = h_val ! Store h only on the first model
 
-            ! WRF計算実行
+            ! Compute WRF
             call wrf%p%calc(h_val, val_theta)
             results_theta(i, j) = val_theta
         end do
     end do
 
     ! ========================================================================
-    ! 2. 透水係数 (HCF) の計算
+    ! 2. Hydraulic Conductivity Function (HCF) Calculation
     ! ========================================================================
     print *, "Calculating HCF (Hydraulic Conductivity Functions)..."
 
     do j = 1, num_models
         call hcf_params%reset()
         hcf_params%unit_id = PHYSICS_UNIT_PA
-        hcf_params%model_number = HCF_BASE ! 基本モデル(Base)を使用
-        hcf_params%k_s = 1.0d0 ! 相対値を見るため Ks=1.0
+        hcf_params%model_number = HCF_BASE ! Use Base model
+        hcf_params%k_s = 1.0d0 ! Ks=1.0 to obtain relative values
         hcf_params%l = l_param
 
-        ! HCFパラメータの設定 (WRFと同じ物理パラメータを使用)
+        ! Set HCF parameters (same physical parameters as WRF)
         select case (j)
         case (1) ! BC
             hcf_params%hcf_model_number = HCF_BC
@@ -167,34 +167,33 @@ program test_physics_models
             hcf_params%w2 = 0.6d0
         end select
 
-        ! HCF初期化
+        ! Initialize HCF
         call hcf%initialize(1, hcf_params, water_dummy)
 
-        ! 計算ループ
+        ! Computation loop
         do i = 1, num_steps
             h_val = h_values(i)
 
-            ! HCF計算にはState経由で圧力(h)を渡す
+            ! Pass pressure (h) to HCF via State
             call state%pressure%set(h_val)
 
-            ! calc_Kflh は (Ks * Kr) を返す
+            ! calc_Kflh returns (Ks * Kr)
             call hcf%p%calc_Kflh(state, val_kr)
             results_kr(i, j) = val_kr
         end do
     end do
 
     ! ========================================================================
-    ! 3. CSV出力
+    ! 3. CSV Output
     ! ========================================================================
     print *, "Writing results to verification_results.csv..."
 
     open (unit=10, file='log/test/wrf.csv', status='replace', action='write')
 
-    ! ヘッダー出力
+    ! Write header
     write (10, '(A)') 'h,theta_bc,theta_vg,theta_ko,theta_mvg,theta_durner,theta_dvgch'
 
     do i = 1, num_steps
-        ! カンマ区切りでデータ出力
         write (10, '(E24.16, 6(",", E24.16))') &
             h_values(i), &
             results_theta(i, 1), results_theta(i, 2), results_theta(i, 3), &
@@ -205,11 +204,10 @@ program test_physics_models
 
     open (unit=10, file='log/test/hcf.csv', status='replace', action='write')
 
-    ! ヘッダー出力
+    ! Write header
     write (10, '(A)') 'h,kr_bc,kr_vg,kr_ko,kr_mvg,kr_durner,kr_dvgch'
 
     do i = 1, num_steps
-        ! カンマ区切りでデータ出力
         write (10, '(E24.16, 6(",", E24.16))') &
             h_values(i), &
             results_kr(i, 1), results_kr(i, 2), results_kr(i, 3), &

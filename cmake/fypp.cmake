@@ -6,7 +6,7 @@ set(FYPP_INCLUDE_DIR
 
 # fypp から include されうる全ファイルを列挙（GLOB禁止）
 set(FYPP_INCLUDE_FILES
-    ${FYPP_INCLUDE_DIR}/common.fypp
+    ${FYPP_INCLUDE_DIR}/kinds.fypp
     ${FYPP_INCLUDE_DIR}/constants.fypp
 )
 
@@ -25,10 +25,10 @@ function(preprocess preproc preprocopts srcext trgext srcfiles trgfiles)
         add_custom_command(
             OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${trgfile}
             COMMAND ${preproc}
-                    ${preprocopts}
-                    -I${FYPP_INCLUDE_DIR}
-                    ${CMAKE_CURRENT_SOURCE_DIR}/${srcfile}
-                    ${CMAKE_CURRENT_BINARY_DIR}/${trgfile}
+            ${preprocopts}
+            -I${FYPP_INCLUDE_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/${srcfile}
+            ${CMAKE_CURRENT_BINARY_DIR}/${trgfile}
             MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${srcfile}
             DEPENDS ${FYPP_INCLUDE_FILES}
         )

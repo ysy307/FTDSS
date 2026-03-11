@@ -3,6 +3,8 @@
 
 module core_check_length
     use, intrinsic :: iso_fortran_env
+    use :: stdlib_strings, only:strip
+    use :: stdlib_optval, only:optval
     implicit none
     private
 
@@ -34,10 +36,10 @@ contains
             !> The second array.
             real(${k}$), intent(in) :: b(:)
             !> The name of the calling routine for error messages.
-            character(len=*), intent(in) :: routine_name
+            character(len=*), intent(in), optional :: routine_name
 
             if (size(a) /= size(b)) then
-                write (*, '(A,A,A)') "ERROR in ", trim(routine_name), ": Array sizes do not match."
+                write (*, '(A,A,A)') "ERROR in ", strip(optval(routine_name, "Unknown Routine")), ": Array sizes do not match."
                 error stop 1
             end if
         end subroutine check_match_length_${k}$
@@ -56,10 +58,10 @@ contains
             !> The second array.
             integer(${k}$), intent(in) :: b(:)
             !> The name of the calling routine for error messages.
-            character(len=*), intent(in) :: routine_name
+            character(len=*), intent(in), optional :: routine_name
 
             if (size(a) /= size(b)) then
-                write (*, '(A,A,A)') "ERROR in ", trim(routine_name), ": Array sizes do not match."
+                write (*, '(A,A,A)') "ERROR in ", strip(optval(routine_name, "Unknown Routine")), ": Array sizes do not match."
                 error stop 1
             end if
         end subroutine check_match_length_${k}$

@@ -1,8 +1,8 @@
 module core_types_physics_state
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use :: core_types_coordinate, only:type_coordinate_dp
     use :: core_allocate, only:allocate_array
     use :: core_deallocate, only:deallocate_array
+    use :: core_types_geometry_coordinate, only:type_coordinate_dp
     implicit none
     private
 
@@ -92,11 +92,11 @@ module core_types_physics_state
         type(type_field_coord) :: vapor_flux ! Vapor flux vector [m/s]
 
     contains
-        !> Bulk Setter (Optional arguments)
+        !> Bulk Setter
         procedure, public, pass(self) :: set => set_all_state
         !> Bulk Getter
         procedure, public, pass(self) :: get => get_all_state
-        !> Reset All (
+        !> Reset All
         procedure, public, pass(self) :: reset => reset_all_state
         !> Copy
         procedure, public, pass(self) :: copy => copy_state
@@ -108,7 +108,6 @@ contains
     ! Implementation: Real64 Field
     ! ==================================================================
 
-    ! Setter
     subroutine set_field_dp(self, value)
         implicit none
         class(type_field_dp), intent(inout) :: self
@@ -118,7 +117,6 @@ contains
         self%is_set = .true.
     end subroutine set_field_dp
 
-    ! Getter (Subroutine style)
     subroutine get_field_dp(self, value, is_set)
         implicit none
         class(type_field_dp), intent(in) :: self
@@ -136,7 +134,6 @@ contains
 
     end subroutine get_field_dp
 
-    ! Reset
     subroutine reset_field_dp(self)
         implicit none
         class(type_field_dp), intent(inout) :: self
@@ -155,7 +152,7 @@ contains
         real(real64), intent(in) :: value(:)
 
         if (allocated(self%value)) then
-            ! サイズが違う場合のみ再確保
+            ! Reallocate only if sizes differ
             if (size(self%value) /= size(value)) then
                 deallocate (self%value)
                 allocate (self%value(size(value)))
@@ -204,7 +201,6 @@ contains
         self%is_set = .false.
     end subroutine reset_field_array_dp
 
-    ! Setter
     subroutine field_coord_set(self, value)
         class(type_field_coord), intent(inout) :: self
         type(type_coordinate_dp), intent(in) :: value
@@ -213,7 +209,6 @@ contains
         self%is_set = .true.
     end subroutine field_coord_set
 
-    ! Getter
     subroutine get_field_coord(self, value, is_set)
         implicit none
         class(type_field_coord), intent(in), target :: self
@@ -229,7 +224,6 @@ contains
         end if
     end subroutine get_field_coord
 
-    ! Reset
     subroutine reset_field_coord(self)
         implicit none
         class(type_field_coord), intent(inout) :: self
@@ -242,9 +236,8 @@ contains
     ! Implementation: State Methods
     ! ==================================================================
 
-    ! Bulk Setter
-    ! には引数制限やコンパイラ依存があるため、
-    ! ここでは通常の Subroutine として実装します（安全策）。
+    ! Regular subroutine to avoid argument count limitations
+    ! and compiler-dependent behavior.
     subroutine set_all_state(self, temperature, pressure, water_content, ice_content, &
                              vapor_content, air_content, porosity, &
                              temperature_history, pressure_history, porosity_history, &
@@ -359,7 +352,6 @@ contains
 
     end subroutine set_all_state
 
-    ! Bulk Getter
     subroutine get_all_state(self, temperature, pressure, water_content, ice_content, &
                              vapor_content, air_content, porosity, &
                              temperature_history, pressure_history, porosity_history, &
@@ -466,7 +458,6 @@ contains
         end if
     end subroutine get_all_state
 
-    ! Reset All (
     subroutine reset_all_state(self)
         implicit none
         class(type_state), intent(inout) :: self

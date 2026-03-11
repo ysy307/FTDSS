@@ -42,8 +42,8 @@
             ('HYDRAULIC',  2, 'hydraulic'), &
             ('MECHANICAL', 3, 'mechanical') &
         ], &
-        'num' : 4, &
-        'id_range' : [0, 3] &
+        'num' : 3, &
+        'id_range' : [1, 3] &
     }
 
     #:set DOF_TYPES = { &
@@ -63,6 +63,21 @@
         'id_range' : [1, 5] &
     }
 
+    #:set SOLVER_BC_TYPES = { &
+        'type_name'  : 'type_solver_bc_types', &
+        'obj_name'   : 'SOLVER_BC_TYPES', &
+        'category'   : 'SOLVER_BC', &
+        'suffix'     : 'solver_bc_type', &
+        'description': 'Solver boundary condition types', &
+        'items'      : [ &
+            ('DIRICHLET', 1, 'dirichlet'),&
+            ('FLUX',      2, 'flux'),&
+            ('ROBIN',     3, 'robin') &
+        ], &
+        'num' : 3, &
+        'id_range' : [1, 3] &
+    }
+
     #:set THERMAL_BC_TYPES = { &
         'type_name'  : 'type_thermal_bc_types', &
         'obj_name'   : 'THERMAL_BC_TYPES', &
@@ -71,17 +86,14 @@
         'description': 'Thermal boundary condition types', &
         'items'      : [ &
             ('DIRICHLET',   101, 'dirichlet'), &
-            ('NEUMANN',     102, 'neumann'), &
-            ('FLUX',        103, 'flux'), &
-            ('ROBIN',       104, 'robin'), &
-            ('CONVECTIVE',  105, 'convective'), &
-            ('RADIATION',   106, 'radiation'), &
-            ('ADIABATIC',   107, 'adiabatic'), &
-            ('FREE',        108, 'free'), &
-            ('ATMOSPHERIC', 109, 'atmospheric') &
+            ('FLUX',        102, 'flux'), &
+            ('ROBIN',       103, 'robin'), &
+            ('CONVECTIVE',  104, 'convective'), &
+            ('RADIATION',   105, 'radiation'), &
+            ('ATMOSPHERIC', 106, 'atmospheric') &
         ], &
-        'num' : 9, &
-        'id_range' : [101, 109] &
+        'num' : 6, &
+        'id_range' : [101, 106] &
     }
 
     #:set HYDRAULIC_BC_TYPES = { &
@@ -92,14 +104,13 @@
         'description': 'Hydraulic boundary condition types', &
         'items'      : [ &
             ('DIRICHLET',   201, 'dirichlet'), &
-            ('NEUMANN',     202, 'neumann'), &
-            ('FLUX',        203, 'flux'), &
-            ('IMPERMEABLE', 204, 'impermeable'), &
-            ('SEEPAGE',     205, 'seepage'), &
-            ('ATMOSPHERIC', 206, 'atmospheric') &
+            ('FLUX',        202, 'flux'), &
+            ('ROBIN',       203, 'robin'), &
+            ('SEEPAGE',     204, 'seepage'), &
+            ('ATMOSPHERIC', 205, 'atmospheric') &
         ], &
-        'num' : 6, &
-        'id_range' : [201, 206] &
+        'num' : 5, &
+        'id_range' : [201, 205] &
     }
 
     #:set IC_TARGETS = { &
@@ -181,6 +192,20 @@
         'num' : 4, &
         'id_range' : [0, 3] &
     }
+    
+    #:set VECTOR_NORM_CRITERIA = { &
+        'type_name'  : 'type_vector_norm_criteria', &
+        'obj_name'   : 'VECTOR_NORM_CRITERIA', &
+        'category'   : 'VECTOR_NORM_CRIT', &
+        'suffix'     : 'vector_norm_criteria', &
+        'description': 'Vector norm criteria', &
+        'items'      : [ &
+            ('RESIDUAL', 1, 'residual'), &
+            ('UPDATE',   2, 'update') &
+        ], &
+        'num' : 2, &
+        'id_range' : [1, 2] &
+    }
 
     #:set NONLINEAR_LOGIC = { &
         'type_name'  : 'type_nonlinear_logic', &
@@ -194,6 +219,21 @@
         ], &
         'num' : 2, &
         'id_range' : [1, 2] &
+    }
+
+    #:set ACCELERATION_METHODS = { &
+        'type_name'  : 'type_acceleration_methods', &
+        'obj_name'   : 'ACCELERATION_METHODS', &
+        'category'   : 'ACCELERATION_METHODS', &
+        'suffix'     : 'acceleration_methods', &
+        'description': 'Acceleration methods types', &
+        'items'      : [ &
+            ('NONE',     0, 'none'), &
+            ('AITKEN',   1, 'aitken'), &
+            ('ANDERSON', 2, 'anderson') &
+        ], &
+        'num' : 3, &
+        'id_range' : [0, 2] &
     }
 
     #:set NORM_TYPES = { &
@@ -412,6 +452,58 @@
         'num' : 2, &
         'id_range' : [1, 2] &
     }
+
+    #:set FILE_FORMATS = { &
+        'type_name' : 'type_file_formats', &
+        'obj_name'  : 'FILE_FORMATS', &
+        'category'  : 'FILE_FORMAT', &
+        'suffix'    : 'file_format', &
+        'description': 'File formats', &
+        'items'     : [ &
+            ('NONE', 0, 'none'), &
+            ('VTK',  1, 'vtk'), &
+            ('VTU',  2, 'vtu'), &
+            ('CSV',  3, 'csv'), &
+            ('DAT',  4, 'dat'), &
+        ], &
+        'num' : 5, &
+        'id_range' : [0, 4] &
+    }
+    
+    #:set BC_DATA_PROVIDER_TYPES = { &
+        'type_name' : 'type_bc_data_providers', &
+        'obj_name'  : 'BC_DATA_PROVIDERS', &
+        'category'  : 'BC_DATA_PROVIDER', &
+        'suffix'    : 'bc_data_provider', &
+        'description': 'Boundary condition data provider types', &
+        'items'     : [ &
+            ('NONE',     0, 'none'), &
+            ('CONSTANT', 1, 'constant'), &
+            ('TABLE',    2, 'table'), &
+            ('DYNAMIC',  3, 'dynamic'), &
+        ], &
+        'num' : 4, &
+        'id_range' : [0, 3] &
+    }
+
+    #:set CONSTITUTIVE_PROPERTIES = { &
+        'type_name' : 'type_constitutive_properties', &
+        'obj_name'  : 'CONSTITUTIVE_PROPERTIES', &
+        'category'  : 'CONSTITUTIVE_PROPERTY', &
+        'suffix'    : 'constitutive_property', &
+        'description': 'Constitutive properties', &
+        'items'     : [ &
+            ('NONE', 0, 'none'), &
+            ('DENSITY', 1, 'density'), &
+            ('SPECIFIC_HEAT', 2, 'specific_heat'), &
+            ('VOLUMETRIC_HEAT_CAPACITY', 3, 'volumetric_heat_capacity'), &
+            ('THERMAL_CONDUCTIVITY', 4, 'thermal_conductivity'), &
+        ], &
+        'num' : 5, &
+        'id_range' : [0, 4] &
+    }
+
+
     #:set FE_TYPES = { &
         'type_name' : 'type_fe_types', &
         'obj_name'  : 'FE_TYPE', &
@@ -581,7 +673,77 @@
         'num' : 2, &
         'id_range' : [1, 2] &
     }
- 
+
+    #:set OUTPUT_TYPES = { &
+        'type_name'  : 'type_output_type', &
+        'obj_name'   : 'OUTPUT_TYPES', &
+        'category'   : 'OUTPUT_TYPE', &
+        'suffix'     : 'output_type', &
+        'description': 'Output category types', &
+        'items'      : [ &
+            ('FIELD',    1, 'field'), &
+            ('HISTORY',  2, 'history'), &
+            ('STANDARD', 3, 'standard') &
+        ], &
+        'num' : 3, &
+        'id_range' : [1, 3] &
+    }
+
+    #:set OUTPUT_VARIABLE_TYPES = { &
+        'type_name'  : 'type_output_variable_type', &
+        'obj_name'   : 'OUTPUT_VARIABLE_TYPES', &
+        'category'   : 'OUTPUT_VARIABLE_TYPE', &
+        'suffix'     : 'output_variable_type', &
+        'description': 'Output variable types', &
+        'items'      : [ &
+            ('WATER_CONTENT',            1, 'water_content'), &
+            ('ICE_CONTENT',              2, 'ice_content'), &
+            ('VAPOR_CONTENT',            3, 'vapor_content'), &
+            ('TEMPERATURE',              4, 'temperature'), &
+            ('THERMAL_CONDUCTIVITY',     5, 'thermal_conductivity'), &
+            ('VOLUMETRIC_HEAT_CAPACITY', 6, 'volumetric_heat_capacity'), &
+            ('PRESSURE',                 7, 'pressure'), &
+            ('WATER_FLUX',               8, 'water_flux'), &
+            ('HYDRAULIC_CONDUCTIVITY',   9, 'hydraulic_conductivity'), &
+        ], &
+        'num' : 9, &
+        'id_range' : [1, 9] &
+    }
+    #:set OUTPUT_OBSERVATION_TYPES = { &
+        'type_name'  : 'type_output_observation_type', &
+        'obj_name'   : 'OUTPUT_OBSERVATION_TYPES', &
+        'category'   : 'OUTPUT_OBSERVATION_TYPE', &
+        'suffix'     : 'output_observation_type', &
+        'description': 'Output observation types', &
+        'items'      : [ &
+            ('NONE',        0, 'none'), &
+            ('COORDINATES', 1, 'coordinates'), &
+            ('NODE_IDS',    2, 'node_ids') &
+        ], &
+        'num' : 3, &
+        'id_range' : [0, 2] &
+    }
+
+    #:set PROFILER_TYPES = { &
+        'type_name'  : 'type_profiler_type', &
+        'obj_name'   : 'PROFILER_TYPES', &
+        'category'   : 'PROFILER_TYPE', &
+        'suffix'     : 'profiler_type', &
+        'description': 'Profiler phase categories', &
+        'items'      : [ &
+            ('IO',       1, 'io'), &
+            ('SETUP',    2, 'setup'), &
+            ('NONLIN',   3, 'nonlin'), &
+            ('ASSEMBLE', 4, 'assemble'), &
+            ('PREC',     5, 'prec'), &
+            ('SOLVE',    6, 'solve'), &
+            ('COMM',     7, 'comm'), &
+            ('TOTAL',    8, 'total') &
+        ], &
+        'num' : 8, &
+        'id_range' : [1, 8] &
+    }
+    
 
     #:set constant_id_groups = [ &
         MATRIX_TYPES, &
@@ -614,7 +776,16 @@
         HCF_MODES, &
         HCF_VISCOSITY_TYPES, &
         GCC_TYPES, &
-        TIME_RECORDS &
+        ACCELERATION_METHODS, &
+        TIME_RECORDS, &
+        FILE_FORMATS, &
+        OUTPUT_TYPES, &
+        OUTPUT_OBSERVATION_TYPES, &
+        OUTPUT_VARIABLE_TYPES, &
+        VECTOR_NORM_CRITERIA, &
+        CONSTITUTIVE_PROPERTIES, &
+        PROFILER_TYPES, &
+        BC_DATA_PROVIDER_TYPES &
     ]
 
 
@@ -637,7 +808,7 @@
     }
 
     #:set constant_value_groups = [ &
-        TIME_UNITS &
+        TIME_UNITS, &
     ]
 
 
@@ -654,10 +825,11 @@
             ('INPUT_DIR_MISSING', 901, "Input folder does not exist."), &
             ('FILE_MISSING',      902, "File '{}' does not exist."), &
             ('OPEN_FILE_FAILED',  903, "Cannot open file '{}'."), &
-            ('READ_FILE_FAILED',  904, "Failed to read file '{}'."), &
-            ('WRITE_FILE_FAILED', 905, "Failed to write to file '{}'."), &
-            ('INVALID_FILE_EXT',  906, "Invalid file extension in '{}'."), &
-            ('INVALID_FILE_FMT',  907, "Invalid file format detected in '{}'."), &
+            ('CLOSE_FILE_FAILED', 904, "Cannot close file '{}'."), &
+            ('READ_FILE_FAILED',  905, "Failed to read file '{}'."), &
+            ('WRITE_FILE_FAILED', 906, "Failed to write to file '{}'."), &
+            ('INVALID_FILE_EXT',  907, "Invalid file extension in '{}'."), &
+            ('INVALID_FILE_FMT',  908, "Invalid file format detected in '{}'."), &
             ('VAR_NOT_FOUND',     910, "Variable '{}' is not found in JSON/Input file."), &
             ('VAR_INVALID',       911, "Value for variable '{}' is invalid."), &
             ('PARAM_RANGE',       912, "Parameter '{}' is out of valid range."), &

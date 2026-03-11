@@ -14,7 +14,7 @@ program test_input
     call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
 #endif
 
-    ! テスト関数の呼び出し
+    ! Call test function
     call run_test_input()
 
 #ifdef _MPI
@@ -23,8 +23,7 @@ program test_input
 
 contains
 
-    !>
-    !> Inputモジュールの読み込みとロジック整合性のテスト
+    !> Test loading and logic consistency of the Input module
     !>
     subroutine run_test_input()
         type(type_input) :: input
@@ -41,10 +40,10 @@ contains
 
         if (myrank_sub == 0) print *, "--- [Input] Testing Loading & Logic ---"
 
-        ! 1. 初期化 (JSON読み込み & 自動設定)
+        ! 1. Initialize (load JSON and apply auto-configuration)
         call input%initialize()
 
-        ! 2. 値の取得
+        ! 2. Retrieve values
         calc_type = input%basic%simulation_settings%calculate_type
         calc_dim = input%basic%simulation_settings%calculate_dimension
         title = input%basic%simulation_settings%title
@@ -56,7 +55,7 @@ contains
             print *, "    Calculate Type:     ", calc_type
             print *, "    Derived Dimension:  ", calc_dim
 
-            ! ロジック検証
+            ! Logic verification
             if (calc_type == 1 .or. calc_type == 2) then
                 if (calc_dim /= 2) then
                     print *, "  [FAIL] Logic Error: Type 1/2 must be Dim 2. Got:", calc_dim
@@ -75,7 +74,7 @@ contains
                 print *, "  [FAIL] Input verification failed."
             end if
 
-            ! 最後に内容を表示して確認
+            ! Display contents for verification
             call input%display()
         end if
 

@@ -14,17 +14,19 @@ module core_constants_base
         character(len=64) :: NAME
         integer(int32) :: ID
     contains
+        ! ---- Meta / Utility ----
         procedure, public, pass(self) :: display => display_constant_id
         
+        ! ---- Operator ----
+        generic, public :: operator(==) => eq_const, eq_id, eq_name
         procedure, private, pass(self) :: eq_const => eq_const_const_id
         procedure, private, pass(self) :: eq_id => eq_id_const_id
         procedure, private, pass(self) :: eq_name => eq_name_const_id
-        generic, public :: operator(==) => eq_const, eq_id, eq_name
 
+        generic, public :: operator(/=) => neq_const, neq_id, neq_name
         procedure, private, pass(self) :: neq_const => neq_const_const_id
         procedure, private, pass(self) :: neq_id => neq_id_const_id
         procedure, private, pass(self) :: neq_name => neq_name_const_id
-        generic, public :: operator(/=) => neq_const, neq_id, neq_name
     end type type_constant_id
 
     type :: type_constant_value
@@ -34,17 +36,19 @@ module core_constants_base
         character(len=16) :: UNIT
         real(real64) :: VALUE
     contains
+        ! ---- Meta / Utility ----
         procedure, public, pass(self) :: display => display_constant
 
+        ! ---- Operator ----
+        generic, public :: operator(==) => eq_const, eq_id, eq_name
         procedure, private, pass(self) :: eq_const => eq_const_const_value
         procedure, private, pass(self) :: eq_id => eq_id_const_value
         procedure, private, pass(self) :: eq_name => eq_name_const_value
-        generic, public :: operator(==) => eq_const, eq_id, eq_name
 
+        generic, public :: operator(/=) => neq_const, neq_id, neq_name
         procedure, private, pass(self) :: neq_const => neq_const_const_value
         procedure, private, pass(self) :: neq_id => neq_id_const_value
         procedure, private, pass(self) :: neq_name => neq_name_const_value
-        generic, public :: operator(/=) => neq_const, neq_id, neq_name
     end type type_constant_value
 
     type :: type_constant_error

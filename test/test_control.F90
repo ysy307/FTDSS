@@ -6,7 +6,7 @@ program test_control
     use :: module_control
     implicit none
     type(type_input) :: input
-    type(type_controls) :: controls
+    type(type_control) :: controls
     integer(int32) :: ierr
     integer(int32) :: myrank
     integer(int32) :: nsize

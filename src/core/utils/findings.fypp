@@ -51,15 +51,16 @@ contains
                                          max_iter, return_insertion) result(idx)
             integer(${k}$), intent(in) :: value
             integer(${k}$), intent(in) :: array(:)
-            ! インデックス用の型も idx_k に合わせて変更
-            integer(${idx_k}$), intent(in), optional :: start_index, end_index, max_iter
+            integer(${idx_k}$), intent(in), optional :: start_index
+            integer(${idx_k}$), intent(in), optional :: end_index
+            integer(${idx_k}$), intent(in), optional :: max_iter
             logical, intent(in), optional :: return_insertion
             integer(${idx_k}$) :: idx
 
             integer(${idx_k}$) :: low, high, mid, iter, limit
             logical :: mode_ins
 
-            ! lbound の返り値も型を合わせる
+            ! Match lbound return type to index kind
             low = optval(start_index, lbound(array, 1, kind=${idx_k}$))
             high = optval(end_index, ubound(array, 1, kind=${idx_k}$))
             limit = optval(max_iter, huge(0_${idx_k}$))
@@ -73,7 +74,7 @@ contains
                 iter = iter + 1
                 mid = low + (high - low) / 2
 
-                ! 完全一致ロジック
+                ! Exact match logic
                 if (array(mid) < value) then
                     low = mid + 1
                 else
@@ -124,7 +125,7 @@ contains
                 iter = iter + 1
                 mid = low + (high - low) / 2
 
-                ! 許容誤差を考慮したロジック
+                ! Tolerance-aware comparison logic
                 if (array(mid) < value - epsilon) then
                     low = mid + 1
                 else

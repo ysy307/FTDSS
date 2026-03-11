@@ -18,7 +18,7 @@ module domain_adjacency_node
     !>
     type, extends(type_graph) :: type_node_adjacency
     contains
-        ! メッシュデータからの初期化メソッド
+        ! Initialization from mesh connectivity data
         procedure, public, pass(self) :: initialize => initialize_from_connectivity
 
         procedure, public, pass(self) :: get_nnz => get_nnz_csr
@@ -162,10 +162,10 @@ contains
             n_nodes = end_idx - start_idx + 1
             if (n_nodes <= 0) cycle
 
-            ! Element内の全ペアを列挙
+            ! Enumerate all node pairs within each element
             do j = 1, n_nodes
                 do k = 1, n_nodes
-                    ! 【修正】インデックスがずれないように -1 する
+                    ! Subtract 1 to prevent index offset
                     pairs(1, count) = conn_val(start_idx + j - 1)
                     pairs(2, count) = conn_val(start_idx + k - 1)
                     count = count + 1

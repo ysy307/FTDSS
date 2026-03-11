@@ -1,12 +1,11 @@
----
-title: FTDSS Documentation
+title: FTCMS Documentation
 author: Kikuchi Shun
 ---
 
-FTDSS (Freezing/Thawing Dynamics Soil Solver)
+FTCMS (Freezing Thawing Coupled Multi-physics Solver)
 =============================================
 
-FTDSS is a Fortran-based numerical solver designed to simulate freezing and thawing processes in soil, integrating heat and water transport (TH coupling).
+FTCMS is a Fortran-based numerical solver designed to simulate freezing and thawing processes in soil, integrating heat and water transport (TH coupling).
 
 Features
 --------
@@ -29,4 +28,4 @@ Build Requirements
 * CMake
 * fypp (Fortran preprocessor)
 
-For more details, visit the [GitHub repository](https://github.com/ysy307/FTDSS.git).
+For more details, visit the [GitHub repository](https://github.com/ysy307/FTCMS.git).

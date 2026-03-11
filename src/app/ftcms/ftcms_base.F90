@@ -1,0 +1,722 @@
+submodule(app_ftcms) ftcms_base
+    implicit none
+contains
+
+    module subroutine initialize_type_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        type(type_input) :: input
+        type(type_ic_manager) :: ic
+
+        integer(int32) :: max_bdf_order
+        integer(int32), allocatable :: active_region_ids(:)
+        integer(int32) :: num_nodes
+        integer(int32) :: i
+        character(len=10), allocatable :: profiler_labels(:)
+        real(real64) :: current_time
+        integer(int32) :: computation_dimension
+        integer(int32) :: num_total_dofs
+        integer(int32) :: ierr
+
+        type(type_config_control_manager) :: config_control_manager
+        type(type_config_iteration) :: config_iteration
+        type(type_config_time) :: config_time
+        type(type_config_time_ats) :: config_time_ats
+        type(type_config_output_manager) :: config_output_field
+        type(type_config_output_manager) :: config_output_history
+        type(type_config_acceleration) :: config_acceleration
+        type(type_config_parallel_openmp) :: config_parallel_openmp
+
+        type(type_config_ic) :: configs_ic(IC_TARGETS%NUM_ID)
+
+        type(type_config_nodes) :: config_nodes
+        type(type_config_elements) :: config_elements
+        type(type_config_multicoloring) :: config_multicoloring
+        type(type_config_elements), allocatable :: config_boundary_elements(:)
+
+        type(type_solver_settings) :: solver_info
+        type(type_preconditioner_settings) :: pc_info
+
+        type(type_config_output) :: config_output
+        type(type_config_observation) :: config_observation
+        type(type_config_overall) :: config_overall
+
+        type(type_config_bc), allocatable :: config_bcs(:)
+
+        call self%control%initialize()
+        call self%control%profiler_record(TIME_RECORDS%START)
+        call self%control%profiler_start(PROFILER_TYPES%TOTAL)
+
+        ! call setup_handler()
+
+        call self%control%profiler_start(PROFILER_TYPES%IO)
+        call input%initialize()
+        call self%control%profiler_stop(PROFILER_TYPES%IO)
+
+        call input_translator%execute(input, config_control_manager)
+        call input_translator%execute(input, config_iteration)
+        call input_translator%execute(input, config_time)
+        call input_translator%execute(input, config_time_ats)
+        call input_translator%execute(input, config_output_field)
+        call input_translator%execute(input, config_output_history)
+        call input_translator%execute(input, config_acceleration)
+        call input_translator%execute(input, config_parallel_openmp)
+
+        call self%control%initialize(config_control_manager, config_iteration, config_time, config_time_ats, &
+                                     config_output_field, config_output_history, &
+                                     config_acceleration, config_parallel_openmp)
+
+        if (self%is_active_thermal()) then
+            call input_translator%execute(input, PHYSICS_TYPES%THERMAL, config_bcs)
+            call self%bc(PHYSICS_TYPES%THERMAL%ID)%initialize(config_bcs)
+            if (allocated(config_bcs)) deallocate (config_bcs)
+        end if
+
+        if (self%is_active_hydraulic()) then
+            call input_translator%execute(input, PHYSICS_TYPES%HYDRAULIC, config_bcs)
+            call self%bc(PHYSICS_TYPES%HYDRAULIC%ID)%initialize(config_bcs)
+            if (allocated(config_bcs)) deallocate (config_bcs)
+        end if
+
+        call input_translator%execute(input, IC_TARGETS%POROSITY, configs_ic(IC_TARGETS%POROSITY%ID))
+        call input_translator%execute(input, IC_TARGETS%THERMAL, configs_ic(IC_TARGETS%THERMAL%ID))
+        call input_translator%execute(input, IC_TARGETS%HYDRAULIC, configs_ic(IC_TARGETS%HYDRAULIC%ID))
+        call input_translator%execute(input, IC_TARGETS%MECHANICAL, configs_ic(IC_TARGETS%MECHANICAL%ID))
+        call ic%initialize(configs_ic)
+
+        if (input%output_settings%standard_output%print_progress) then
+            call global_logger%configure(level=information_level, &
+                                         time_stamp=.true., &
+                                         max_width=0)
+        else
+            call global_logger%configure(level=warning_level, &
+                                         time_stamp=.true., &
+                                         max_width=0)
+        end if
+
+        call input_translator%execute(input, config_nodes)
+        call input_translator%execute(input, config_elements, config_multicoloring)
+        call input_translator%execute(input, config_boundary_elements)
+        call self%domain%initialize(config_nodes, config_elements, config_multicoloring, config_boundary_elements, &
+                                    input%basic%simulation_settings%calculate_type, config_control_manager%coupling_mode, &
+                                    config_control_manager%compute_active)
+        call self%domain%get_total_dofs(num_total_dofs)
+        call self%domain%get_num_nodes(num_nodes)
+
+        call self%K%initialize(self%domain)
+        call self%K%build_scatter_map(self%domain)
+        call self%F%initialize(self%domain)
+        call self%du%initialize(self%domain)
+
+        max_bdf_order = input%basic%solver_settings%bdf_order
+        call self%porosity%initialize(num_nodes, max_bdf_order)
+        call ic%apply(IC_TARGETS%POROSITY, self%porosity)
+
+        if (self%is_active_thermal()) then
+            call self%temperature%initialize(num_nodes, max_bdf_order)
+            call ic%apply(IC_TARGETS%THERMAL, self%temperature)
+        end if
+
+        if (self%is_active_hydraulic()) then
+            call self%pressure%initialize(num_nodes, max_bdf_order)
+            call ic%apply(IC_TARGETS%HYDRAULIC, self%pressure)
+        end if
+
+        call self%Qw%initialize(num_nodes, max_bdf_order)
+        call self%Qi%initialize(num_nodes, max_bdf_order)
+        call self%Qa%initialize(num_nodes, max_bdf_order)
+        call self%Qv%initialize(num_nodes, max_bdf_order)
+
+        call self%domain%get_computation_dimension(computation_dimension)
+        call input%geometry%vtk%get_active_region_info(active_region_ids, target_dim=computation_dimension)
+
+        call self%thermal%initialize(input, active_region_ids)
+        call self%hydraulic%initialize(input, active_region_ids)
+
+        ! Initialize solver
+        associate (solver_settings => input%basic%solver_settings%linear_solver)
+            call solver_info%set(solver_settings%solver_type, &
+                                 num_total_dofs, &
+                                 solver_settings%tolerance, &
+                                 solver_settings%max_iterations, &
+                                 solver_settings%m_restarts)
+            call pc_info%set(solver_settings%preconditioner_type, num_total_dofs)
+            call create_solver(self%solver, solver_info, pc_info, ierr)
+        end associate
+
+        ! Apply initial Dirichlet boundary conditions to field variables
+        call self%apply_bc()
+
+        call input_translator%execute(input, config_output)
+        call input_translator%execute(input, config_observation)
+        call input_translator%execute(input, config_overall)
+
+        if (config_observation%point_type == OUTPUT_OBSERVATION_TYPES%COORDINATES) then
+            if (allocated(config_observation%observation_geometries)) then
+                do i = 1, size(config_observation%observation_geometries)
+                    call self%domain%get_config(config_observation%observation_geometries(i))
+                end do
+            end if
+        end if
+
+        call self%output%initialize(config_output, config_observation, config_overall)
+        call self%output_fields()
+        call self%output_history()
+
+        ! !
+        ! call global_logger%log_information(message="FTCMS module initialized successfully.")
+    end subroutine initialize_type_ftcms
+
+    module subroutine output_fields_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        integer(int32) :: iter
+        real(real64) :: current_time
+
+        real(real64), pointer, contiguous, dimension(:) :: temperature
+        real(real64), pointer, contiguous, dimension(:) :: pressure
+        real(real64), pointer, contiguous, dimension(:) :: water_content
+        real(real64), pointer, contiguous, dimension(:) :: ice_content
+        real(real64), pointer, contiguous, dimension(:) :: vapor_content
+
+        call self%control%profiler_start(PROFILER_TYPES%IO)
+
+        nullify (temperature)
+        nullify (pressure)
+        nullify (ice_content)
+        nullify (vapor_content)
+        nullify (water_content)
+
+        call self%control%get_time(current_time)
+
+        if (self%control%is_output_triggered(OUTPUT_TYPES%FIELD, current_time)) then
+            call self%control%get_output_step(OUTPUT_TYPES%FIELD, iter)
+            if (self%is_active_thermal()) then
+                call self%temperature%get_previous(temperature)
+            end if
+            if (self%is_active_hydraulic()) then
+                call self%pressure%get_previous(pressure)
+            end if
+            call self%Qw%get_previous(water_content)
+            call self%Qi%get_previous(ice_content)
+            call self%Qv%get_previous(vapor_content)
+            call self%output%output_fields(file_counts=iter, &
+                                           temperature=temperature, &
+                                           water_content=water_content, &
+                                           ice_content=ice_content, &
+                                           vapor_content=vapor_content, &
+                                           pressure=pressure)
+
+            call self%control%update_output(OUTPUT_TYPES%FIELD, current_time)
+
+            nullify (temperature)
+            nullify (pressure)
+            nullify (ice_content)
+            nullify (water_content)
+            nullify (vapor_content)
+        end if
+
+        call self%control%profiler_stop(PROFILER_TYPES%IO)
+    end subroutine output_fields_ftcms
+
+    module subroutine output_history_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        real(real64) :: current_time, current_time_converted
+        real(real64), pointer, contiguous, dimension(:) :: temperature
+        real(real64), pointer, contiguous, dimension(:) :: pressure
+        real(real64), pointer, contiguous, dimension(:) :: water_content
+        real(real64), pointer, contiguous, dimension(:) :: ice_content
+        real(real64), pointer, contiguous, dimension(:) :: vapor_content
+        call self%control%profiler_start(PROFILER_TYPES%IO)
+
+        nullify (temperature)
+        nullify (pressure)
+        nullify (water_content)
+        nullify (ice_content)
+        nullify (vapor_content)
+
+        call self%control%get_time(current_time)
+
+        if (self%control%is_output_triggered(OUTPUT_TYPES%HISTORY, current_time)) then
+            if (self%is_active_thermal()) then
+                call self%temperature%get_previous(temperature)
+            end if
+            if (self%is_active_hydraulic()) then
+                call self%pressure%get_previous(pressure)
+            end if
+            call self%Qw%get_previous(water_content)
+            call self%Qi%get_previous(ice_content)
+            call self%Qv%get_previous(vapor_content)
+            call self%control%get_output_time(OUTPUT_TYPES%HISTORY, current_time, current_time_converted)
+            call self%output%output_history(time=current_time_converted, &
+                                            temperature=temperature, &
+                                            water_content=water_content, &
+                                            ice_content=ice_content, &
+                                            vapor_content=vapor_content, &
+                                            pressure=pressure)
+            call self%control%update_output(OUTPUT_TYPES%HISTORY, current_time)
+
+            nullify (water_content)
+            nullify (ice_content)
+            nullify (vapor_content)
+            nullify (temperature)
+            nullify (pressure)
+        end if
+
+        call self%control%profiler_stop(PROFILER_TYPES%IO)
+    end subroutine output_history_ftcms
+
+    module subroutine get_variable_increment_ftcms(self, variable_id, variable)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        type(type_constant_id), intent(in) :: variable_id
+        real(real64), intent(inout), allocatable :: variable(:)
+
+        real(real64), pointer, dimension(:) :: du
+
+        integer(int32) :: target_dof
+        integer(int32) :: num_nodes, num_dofs_per_node
+        integer(int32) :: start_idx, end_idx
+
+        nullify (du)
+        call deallocate_array(variable)
+
+        if (.not. PHYSICS_TYPES%is_valid(variable_id)) then
+            call allocate_array(variable, 0)
+            return
+        end if
+
+        du => self%du%get_data()
+        if (.not. associated(du)) then
+            call allocate_array(variable, 0)
+            return
+        end if
+
+        if (self%control%is_physics_active(variable_id)) then
+            call self%domain%get_num_nodes(num_nodes)
+            call self%domain%get_num_dof_per_node(num_dofs_per_node)
+            call self%domain%get_target_dof(variable_id, target_dof)
+
+            call allocate_array(variable, num_nodes)
+
+            start_idx = target_dof
+            end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
+
+            variable(:) = du(start_idx:end_idx:num_dofs_per_node)
+        else
+            call allocate_array(variable, 0)
+        end if
+
+        nullify (du)
+
+    end subroutine get_variable_increment_ftcms
+
+    module subroutine get_variable_residual_ftcms(self, variable_id, variable)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        type(type_constant_id), intent(in) :: variable_id
+        real(real64), intent(inout), allocatable :: variable(:)
+
+        real(real64), pointer, dimension(:) :: F
+
+        integer(int32) :: target_dof
+        integer(int32) :: num_nodes, num_dofs_per_node
+        integer(int32) :: start_idx, end_idx
+
+        nullify (F)
+        call deallocate_array(variable)
+
+        if (.not. PHYSICS_TYPES%is_valid(variable_id)) then
+            call allocate_array(variable, 0)
+            return
+        end if
+
+        F => self%F%get_data()
+        if (.not. associated(F)) then
+            call allocate_array(variable, 0)
+            return
+        end if
+
+        if (self%control%is_physics_active(variable_id)) then
+            call self%domain%get_num_nodes(num_nodes)
+            call self%domain%get_num_dof_per_node(num_dofs_per_node)
+            call self%domain%get_target_dof(variable_id, target_dof)
+
+            call allocate_array(variable, num_nodes)
+
+            start_idx = target_dof
+            end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
+
+            variable(:) = F(start_idx:end_idx:num_dofs_per_node)
+        else
+            call allocate_array(variable, 0)
+        end if
+
+    end subroutine get_variable_residual_ftcms
+
+    module subroutine set_state_ftcms(self, node_id, element_id, state, calc_physics)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(in) :: node_id
+        integer(int32), intent(in) :: element_id
+        type(type_state), intent(inout) :: state
+        logical, intent(in), optional :: calc_physics
+
+        integer(int32) :: material_id
+        integer(int32) :: bdf_order
+        real(real64) :: temperature, pressure, porosity
+        type(type_coordinate_dp) :: grad_T, grad_P
+        real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
+
+        logical :: do_calc
+
+        ! Default: compute physics (for backward compatibility)
+        do_calc = .true.
+        if (present(calc_physics)) do_calc = calc_physics
+
+        call state%reset()
+
+        call self%control%get_bdf_coeffs(bdf_order=bdf_order)
+
+        ! Retrieve primary variables and their histories (always executed)
+        if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+            call self%temperature%get_current(node_id, temperature)
+            call self%temperature%get_current_gradient(node_id, grad_T)
+            call self%temperature%get_history(node_id, temperature_history)
+            call state%set(temperature=temperature, &
+                           grad_T=grad_T, &
+                           temperature_history=temperature_history(1:bdf_order + 1))
+        end if
+        if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+            call self%pressure%get_current(node_id, pressure)
+            call self%pressure%get_current_gradient(node_id, grad_P)
+            call self%pressure%get_history(node_id, pressure_history)
+            call state%set(pressure=pressure, &
+                           grad_P=grad_P, &
+                           pressure_history=pressure_history(1:bdf_order + 1))
+        end if
+        call self%porosity%get_current(node_id, porosity)
+        call self%porosity%get_history(node_id, porosity_history)
+        call state%set(porosity=porosity, &
+                       porosity_history=porosity_history(1:bdf_order + 1))
+
+        ! Run expensive physics computations only when flagged
+        if (do_calc) then
+            call self%domain%get_material_id(element_id, material_id)
+            call self%update_physical_properties(material_id, state)
+        end if
+
+    end subroutine set_state_ftcms
+
+    module subroutine set_states_from_connectivity_ftcms(self, connectivity, element_id, states, calc_physics)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(in) :: connectivity(:)
+        integer(int32), intent(in) :: element_id
+        type(type_state), intent(inout) :: states(:)
+        logical, intent(in), optional :: calc_physics
+
+        integer(int32) :: i, node_id
+        integer(int32) :: material_id
+        integer(int32) :: bdf_order
+        real(real64), pointer, contiguous :: T_current(:), P_current(:), phi_current(:)
+        type(type_coordinate_array_dp), pointer :: grad_T_array, grad_P_array
+        type(type_coordinate_dp) :: grad_T, grad_P
+        real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
+        logical :: do_calc
+
+        nullify (T_current)
+        nullify (P_current)
+        nullify (phi_current)
+        nullify (grad_T_array)
+        nullify (grad_P_array)
+
+        if (size(states) /= size(connectivity)) then
+            error stop 'set_states_from_connectivity_ftcms: size(states) /= size(connectivity)'
+        end if
+
+        do_calc = .true.
+        if (present(calc_physics)) do_calc = calc_physics
+
+        call self%control%get_bdf_coeffs(bdf_order=bdf_order)
+
+        if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+            call self%temperature%get_current(T_current)
+            call self%temperature%get_current_gradient(grad_T_array)
+        end if
+        if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+            call self%pressure%get_current(P_current)
+            call self%pressure%get_current_gradient(grad_P_array)
+        end if
+        call self%porosity%get_current(phi_current)
+
+        do i = 1, size(connectivity)
+            node_id = connectivity(i)
+            call states(i)%reset()
+
+            if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+                call grad_T%set(grad_T_array%x(node_id), grad_T_array%y(node_id), grad_T_array%z(node_id))
+                call self%temperature%get_history(node_id, temperature_history)
+                call states(i)%set(temperature=T_current(node_id), &
+                                   grad_T=grad_T, &
+                                   temperature_history=temperature_history(1:bdf_order + 1))
+            end if
+
+            if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+                call grad_P%set(grad_P_array%x(node_id), grad_P_array%y(node_id), grad_P_array%z(node_id))
+                call self%pressure%get_history(node_id, pressure_history)
+                call states(i)%set(pressure=P_current(node_id), &
+                                   grad_P=grad_P, &
+                                   pressure_history=pressure_history(1:bdf_order + 1))
+            end if
+
+            call self%porosity%get_history(node_id, porosity_history)
+            call states(i)%set(porosity=phi_current(node_id), &
+                               porosity_history=porosity_history(1:bdf_order + 1))
+        end do
+
+        if (do_calc) then
+            call self%domain%get_material_id(element_id, material_id)
+            call self%update_physical_properties_bulk(material_id, states)
+        end if
+    end subroutine set_states_from_connectivity_ftcms
+
+    ! Update all physical quantities (phase, fluxes) for a given state
+    module subroutine update_physical_properties_ftcms(self, material_id, state)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(inout) :: state
+
+        type(type_coordinate_dp) :: water_flux, vapor_flux
+        type(type_coordinate_dp), pointer :: grad_T, grad_P
+        type(type_coordinate_dp), target :: zero_grad
+
+        nullify (grad_T)
+        nullify (grad_P)
+        call zero_grad%set(0.0d0, 0.0d0, 0.0d0)
+
+        ! 1. Phase change calculation (Ice/Water Content)
+        call self%thermal%update_water_phases(material_id, state)
+
+        ! 2. Flux calculation (used in advection and diffusion)
+        if (self%control%is_target(PHYSICS_TYPES%HYDRAULIC, material_id)) then
+            call state%grad_T%get(grad_T)
+            call state%grad_P%get(grad_P)
+            ! Guard against null pointer when gradient is not set
+            if (.not. associated(grad_T)) grad_T => zero_grad
+            if (.not. associated(grad_P)) grad_P => zero_grad
+            call self%calc_water_flux(material_id, state, grad_T, grad_P, water_flux)
+            call self%calc_vapor_flux(material_id, state, grad_T, grad_P, vapor_flux)
+        else
+            call water_flux%set(0.0d0, 0.0d0, 0.0d0)
+            call vapor_flux%set(0.0d0, 0.0d0, 0.0d0)
+        end if
+
+        call state%set(water_flux=water_flux, vapor_flux=vapor_flux)
+    end subroutine update_physical_properties_ftcms
+
+    module subroutine update_physical_properties_bulk_ftcms(self, material_id, states)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(inout) :: states(:)
+
+        integer(int32) :: i
+
+        do i = 1, size(states)
+            call self%update_physical_properties(material_id, states(i))
+        end do
+    end subroutine update_physical_properties_bulk_ftcms
+
+    module subroutine shift_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        call self%control%profiler_start(PROFILER_TYPES%SETUP)
+
+        if (self%is_active_thermal()) then
+            call self%temperature%advance()
+        end if
+
+        if (self%is_active_hydraulic()) then
+            call self%pressure%advance()
+        end if
+
+        call self%porosity%advance()
+        call self%Qw%advance()
+        call self%Qi%advance()
+        call self%Qa%advance()
+        call self%Qv%advance()
+
+        call self%control%profiler_stop(PROFILER_TYPES%SETUP)
+    end subroutine shift_ftcms
+
+    module subroutine reflect_variables_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        integer(int32) :: iter
+        real(real64), pointer, contiguous, dimension(:) :: bdf_coeffs
+        integer(int32) :: bdf_order
+        real(real64), pointer, contiguous, dimension(:) :: current
+        real(real64), allocatable :: du(:)
+
+        real(real64) :: relaxation_factor
+        logical :: is_none
+        logical :: is_newton
+
+        ! Line search parameters for Newton mode
+        real(real64) :: max_du, alpha
+        real(real64), parameter :: MAX_DT_STEP = 5.0d0
+        real(real64), parameter :: MAX_DP_STEP = 1.0d5
+        real(real64), parameter :: ALPHA_MIN = 0.1d0
+
+        call self%control%profiler_start(PROFILER_TYPES%SETUP)
+
+        nullify (current)
+        nullify (bdf_coeffs)
+
+        call self%control%get_nonlinear_iter(iter)
+
+        call self%control%get_bdf_coeffs(bdf_order, bdf_coeffs)
+
+        is_none = self%control%is_none()
+        is_newton = self%control%is_compute_newton()
+
+        if (self%is_active_thermal()) then
+            call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
+            call self%temperature%get_current(current)
+            if (associated(current)) then
+                if (allocated(du) .and. size(du) > 0) then
+                    if (.not. is_none) then
+                        if (is_newton) then
+                            ! Damped Newton: clamp step by max allowable change
+                            max_du = maxval(abs(du))
+                            if (max_du > MAX_DT_STEP) then
+                                alpha = MAX_DT_STEP / max_du
+                                alpha = max(alpha, ALPHA_MIN)
+                            else
+                                alpha = 1.0d0
+                            end if
+                            relaxation_factor = alpha
+                            write (*, '("   [Newton] Iter:", I3, " Alpha:", F6.4, " max|dT|:", ES10.3)') &
+                                iter, alpha, max_du
+                            ! Apply damped Newton update directly
+                            current(:) = current(:) + relaxation_factor * du(:)
+                        else
+                            call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, du, current)
+                            call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
+                            write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                        end if
+                    else
+                        relaxation_factor = 1.0d0
+                    end if
+                    call self%temperature%set_delta(relaxation_factor * du(:))
+                else
+                    call self%temperature%set_delta(0.0d0 * current)
+                end if
+            end if
+
+            call self%calc_gradient_temperature()
+            call self%temperature%compute_time_derivative(bdf_coeffs, bdf_order)
+
+            call deallocate_array(du)
+        end if
+
+        if (self%is_active_hydraulic()) then
+            call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, du)
+            call self%pressure%get_current(current)
+            if (associated(current)) then
+                if (allocated(du) .and. size(du) > 0) then
+                    if (.not. is_none) then
+                        if (is_newton) then
+                            ! Damped Newton: clamp step by max allowable pressure change
+                            max_du = maxval(abs(du))
+                            if (max_du > MAX_DP_STEP) then
+                                alpha = MAX_DP_STEP / max_du
+                                alpha = max(alpha, ALPHA_MIN)
+                            else
+                                alpha = 1.0d0
+                            end if
+                            relaxation_factor = alpha
+                            write (*, '("   [Newton] Iter:", I3, " Alpha:", F6.4, " max|dP|:", ES10.3)') &
+                                iter, alpha, max_du
+                            current(:) = current(:) + relaxation_factor * du(:)
+                        else
+                            call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, du, current)
+                            call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
+                            write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                        end if
+                    else
+                        relaxation_factor = 1.0d0
+                    end if
+                    call self%pressure%set_delta(relaxation_factor * du(:))
+                else
+                    call self%pressure%set_delta(0.0d0 * current)
+                end if
+            end if
+
+            call self%calc_gradient_pressure()
+            call self%pressure%compute_time_derivative(bdf_coeffs, bdf_order)
+
+            call deallocate_array(du)
+        end if
+
+        call self%control%profiler_stop(PROFILER_TYPES%SETUP)
+
+    end subroutine reflect_variables_ftcms
+
+    module subroutine reset_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        call self%control%reset_iteration()
+
+    end subroutine reset_ftcms
+
+    module function is_active_thermal_ftcms(self) result(is_active)
+        implicit none
+        class(type_ftcms), intent(in) :: self
+        logical :: is_active
+
+        is_active = self%control%is_physics_active(PHYSICS_TYPES%THERMAL)
+
+    end function is_active_thermal_ftcms
+
+    module function is_active_hydraulic_ftcms(self) result(is_active)
+        implicit none
+        class(type_ftcms), intent(in) :: self
+        logical :: is_active
+
+        is_active = self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)
+
+    end function is_active_hydraulic_ftcms
+
+    module subroutine destroy_type_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        integer(int32) :: log_io_unit
+#ifdef _MPI
+        integer(int32) :: ierr
+#endif
+
+        ! --- Stop and Record Profiler ---
+        call self%control%profiler_stop(PROFILER_TYPES%TOTAL)
+        call self%control%profiler_record(TIME_RECORDS%END)
+
+        call self%output%output_system_log()
+        call self%output%get_log_io_unit(log_io_unit)
+        call self%control%display_profiler(log_io_unit)
+
+#ifdef _MPI
+        call MPI_Finalize(ierr)
+#endif
+
+    end subroutine destroy_type_ftcms
+end submodule ftcms_base

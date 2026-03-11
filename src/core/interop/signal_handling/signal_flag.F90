@@ -3,7 +3,7 @@
 !> signals (e.g., SIGINT). This module is intended for interoperability and is
 !> typically wrapped by a more user-friendly Fortran module.
 !>
-module core_c_utils_signal_flag
+module core_interop_signal_flag
     use :: iso_c_binding, only:c_int
     implicit none
     private
@@ -34,4 +34,4 @@ module core_c_utils_signal_flag
         end function c_get_interrupted_flag
     end interface
 
-end module core_c_utils_signal_flag
+end module core_interop_signal_flag

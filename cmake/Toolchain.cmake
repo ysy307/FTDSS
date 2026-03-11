@@ -1,84 +1,82 @@
 # =========================================================================
 # src/cmake/BuildSettings.cmake
-# 完全修正版: 言語別フラグ分離 (Fortran/CXX) + MKL/VTK設定統合
 # =========================================================================
 
-# -------------------------------------------------------------------------
-# 必須パッケージの探索
-# -------------------------------------------------------------------------
+# 1. Determine compiler-specific paths and package names
+if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
+    set(COMPILER_DIR "intel")
+    if(CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM")
+        set(JSON_FORTRAN_PKG "jsonfortran-intelllvm")
+    else()
+        set(JSON_FORTRAN_PKG "jsonfortran-intel")
+    endif()
+elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
+    set(COMPILER_DIR "gnu")
+    set(JSON_FORTRAN_PKG "jsonfortran-gnu")
+elseif(CMAKE_Fortran_COMPILER_ID MATCHES "NVHPC|PGI")
+    set(COMPILER_DIR "nvidia")
+    set(JSON_FORTRAN_PKG "jsonfortran-nvhpc")
+else()
+    message(FATAL_ERROR "Unsupported compiler: ${CMAKE_Fortran_COMPILER_ID}")
+endif()
+
+# 2. Add local third-party directory to search path
+list(PREPEND CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/third_party/.local/${COMPILER_DIR}")
+
+# 3. Find required packages
 include(FindPkgConfig REQUIRED)
 find_package(MPI REQUIRED)
 find_package(OpenMP REQUIRED)
 
-# -------------------------------------------------------------------------
-# MKL (BLAS/LAPACK/ScaLAPACK) 設定
-# -------------------------------------------------------------------------
+# 4. MKL Configuration
 set(MKL_LINK static)
 set(MKL_INTERFACE lp64)
-set(MKL_MPI "intelmpi")
-
-# SYCL (DPC++) リンクを無効化
 set(MKL_SYCL_LINK OFF)
 
-# コンパイラに応じたスレッド層の選択
 if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
     set(MKL_THREADING "intel_thread")
+    set(MKL_MPI "intelmpi")
 elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
     set(MKL_THREADING "gnu_thread")
+    set(MKL_MPI "openmpi")
 else()
     set(MKL_THREADING "intel_thread")
+    set(MKL_MPI "intelmpi")
 endif()
 
-# MKLコンポーネントの決定 (MPI有無で分岐)
 set(MKL_COMPONENTS_LIST)
 if(ENABLE_MPI)
     set(ENABLE_SCALAPACK ON CACHE BOOL "Enable ScaLAPACK components")
     list(APPEND MKL_COMPONENTS_LIST ScaLAPACK)
 endif()
 
-# MKL探索実行
 find_package(MKL CONFIG REQUIRED COMPONENTS ${MKL_COMPONENTS_LIST})
 
-# BLAS/LAPACK エイリアス作成
+# 5. Create ALIAS targets for BLAS/LAPACK to satisfy fortran_stdlib requirements
 if(NOT TARGET BLAS::BLAS)
     add_library(BLAS::BLAS INTERFACE IMPORTED)
     target_link_libraries(BLAS::BLAS INTERFACE MKL::MKL)
 endif()
+
 if(NOT TARGET LAPACK::LAPACK)
     add_library(LAPACK::LAPACK INTERFACE IMPORTED)
     target_link_libraries(LAPACK::LAPACK INTERFACE MKL::MKL)
 endif()
 
-# -------------------------------------------------------------------------
-# サードパーティライブラリの探索
-# -------------------------------------------------------------------------
-list(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/third_party/.local)
-
-# --- fortran-stdlib ---
-find_package(fortran_stdlib REQUIRED)
-
-# --- json-fortran ---
-find_package(jsonfortran-intelllvm REQUIRED)
-
-# --- VTK (C++本体) ---
-find_package(VTK REQUIRED COMPONENTS CommonCore CommonDataModel IOLegacy IOXML)
-
-# --- IAPWS ---
-find_package(IAPWS REQUIRED)
-
-# --- VTKFortran (ラッパー静的ライブラリ) ---
-if(NOT TARGET VTK::VTKFortran)
-    add_library(VTK::VTKFortran STATIC IMPORTED GLOBAL)
-    set_target_properties(VTK::VTKFortran PROPERTIES
-        IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/third_party/.local/lib/libvtkfortran.a"
-    )
+if(ENABLE_MPI AND NOT TARGET SCALAPACK::SCALAPACK)
+    add_library(SCALAPACK::SCALAPACK INTERFACE IMPORTED)
+    target_link_libraries(SCALAPACK::SCALAPACK INTERFACE MKL::MKL_SCALAPACK)
 endif()
 
+# 6. Find third-party libraries
+find_package(fortran_stdlib REQUIRED)
+find_package(${JSON_FORTRAN_PKG} REQUIRED)
+find_package(X11 REQUIRED)
+find_package(VTK REQUIRED COMPONENTS CommonCore CommonDataModel IOLegacy IOXML)
+find_package(IAPWS REQUIRED)
+
 # =========================================================================
-# 関数定義: enable_build_flags
-#  - コンパイルオプション設定 (Fortran/C++分離)
-#  - USE_DEBUG 定義
-#  - OpenMP, MPI, MKL リンク
+# Function: enable_build_flags
 # =========================================================================
 function(enable_build_flags target)
     get_target_property(TARGET_TYPE ${target} TYPE)
@@ -88,99 +86,97 @@ function(enable_build_flags target)
     endif()
 
     if(NOT KEYWORD STREQUAL "INTERFACE")
-        # ---------------------------------------------------------
-        # Fortran Compile Options
-        # ---------------------------------------------------------
-# Intel / IntelLLVM (Fortran)
-        if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
-            target_compile_options(${target} ${KEYWORD} 
-                # Common for Intel (Standard, Preprocessor, Traceback)
-                $<$<COMPILE_LANGUAGE:Fortran>:-stand f18 -fpp -traceback>
+        target_compile_options(${target} ${KEYWORD}
+            # Fortran: Intel / IntelLLVM
+            $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:Intel,IntelLLVM>>:
+            -stand f18 -fpp -fpscomp logicals -extend-source -g -traceback
+            $<$<CONFIG:Release>:-O3 -xHost>
+            $<$<CONFIG:Debug>:-O0 -check all -fpe0 -ftrapuv -init=snan -init=arrays -warn all -warn errors -implicitnone -fstack-protector-all>
+            >
+            # Fortran: GNU
+            $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:GNU>>:
+            -std=f2018 -cpp
+            $<$<CONFIG:Release>:-O3 -march=native>
+            $<$<CONFIG:Debug>:-g -fbacktrace -fcheck=all -ffpe-trap=invalid,zero,overflow -finit-real=snan -finit-integer=-9999999 -Wall -Wextra -pedantic>
+            >
+            # Fortran: NVHPC
+            $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:NVHPC,PGI>>:
+            -Mpreprocess
+            $<$<CONFIG:Release>:-fast>
+            $<$<CONFIG:Debug>:-g -O0 -Mbounds -Mchkptr -traceback -Ktrap=fp>
+            >
 
-                # Release: Fortran Only
-                $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Release>>:-O3 -xHost>
-                
-                # Debug: Fortran Only 
-                # -check all: 全チェック
-                # -fpe0: 浮動小数点例外(NaN等)で即停止
-                # -ftrapuv: 未初期化変数を変な値で埋める
-                $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Debug>>:-g -check all -fpe0 -ftrapuv>
-            )
-        
-        # GNU (Fortran)
-        elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-            target_compile_options(${target} ${KEYWORD} 
-                # Common for GNU (Standard, Preprocessor)
-                $<$<COMPILE_LANGUAGE:Fortran>:-std=f2018 -cpp>
+            # ---------------------------------------------------------
+            # C Compile Options
+            # ---------------------------------------------------------
+            # C: Intel / IntelLLVM
+            $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:Intel,IntelLLVM>>:
+            $<$<CONFIG:Release>:-O3 -xHost -g -traceback>
+            $<$<CONFIG:Debug>:-O0 -g -traceback -Wall -Wextra -Werror -fstack-protector-all -ftrapv>
+            >
+            # C: GNU
+            $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:GNU>>:
+            $<$<CONFIG:Release>:-O3 -march=native>
+            $<$<CONFIG:Debug>:-g -O0 -Wall -Wextra -pedantic -Werror -fstack-protector-all -ftrapv>
+            >
+            # C: NVHPC
+            $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:NVHPC,PGI>>:
+            $<$<CONFIG:Release>:-fast>
+            $<$<CONFIG:Debug>:-g -O0 -Mbounds -Mchkptr -traceback -Ktrap=fp>
+            >
 
-                # Release: Fortran Only
-                $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Release>>:-O3 -march=native>
-                
-                # Debug: Fortran Only
-                # -fbacktrace: 行番号を表示
-                # -fcheck=all: 全チェック（配列外参照など）
-                # -ffpe-trap=...: NaNやゼロ除算で即停止
-                # -finit-real=snan: 実数をNaNで初期化（未初期化変数対策）
-                $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Debug>>:-g -fbacktrace -fcheck=all -ffpe-trap=invalid,zero,overflow -finit-real=snan -finit-integer=-9999999>
-            )
-        endif()
-        # ---------------------------------------------------------
-        # C++ Compile Options
-        # ---------------------------------------------------------
-        if(CMAKE_CXX_COMPILER_ID MATCHES "Intel|IntelLLVM")
-            target_compile_options(${target} ${KEYWORD}
-                $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:Release>>:-O3 -xHost>
-                $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:Debug>>:-g>
-            )
-        elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-            target_compile_options(${target} ${KEYWORD}
-                $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:Release>>:-O3 -march=native>
-                $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:Debug>>:-g>
-            )
-        endif()
-
+            # ---------------------------------------------------------
+            # CXX Compile Options
+            # ---------------------------------------------------------
+            # CXX: Intel / IntelLLVM
+            $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:Intel,IntelLLVM>>:
+            $<$<CONFIG:Release>:-O3 -xHost -g -traceback>
+            $<$<CONFIG:Debug>:-O0 -g -traceback -Wall -Wextra -Werror -fstack-protector-all -ftrapv>
+            >
+            # CXX: GNU
+            $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:GNU>>:
+            $<$<CONFIG:Release>:-O3 -march=native>
+            $<$<CONFIG:Debug>:-g -O0 -Wall -Wextra -pedantic -Werror -fstack-protector-all -ftrapv>
+            >
+            # CXX: NVHPC
+            $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:NVHPC,PGI>>:
+            $<$<CONFIG:Release>:-fast>
+            $<$<CONFIG:Debug>:-g -O0 -Mbounds -Mchkptr -traceback -Ktrap=fp>
+            >
+        )
     endif()
 
-    # --- 2. マクロ定義 (USE_DEBUG) ---
-    # BuildTypeがDebug または ENABLE_DEBUGがON の場合に定義
-    if(CMAKE_BUILD_TYPE MATCHES "Debug" OR ENABLE_DEBUG)
-        target_compile_definitions(${target} ${KEYWORD} USE_DEBUG)
-    endif()
+    target_compile_definitions(${target} ${KEYWORD}
+        USE_OPENMP
+        _MKL
+        $<$<OR:$<CONFIG:Debug>,$<BOOL:${ENABLE_DEBUG}>>:USE_DEBUG>
+    )
 
-    # --- 3. リンクと共通定義 ---
-    target_compile_definitions(${target} ${KEYWORD} USE_OPENMP _MKL)
     target_link_libraries(${target} ${KEYWORD} OpenMP::OpenMP_Fortran)
 
     if(ENABLE_MPI)
         target_compile_definitions(${target} ${KEYWORD} _MPI)
-        target_link_libraries(${target} ${KEYWORD} MPI::MPI_Fortran)
-        target_link_libraries(${target} ${KEYWORD} MKL::MKL_SCALAPACK)
+        target_link_libraries(${target} ${KEYWORD} MPI::MPI_Fortran MKL::MKL_SCALAPACK)
     else()
         target_link_libraries(${target} ${KEYWORD} MKL::MKL)
     endif()
 endfunction()
 
 # =========================================================================
-# 関数定義: enable_thirdparty
-#  - インクルードパス設定
-#  - VTK, stdlib, json-fortran リンク
+# Function: enable_thirdparty
 # =========================================================================
 function(enable_thirdparty target)
-    # インクルードパス
     target_include_directories(${target} PUBLIC
-        ${PROJECT_SOURCE_DIR}/third_party/.local/include/VTKFortran
         $<TARGET_PROPERTY:fortran_stdlib::fortran_stdlib,INTERFACE_INCLUDE_DIRECTORIES>
-        $<TARGET_PROPERTY:jsonfortran-intelllvm::jsonfortran-static,INTERFACE_INCLUDE_DIRECTORIES>
+        $<TARGET_PROPERTY:${JSON_FORTRAN_PKG}::jsonfortran-static,INTERFACE_INCLUDE_DIRECTORIES>
         $<TARGET_PROPERTY:IAPWS::IAPWS,INTERFACE_INCLUDE_DIRECTORIES>
     )
 
-    # ライブラリリンク
-    # 【重要】VTK本体(C++)も同時にリンクする
     target_link_libraries(${target} PUBLIC
-        VTK::VTKFortran
+        X11::X11
         VTK::CommonCore VTK::CommonDataModel VTK::IOLegacy VTK::IOXML
         fortran_stdlib::fortran_stdlib
-        jsonfortran-intelllvm::jsonfortran-static
+        ${JSON_FORTRAN_PKG}::jsonfortran-static
         IAPWS::IAPWS
     )
 endfunction()

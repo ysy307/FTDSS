@@ -1,5 +1,5 @@
 {
-    "name": "FTDSS",
+    "name": "FTCMS",
     "dockerFile": "Dockerfile",
     "build": {
         "args": {
@@ -7,15 +7,18 @@
         }
     },
     "mounts": [
-        // .gitconfigと.fortlsをdevuserのホームディレクトリにマウント
         "source=${localEnv:USERPROFILE}/.gitconfig,target=/home/devuser/.gitconfig,type=bind,consistency=cached",
-        "source=${localWorkspaceFolder}/.fortls,target=/home/devuser/.fortls,type=bind,consistency=cached"
+        "source=${localWorkspaceFolder}/.fortls,target=/home/devuser/.fortls,type=bind,consistency=cached",
+        "source=ftcms-build-vol,target=${containerWorkspaceFolder}/CMakeBuild,type=volume",
+        "source=ftcms-git-vol,target=${containerWorkspaceFolder}/.git,type=volume"
     ],
     "runArgs": [
-        "--hostname=ftdss-dev",
+        "--hostname=ftcms-dev",
         "--privileged",
         "--cap-add=SYS_ADMIN",
         "--cap-add=SYS_PTRACE",
+        "--security-opt",
+        "seccomp=unconfined",
         "-v",
         "/sys/kernel/debug:/sys/kernel/debug"
     ],

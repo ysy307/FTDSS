@@ -11,6 +11,7 @@ module domain_base_fe
     use :: stdlib_optval, only:optval
     use :: module_core
     use :: module_linalg
+    use :: domain_fe_integration
 
     implicit none
     private

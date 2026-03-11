@@ -1,7 +1,7 @@
-module core_types_config_conditions
-    use :: core_types_config_conditions_boundary, only: &
+module types_config_conditions
+    use :: types_config_conditions_boundary, only: &
         type_config_bc
-    use :: core_types_config_conditions_initial, only: &
+    use :: types_config_conditions_initial, only: &
         type_config_ic
     implicit none
     private
@@ -9,4 +9,4 @@ module core_types_config_conditions
     public :: type_config_bc
     public :: type_config_ic
 
-end module core_types_config_conditions
+end module types_config_conditions

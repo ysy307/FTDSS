@@ -7,26 +7,36 @@
 *.lib
 *.dll
 *.so
+*.dylib
 *.exe
 *.bin
 
+# === CMake & Ninja ===
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+.ninja*
+*.dir/
+
 # === Temporary/Intermediate Files ===
 *.tmp
-*.tmp.*
-*.log
-*.log.*
 *.swp
-*.swp.*
 *.swo
-*.swo.*
+*~
+.DS_Store
 
-# === Debugging/Profiling Files ===
+# === Debugging/Profiling/Logs ===
 *.pdb
 *.out
+*.log
+*.log.*
 
-# === Configuration Files ===
-*.yaml
-*.toml
+# === Optimization Reports (Intel Compiler) ===
+*.optrpt
+repopt
 
 # === Media Files ===
 *.png
@@ -51,32 +61,26 @@ files.vtk.series
 *.csv
 *.bak
 
-# === Executable Files ===
+# === Python ===
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# === Project-Specific Directories ===
 bin/
-test_program
-ysy_fc
-fpm*
-*.dir
-
-# === Text Files (if not part of source) ===
-# *.txt
-
-# === Optimization Reports ===
-*.optrpt
-repopt
-
-# === Project-Specific Files and Directories ===
 .archive/
 *Build*/
 *EXTERNAL*/ 
 docs/api-docs/
-Results/*
+Results/
 *tmp/
 *log/
 project/*/Output/
 */gdb/
-fpm/*
 third_party/*
 
-# === Python Virtual Environment ===
-.venv/
+# === Specific Executables/Folders ===
+test_program
+ysy_fc
+fpm/

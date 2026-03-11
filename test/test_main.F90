@@ -3,36 +3,41 @@ program test_main
 #ifdef _MPI
     use :: mpi_f08
 #endif
-    use :: module_ftdss
-    use :: module_domain
+    use :: module_ftcms
 
     implicit none
 
     integer(int32) :: ierr
     integer(int32) :: myrank
+#ifdef _MPI
+    logical :: mpi_is_initialized
+    logical :: mpi_is_finalized
+#endif
 
 #ifdef _MPI
-    call MPI_Init(ierr)
+    call MPI_Initialized(mpi_is_initialized, ierr)
+    if (.not. mpi_is_initialized) call MPI_Init(ierr)
     call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
 #endif
 
-    ! テスト関数の呼び出し
-    call run_test_ftdss()
+    call run_test_ftcms()
 
 #ifdef _MPI
-    call MPI_Finalize(ierr)
+    call MPI_Initialized(mpi_is_initialized, ierr)
+    call MPI_Finalized(mpi_is_finalized, ierr)
+    if (mpi_is_initialized .and. (.not. mpi_is_finalized)) call MPI_Finalize(ierr)
 #endif
 
 contains
 
-    subroutine run_test_ftdss()
+    subroutine run_test_ftcms()
         implicit none
-        type(type_ftdss) :: ftdss
+        type(type_ftcms) :: ftcms
 
-        call ftdss%initialize()
-        call ftdss%run()
-        call ftdss%finalize()
+        call ftcms%initialize()
+        call ftcms%run()
+        call ftcms%destroy()
 
-    end subroutine run_test_ftdss
+    end subroutine run_test_ftcms
 
 end program test_main
