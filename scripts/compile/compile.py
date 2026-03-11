@@ -38,7 +38,7 @@ def main():
     log_dir = Path("/workspaces/FTDSS/log")
     log_dir.mkdir(parents=True, exist_ok=True)
     log_file = log_dir / "compile.log"
-    build_dir = f"CMakeBuild_{args.compiler}"
+    build_dir = f"CMakeBuild/{args.compiler}"
 
     config_cmd = [
         "cmake", "-S", ".", "-B", build_dir,
