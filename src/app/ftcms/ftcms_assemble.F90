@@ -39,7 +39,7 @@ contains
             call self%domain%get_target_dof(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
         end if
 
-        use_scatter = self%K%is_scatter_ready()
+        use_scatter = .true.
 
         !$OMP PARALLEL DEFAULT(NONE) &
         !$OMP SHARED(self, num_colors, elements_list, num_elements_in_color, &

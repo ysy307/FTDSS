@@ -1,4 +1,5 @@
 submodule(physics_governing_hydraulic) hydraulic_matrix
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
 contains
 
@@ -59,6 +60,28 @@ contains
             call self%compute_transient_term(workspace%material_id, workspace%state_gp(i), &
                                              workspace%bdf_coeffs(1:workspace%bdf_order + 1), &
                                              workspace%work_d_dt(i))
+
+            if (.not. ieee_is_finite(workspace%work_C(i)) .or. abs(workspace%work_C(i)) > 1.0d120) then
+                write (*, '(A,I0,A,I0,A,ES13.5)') 'Error: Hydraulic mass term exploded. mat=', &
+                    workspace%material_id, ', gp=', i, ', C=', workspace%work_C(i)
+                error stop 'Hydraulic mass term overflow in local assembly.'
+            end if
+
+            if (.not. ieee_is_finite(workspace%work_d_dt(i)) .or. abs(workspace%work_d_dt(i)) > 1.0d120) then
+                write (*, '(A,I0,A,I0,A,ES13.5)') 'Error: Hydraulic transient term exploded. mat=', &
+                    workspace%material_id, ', gp=', i, ', dUdt=', workspace%work_d_dt(i)
+                error stop 'Hydraulic transient overflow in local assembly.'
+            end if
+
+            if (any(.not. ieee_is_finite(workspace%work_D(:, :, i))) .or. any(abs(workspace%work_D(:, :, i)) > 1.0d120)) then
+                write (*, '(A,I0,A,I0)') 'Error: Hydraulic diffusion tensor exploded. mat=', workspace%material_id, ', gp=', i
+                error stop 'Hydraulic diffusion overflow in local assembly.'
+            end if
+
+            if (any(.not. ieee_is_finite(workspace%work_V(:, i))) .or. any(abs(workspace%work_V(:, i)) > 1.0d120)) then
+                write (*, '(A,I0,A,I0)') 'Error: Hydraulic advection term exploded. mat=', workspace%material_id, ', gp=', i
+                error stop 'Hydraulic advection overflow in local assembly.'
+            end if
         end do
 
         ! 2. Mass Matrix Contribution (Accumulate to K_HH)

@@ -3,12 +3,15 @@
 !> Connects state variables to thermodynamic property models (e.g., IAPWS).
 module physics_constitutive_base
     use, intrinsic :: iso_fortran_env
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state
     use :: constitutive_constants, only:TtoK => celsius_to_kelvin, &
         P_atm => standard_atmospheric_pressure, &
         min_vapor_density, &
-        reference_water_density
+        reference_water_density, &
+        water_triple_point_temperature, &
+        water_critical_point_temperature
     implicit none
     private
 
@@ -271,6 +274,10 @@ contains
             density = reference_water_density
             return
         end if
+        if (.not. ieee_is_finite(T_K) .or. .not. ieee_is_finite(P_abs)) then
+            density = reference_water_density
+            return
+        end if
         call self%water%calc_rho(T_K, P_abs, density)
     end subroutine calc_rho_water_abst_constitutive
 
@@ -306,6 +313,10 @@ contains
 
         call self%get_thermo_state_TP(state, T_K, P_abs)
         if (T_K < 273.15d0) then
+            deriv_density = 0.0d0
+            return
+        end if
+        if (.not. ieee_is_finite(T_K) .or. .not. ieee_is_finite(P_abs)) then
             deriv_density = 0.0d0
             return
         end if
@@ -347,6 +358,10 @@ contains
             deriv_density = 0.0d0
             return
         end if
+        if (.not. ieee_is_finite(T_K) .or. .not. ieee_is_finite(P_abs)) then
+            deriv_density = 0.0d0
+            return
+        end if
         call self%water%calc_drho_dP(T_K, P_abs, deriv_density)
     end subroutine calc_drho_water_dP_abst_constitutive
 
@@ -382,6 +397,10 @@ contains
 
         call self%get_thermo_state_TP(state, T_K, P_abs)
         if (T_K < 273.15d0) then
+            cp = 4181.3d0
+            return
+        end if
+        if (.not. ieee_is_finite(T_K) .or. .not. ieee_is_finite(P_abs)) then
             cp = 4181.3d0
             return
         end if
@@ -555,6 +574,7 @@ contains
         real(real64) :: T_K, relative_humidity
 
         call self%get_thermo_state_T(state, T_K)
+        T_K = min(max(T_K, water_triple_point_temperature), water_critical_point_temperature)
         call state%relative_humidity%get(relative_humidity)
 
         call self%water%calc_saturation_density(T_K, density)
@@ -592,6 +612,7 @@ contains
         real(real64) :: T_K, relative_humidity, drho_sat_dT
 
         call self%get_thermo_state_T(state, T_K)
+        T_K = min(max(T_K, water_triple_point_temperature), water_critical_point_temperature)
         call state%relative_humidity%get(relative_humidity)
 
         call self%water%calc_saturation_drho_dT(T_K, drho_sat_dT)
@@ -661,6 +682,7 @@ contains
         real(real64) :: T_K
 
         call self%get_thermo_state_T(state, T_K)
+        T_K = min(max(T_K, water_triple_point_temperature), water_critical_point_temperature)
         call self%water%calc_saturation_density(T_K, density)
     end subroutine calc_rho_vapor_saturation_abst_constitutive
 
@@ -695,6 +717,7 @@ contains
         real(real64) :: T_K
 
         call self%get_thermo_state_T(state, T_K)
+        T_K = min(max(T_K, water_triple_point_temperature), water_critical_point_temperature)
         call self%water%calc_saturation_drho_dT(T_K, deriv_density)
     end subroutine calc_drho_vapor_saturation_dT_abst_constitutive
 
@@ -729,6 +752,7 @@ contains
         real(real64) :: T_K
 
         call self%get_thermo_state_T(state, T_K)
+        T_K = min(max(T_K, water_triple_point_temperature), water_critical_point_temperature)
         call self%water%calc_saturation_drho_dP(T_K, deriv_density)
     end subroutine calc_drho_vapor_saturation_dP_abst_constitutive
 
@@ -763,6 +787,7 @@ contains
         real(real64) :: T_K
 
         call self%get_thermo_state_T(state, T_K)
+        T_K = min(max(T_K, water_triple_point_temperature), water_critical_point_temperature)
         call self%water%calc_saturation_cp(T_K, cp)
     end subroutine calc_cp_vapor_abst_constitutive
 

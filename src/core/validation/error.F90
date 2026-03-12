@@ -69,9 +69,9 @@ contains
             full_msg = strip(full_msg)//"]"
         end if
 
-        ! 4. STOP Execution
+        ! 4. Print detailed context and stop execution
+        write (*, '(A)') strip(full_msg)
         error stop err%ID
-        ! error stop strip(full_msg)
 
     end subroutine raise_error
 

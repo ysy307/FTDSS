@@ -56,7 +56,7 @@ contains
         type(type_vector_dp), intent(inout) :: x
 
         real(real64) :: rho, rho_old, alpha, beta, omega
-        real(real64) :: denom
+        real(real64) :: denom, ratio1, ratio2
         real(real64) :: resid
         real(real64) :: norm_r, norm_v, norm_t, norm_s, norm_p
         integer(int32) :: iter
@@ -146,7 +146,53 @@ contains
                     return
                 end if
                 ! 12: beta = (rho / rho_old) * (alpha_k / omega_k)
-                beta = (rho / rho_old) * (alpha / omega)
+                if (abs(rho) / huge(1.0d0) > abs(rho_old)) then
+                    norm_r = vector_norm2(self%r)
+                    write (*, '(A,I0,3(A,ES13.5))') 'BiCG breakdown(rho/rho_old overflow): iter=', iter, &
+                        ', rho=', rho, ', rho_old=', rho_old, ', ||r||2=', norm_r
+                    self%current_iteration = iter
+                    self%status = SOLVER_STATUS%BREAKDOWN%ID
+                    if (has_internal_x) call x%copy(self%x)
+                    return
+                end if
+                if (abs(alpha) / huge(1.0d0) > abs(omega)) then
+                    norm_r = vector_norm2(self%r)
+                    write (*, '(A,I0,3(A,ES13.5))') 'BiCG breakdown(alpha/omega overflow): iter=', iter, &
+                        ', alpha=', alpha, ', omega=', omega, ', ||r||2=', norm_r
+                    self%current_iteration = iter
+                    self%status = SOLVER_STATUS%BREAKDOWN%ID
+                    if (has_internal_x) call x%copy(self%x)
+                    return
+                end if
+
+                ratio1 = rho / rho_old
+                ratio2 = alpha / omega
+
+                if (abs(ratio1) > 1.0d0) then
+                    if (abs(ratio2) > huge(1.0d0) / abs(ratio1)) then
+                        norm_r = vector_norm2(self%r)
+                        write (*, '(A,I0,3(A,ES13.5))') 'BiCG breakdown(beta overflow): iter=', iter, &
+                            ', rho/rho_old=', ratio1, ', alpha/omega=', ratio2, ', ||r||2=', norm_r
+                        self%current_iteration = iter
+                        self%status = SOLVER_STATUS%BREAKDOWN%ID
+                        if (has_internal_x) call x%copy(self%x)
+                        return
+                    end if
+                end if
+
+                if (abs(ratio2) > 1.0d0) then
+                    if (abs(ratio1) > huge(1.0d0) / abs(ratio2)) then
+                        norm_r = vector_norm2(self%r)
+                        write (*, '(A,I0,3(A,ES13.5))') 'BiCG breakdown(beta overflow): iter=', iter, &
+                            ', rho/rho_old=', ratio1, ', alpha/omega=', ratio2, ', ||r||2=', norm_r
+                        self%current_iteration = iter
+                        self%status = SOLVER_STATUS%BREAKDOWN%ID
+                        if (has_internal_x) call x%copy(self%x)
+                        return
+                    end if
+                end if
+
+                beta = ratio1 * ratio2
                 if (.not. ieee_is_finite(beta)) then
                     norm_r = vector_norm2(self%r)
                     write (*, '(A,I0,2(A,ES13.5))') 'BiCG invalid beta: iter=', iter, ', beta=', beta, ', ||r||2=', norm_r
@@ -156,14 +202,16 @@ contains
                     return
                 end if
                 norm_p = vector_norminf(self%p)
-                if (norm_p > 0.0d0 .and. abs(beta) > huge(1.0d0) / norm_p) then
-                    norm_r = vector_norm2(self%r)
-                    write (*, '(A,I0,3(A,ES13.5))') 'BiCG overflow(beta): iter=', iter, &
-                        ', beta=', beta, ', ||p||inf=', norm_p, ', ||r||2=', norm_r
-                    self%current_iteration = iter
-                    self%status = SOLVER_STATUS%BREAKDOWN%ID
-                    if (has_internal_x) call x%copy(self%x)
-                    return
+                if (norm_p >= 1.0d0) then
+                    if (abs(beta) > huge(1.0d0) / norm_p) then
+                        norm_r = vector_norm2(self%r)
+                        write (*, '(A,I0,3(A,ES13.5))') 'BiCG overflow(beta): iter=', iter, &
+                            ', beta=', beta, ', ||p||inf=', norm_p, ', ||r||2=', norm_r
+                        self%current_iteration = iter
+                        self%status = SOLVER_STATUS%BREAKDOWN%ID
+                        if (has_internal_x) call x%copy(self%x)
+                        return
+                    end if
                 end if
                 ! 13: p_k = r_k + beta_k(p_(k-1) - omega_k * Av)
                 call vector_axpy(-omega, self%v, self%p)
@@ -196,7 +244,18 @@ contains
             call matvec(A, self%shat, self%t, ierr)
 
             ! 21: omega_k = (t,s)/(t,t)
-            omega = vector_dot(self%t, self%s) / vector_dot(self%t, self%t)
+            denom = vector_dot(self%t, self%t)
+            if (abs(denom) <= tiny(1.0d0) .or. .not. ieee_is_finite(denom)) then
+                norm_t = vector_norm2(self%t)
+                norm_s = vector_norm2(self%s)
+                write (*, '(A,I0,3(A,ES13.5))') 'BiCGSTAB breakdown(omega denom): iter=', iter, &
+                    ', dot(t,t)=', denom, ', ||t||2=', norm_t, ', ||s||2=', norm_s
+                self%current_iteration = iter
+                self%status = SOLVER_STATUS%BREAKDOWN%ID
+                if (has_internal_x) call x%copy(self%x)
+                return
+            end if
+            omega = vector_dot(self%t, self%s) / denom
 
             ! 22: omega breakdown check
             if (omega == 0.0d0) then

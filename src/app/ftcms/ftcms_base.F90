@@ -15,6 +15,7 @@ contains
         integer(int32) :: computation_dimension
         integer(int32) :: num_total_dofs
         integer(int32) :: ierr
+        real(real64), pointer, contiguous, dimension(:) :: phase_values
 
         type(type_config_control_manager) :: config_control_manager
         type(type_config_iteration) :: config_iteration
@@ -144,6 +145,22 @@ contains
 
         ! Apply initial Dirichlet boundary conditions to field variables
         call self%apply_bc()
+
+        ! Populate initial phase variables from initial T/P/porosity before first output.
+        call self%update_variables()
+        nullify (phase_values)
+        call self%Qw%get_current(phase_values)
+        if (associated(phase_values)) call self%Qw%set_previous(phase_values)
+        nullify (phase_values)
+        call self%Qi%get_current(phase_values)
+        if (associated(phase_values)) call self%Qi%set_previous(phase_values)
+        nullify (phase_values)
+        call self%Qa%get_current(phase_values)
+        if (associated(phase_values)) call self%Qa%set_previous(phase_values)
+        nullify (phase_values)
+        call self%Qv%get_current(phase_values)
+        if (associated(phase_values)) call self%Qv%set_previous(phase_values)
+        nullify (phase_values)
 
         call input_translator%execute(input, config_output)
         call input_translator%execute(input, config_observation)

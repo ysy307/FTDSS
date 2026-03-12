@@ -72,7 +72,19 @@ contains
                                         configs(num_active)%num_variables, &
                                         configs(num_active)%num_time_points)
 
-                    ! Assign values for 2 variables here
+                    do i = 1, configs(num_active)%num_time_points
+                        configs(num_active)%time_points(i) = physics_data%values(i)%time
+
+                        if (.not. allocated(physics_data%values(i)%values)) then
+                            error stop 'Boundary condition requires two values, but none were provided.'
+                        end if
+                        if (size(physics_data%values(i)%values) < 2) then
+                            error stop 'Boundary condition requires at least two values.'
+                        end if
+
+                        configs(num_active)%values(1, i) = physics_data%values(i)%values(1)
+                        configs(num_active)%values(2, i) = physics_data%values(i)%values(2)
+                    end do
                 case default
                     configs(num_active)%num_variables = 0
                 end select
