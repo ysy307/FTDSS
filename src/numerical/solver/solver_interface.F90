@@ -53,6 +53,7 @@ module numerical_solver_interface
         procedure(abst_solver_initialize), pass(self), public, deferred :: initialize !&
         procedure(abst_solver_solve),      pass(self), public, deferred :: solve !&
         procedure,                         pass(self), public           :: check => check_solver !&
+        procedure,                         pass(self), public           :: is_success => is_success_solver !&
         procedure,                         pass(self), public           :: display_rhistory => display_residual_history_solver !&
         procedure(abst_solver_destroy),    pass(self), public, deferred :: destroy !&
     end type abst_solver
@@ -244,10 +245,14 @@ contains
             end select
         end if
 
-            if (self%status == SOLVER_STATUS%BREAKDOWN%ID) then
-                error stop "Solver BREAKDOWN detected. Program is stopped. Please specify next improvement."
-            end if
     end subroutine check_solver
+
+    pure function is_success_solver(self) result(ret)
+        implicit none
+        class(abst_solver), intent(in) :: self
+        logical :: ret
+        ret = (self%status == SOLVER_STATUS%SUCCESS%ID)
+    end function is_success_solver
 
     subroutine display_residual_history_solver(self, unit_display)
         implicit none

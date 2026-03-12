@@ -253,33 +253,36 @@ contains
         implicit none
         !> Scalar \( \alpha \)
         real(real64), intent(in) :: alpha
-        !> Dense matrix A (contiguous)
-        real(real64), intent(in), contiguous :: A(:, :)
-        !> Input vector x (contiguous)
-        real(real64), intent(in), contiguous :: x(:)
+        !> Dense matrix A
+        real(real64), intent(in) :: A(:, :)
+        !> Input vector x
+        real(real64), intent(in) :: x(:)
         !> Scalar \( \beta \)
         real(real64), intent(in) :: beta
-        !> Input/Output vector y (contiguous)
-        real(real64), intent(inout), contiguous :: y(:)
+        !> Input/Output vector y
+        real(real64), intent(inout) :: y(:)
         !> Error status
         integer(int32), intent(inout) :: ierr
 
         integer(int32) :: num_row, num_col
+        integer(int32) :: j
 
         num_row = size(A, 1)
         num_col = size(A, 2)
 #ifdef _MKL
-        ! Warning (406) fixed by declaring A as contiguous
-        call dgemv('N', num_row, num_col, alpha, A, num_row, x, 1, beta, y, 1)
+        if (is_contiguous(A) .and. is_contiguous(x) .and. is_contiguous(y)) then
+            call dgemv('N', num_row, num_col, alpha, A, num_row, x, 1, beta, y, 1)
+        else
+            y = beta * y
+            do j = 1, num_col
+                y = y + alpha * x(j) * A(:, j)
+            end do
+        end if
 #else
-        block
-        integer(int32) :: i
-        !$omp parallel do private(i)
-        do i = 1, num_row
-            y(i) = alpha * dot_product(A(i, :), x) + beta * y(i)
+        y = beta * y
+        do j = 1, num_col
+            y = y + alpha * x(j) * A(:, j)
         end do
-        !$omp end parallel do
-        end block
 #endif
         ierr = MATRIX_STATUS%SUCCESS%ID
 
@@ -314,19 +317,13 @@ contains
         end if
 
         val_ptr => A%get_val()
-        ! Ensure pointer target is handled correctly by MKL
-        call dgemv('N', info%num_rows, info%num_cols, alpha, val_ptr, info%num_rows, x, 1, beta, y, 1)
+        call gemv_matrix_real64(alpha, val_ptr, x, beta, y, ierr)
 #else
         call A%get_info(info)
-        block
-        integer(int32) :: i
-        !$omp parallel do private(i)
-        do i = 1, info%num_rows
-            y(i) = alpha * dot_product(A%val(i, :), x) + beta * y(i)
-        end do
-        !$omp end parallel do
-        end block
+        call gemv_matrix_real64(alpha, A%val, x, beta, y, ierr)
 #endif
+        if (ierr /= MATRIX_STATUS%SUCCESS%ID) return
+
         ierr = MATRIX_STATUS%SUCCESS%ID
 
     end subroutine gemv_matrix_dense

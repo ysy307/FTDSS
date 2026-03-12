@@ -96,15 +96,9 @@ contains
         integer(int32), intent(in) :: integration_order
         class(abst_fe), allocatable :: fe
 
-        character(len=*), parameter :: cell_name = "LagrangeQuadrilateral"
-        integer(int32) :: vtk_type
-        integer(int32) :: num_nodes_info, dim_info, order_info
-
         allocate (type_square_third :: fe)
 
-        call vtk_constants%get_cell_info_from_cell_name(cell_name, vtk_type, num_nodes_info, dim_info, order_info)
-
-        call fe%initialize(type=vtk_type, dimension=2, order=3, num_nodes=16, &
+        call fe%initialize(type=FE_TYPE%LAGRANGE_QUADRILATERAL%ID, dimension=2, order=3, num_nodes=16, &
                            integration_order=integration_order)
 
     end function construct_square_third

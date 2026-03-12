@@ -189,22 +189,22 @@ module linalg_vector_operations
         function abst_real_from_one_vector_function(vector) result(res)
             import :: real64
             implicit none
-            real(real64), intent(in), contiguous :: vector(:)
+            real(real64), intent(in) :: vector(:)
             real(real64) :: res
         end function
 
         function abst_real_from_two_vectors_function(vector_a, vector_b) result(res)
             import :: real64
             implicit none
-            real(real64), intent(in), contiguous :: vector_a(:)
-            real(real64), intent(in), contiguous :: vector_b(:)
+            real(real64), intent(in) :: vector_a(:)
+            real(real64), intent(in) :: vector_b(:)
             real(real64) :: res
         end function
 
         function abst_real_from_vector_for_inf_norm_function(vector) result(res)
             import :: real64
             implicit none
-            real(real64), intent(in), contiguous :: vector(:)
+            real(real64), intent(in) :: vector(:)
             real(real64) :: res
         end function
     end interface

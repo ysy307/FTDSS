@@ -91,6 +91,7 @@ contains
         ! Initialize
         iter_global = 0
         self%current_iteration = 0
+        self%status = SOLVER_STATUS%SUCCESS%ID
         converged = .false.
 
         ! Clear history
@@ -252,6 +253,10 @@ contains
             end if
 
             if (self%status == SOLVER_STATUS%MAXITER%ID) then
+                write (*, '(A,ES13.5,A,ES13.5,A,I0,A,I0)') &
+                    '   [GMRES] beta0=', beta, &
+                    ' resid=', resid, ' iters=', iter_global, &
+                    ' maxiter=', self%max_iterations
                 exit restart_loop
             end if
 

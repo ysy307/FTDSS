@@ -1,4 +1,5 @@
 submodule(numerical_solver_interface) impl_solve_type_solver_bicgstab
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
 contains
 
@@ -57,7 +58,7 @@ contains
         real(real64) :: rho, rho_old, alpha, beta, omega
         real(real64) :: denom
         real(real64) :: resid
-        real(real64) :: norm_r, norm_v, norm_t, norm_s
+        real(real64) :: norm_r, norm_v, norm_t, norm_s, norm_p
         integer(int32) :: iter
 
         real(real64), dimension(:), pointer :: b_ptr, r_ptr, x_internal_ptr
@@ -134,8 +135,36 @@ contains
                 ! 10: p0 = r0
                 call self%p%copy(self%r)
             else
+                if (.not. ieee_is_finite(rho_old) .or. .not. ieee_is_finite(omega) .or. &
+                    .not. ieee_is_finite(alpha) .or. abs(rho_old) <= tiny(1.0d0) .or. abs(omega) <= tiny(1.0d0)) then
+                    norm_r = vector_norm2(self%r)
+                    write (*, '(A,I0,3(A,ES13.5))') 'BiCG breakdown(beta): iter=', iter, &
+                        ', rho_old=', rho_old, ', omega=', omega, ', ||r||2=', norm_r
+                    self%current_iteration = iter
+                    self%status = SOLVER_STATUS%BREAKDOWN%ID
+                    if (has_internal_x) call x%copy(self%x)
+                    return
+                end if
                 ! 12: beta = (rho / rho_old) * (alpha_k / omega_k)
                 beta = (rho / rho_old) * (alpha / omega)
+                if (.not. ieee_is_finite(beta)) then
+                    norm_r = vector_norm2(self%r)
+                    write (*, '(A,I0,2(A,ES13.5))') 'BiCG invalid beta: iter=', iter, ', beta=', beta, ', ||r||2=', norm_r
+                    self%current_iteration = iter
+                    self%status = SOLVER_STATUS%BREAKDOWN%ID
+                    if (has_internal_x) call x%copy(self%x)
+                    return
+                end if
+                norm_p = vector_norminf(self%p)
+                if (norm_p > 0.0d0 .and. abs(beta) > huge(1.0d0) / norm_p) then
+                    norm_r = vector_norm2(self%r)
+                    write (*, '(A,I0,3(A,ES13.5))') 'BiCG overflow(beta): iter=', iter, &
+                        ', beta=', beta, ', ||p||inf=', norm_p, ', ||r||2=', norm_r
+                    self%current_iteration = iter
+                    self%status = SOLVER_STATUS%BREAKDOWN%ID
+                    if (has_internal_x) call x%copy(self%x)
+                    return
+                end if
                 ! 13: p_k = r_k + beta_k(p_(k-1) - omega_k * Av)
                 call vector_axpy(-omega, self%v, self%p)
                 call vector_scale(beta, self%p)

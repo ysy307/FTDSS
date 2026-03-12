@@ -166,6 +166,10 @@ contains
         real(real64), pointer :: f_data(:) => null()
         real(real64), pointer :: du_data(:) => null()
         real(real64) :: rhs_norm
+        type(type_vector_dp) :: diag_vec
+        real(real64), pointer :: diag_data(:) => null()
+        integer(int32) :: num_nodes_local
+        logical, save :: first_call = .true.
 
         call self%control%profiler_start(PROFILER_TYPES%SOLVE)
 
@@ -188,8 +192,28 @@ contains
         end if
 
         rhs_norm = vector_norm2(F_ptr)
+        write (*, '(A,ES13.5)') '   [DEBUG] ||F||2 = ', rhs_norm
         if (rhs_norm <= tiny(1.0d0)) then
             write (*, '(A,ES13.5)') 'Warning: RHS norm is near zero before linear solve. ||F||2=', rhs_norm
+        end if
+
+        if (first_call) then
+            first_call = .false.
+            call self%domain%get_num_nodes(num_nodes_local)
+            call diag_vec%initialize(num_nodes_local)
+            call diag_vec%zero()
+            call K_ptr%get_diagonal(diag_vec)
+            diag_data => diag_vec%get_data()
+            if (associated(diag_data)) then
+                write (*, '(A,I0,A,ES13.5,A,ES13.5)') &
+                    '   [DEBUG] K diag: n=', size(diag_data), &
+                    ' min=', minval(diag_data), &
+                    ' max=', maxval(diag_data)
+                write (*, '(A,I0)') &
+                    '   [DEBUG] K diag zeros: ', &
+                    count(abs(diag_data) < 1.0d-20)
+            end if
+            nullify (diag_data)
         end if
 
         call self%solver%solve(K_ptr, F_ptr, du_ptr)

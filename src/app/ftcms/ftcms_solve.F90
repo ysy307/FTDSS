@@ -255,6 +255,23 @@ contains
                 ! Linear solve (K * du = F)
                 call self%solve()
 
+                ! If linear solver failed, mark as diverged and exit
+                if (.not. self%solver%is_success()) then
+                    if (self%is_active_thermal()) then
+                        call self%control%set_converged( &
+                            PHYSICS_TYPES%THERMAL, .false.)
+                        call self%control%set_diverged( &
+                            PHYSICS_TYPES%THERMAL, .true.)
+                    end if
+                    if (self%is_active_hydraulic()) then
+                        call self%control%set_converged( &
+                            PHYSICS_TYPES%HYDRAULIC, .false.)
+                        call self%control%set_diverged( &
+                            PHYSICS_TYPES%HYDRAULIC, .true.)
+                    end if
+                    exit nonlinear
+                end if
+
                 ! Convergence check; always converged when config is NONE
                 call self%solve_time_step_check_convergence()
 
@@ -315,6 +332,10 @@ contains
         class(type_ftcms), intent(inout) :: self
 
         logical :: is_step_converged
+        integer(int32) :: consecutive_failures
+        integer(int32), parameter :: MAX_CONSECUTIVE_FAILURES = 50
+
+        consecutive_failures = 0
 
         ! Loop until end time
         time_loop: do while (.not. self%control%is_end_time())
@@ -324,6 +345,7 @@ contains
             call self%control%update(is_step_converged)
 
             if (is_step_converged) then
+                consecutive_failures = 0
                 ! Shift variable history on convergence
                 call self%shift()
 
@@ -332,7 +354,13 @@ contains
                 call self%output_history()
             else
                 ! Retry with smaller dt
-                write (*, '("   [WARNING] Step Failed. Retrying with smaller dt...")')
+                consecutive_failures = consecutive_failures + 1
+                write (*, '("   [WARNING] Step Failed (",I0,"/",I0,"). Retrying with smaller dt...")') &
+                    consecutive_failures, MAX_CONSECUTIVE_FAILURES
+                if (consecutive_failures >= MAX_CONSECUTIVE_FAILURES) then
+                    write (*, '("   [ERROR] Too many consecutive failures. Stopping.")')
+                    exit time_loop
+                end if
                 call self%control%update(is_step_converged)
                 cycle time_loop
             end if

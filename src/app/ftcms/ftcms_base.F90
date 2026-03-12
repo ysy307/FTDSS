@@ -5,8 +5,7 @@ contains
     module subroutine initialize_type_ftcms(self)
         implicit none
         class(type_ftcms), intent(inout) :: self
-
-        type(type_input) :: input
+        type(type_input), save :: input
         type(type_ic_manager) :: ic
 
         integer(int32) :: max_bdf_order
@@ -420,18 +419,7 @@ contains
 
         integer(int32) :: i, node_id
         integer(int32) :: material_id
-        integer(int32) :: bdf_order
-        real(real64), pointer, contiguous :: T_current(:), P_current(:), phi_current(:)
-        type(type_coordinate_array_dp), pointer :: grad_T_array, grad_P_array
-        type(type_coordinate_dp) :: grad_T, grad_P
-        real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
         logical :: do_calc
-
-        nullify (T_current)
-        nullify (P_current)
-        nullify (phi_current)
-        nullify (grad_T_array)
-        nullify (grad_P_array)
 
         if (size(states) /= size(connectivity)) then
             error stop 'set_states_from_connectivity_ftcms: size(states) /= size(connectivity)'
@@ -440,41 +428,13 @@ contains
         do_calc = .true.
         if (present(calc_physics)) do_calc = calc_physics
 
-        call self%control%get_bdf_coeffs(bdf_order=bdf_order)
-
-        if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
-            call self%temperature%get_current(T_current)
-            call self%temperature%get_current_gradient(grad_T_array)
-        end if
-        if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
-            call self%pressure%get_current(P_current)
-            call self%pressure%get_current_gradient(grad_P_array)
-        end if
-        call self%porosity%get_current(phi_current)
-
         do i = 1, size(connectivity)
             node_id = connectivity(i)
-            call states(i)%reset()
-
-            if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
-                call grad_T%set(grad_T_array%x(node_id), grad_T_array%y(node_id), grad_T_array%z(node_id))
-                call self%temperature%get_history(node_id, temperature_history)
-                call states(i)%set(temperature=T_current(node_id), &
-                                   grad_T=grad_T, &
-                                   temperature_history=temperature_history(1:bdf_order + 1))
+            if (node_id < 1) then
+                write (*, '(A, I0, A, I0, A, I0)') 'invalid node_id=', node_id, ', elem=', element_id, ', local=', i
+                error stop 'set_states_from_connectivity_ftcms: node_id out of range'
             end if
-
-            if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
-                call grad_P%set(grad_P_array%x(node_id), grad_P_array%y(node_id), grad_P_array%z(node_id))
-                call self%pressure%get_history(node_id, pressure_history)
-                call states(i)%set(pressure=P_current(node_id), &
-                                   grad_P=grad_P, &
-                                   pressure_history=pressure_history(1:bdf_order + 1))
-            end if
-
-            call self%porosity%get_history(node_id, porosity_history)
-            call states(i)%set(porosity=phi_current(node_id), &
-                               porosity_history=porosity_history(1:bdf_order + 1))
+            call self%set_state(node_id, element_id, states(i), calc_physics=.false.)
         end do
 
         if (do_calc) then

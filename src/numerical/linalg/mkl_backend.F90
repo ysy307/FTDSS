@@ -40,7 +40,7 @@ contains
     function norm_1_mkl(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The computed 1-norm, \( \sum |x_i| \).
         real(real64) :: norm_value
 
@@ -64,7 +64,7 @@ contains
     function norm_2_mkl(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The computed 2-norm, \( \sqrt{\sum x_i^2} \).
         real(real64) :: norm_value
 
@@ -87,7 +87,7 @@ contains
     function norm_inf_mkl(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The computed infinity-norm, \( \max(|x_i|) \).
         real(real64) :: norm_value
 
@@ -114,23 +114,39 @@ contains
     function dot_mkl(x, y) result(product)
         implicit none
         !> The first input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The second input vector.
-        real(real64), intent(in), contiguous :: y(:)
+        real(real64), intent(in) :: y(:)
         !> The computed dot product, \( \sum x_i y_i \).
         real(real64) :: product
 
+    real(real64) :: local_prod
 #ifdef _MPI
-        integer(int32) :: nprocs
+    real(real64) :: global_prod
+    integer(int32) :: ierr
+    integer(int32) :: nprocs
+#endif
+
+    if (is_contiguous(x) .and. is_contiguous(y)) then
+#ifdef _MPI
         call MPI_Comm_size(MPI_COMM_WORLD, nprocs)
         if (nprocs == 1) then
-            product = ddot(int(size(x), int32), x, 1, y, 1)
+        product = ddot(int(size(x), int32), x, 1, y, 1)
         else
-            product = pddot(int(size(x), int32), x, 1, y, 1)
+        product = pddot(int(size(x), int32), x, 1, y, 1)
         end if
 #else
         product = ddot(int(size(x), int32), x, 1, y, 1)
 #endif
+    else
+        local_prod = sum(x * y)
+#ifdef _MPI
+        call MPI_Allreduce(local_prod, global_prod, 1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, ierr)
+        product = global_prod
+#else
+        product = local_prod
+#endif
+    end if
     end function dot_mkl
 #endif
 
@@ -144,7 +160,7 @@ contains
     function norm_1_native(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The computed 1-norm, \( \sum |x_i| \).
         real(real64) :: norm_value
 
@@ -167,7 +183,7 @@ contains
     function norm_2_native(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The computed 2-norm, \( \sqrt{\sum x_i^2} \).
         real(real64) :: norm_value
 
@@ -190,7 +206,7 @@ contains
     function norm_inf_native(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The computed infinity-norm, \( \max(|x_i|) \).
         real(real64) :: norm_value
 
@@ -217,9 +233,9 @@ contains
     function dot_native(x, y) result(product)
         implicit none
         !> The first input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The second input vector.
-        real(real64), intent(in), contiguous :: y(:)
+        real(real64), intent(in) :: y(:)
         !> The computed dot product, \( \sum x_i y_i \).
         real(real64) :: product
 

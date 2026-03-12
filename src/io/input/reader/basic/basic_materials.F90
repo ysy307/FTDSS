@@ -30,6 +30,8 @@ submodule(io_input_basic) input_basic_materials
     character(*), parameter :: theta_r = "theta_r"
     character(*), parameter :: n1 = "n1"
     character(*), parameter :: n2 = "n2"
+    character(*), parameter :: m1 = "m1"
+    character(*), parameter :: m2 = "m2"
     character(*), parameter :: alpha1 = "alpha1"
     character(*), parameter :: alpha2 = "alpha2"
     character(*), parameter :: w1 = "w1"
@@ -150,8 +152,8 @@ contains
 
         if (self%materials(i_material)%phase > 3) then
             buffer(3) = params
-            call get_json_value(json, join(buffer(1:4)), self%materials(i_material)%volumetric_heat_capacity%value, &
-                                is_required=.true., valid_range=[0.0d0, huge(0.0d0)], array_size=self%materials(i_material)%phase)
+            call get_json_value(json, join(buffer(1:4)), self%materials(i_material)%volumetric_heat_capacity%params, &
+                                is_required=.false., valid_range=[-huge(0.0d0), huge(0.0d0)])
         end if
 
         buffer(2) = thermal_conductivity
@@ -172,7 +174,7 @@ contains
         if (self%materials(i_material)%phase > 3) then
             buffer(3) = params
             call get_json_value(json, join(buffer(1:4)), self%materials(i_material)%thermal_conductivity%params, &
-                                is_required=.true., valid_range=[0.0d0, huge(0.0d0)], array_size=self%materials(i_material)%phase)
+                                is_required=.false., valid_range=[-huge(0.0d0), huge(0.0d0)])
         end if
 
         if (self%materials(i_material)%phase > 2) then
@@ -230,6 +232,7 @@ contains
         integer(int32), intent(in) :: i_material !! Material index
 
         character(256) :: buffer(3) = [character(256) :: "", "", ""]
+        logical :: found
 
         character(:), allocatable :: tmp_strings
 
@@ -256,7 +259,11 @@ contains
             buffer(3) = n1
             call get_json_value(json, join(buffer(1:3)), swcc%n1, is_required=.true.)
 
-            ! swcc%m1 = 1.0d0 - 1.0d0 / swcc%n1
+            buffer(3) = m1
+            call get_json_value(json, join(buffer(1:3)), swcc%m1, found=found, is_required=.false., valid_range=[0.0d0, 1.0d0])
+            if (.not. found) then
+                swcc%m1 = 1.0d0 - 1.0d0 / swcc%n1
+            end if
 
             select case (swcc%model_number)
             case (4)
@@ -268,21 +275,29 @@ contains
                 call get_json_value(json, join(buffer(1:3)), swcc%alpha2, is_required=.true.)
                 buffer(3) = n2
                 call get_json_value(json, join(buffer(1:3)), swcc%n2, is_required=.true.)
-                ! swcc%m2 = 1.0d0 - 1.0d0 / swcc%n2
+
+                buffer(3) = m2
+                call get_json_value(json, join(buffer(1:3)), swcc%m2, found=found, is_required=.false., valid_range=[0.0d0, 1.0d0])
+                if (.not. found) then
+                    swcc%m2 = 1.0d0 - 1.0d0 / swcc%n2
+                end if
 
                 buffer(3) = w1
                 call get_json_value(json, join(buffer(1:3)), swcc%w1, is_required=.true., valid_range=[0.0d0, 1.0d0])
-                ! swcc%w2 = 1.0d0 - swcc%w1
+                swcc%w2 = 1.0d0 - swcc%w1
             case (6)
                 buffer(3) = alpha2
                 call get_json_value(json, join(buffer(1:3)), swcc%alpha2, is_required=.true.)
                 buffer(3) = n2
                 call get_json_value(json, join(buffer(1:3)), swcc%n2, is_required=.true.)
-                ! swcc%m2 = 1.0d0 - 1.0d0 / swcc%n2
-
+                buffer(3) = m2
+                call get_json_value(json, join(buffer(1:3)), swcc%m2, found=found, is_required=.false., valid_range=[0.0d0, 1.0d0])
+                    if (.not. found) then
+                        swcc%m2 = 1.0d0 - 1.0d0 / swcc%n2
+                    end if
                 buffer(3) = w1
                 call get_json_value(json, join(buffer(1:3)), swcc%w1, is_required=.true., valid_range=[0.0d0, 1.0d0])
-                ! swcc%w2 = 1.0d0 - swcc%w1
+                swcc%w2 = 1.0d0 - swcc%w1
             end select
 
             buffer(3) = l

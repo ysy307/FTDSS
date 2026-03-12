@@ -54,6 +54,8 @@ contains
             call self%compute_triangle_rule(integration_order)
         else if (FE_TYPE%LAGRANGE_TRIANGLE == cell_type) then
             call self%compute_triangle_rule(integration_order)
+        else if (FE_TYPE%HIGHER_ORDER_TRIANGLE == cell_type) then
+            call self%compute_triangle_rule(integration_order)
         else if (FE_TYPE%QUAD == cell_type) then
             call self%compute_quad_rule(integration_order)
         else if (FE_TYPE%QUADRATIC_QUAD == cell_type) then
@@ -61,6 +63,8 @@ contains
         else if (FE_TYPE%BIQUADRATIC_QUAD == cell_type) then
             call self%compute_quad_rule(integration_order)
         else if (FE_TYPE%LAGRANGE_QUADRILATERAL == cell_type) then
+            call self%compute_quad_rule(integration_order)
+        else if (FE_TYPE%HIGHER_ORDER_QUAD == cell_type) then
             call self%compute_quad_rule(integration_order)
         else if (FE_TYPE%LINE == cell_type) then
             call self%compute_line_rule(integration_order)
@@ -74,6 +78,8 @@ contains
             call self%compute_tetra_rule(integration_order)
         else if (FE_TYPE%LAGRANGE_TETRAHEDRON == cell_type) then
             call self%compute_tetra_rule(integration_order)
+        else if (FE_TYPE%HIGHER_ORDER_TETRAHEDRON == cell_type) then
+            call self%compute_tetra_rule(integration_order)
         else if (FE_TYPE%HEXAHEDRON == cell_type) then
             call self%compute_hexa_rule(integration_order)
         else if (FE_TYPE%QUADRATIC_HEXAHEDRON == cell_type) then
@@ -81,6 +87,8 @@ contains
         else if (FE_TYPE%TRIQUADRATIC_HEXAHEDRON == cell_type) then
             call self%compute_hexa_rule(integration_order)
         else if (FE_TYPE%LAGRANGE_HEXAHEDRON == cell_type) then
+            call self%compute_hexa_rule(integration_order)
+        else if (FE_TYPE%HIGHER_ORDER_HEXAHEDRON == cell_type) then
             call self%compute_hexa_rule(integration_order)
         else
             self%num_gauss = 0
