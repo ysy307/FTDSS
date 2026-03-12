@@ -24,10 +24,18 @@ target_sources(SOLVER_DOMAIN PRIVATE
     fe/element/element_interface.F90
     fe/element/element_triangle_first.F90
     fe/element/element_triangle_second.F90
+    fe/element/element_triangle_third.F90
     fe/element/element_square_first.F90
     fe/element/element_square_second.F90
+    fe/element/element_square_third.F90
     # 3D Finite Elements
     fe/volume/volume_interface.F90
+    fe/volume/volume_tetra_first.F90
+    fe/volume/volume_tetra_second.F90
+    fe/volume/volume_tetra_third.F90
+    fe/volume/volume_hexa_first.F90
+    fe/volume/volume_hexa_second.F90
+    fe/volume/volume_hexa_third.F90
     # FE utilities
     fe/fe_integration.F90
     fe/fe_factory.F90

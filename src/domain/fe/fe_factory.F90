@@ -9,6 +9,7 @@ module domain_fe_factory
     use :: domain_base_fe, only:abst_fe
     use :: domain_fe_side
     use :: domain_fe_element
+    use :: domain_fe_volume
 
     implicit none
     private
@@ -106,6 +107,14 @@ contains
         call register_constructor(vtk_constants%get_cell_type("Quad"),              construct_square_first) !&
         call register_constructor(vtk_constants%get_cell_type("QuadraticTriangle"), construct_triangle_second) !&
         call register_constructor(vtk_constants%get_cell_type("QuadraticQuad"),     construct_square_second) !&
+        call register_constructor(vtk_constants%get_cell_type("LagrangeTriangle"),  construct_triangle_third) !&
+        call register_constructor(vtk_constants%get_cell_type("LagrangeQuadrilateral"), construct_square_third) !&
+        call register_constructor(vtk_constants%get_cell_type("Tetra"),             construct_tetra_first) !&
+        call register_constructor(vtk_constants%get_cell_type("QuadraticTetra"),    construct_tetra_second) !&
+        call register_constructor(vtk_constants%get_cell_type("LagrangeTetrahedron"), construct_tetra_third) !&
+        call register_constructor(vtk_constants%get_cell_type("Hexahedron"),        construct_hexa_first) !&
+        call register_constructor(vtk_constants%get_cell_type("TriQuadraticHexahedron"), construct_hexa_second) !&
+        call register_constructor(vtk_constants%get_cell_type("LagrangeHexahedron"), construct_hexa_third) !&
 
     end subroutine initialize_factory_internal
 

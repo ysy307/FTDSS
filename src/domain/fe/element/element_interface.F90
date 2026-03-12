@@ -15,13 +15,17 @@ module domain_fe_element
 
     public :: type_triangle_first
     public :: type_triangle_second
+    public :: type_triangle_third
     public :: type_square_first
     public :: type_square_second
+    public :: type_square_third
 
     public :: construct_triangle_first
     public :: construct_square_first
     public :: construct_triangle_second
     public :: construct_square_second
+    public :: construct_triangle_third
+    public :: construct_square_third
 
     ! ====================================================================================
     !   Type Definitions
@@ -74,6 +78,30 @@ module domain_fe_element
         procedure, pass(self) :: calc_jacobian => calc_jacobian_square_second
         procedure, pass(self) :: is_inside => is_in_square_second
     end type type_square_second
+
+    !>
+    !> Represents a third-order triangular element (10 nodes, Lagrange P3).
+    !>
+    type, extends(abst_fe) :: type_triangle_third
+    contains
+        procedure, pass(self) :: calc_measure => calc_area_triangle_third
+        procedure, pass(self) :: calc_psi => calc_psi_triangle_third
+        procedure, pass(self) :: calc_dpsi => calc_dpsi_triangle_third
+        procedure, pass(self) :: calc_jacobian => calc_jacobian_triangle_third
+        procedure, pass(self) :: is_inside => is_in_triangle_third
+    end type type_triangle_third
+
+    !>
+    !> Represents a third-order quadrilateral element (16 nodes, Lagrange Q3).
+    !>
+    type, extends(abst_fe) :: type_square_third
+    contains
+        procedure, pass(self) :: calc_measure => calc_area_square_third
+        procedure, pass(self) :: calc_psi => calc_psi_square_third
+        procedure, pass(self) :: calc_dpsi => calc_dpsi_square_third
+        procedure, pass(self) :: calc_jacobian => calc_jacobian_square_third
+        procedure, pass(self) :: is_inside => is_in_square_third
+    end type type_square_third
 
     ! ====================================================================================
     !   Interface Definitions for Submodule Implementation
@@ -387,6 +415,102 @@ module domain_fe_element
             !> Output flag.
             logical, intent(inout) :: is_in
         end subroutine is_in_square_second
+
+        ! --- Triangle Third Order ---
+        module function construct_triangle_third(integration_order) result(fe)
+            implicit none
+            integer(int32), intent(in) :: integration_order
+            class(abst_fe), allocatable :: fe
+        end function construct_triangle_third
+
+        module subroutine calc_area_triangle_third(self, node_coords, measure)
+            implicit none
+            class(type_triangle_third), intent(in) :: self
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64), intent(inout) :: measure
+        end subroutine calc_area_triangle_third
+
+        pure elemental module subroutine calc_psi_triangle_third(self, i, r, psi_val)
+            implicit none
+            class(type_triangle_third), intent(in) :: self
+            integer(int32), intent(in) :: i
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(inout) :: psi_val
+        end subroutine calc_psi_triangle_third
+
+        pure elemental module subroutine calc_dpsi_triangle_third(self, i, j, r, dpsi_val)
+            implicit none
+            class(type_triangle_third), intent(in) :: self
+            integer(int32), intent(in) :: i
+            integer(int32), intent(in) :: j
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(inout) :: dpsi_val
+        end subroutine calc_dpsi_triangle_third
+
+        pure module subroutine calc_jacobian_triangle_third(self, r, node_coords, jac)
+            implicit none
+            class(type_triangle_third), intent(in) :: self
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64), intent(inout) :: jac(:, :)
+        end subroutine calc_jacobian_triangle_third
+
+        module subroutine is_in_triangle_third(self, cartesian, normalized, node_coords, is_in)
+            implicit none
+            class(type_triangle_third), intent(in) :: self
+            type(type_coordinate_dp), intent(in) :: cartesian
+            type(type_coordinate_dp), intent(inout) :: normalized
+            real(real64), intent(in) :: node_coords(:, :)
+            logical, intent(inout) :: is_in
+        end subroutine is_in_triangle_third
+
+        ! --- Square Third Order ---
+        module function construct_square_third(integration_order) result(fe)
+            implicit none
+            integer(int32), intent(in) :: integration_order
+            class(abst_fe), allocatable :: fe
+        end function construct_square_third
+
+        module subroutine calc_area_square_third(self, node_coords, measure)
+            implicit none
+            class(type_square_third), intent(in) :: self
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64), intent(inout) :: measure
+        end subroutine calc_area_square_third
+
+        pure elemental module subroutine calc_psi_square_third(self, i, r, psi_val)
+            implicit none
+            class(type_square_third), intent(in) :: self
+            integer(int32), intent(in) :: i
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(inout) :: psi_val
+        end subroutine calc_psi_square_third
+
+        pure elemental module subroutine calc_dpsi_square_third(self, i, j, r, dpsi_val)
+            implicit none
+            class(type_square_third), intent(in) :: self
+            integer(int32), intent(in) :: i
+            integer(int32), intent(in) :: j
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(inout) :: dpsi_val
+        end subroutine calc_dpsi_square_third
+
+        pure module subroutine calc_jacobian_square_third(self, r, node_coords, jac)
+            implicit none
+            class(type_square_third), intent(in) :: self
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64), intent(inout) :: jac(:, :)
+        end subroutine calc_jacobian_square_third
+
+        module subroutine is_in_square_third(self, cartesian, normalized, node_coords, is_in)
+            implicit none
+            class(type_square_third), intent(in) :: self
+            type(type_coordinate_dp), intent(in) :: cartesian
+            type(type_coordinate_dp), intent(inout) :: normalized
+            real(real64), intent(in) :: node_coords(:, :)
+            logical, intent(inout) :: is_in
+        end subroutine is_in_square_third
 
     end interface
 

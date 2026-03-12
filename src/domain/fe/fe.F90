@@ -5,7 +5,9 @@ module module_fe
     use :: domain_base_fe, only:abst_fe, holder_fes
     use :: domain_fe_side, only:type_side_first, type_side_second
     use :: domain_fe_element, only:type_triangle_first, type_triangle_second, &
-        type_square_first, type_square_second
+        type_triangle_third, type_square_first, type_square_second, type_square_third
+    use :: domain_fe_volume, only:type_tetra_first, type_tetra_second, type_tetra_third, &
+        type_hexa_first, type_hexa_second, type_hexa_third
     use :: domain_fe_factory, only:create_fe
     use :: domain_fe_manager, only:type_fe_manager
     implicit none
@@ -20,8 +22,16 @@ module module_fe
     public :: type_side_second
     public :: type_triangle_first
     public :: type_triangle_second
+    public :: type_triangle_third
     public :: type_square_first
     public :: type_square_second
+    public :: type_square_third
+    public :: type_tetra_first
+    public :: type_tetra_second
+    public :: type_tetra_third
+    public :: type_hexa_first
+    public :: type_hexa_second
+    public :: type_hexa_third
 
     !-------------------------------------------------------------------------------------------------------------------------------
     ! operation procedures
