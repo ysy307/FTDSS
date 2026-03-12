@@ -17,14 +17,18 @@ module domain_fe_volume
     public :: type_tetra_third
     public :: type_hexa_first
     public :: type_hexa_second
+    public :: type_hexa_second_serendipity
     public :: type_hexa_third
+    public :: type_hexa_third_serendipity
 
     public :: construct_tetra_first
     public :: construct_tetra_second
     public :: construct_tetra_third
     public :: construct_hexa_first
     public :: construct_hexa_second
+    public :: construct_hexa_second_serendipity
     public :: construct_hexa_third
+    public :: construct_hexa_third_serendipity
 
     ! ====================================================================================
     !   Type Definitions
@@ -80,6 +84,16 @@ module domain_fe_volume
         procedure, pass(self) :: is_inside => is_in_hexa_second
     end type type_hexa_second
 
+    !> 20-node quadratic Serendipity hexahedron (Q2 Serendipity)
+    type, extends(abst_fe) :: type_hexa_second_serendipity
+    contains
+        procedure, pass(self) :: calc_measure => calc_volume_hexa_second_serendipity
+        procedure, pass(self) :: calc_psi => calc_psi_hexa_second_serendipity
+        procedure, pass(self) :: calc_dpsi => calc_dpsi_hexa_second_serendipity
+        procedure, pass(self) :: calc_jacobian => calc_jacobian_hexa_second_serendipity
+        procedure, pass(self) :: is_inside => is_in_hexa_second_serendipity
+    end type type_hexa_second_serendipity
+
     !> 64-node tricubic hexahedron (Q3)
     type, extends(abst_fe) :: type_hexa_third
     contains
@@ -89,6 +103,16 @@ module domain_fe_volume
         procedure, pass(self) :: calc_jacobian => calc_jacobian_hexa_third
         procedure, pass(self) :: is_inside => is_in_hexa_third
     end type type_hexa_third
+
+    !> 32-node cubic Serendipity hexahedron (Q3 Serendipity)
+    type, extends(abst_fe) :: type_hexa_third_serendipity
+    contains
+        procedure, pass(self) :: calc_measure => calc_volume_hexa_third_serendipity
+        procedure, pass(self) :: calc_psi => calc_psi_hexa_third_serendipity
+        procedure, pass(self) :: calc_dpsi => calc_dpsi_hexa_third_serendipity
+        procedure, pass(self) :: calc_jacobian => calc_jacobian_hexa_third_serendipity
+        procedure, pass(self) :: is_inside => is_in_hexa_third_serendipity
+    end type type_hexa_third_serendipity
 
     ! ====================================================================================
     !   Interface Definitions for Submodule Implementation
@@ -334,6 +358,54 @@ module domain_fe_volume
             logical, intent(inout) :: is_in
         end subroutine is_in_hexa_second
 
+        ! --- Hexa Second Order Serendipity (20-node) ---
+        module function construct_hexa_second_serendipity(integration_order) result(fe)
+            implicit none
+            integer(int32), intent(in) :: integration_order
+            class(abst_fe), allocatable :: fe
+        end function construct_hexa_second_serendipity
+
+        module subroutine calc_volume_hexa_second_serendipity(self, node_coords, measure)
+            implicit none
+            class(type_hexa_second_serendipity), intent(in) :: self
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64), intent(inout) :: measure
+        end subroutine calc_volume_hexa_second_serendipity
+
+        pure elemental module subroutine calc_psi_hexa_second_serendipity(self, i, r, psi_val)
+            implicit none
+            class(type_hexa_second_serendipity), intent(in) :: self
+            integer(int32), intent(in) :: i
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(inout) :: psi_val
+        end subroutine calc_psi_hexa_second_serendipity
+
+        pure elemental module subroutine calc_dpsi_hexa_second_serendipity(self, i, j, r, dpsi_val)
+            implicit none
+            class(type_hexa_second_serendipity), intent(in) :: self
+            integer(int32), intent(in) :: i
+            integer(int32), intent(in) :: j
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(inout) :: dpsi_val
+        end subroutine calc_dpsi_hexa_second_serendipity
+
+        pure module subroutine calc_jacobian_hexa_second_serendipity(self, r, node_coords, jac)
+            implicit none
+            class(type_hexa_second_serendipity), intent(in) :: self
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64), intent(inout) :: jac(:, :)
+        end subroutine calc_jacobian_hexa_second_serendipity
+
+        module subroutine is_in_hexa_second_serendipity(self, cartesian, normalized, node_coords, is_in)
+            implicit none
+            class(type_hexa_second_serendipity), intent(in) :: self
+            type(type_coordinate_dp), intent(in) :: cartesian
+            type(type_coordinate_dp), intent(inout) :: normalized
+            real(real64), intent(in) :: node_coords(:, :)
+            logical, intent(inout) :: is_in
+        end subroutine is_in_hexa_second_serendipity
+
         ! --- Hexa Third Order ---
         module function construct_hexa_third(integration_order) result(fe)
             implicit none
@@ -381,6 +453,54 @@ module domain_fe_volume
             real(real64), intent(in) :: node_coords(:, :)
             logical, intent(inout) :: is_in
         end subroutine is_in_hexa_third
+
+        ! --- Hexa Third Order Serendipity (32-node) ---
+        module function construct_hexa_third_serendipity(integration_order) result(fe)
+            implicit none
+            integer(int32), intent(in) :: integration_order
+            class(abst_fe), allocatable :: fe
+        end function construct_hexa_third_serendipity
+
+        module subroutine calc_volume_hexa_third_serendipity(self, node_coords, measure)
+            implicit none
+            class(type_hexa_third_serendipity), intent(in) :: self
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64), intent(inout) :: measure
+        end subroutine calc_volume_hexa_third_serendipity
+
+        pure elemental module subroutine calc_psi_hexa_third_serendipity(self, i, r, psi_val)
+            implicit none
+            class(type_hexa_third_serendipity), intent(in) :: self
+            integer(int32), intent(in) :: i
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(inout) :: psi_val
+        end subroutine calc_psi_hexa_third_serendipity
+
+        pure elemental module subroutine calc_dpsi_hexa_third_serendipity(self, i, j, r, dpsi_val)
+            implicit none
+            class(type_hexa_third_serendipity), intent(in) :: self
+            integer(int32), intent(in) :: i
+            integer(int32), intent(in) :: j
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(inout) :: dpsi_val
+        end subroutine calc_dpsi_hexa_third_serendipity
+
+        pure module subroutine calc_jacobian_hexa_third_serendipity(self, r, node_coords, jac)
+            implicit none
+            class(type_hexa_third_serendipity), intent(in) :: self
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64), intent(inout) :: jac(:, :)
+        end subroutine calc_jacobian_hexa_third_serendipity
+
+        module subroutine is_in_hexa_third_serendipity(self, cartesian, normalized, node_coords, is_in)
+            implicit none
+            class(type_hexa_third_serendipity), intent(in) :: self
+            type(type_coordinate_dp), intent(in) :: cartesian
+            type(type_coordinate_dp), intent(inout) :: normalized
+            real(real64), intent(in) :: node_coords(:, :)
+            logical, intent(inout) :: is_in
+        end subroutine is_in_hexa_third_serendipity
 
     end interface
 

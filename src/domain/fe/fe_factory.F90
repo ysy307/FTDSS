@@ -109,11 +109,13 @@ contains
         call register_constructor(vtk_constants%get_cell_type("QuadraticQuad"),     construct_square_second) !&
         call register_constructor(vtk_constants%get_cell_type("LagrangeTriangle"),  construct_triangle_third) !&
         call register_constructor(vtk_constants%get_cell_type("LagrangeQuadrilateral"), construct_square_third) !&
+        call register_constructor(vtk_constants%get_cell_type("BiQuadraticQuad"), construct_square_second_lagrange) !&
         call register_constructor(vtk_constants%get_cell_type("Tetra"),             construct_tetra_first) !&
         call register_constructor(vtk_constants%get_cell_type("QuadraticTetra"),    construct_tetra_second) !&
         call register_constructor(vtk_constants%get_cell_type("LagrangeTetrahedron"), construct_tetra_third) !&
         call register_constructor(vtk_constants%get_cell_type("Hexahedron"),        construct_hexa_first) !&
         call register_constructor(vtk_constants%get_cell_type("TriQuadraticHexahedron"), construct_hexa_second) !&
+        call register_constructor(vtk_constants%get_cell_type("QuadraticHexahedron"), construct_hexa_second_serendipity) !&
         call register_constructor(vtk_constants%get_cell_type("LagrangeHexahedron"), construct_hexa_third) !&
 
     end subroutine initialize_factory_internal
