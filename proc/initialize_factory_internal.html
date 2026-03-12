@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">12 statements</a>
+                 title=" 0.0% of total for procedures.">20 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -540,6 +540,14 @@ large graphs.</div>
 <span class="w">        </span><span class="k">call </span><span class="n">register_constructor</span><span class="p">(</span><span class="n">vtk_constants</span><span class="p">%</span><span class="n">get_cell_type</span><span class="p">(</span><span class="s2">&quot;Quad&quot;</span><span class="p">),</span><span class="w">              </span><span class="n">construct_square_first</span><span class="p">)</span><span class="w"> </span><span class="c">!&amp;</span>
 <span class="w">        </span><span class="k">call </span><span class="n">register_constructor</span><span class="p">(</span><span class="n">vtk_constants</span><span class="p">%</span><span class="n">get_cell_type</span><span class="p">(</span><span class="s2">&quot;QuadraticTriangle&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">construct_triangle_second</span><span class="p">)</span><span class="w"> </span><span class="c">!&amp;</span>
 <span class="w">        </span><span class="k">call </span><span class="n">register_constructor</span><span class="p">(</span><span class="n">vtk_constants</span><span class="p">%</span><span class="n">get_cell_type</span><span class="p">(</span><span class="s2">&quot;QuadraticQuad&quot;</span><span class="p">),</span><span class="w">     </span><span class="n">construct_square_second</span><span class="p">)</span><span class="w"> </span><span class="c">!&amp;</span>
+<span class="w">        </span><span class="k">call </span><span class="n">register_constructor</span><span class="p">(</span><span class="n">vtk_constants</span><span class="p">%</span><span class="n">get_cell_type</span><span class="p">(</span><span class="s2">&quot;LagrangeTriangle&quot;</span><span class="p">),</span><span class="w">  </span><span class="n">construct_triangle_third</span><span class="p">)</span><span class="w"> </span><span class="c">!&amp;</span>
+<span class="w">        </span><span class="k">call </span><span class="n">register_constructor</span><span class="p">(</span><span class="n">vtk_constants</span><span class="p">%</span><span class="n">get_cell_type</span><span class="p">(</span><span class="s2">&quot;LagrangeQuadrilateral&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">construct_square_third</span><span class="p">)</span><span class="w"> </span><span class="c">!&amp;</span>
+<span class="w">        </span><span class="k">call </span><span class="n">register_constructor</span><span class="p">(</span><span class="n">vtk_constants</span><span class="p">%</span><span class="n">get_cell_type</span><span class="p">(</span><span class="s2">&quot;Tetra&quot;</span><span class="p">),</span><span class="w">             </span><span class="n">construct_tetra_first</span><span class="p">)</span><span class="w"> </span><span class="c">!&amp;</span>
+<span class="w">        </span><span class="k">call </span><span class="n">register_constructor</span><span class="p">(</span><span class="n">vtk_constants</span><span class="p">%</span><span class="n">get_cell_type</span><span class="p">(</span><span class="s2">&quot;QuadraticTetra&quot;</span><span class="p">),</span><span class="w">    </span><span class="n">construct_tetra_second</span><span class="p">)</span><span class="w"> </span><span class="c">!&amp;</span>
+<span class="w">        </span><span class="k">call </span><span class="n">register_constructor</span><span class="p">(</span><span class="n">vtk_constants</span><span class="p">%</span><span class="n">get_cell_type</span><span class="p">(</span><span class="s2">&quot;LagrangeTetrahedron&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">construct_tetra_third</span><span class="p">)</span><span class="w"> </span><span class="c">!&amp;</span>
+<span class="w">        </span><span class="k">call </span><span class="n">register_constructor</span><span class="p">(</span><span class="n">vtk_constants</span><span class="p">%</span><span class="n">get_cell_type</span><span class="p">(</span><span class="s2">&quot;Hexahedron&quot;</span><span class="p">),</span><span class="w">        </span><span class="n">construct_hexa_first</span><span class="p">)</span><span class="w"> </span><span class="c">!&amp;</span>
+<span class="w">        </span><span class="k">call </span><span class="n">register_constructor</span><span class="p">(</span><span class="n">vtk_constants</span><span class="p">%</span><span class="n">get_cell_type</span><span class="p">(</span><span class="s2">&quot;TriQuadraticHexahedron&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">construct_hexa_second</span><span class="p">)</span><span class="w"> </span><span class="c">!&amp;</span>
+<span class="w">        </span><span class="k">call </span><span class="n">register_constructor</span><span class="p">(</span><span class="n">vtk_constants</span><span class="p">%</span><span class="n">get_cell_type</span><span class="p">(</span><span class="s2">&quot;LagrangeHexahedron&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">construct_hexa_third</span><span class="p">)</span><span class="w"> </span><span class="c">!&amp;</span>
 
 <span class="w">    </span><span class="k">end subroutine </span><span class="n">initialize_factory_internal</span>
 </pre></div>
@@ -565,7 +573,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-12 00:35 +0000             </p>
+ on 2026-03-12 08:04 +0000             </p>
           </div>
         </div>
         <br>

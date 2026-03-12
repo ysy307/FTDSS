@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.7% of total for modules and submodules.">289 statements</a>
+                 title=" 0.6% of total for modules and submodules.">289 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -216,11 +216,11 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
+                  <li class="list-inline-item"><a href='module_linalg.html'>module_linalg</a></li>
                   <li class="list-inline-item"><a href='numerical_solver_preconditioner.html'>numerical_solver_preconditioner</a></li>
                   <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
-                  <li class="list-inline-item">stdlib_strings</li>
                   <li class="list-inline-item"><a href='module_core.html'>module_core</a></li>
-                  <li class="list-inline-item"><a href='module_linalg.html'>module_linalg</a></li>
+                  <li class="list-inline-item">stdlib_strings</li>
               </ul>
             </li>
             <li class="list-group-item">
@@ -3114,7 +3114,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1540"></span>
+              <span class="anchor" id="variable-self~1024"></span>
               class(<a href='../type/type_solver_bicgstab.html'>type_solver_bicgstab</a>),
             </td>
 <td>intent(inout)</td>
@@ -3163,7 +3163,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1543"></span>
+              <span class="anchor" id="variable-self~1027"></span>
               class(<a href='../type/type_solver_gmres.html'>type_solver_gmres</a>),
             </td>
 <td>intent(inout)</td>
@@ -3212,8 +3212,87 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1538"></span>
+              <span class="anchor" id="variable-self~1022"></span>
               class(<a href='../type/type_solver_bicgstab.html'>type_solver_bicgstab</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-solver_settings~4"></span>
+              type(<a href='../type/type_solver_settings~2.html'>type_solver_settings</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>solver_settings</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-preconditioner_settings~2"></span>
+              type(<a href='../type/type_preconditioner_settings.html'>type_preconditioner_settings</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>preconditioner_settings</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+        </li>
+    </ul>
+  </div>
+
+              <div class="card">
+    <div class="card-header bg-light codesum">
+      <span class="anchor" id="interface-initialize_type_solver_gmres"></span>
+      <h3>        interface
+      </h3>
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item">
+              <h3>
+    private module subroutine initialize_type_solver_gmres(self, solver_settings, preconditioner_settings)  
+    <a href="../proc/initialize_type_solver_gmres.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+
+    </h3>
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~1025"></span>
+              class(<a href='../type/type_solver_gmres.html'>type_solver_gmres</a>),
             </td>
 <td>intent(inout)</td>
               <td></td>            <td>
@@ -3265,85 +3344,6 @@ large graphs.</div>
 
               <div class="card">
     <div class="card-header bg-light codesum">
-      <span class="anchor" id="interface-initialize_type_solver_gmres"></span>
-      <h3>        interface
-      </h3>
-    </div>
-    <ul class="list-group">
-        <li class="list-group-item">
-              <h3>
-    private module subroutine initialize_type_solver_gmres(self, solver_settings, preconditioner_settings)  
-    <a href="../proc/initialize_type_solver_gmres.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
-
-    </h3>
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-self~1541"></span>
-              class(<a href='../type/type_solver_gmres.html'>type_solver_gmres</a>),
-            </td>
-<td>intent(inout)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-solver_settings~6"></span>
-              type(<a href='../type/type_solver_settings~2.html'>type_solver_settings</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>solver_settings</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" id="variable-preconditioner_settings~4"></span>
-              type(<a href='../type/type_preconditioner_settings.html'>type_preconditioner_settings</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>preconditioner_settings</strong></td>
-            <td>
-                
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-        </li>
-    </ul>
-  </div>
-
-              <div class="card">
-    <div class="card-header bg-light codesum">
       <span class="anchor" id="interface-solve_type_solver_bicgstab"></span>
       <h3>        interface
       </h3>
@@ -3370,7 +3370,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1539"></span>
+              <span class="anchor" id="variable-self~1023"></span>
               class(<a href='../type/type_solver_bicgstab.html'>type_solver_bicgstab</a>),
             </td>
 <td>intent(inout)</td>
@@ -3385,7 +3385,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-a~34"></span>
+              <span class="anchor" id="variable-a~7"></span>
               class(<a href='../type/abst_matrix.html'>abst_matrix</a>),
             </td>
 <td>intent(in)</td>
@@ -3400,7 +3400,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-b~36"></span>
+              <span class="anchor" id="variable-b~10"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
 <td>intent(in)</td>
@@ -3415,7 +3415,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-x~74"></span>
+              <span class="anchor" id="variable-x~39"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
 <td>intent(inout)</td>
@@ -3464,7 +3464,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1542"></span>
+              <span class="anchor" id="variable-self~1026"></span>
               class(<a href='../type/type_solver_gmres.html'>type_solver_gmres</a>),
             </td>
 <td>intent(inout)</td>
@@ -3479,7 +3479,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-a~35"></span>
+              <span class="anchor" id="variable-a~8"></span>
               class(<a href='../type/abst_matrix.html'>abst_matrix</a>),
             </td>
 <td>intent(in)</td>
@@ -3494,7 +3494,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-b~37"></span>
+              <span class="anchor" id="variable-b~11"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
 <td>intent(in)</td>
@@ -3509,7 +3509,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-x~75"></span>
+              <span class="anchor" id="variable-x~40"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
 <td>intent(inout)</td>
@@ -3560,7 +3560,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1537"></span>
+              <span class="anchor" id="variable-self~1021"></span>
               class(<a href='../type/abst_solver.html'>abst_solver</a>),
             </td>
 <td>intent(inout)</td>
@@ -3606,7 +3606,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1535"></span>
+              <span class="anchor" id="variable-self~1019"></span>
               class(<a href='../type/abst_solver.html'>abst_solver</a>),
             </td>
 <td>intent(inout)</td>
@@ -3621,7 +3621,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-solver_settings~4"></span>
+              <span class="anchor" id="variable-solver_settings~3"></span>
               type(<a href='../type/type_solver_settings~2.html'>type_solver_settings</a>),
             </td>
 <td>intent(in)</td>
@@ -3636,7 +3636,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-preconditioner_settings~2"></span>
+              <span class="anchor" id="variable-preconditioner_settings"></span>
               type(<a href='../type/type_preconditioner_settings.html'>type_preconditioner_settings</a>),
             </td>
 <td>intent(in)</td>
@@ -3682,7 +3682,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1536"></span>
+              <span class="anchor" id="variable-self~1020"></span>
               class(<a href='../type/abst_solver.html'>abst_solver</a>),
             </td>
 <td>intent(inout)</td>
@@ -3697,7 +3697,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-a~33"></span>
+              <span class="anchor" id="variable-a~6"></span>
               class(<a href='../type/abst_matrix.html'>abst_matrix</a>),
             </td>
 <td>intent(in)</td>
@@ -3712,7 +3712,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-b~35"></span>
+              <span class="anchor" id="variable-b~9"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
 <td>intent(in)</td>
@@ -3727,7 +3727,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-x~72"></span>
+              <span class="anchor" id="variable-x~37"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
 <td>intent(inout)</td>
@@ -3795,7 +3795,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-id~139"></span>
+              <span class="anchor" id="variable-id~15"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -3812,7 +3812,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-max_iterations~13"></span>
+              <span class="anchor" id="variable-max_iterations~10"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -3829,7 +3829,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-name~138"></span>
+              <span class="anchor" id="variable-name~6"></span>
               character(len=:),
             </td>
               <td>private,</td>
@@ -3846,7 +3846,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_dofs_per_node~12"></span>
+              <span class="anchor" id="variable-num_dofs_per_node~8"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -3863,7 +3863,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_nodes~59"></span>
+              <span class="anchor" id="variable-num_nodes~46"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -3880,7 +3880,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-pc~2"></span>
+              <span class="anchor" id="variable-pc"></span>
               class(<a href='../type/abst_preconditioner.html'>abst_preconditioner</a>),
             </td>
               <td>private,</td>
@@ -3914,7 +3914,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-status~13"></span>
+              <span class="anchor" id="variable-status~12"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -3962,7 +3962,7 @@ large graphs.</div>
               </tr>
               <tr>
                 <td>  procedure(<a href='../interface/abst_solver_destroy.html'>abst_solver_destroy</a>), public, deferred, pass(self) ::
-  <strong><a href='../type/abst_solver.html#boundprocedure-destroy~36'>destroy</a></strong></td>
+  <strong><a href='../type/abst_solver.html#boundprocedure-destroy~35'>destroy</a></strong></td>
                   <td></td>
               </tr>
               <tr>
@@ -3972,7 +3972,7 @@ large graphs.</div>
               </tr>
               <tr>
                 <td>  procedure(<a href='../interface/abst_solver_initialize.html'>abst_solver_initialize</a>), public, deferred, pass(self) ::
-  <strong><a href='../type/abst_solver.html#boundprocedure-initialize~76'>initialize</a></strong></td>
+  <strong><a href='../type/abst_solver.html#boundprocedure-initialize~65'>initialize</a></strong></td>
                   <td></td>
               </tr>
               <tr>
@@ -4010,7 +4010,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-p~18"></span>
+              <span class="anchor" id="variable-p~16"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
               <td>public</td>
@@ -4044,7 +4044,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-r~59"></span>
+              <span class="anchor" id="variable-r~68"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
               <td>public</td>
@@ -4078,7 +4078,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-s~2"></span>
+              <span class="anchor" id="variable-s"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
               <td>public</td>
@@ -4112,7 +4112,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-t~2"></span>
+              <span class="anchor" id="variable-t~10"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
               <td>public</td>
@@ -4129,7 +4129,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-v~2"></span>
+              <span class="anchor" id="variable-v~3"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
               <td>public</td>
@@ -4146,7 +4146,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-x~73"></span>
+              <span class="anchor" id="variable-x~38"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
               <td>public</td>
@@ -4177,7 +4177,7 @@ large graphs.</div>
               </tr>
               <tr>
                 <td>  procedure, public ::
-  <strong><a href='../type/type_solver_bicgstab.html#boundprocedure-destroy~37'>destroy</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/destroy_type_solver_bicgstab.html'>destroy_type_solver_bicgstab</a></td>
+  <strong><a href='../type/type_solver_bicgstab.html#boundprocedure-destroy~36'>destroy</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/destroy_type_solver_bicgstab.html'>destroy_type_solver_bicgstab</a></td>
                   <td></td>
               </tr>
               <tr>
@@ -4187,7 +4187,7 @@ large graphs.</div>
               </tr>
               <tr>
                 <td>  procedure, public ::
-  <strong><a href='../type/type_solver_bicgstab.html#boundprocedure-initialize~77'>initialize</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/initialize_type_solver_bicgstab.html'>initialize_type_solver_bicgstab</a></td>
+  <strong><a href='../type/type_solver_bicgstab.html#boundprocedure-initialize~66'>initialize</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/initialize_type_solver_bicgstab.html'>initialize_type_solver_bicgstab</a></td>
                   <td></td>
               </tr>
               <tr>
@@ -4259,7 +4259,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-h~32"></span>
+              <span class="anchor" id="variable-h~24"></span>
               real(kind=real64),
             </td>
               <td>public,</td>
@@ -4293,7 +4293,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-r~60"></span>
+              <span class="anchor" id="variable-r~69"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
               <td>public</td>
@@ -4327,7 +4327,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-v~3"></span>
+              <span class="anchor" id="variable-v~4"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
               <td>public,</td>
@@ -4344,7 +4344,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-w~9"></span>
+              <span class="anchor" id="variable-w~11"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
               <td>public</td>
@@ -4378,7 +4378,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-y~37"></span>
+              <span class="anchor" id="variable-y~19"></span>
               real(kind=real64),
             </td>
               <td>public,</td>
@@ -4395,7 +4395,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-z~25"></span>
+              <span class="anchor" id="variable-z~10"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
               <td>public</td>
@@ -4426,7 +4426,7 @@ large graphs.</div>
               </tr>
               <tr>
                 <td>  procedure, public ::
-  <strong><a href='../type/type_solver_gmres.html#boundprocedure-destroy~38'>destroy</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/destroy_type_solver_gmres.html'>destroy_type_solver_gmres</a></td>
+  <strong><a href='../type/type_solver_gmres.html#boundprocedure-destroy~37'>destroy</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/destroy_type_solver_gmres.html'>destroy_type_solver_gmres</a></td>
                   <td></td>
               </tr>
               <tr>
@@ -4436,7 +4436,7 @@ large graphs.</div>
               </tr>
               <tr>
                 <td>  procedure, public ::
-  <strong><a href='../type/type_solver_gmres.html#boundprocedure-initialize~78'>initialize</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/initialize_type_solver_gmres.html'>initialize_type_solver_gmres</a></td>
+  <strong><a href='../type/type_solver_gmres.html#boundprocedure-initialize~67'>initialize</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/initialize_type_solver_gmres.html'>initialize_type_solver_gmres</a></td>
                   <td></td>
               </tr>
               <tr>
@@ -4474,7 +4474,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-id~138"></span>
+              <span class="anchor" id="variable-id~14"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -4508,7 +4508,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-max_iterations~12"></span>
+              <span class="anchor" id="variable-max_iterations~9"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -4525,7 +4525,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_dofs_per_node~11"></span>
+              <span class="anchor" id="variable-num_dofs_per_node~7"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -4542,7 +4542,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_nodes~58"></span>
+              <span class="anchor" id="variable-num_nodes~45"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -4602,7 +4602,7 @@ large graphs.</div>
           <tbody>
               <tr>
                 <td>  procedure, public ::
-  <strong><a href='../type/type_solver_settings~2.html#boundprocedure-set~16'>set</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/set_solver_settings.html'>set_solver_settings</a></td>
+  <strong><a href='../type/type_solver_settings~2.html#boundprocedure-set~8'>set</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/set_solver_settings.html'>set_solver_settings</a></td>
                   <td></td>
               </tr>
           </tbody>
@@ -4636,7 +4636,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1545"></span>
+              <span class="anchor" id="variable-self~1029"></span>
               class(<a href='../type/abst_solver.html'>abst_solver</a>),
             </td>
 <td>intent(inout)</td>
@@ -4651,7 +4651,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-time~7"></span>
+              <span class="anchor" id="variable-time~3"></span>
               real(kind=real64),
             </td>
 <td>intent(in),</td>
@@ -4721,7 +4721,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-solver_settings~7"></span>
+              <span class="anchor" id="variable-solver_settings~6"></span>
               type(<a href='../type/type_solver_settings~2.html'>type_solver_settings</a>),
             </td>
 <td>intent(in)</td>
@@ -4736,7 +4736,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-preconditioner_settings~5"></span>
+              <span class="anchor" id="variable-preconditioner_settings~4"></span>
               type(<a href='../type/type_preconditioner_settings.html'>type_preconditioner_settings</a>),
             </td>
 <td>intent(in)</td>
@@ -4751,7 +4751,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-ierr~51"></span>
+              <span class="anchor" id="variable-ierr~25"></span>
               integer(kind=int32),
             </td>
 <td>intent(inout)</td>
@@ -4791,7 +4791,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1546"></span>
+              <span class="anchor" id="variable-self~1030"></span>
               class(<a href='../type/abst_solver.html'>abst_solver</a>),
             </td>
 <td>intent(inout)</td>
@@ -4846,7 +4846,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1544"></span>
+              <span class="anchor" id="variable-self~1028"></span>
               class(<a href='../type/type_solver_settings~2.html'>type_solver_settings</a>),
             </td>
 <td>intent(inout)</td>
@@ -4861,7 +4861,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-id~140"></span>
+              <span class="anchor" id="variable-id~16"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -4876,7 +4876,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_nodes~60"></span>
+              <span class="anchor" id="variable-num_nodes~47"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -4906,7 +4906,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-max_iterations~14"></span>
+              <span class="anchor" id="variable-max_iterations~11"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -4964,7 +4964,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-12 00:35 +0000             </p>
+ on 2026-03-12 08:04 +0000             </p>
           </div>
         </div>
         <br>
