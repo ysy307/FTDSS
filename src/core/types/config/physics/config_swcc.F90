@@ -69,7 +69,7 @@ contains
         call copy_config_physics_model(self, source)
 
         select type (source)
-        type is (type_config_wrf)
+        class is (type_config_wrf)
             call self%set(self%swcc_model, source%swcc_model)
             call self%set(self%theta_s, source%theta_s)
             call self%set(self%theta_r, source%theta_r)

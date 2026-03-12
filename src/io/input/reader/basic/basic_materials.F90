@@ -153,7 +153,7 @@ contains
         if (self%materials(i_material)%phase > 3) then
             buffer(3) = params
             call get_json_value(json, join(buffer(1:4)), self%materials(i_material)%volumetric_heat_capacity%params, &
-                                is_required=.false., valid_range=[-huge(0.0d0), huge(0.0d0)])
+                                is_required=.false.)
         end if
 
         buffer(2) = thermal_conductivity
@@ -174,7 +174,7 @@ contains
         if (self%materials(i_material)%phase > 3) then
             buffer(3) = params
             call get_json_value(json, join(buffer(1:4)), self%materials(i_material)%thermal_conductivity%params, &
-                                is_required=.false., valid_range=[-huge(0.0d0), huge(0.0d0)])
+                                is_required=.false.)
         end if
 
         if (self%materials(i_material)%phase > 2) then
@@ -233,6 +233,7 @@ contains
 
         character(256) :: buffer(3) = [character(256) :: "", "", ""]
         logical :: found
+        integer(int32) :: nul_pos
 
         character(:), allocatable :: tmp_strings
 
@@ -242,7 +243,23 @@ contains
         associate (swcc => self%materials(i_material)%water_characteristic_curve)
             buffer(3) = model
             call get_json_value(json, join(buffer(1:3)), tmp_strings, is_required=.true.)
+
+            ! Normalize parser output to avoid hidden characters (e.g., NUL) causing model lookup failures.
+            tmp_strings = strip(tmp_strings)
+            nul_pos = index(tmp_strings, achar(0))
+            if (nul_pos > 0) then
+                if (nul_pos == 1) then
+                    tmp_strings = ""
+                else
+                    tmp_strings = tmp_strings(:nul_pos - 1)
+                end if
+            end if
+
             swcc%model_number = SWCC_MODELS%to_id(tmp_strings)
+            if (swcc%model_number < 0) then
+                write (*, *) 'Error: Invalid SWCC model in input ', trim(tmp_strings)
+                stop 1
+            end if
 
             buffer(3) = unit
             call get_json_value(json, join(buffer(1:3)), tmp_strings, is_required=.true., valid_list=valid_units)

@@ -8,7 +8,9 @@ contains
         integer(int32), intent(in) :: active_region_ids(:)
 
         integer(int32) :: num_materials
+        integer(int32) :: num_active_materials
         integer(int32) :: i, j
+        integer(int32) :: material_idx
 
         type(type_config_constitutive), allocatable :: density_info(:)
         type(type_config_constitutive), allocatable :: specific_heat_info(:)
@@ -21,38 +23,51 @@ contains
         ! Initialize thermal physics components
 
         num_materials = input%basic%num_materials
+        num_active_materials = size(active_region_ids)
 
-        allocate (density_info(num_materials))
-        allocate (specific_heat_info(num_materials))
-        allocate (heat_capacity_info(num_materials))
-        allocate (thermal_conductivity_info(num_materials))
-        allocate (wrf_model_info(num_materials))
-        allocate (hcf_model_info(num_materials))
-        allocate (gcc_model_info(num_materials))
+        allocate (density_info(num_active_materials))
+        allocate (specific_heat_info(num_active_materials))
+        allocate (heat_capacity_info(num_active_materials))
+        allocate (thermal_conductivity_info(num_active_materials))
+        allocate (wrf_model_info(num_active_materials))
+        allocate (hcf_model_info(num_active_materials))
+        allocate (gcc_model_info(num_active_materials))
 
-        do i = 1, num_materials
-            do j = 1, size(active_region_ids)
+        do j = 1, num_active_materials
+            material_idx = 0
+            do i = 1, num_materials
                 if (input%basic%materials(i)%id == active_region_ids(j)) then
-
-                    call density_info(i)%reset()
-                    call specific_heat_info(i)%reset()
-                    call heat_capacity_info(i)%reset()
-                    call thermal_conductivity_info(i)%reset()
-
-                    call input_translator%execute(input, i, CONSTITUTIVE_PROPERTIES%DENSITY, &
-                                                  density_info(i))
-                    call input_translator%execute(input, i, CONSTITUTIVE_PROPERTIES%SPECIFIC_HEAT, &
-                                                  specific_heat_info(i))
-                    call input_translator%execute(input, i, CONSTITUTIVE_PROPERTIES%VOLUMETRIC_HEAT_CAPACITY, &
-                                                  heat_capacity_info(i))
-                    call input_translator%execute(input, i, CONSTITUTIVE_PROPERTIES%THERMAL_CONDUCTIVITY, &
-                                                  thermal_conductivity_info(i))
-
-                    call input_translator%execute(input, i, wrf_model_info(i))
-                    call input_translator%execute(input, i, hcf_model_info(i))
-                    call input_translator%execute(input, i, gcc_model_info(i))
+                    material_idx = i
+                    exit
                 end if
             end do
+
+            if (material_idx == 0) then
+                if (num_materials == 1) then
+                    material_idx = 1
+                else
+                    write (*, *) 'Error: No material definition matched active region id ', active_region_ids(j)
+                    stop 1
+                end if
+            end if
+
+            call density_info(j)%reset()
+            call specific_heat_info(j)%reset()
+            call heat_capacity_info(j)%reset()
+            call thermal_conductivity_info(j)%reset()
+
+            call input_translator%execute(input, material_idx, CONSTITUTIVE_PROPERTIES%DENSITY, &
+                                          density_info(j))
+            call input_translator%execute(input, material_idx, CONSTITUTIVE_PROPERTIES%SPECIFIC_HEAT, &
+                                          specific_heat_info(j))
+            call input_translator%execute(input, material_idx, CONSTITUTIVE_PROPERTIES%VOLUMETRIC_HEAT_CAPACITY, &
+                                          heat_capacity_info(j))
+            call input_translator%execute(input, material_idx, CONSTITUTIVE_PROPERTIES%THERMAL_CONDUCTIVITY, &
+                                          thermal_conductivity_info(j))
+
+            call input_translator%execute(input, material_idx, wrf_model_info(j))
+            call input_translator%execute(input, material_idx, hcf_model_info(j))
+            call input_translator%execute(input, material_idx, gcc_model_info(j))
         end do
 
         call self%physics%initialize(active_region_ids, density_info, &
