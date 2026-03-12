@@ -21,7 +21,6 @@ contains
         integer(int32) :: num_nodes
         integer(int32) :: dimension
         integer(int32) :: order
-        integer(int32) :: num_gauss
 
         allocate (type_side_first :: fe)
 
@@ -40,8 +39,6 @@ contains
         class(type_side_first), intent(in) :: self
         real(real64), intent(in) :: node_coords(:, :)
         real(real64), intent(inout) :: measure
-        integer(int32) :: node1_id
-        integer(int32) :: node2_id
         real(real64) :: dx
         real(real64) :: dy
         real(real64) :: dz
@@ -106,7 +103,6 @@ contains
         real(real64), intent(inout) :: tangent_vec(:)
 
         integer(int32) :: i
-        integer(int32) :: node_id
         integer(int32) :: nn
         real(real64) :: dpsi_val
 
@@ -152,8 +148,6 @@ contains
         real(real64) :: w(3)
         real(real64) :: t
         real(real64) :: v_dot_v
-        integer(int32) :: node1_id
-        integer(int32) :: node2_id
         real(real64), parameter :: tol = 1.0e-9
 
         ! Vector from node 1 to node 2

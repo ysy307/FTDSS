@@ -153,8 +153,8 @@ contains
                 self%cells(i)%cell_type = raw_cell_types(i)
                 self%cells(i)%cell_entity_id = raw_cell_entity_ids(i)
 
-                connectivity_first = raw_offsets(i) + 1
-                connectivity_last = raw_offsets(i + 1)
+                connectivity_first = int(raw_offsets(i), int32) + 1
+                connectivity_last = int(raw_offsets(i + 1), int32)
                 num_nodes_in_cell = connectivity_last - connectivity_first + 1
                 call allocate_array(self%cells(i)%connectivity, num_nodes_in_cell)
                 self%cells(i)%connectivity(:) = int(raw_connectivity(connectivity_first:connectivity_last), kind=int32) + 1

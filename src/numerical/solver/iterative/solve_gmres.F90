@@ -1,4 +1,4 @@
-submodule(numerical_solver_interface) solve_type_solver_gmres
+submodule(numerical_solver_interface) impl_solve_type_solver_gmres
     implicit none
 contains
 
@@ -85,7 +85,7 @@ contains
         type(type_vector_dp), intent(inout) :: x
 
         real(real64) :: beta, w_norm, temp_val, resid
-        integer(int32) :: i, j, k, ierr, iter_global, iter
+        integer(int32) :: i, k, ierr, iter_global, iter
         logical :: converged
 
         ! Initialize
@@ -347,4 +347,4 @@ contains
         end do
     end subroutine backward_substitution
 
-end submodule solve_type_solver_gmres
+end submodule impl_solve_type_solver_gmres

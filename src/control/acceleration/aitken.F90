@@ -1,7 +1,7 @@
 !> Implementation overview
 !>
 !> Algorithm:
-!> - Aitken's delta-squared process for dynamic relaxation
+!> - Aitken delta-squared process for dynamic relaxation
 !>
 !> Numerical considerations:
 !> - Relaxation factor is bounded by configuration limits to prevent instability

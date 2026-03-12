@@ -74,7 +74,7 @@ contains
 
     subroutine evaluate_bc_manager(self, bc_id, current_time, u_curr, result)
         implicit none
-        class(type_bc_manager), intent(in) :: self
+        class(type_bc_manager), intent(inout) :: self
         integer(int32), intent(in) :: bc_id
         real(real64), intent(in) :: current_time
         real(real64), intent(in) :: u_curr
@@ -89,7 +89,7 @@ contains
 
     subroutine evaluate_bcs_manager(self, bc_id, current_time, u_curr, results)
         implicit none
-        class(type_bc_manager), intent(in) :: self
+        class(type_bc_manager), intent(inout) :: self
         integer(int32), intent(in) :: bc_id
         real(real64), intent(in) :: current_time
         real(real64), intent(in) :: u_curr(:)

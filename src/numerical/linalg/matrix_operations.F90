@@ -264,7 +264,6 @@ contains
         !> Error status
         integer(int32), intent(inout) :: ierr
 
-        integer(int32) :: i
         integer(int32) :: num_row, num_col
 
         num_row = size(A, 1)
@@ -273,11 +272,14 @@ contains
         ! Warning (406) fixed by declaring A as contiguous
         call dgemv('N', num_row, num_col, alpha, A, num_row, x, 1, beta, y, 1)
 #else
+        block
+        integer(int32) :: i
         !$omp parallel do private(i)
         do i = 1, num_row
             y(i) = alpha * dot_product(A(i, :), x) + beta * y(i)
         end do
         !$omp end parallel do
+        end block
 #endif
         ierr = MATRIX_STATUS%SUCCESS%ID
 
@@ -301,7 +303,6 @@ contains
         integer(int32), intent(inout) :: ierr
 
         type(type_matrix_info) :: info
-        integer(int32) :: i
 
 #ifdef _MKL
         real(real64), dimension(:, :), pointer :: val_ptr
@@ -317,11 +318,14 @@ contains
         call dgemv('N', info%num_rows, info%num_cols, alpha, val_ptr, info%num_rows, x, 1, beta, y, 1)
 #else
         call A%get_info(info)
+        block
+        integer(int32) :: i
         !$omp parallel do private(i)
         do i = 1, info%num_rows
             y(i) = alpha * dot_product(A%val(i, :), x) + beta * y(i)
         end do
         !$omp end parallel do
+        end block
 #endif
         ierr = MATRIX_STATUS%SUCCESS%ID
 
@@ -536,7 +540,7 @@ contains
 
     !> Compute the inverse of a square matrix A.
     !> The result overwrites A (In-place).
-    !> Uses analytical formulas (Cramer's rule variant) for N <= 3.
+    !> Uses analytical formulas (Cramer rule variant) for N <= 3.
     !> For N > 3: Uses LAPACK (dgetrf/dgetri) if _MKL is defined.
     !> [FIX] Corrected fallback implementation (Gauss-Jordan with identity augmentation) for non-MKL case.
     subroutine matrix_inverse_real64(A, ierr)

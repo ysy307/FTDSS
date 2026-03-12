@@ -91,10 +91,6 @@ contains
         type(type_config_time), intent(in) :: config_time
         type(type_config_time_ats), intent(in) :: config_time_ats
 
-        integer(int32) :: istat
-        real(real64) :: time_conv_coeff
-        type(type_constant_value) :: time_unit
-
         call self%config%copy(config_time)
 
         ! --- BDF Settings ---
@@ -204,7 +200,7 @@ contains
         ! L_j(t) = prod_{m!=j} (t - t_{n-m}) / (t_{n-j} - t_{n-m})
 
         ! (A) Case j = 0 (Coefficient for y_n)
-        ! L_0'(t_n) = sum_{m=1}^k (1 / tau(m))
+        ! L_0_(t_n) = sum_{m=1}^k (1 / tau(m))
         do m = 1, k
             self%coeffs(0) = self%coeffs(0) + (1.0d0 / tau(m))
         end do

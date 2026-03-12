@@ -29,9 +29,7 @@ contains
         type(type_config_ic), intent(in) :: configs(:)
         ! type(type_input), intent(in) :: input
 
-        integer(int32) :: i, ic_method
-        integer(int32) :: target_ic_id
-        character(:), allocatable :: target_str
+        integer(int32) :: i
 
         do i = 1, IC_TARGETS%NUM_ID
             ! Skip if analysis is not active (except Porosity which might always be needed)
@@ -60,8 +58,6 @@ contains
         class(type_ic_manager), intent(in) :: self
         type(type_constant_id), intent(in) :: initial_target_id
         type(type_variable), intent(inout) :: variable
-
-        integer(int32) :: id
 
         if (.not. IC_TARGETS%is_valid(initial_target_id)) then
             return

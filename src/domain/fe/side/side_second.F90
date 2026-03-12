@@ -20,7 +20,6 @@ contains
         integer(int32) :: num_nodes
         integer(int32) :: dimension
         integer(int32) :: order
-        integer(int32) :: num_gauss
 
         allocate (type_side_second :: fe)
 
@@ -176,7 +175,6 @@ contains
         real(real64) :: psi_val
         integer(int32) :: iter
         integer(int32) :: i
-        integer(int32) :: node_id
         integer(int32) :: nn
         logical :: converged
         real(real64), parameter :: tol = 1.0e-9

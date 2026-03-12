@@ -35,7 +35,7 @@ contains
     ! =========================================================================
 #ifdef _MKL
     !>
-    !> Computes the 1-norm of a vector using MKL's ASUM function.
+    !> Computes the 1-norm of a vector using the MKL ASUM function.
     !>
     function norm_1_mkl(x) result(norm_value)
         implicit none
@@ -59,7 +59,7 @@ contains
     end function norm_1_mkl
 
     !>
-    !> Computes the 2-norm (Euclidean norm) of a vector using MKL's NRM2 function.
+    !> Computes the 2-norm (Euclidean norm) of a vector using the MKL NRM2 function.
     !>
     function norm_2_mkl(x) result(norm_value)
         implicit none
@@ -82,7 +82,7 @@ contains
     end function norm_2_mkl
 
     !>
-    !> Computes the infinity-norm (maximum absolute value) of a vector using MKL's IDAMAX.
+    !> Computes the infinity-norm (maximum absolute value) of a vector using the MKL IDAMAX.
     !>
     function norm_inf_mkl(x) result(norm_value)
         implicit none
@@ -109,7 +109,7 @@ contains
     end function norm_inf_mkl
 
     !>
-    !> Computes the dot product of two vectors using MKL's DOT function.
+    !> Computes the dot product of two vectors using the MKL DOT function.
     !>
     function dot_mkl(x, y) result(product)
         implicit none
@@ -137,6 +137,7 @@ contains
     ! =========================================================================
     ! 2. Native Fortran Backend Implementations
     ! =========================================================================
+#ifndef _MKL
     !>
     !> Computes the 1-norm of a vector using native Fortran intrinsics.
     !>
@@ -234,5 +235,6 @@ contains
         product = local_prod
 #endif
     end function dot_native
+#endif
 
 end module linalg_mkl_backend

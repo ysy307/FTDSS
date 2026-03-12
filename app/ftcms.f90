@@ -30,7 +30,7 @@ contains
 
         call ftcms%initialize()
         call ftcms%run()
-        call ftcms%finalize()
+        call ftcms%destroy()
 
     end subroutine run_test_ftcms
 

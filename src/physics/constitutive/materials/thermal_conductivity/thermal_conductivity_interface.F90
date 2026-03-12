@@ -68,7 +68,6 @@ module materials_thermal_conductivity
 
     interface
         module subroutine initialize_abst_thc(self, material_id, constitutive_info, water, ice)
-            import :: abst_thc, type_config_constitutive, type_iapws97, type_iapws06, int32
             implicit none
             class(abst_thc), intent(inout) :: self
             integer(int32), intent(in) :: material_id

@@ -70,7 +70,7 @@ contains
             if (.not. file_exists(self%input_path//"Output.json")) error_flag = 4
         end if
 
-        ! 2. Broadcast rank 0's check result (error_flag) to all ranks
+        ! 2. Broadcast rank 0 check result (error_flag) to all ranks
         call MPI_Bcast(error_flag, 1, MPI_INTEGER, 0, MPI_COMM_WORLD, ierr)
 
         ! 3. Abort all ranks if an error was detected
@@ -113,7 +113,6 @@ contains
         class(type_input), intent(in) :: self
 
         integer(int32) :: ierr, myrank
-        integer(int32) :: i
 
         call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
         if (myrank == 0) then

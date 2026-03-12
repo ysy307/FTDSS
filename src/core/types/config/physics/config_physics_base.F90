@@ -35,7 +35,7 @@ contains
         class(abst_config), intent(in) :: source
 
         select type (source)
-        type is (abst_config_physics_model)
+        class is (abst_config_physics_model)
             call self%set(self%material_id, source%material_id)
         end select
     end subroutine copy_config_physics_model
@@ -52,7 +52,7 @@ contains
         class(abst_config), intent(in) :: source
 
         select type (source)
-        type is (abst_config_physics_material)
+        class is (abst_config_physics_material)
             call self%set(self%material_id, source%material_id)
             call self%set(self%num_phases, source%num_phases)
         end select

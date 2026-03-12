@@ -52,9 +52,7 @@ contains
         implicit none
         class(type_jacobian_matrix), intent(inout) :: self
         class(type_domain), intent(in) :: domain
-        integer(int32) :: num_nodes, num_dofs
         integer(int32), allocatable :: row(:), col(:)
-        integer(int32) :: target_matrix_type
 
         if (allocated(self%matrix)) call self%destroy()
 

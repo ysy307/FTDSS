@@ -418,7 +418,6 @@ module models_hcf
 
     interface
         module subroutine calc_kr_abst_hcf_viscosity(self, temperature, kr)
-            import :: abst_hcf_viscosity, real64
             implicit none
             class(abst_hcf_viscosity), intent(in) :: self
             real(real64), intent(in) :: temperature

@@ -13,8 +13,6 @@ contains
         integer(int32), allocatable :: active_region_ids(:)
         integer(int32) :: num_nodes
         integer(int32) :: i
-        character(len=10), allocatable :: profiler_labels(:)
-        real(real64) :: current_time
         integer(int32) :: computation_dimension
         integer(int32) :: num_total_dofs
         integer(int32) :: ierr

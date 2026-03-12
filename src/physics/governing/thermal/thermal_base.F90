@@ -8,7 +8,6 @@ contains
         integer(int32), intent(in) :: active_region_ids(:)
 
         integer(int32) :: num_materials
-        integer(int32) :: num_phases
         integer(int32) :: i, j
 
         type(type_config_constitutive), allocatable :: density_info(:)

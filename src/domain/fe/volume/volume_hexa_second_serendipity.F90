@@ -21,8 +21,12 @@ submodule(domain_fe_volume) domain_fe_volume_hexa_second_serendipity
     real(real64), parameter :: vz(8) = [-1.0d0, -1.0d0, -1.0d0, -1.0d0,  1.0d0,  1.0d0,  1.0d0,  1.0d0]
 
     ! Edge midpoint reference coordinates for nodes 9-20
-    real(real64), parameter :: ex(12) = [0.0d0,  1.0d0, 0.0d0, -1.0d0,  0.0d0,  1.0d0, 0.0d0, -1.0d0, -1.0d0,  1.0d0,  1.0d0, -1.0d0]
-    real(real64), parameter :: ey(12) = [-1.0d0, 0.0d0, 1.0d0,  0.0d0, -1.0d0,  0.0d0, 1.0d0,  0.0d0, -1.0d0, -1.0d0,  1.0d0,  1.0d0]
+    real(real64), parameter :: ex(12) = [ &
+        0.0d0,  1.0d0, 0.0d0, -1.0d0,  0.0d0,  1.0d0, &
+        0.0d0, -1.0d0, -1.0d0,  1.0d0,  1.0d0, -1.0d0]
+    real(real64), parameter :: ey(12) = [ &
+        -1.0d0, 0.0d0, 1.0d0,  0.0d0, -1.0d0,  0.0d0, &
+        1.0d0,  0.0d0, -1.0d0, -1.0d0,  1.0d0,  1.0d0]
     real(real64), parameter :: ez(12) = [-1.0d0, -1.0d0, -1.0d0, -1.0d0, 1.0d0, 1.0d0, 1.0d0, 1.0d0, 0.0d0, 0.0d0, 0.0d0, 0.0d0]
 
     ! Which directions are "free" for each edge midpoint (1=xi varies, 2=eta varies, 3=zeta varies)

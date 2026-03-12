@@ -17,8 +17,6 @@ contains
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json
 
-        character(:), allocatable :: temp_string
-
         character(256) :: buffer(2) = [character(256) :: analysis_controls, ""]
 
         buffer(2) = calculate_thermal

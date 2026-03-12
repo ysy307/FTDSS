@@ -53,7 +53,6 @@ contains
 
         logical :: found
         integer(int32) :: i
-        integer(int32) :: target_id
 
         call json%info(materials, found=found, n_children=self%num_materials)
         call json%print_error_message(output_unit)

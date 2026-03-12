@@ -222,7 +222,6 @@ contains
         type(type_constant_id), intent(in) :: op
         class(type_vector_int), intent(in) :: alpha
 
-        integer(int32) :: i
         integer(int32), dimension(:), pointer :: alpha_data
 
         if (.not. VECTOR_OPS%is_valid(op)) then

@@ -22,7 +22,6 @@ contains
         integer(int32) :: num_nodes
         integer(int32) :: dimension
         integer(int32) :: order
-        integer(int32) :: num_gauss
 
         allocate (type_triangle_first :: fe)
 

@@ -125,8 +125,6 @@ contains
         type(type_constant_id), pointer :: computation_type
         integer(int32) :: num_nodes
 
-        integer(int32) :: i
-
         nullify (fe)
         nullify (connectivity_local)
 

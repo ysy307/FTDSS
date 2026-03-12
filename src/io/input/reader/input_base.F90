@@ -63,7 +63,6 @@ contains
 
         logical :: var_found
         logical :: required
-        integer(int32) :: i
 
         required = optval(is_required, .false.)
 

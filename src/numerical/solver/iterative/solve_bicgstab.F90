@@ -1,4 +1,4 @@
-submodule(numerical_solver_interface) solve_type_solver_bicgstab
+submodule(numerical_solver_interface) impl_solve_type_solver_bicgstab
     implicit none
 contains
 
@@ -233,4 +233,4 @@ contains
 
         self%status = SOLVER_STATUS%SUCCESS%ID
     end subroutine destroy_type_solver_bicgstab
-end submodule solve_type_solver_bicgstab
+end submodule impl_solve_type_solver_bicgstab

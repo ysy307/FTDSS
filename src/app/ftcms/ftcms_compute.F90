@@ -4,7 +4,7 @@
 !> - Volume-weighted smoothing of element-wise state variables to nodes
 !> - Solving the global linear system
 !> - L2 projection (lumped mass) for nodal gradient calculations
-!> - Evaluation of water and vapor fluxes based on Darcy's law
+!> - Evaluation of water and vapor fluxes based on the Darcy law
 submodule(app_ftcms) ftcms_compute
     implicit none
 contains
@@ -483,7 +483,7 @@ contains
         call self%thermal%calc_density_water(state, rho_w)
         gravity_term = K_wP * rho_w * g
 
-        ! --- Flux calculation (Darcy's law: q = -K_wT*grad_T - K_wP*grad_P - K*grad_z) ---
+        ! --- Flux calculation (Darcy law: q = -K_wT*grad_T - K_wP*grad_P - K*grad_z) ---
         select case (computation_type%ID)
         case (COMP_TYPES%XY_2D%ID)
             water_flux%x = -K_wT * grad_T%x - K_wP * grad_P%x
