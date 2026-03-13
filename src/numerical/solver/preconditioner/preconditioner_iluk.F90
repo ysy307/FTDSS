@@ -170,6 +170,9 @@ contains
         integer(int32) :: bs
         integer(int32) :: info_lapack
         integer(int32), allocatable :: work_pos(:)
+        integer(int32) :: kb
+        real(real64) :: diag_val
+        real(real64), parameter :: PIVOT_TOL = 1.0d-12
 
         bs = self%block_size
         mat_ptr => A%get_ptr()
@@ -215,6 +218,21 @@ contains
             end if
         end do
 
+        ! Modified ILU(0): replace negative in-block diagonals with absolute values
+        ! in the PRECONDITIONER copy only. This makes the preconditioner approximate
+        ! a positive-definite matrix, which is more robust for indefinite systems
+        ! arising from phase-change (latent heat) contributions.
+        do i = 1, self%num_rows
+            do kb = 1, bs
+                diag_val = self%val_blocks(kb, kb, self%diag_ptr(i))
+                if (diag_val < 0.0d0) then
+                    self%val_blocks(kb, kb, self%diag_ptr(i)) = abs(diag_val)
+                else if (abs(diag_val) < PIVOT_TOL) then
+                    self%val_blocks(kb, kb, self%diag_ptr(i)) = PIVOT_TOL
+                end if
+            end do
+        end do
+
         do i = 1, self%num_rows
             do k = self%ptr(i), self%ptr(i + 1) - 1
                 work_pos(self%ind(k)) = k
@@ -236,6 +254,14 @@ contains
                                    self%val_blocks(:, :, target_idx), bs)
                     end if
                 end do
+            end do
+
+            ! Ensure diagonal block has no near-zero pivots after elimination
+            do kb = 1, bs
+                diag_val = self%val_blocks(kb, kb, self%diag_ptr(i))
+                if (abs(diag_val) < PIVOT_TOL) then
+                    self%val_blocks(kb, kb, self%diag_ptr(i)) = PIVOT_TOL
+                end if
             end do
 
             call dgetrf(bs, bs, self%val_blocks(:, :, self%diag_ptr(i)), bs, &

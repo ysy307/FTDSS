@@ -177,7 +177,20 @@ contains
                 ! Happy Breakdown check
                 if (w_norm < 1.0d-20) then
                     self%h(iter + 1, iter) = 0.0d0
-                    ! Cannot extend basis further; break loop (residual should be small)
+
+                    ! Still need to apply Givens rotations to this column
+                    do i = 1, iter - 1
+                        temp_val = self%cs(i) * self%h(i, iter) + self%sn(i) * self%h(i + 1, iter)
+                        self%h(i + 1, iter) = -self%sn(i) * self%h(i, iter) + self%cs(i) * self%h(i + 1, iter)
+                        self%h(i, iter) = temp_val
+                    end do
+                    call generate_givens_rotation(self%h(iter, iter), self%h(iter + 1, iter), self%cs(iter), self%sn(iter))
+                    self%h(iter, iter) = self%cs(iter) * self%h(iter, iter) + self%sn(iter) * self%h(iter + 1, iter)
+                    self%h(iter + 1, iter) = 0.0d0
+                    self%g(iter + 1) = -self%sn(iter) * self%g(iter)
+                    self%g(iter) = self%cs(iter) * self%g(iter)
+
+                    converged = .true.
                     exit arnoldi_loop
                 else
                     self%h(iter + 1, iter) = w_norm
@@ -213,7 +226,8 @@ contains
                 resid = abs(self%g(iter + 1))
                 call self%residual_history%set(MATRIX_OPS%INS, iter_global, resid)
 
-                if (resid < self%tolerance) then
+                if (resid < self%tolerance .or. &
+                    (beta > self%tolerance .and. resid < self%relative_tolerance * beta)) then
                     converged = .true.
                     exit arnoldi_loop
                 end if
@@ -283,6 +297,7 @@ contains
         end if
 
         call self%r%destroy()
+        call self%w%destroy()
         call self%z%destroy()
         call self%x_update%destroy()
 
@@ -348,7 +363,11 @@ contains
             do j = i + 1, n
                 sum_val = sum_val - H(i, j) * y(j)
             end do
-            y(i) = sum_val / H(i, i)
+            if (abs(H(i, i)) > tiny(1.0d0)) then
+                y(i) = sum_val / H(i, i)
+            else
+                y(i) = 0.0d0
+            end if
         end do
     end subroutine backward_substitution
 

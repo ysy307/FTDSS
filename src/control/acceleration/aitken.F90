@@ -86,7 +86,7 @@ contains
                 omega = self%previous_relaxation_factor(pid)
             end if
         else
-            omega = 1.0d0
+            omega = 0.5d0
             self%relaxation_factor(pid) = omega
         end if
 

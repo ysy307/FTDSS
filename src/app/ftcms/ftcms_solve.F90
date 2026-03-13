@@ -118,12 +118,6 @@ contains
 
             ! Aitken relaxation check
 
-            if (is_compute_picard .and. .not. is_config_none) then
-                if (self%control%reach_minimum_relaxation(PHYSICS_TYPES%THERMAL)) then
-                    write (*, *) "Warning: Relaxation factor too small. Stagnation detected."
-                    call self%control%set_diverged(PHYSICS_TYPES%THERMAL, diverged)
-                end if
-            end if
         end if
 
         ! ----------------------------------------------------------------------
@@ -142,13 +136,6 @@ contains
                 call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, diverged)
             else
                 call self%control%check_convergence(PHYSICS_TYPES%HYDRAULIC, residual, increment)
-            end if
-
-            if (is_compute_picard .and. .not. is_config_none) then
-                if (self%control%reach_minimum_relaxation(PHYSICS_TYPES%HYDRAULIC)) then
-                    write (*, *) "Warning: Relaxation factor too small. Stagnation detected."
-                    call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, diverged)
-                end if
             end if
         end if
 
@@ -361,7 +348,6 @@ contains
                     write (*, '("   [ERROR] Too many consecutive failures. Stopping.")')
                     exit time_loop
                 end if
-                call self%control%update(is_step_converged)
                 cycle time_loop
             end if
 

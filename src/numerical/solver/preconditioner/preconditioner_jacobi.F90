@@ -112,6 +112,14 @@ contains
                 call A%get_diagonal_block(i, self%M_inv_blocks(:, :, i))
                 call dgetrf(bs, bs, self%M_inv_blocks(:, :, i), bs, &
                             self%ipiv_blocks(:, i), ierr)
+                if (ierr /= 0) then
+                    ! Fallback to identity for singular blocks
+                    self%M_inv_blocks(:, :, i) = 0.0d0
+                    do concurrent (integer(int32) :: kb = 1:bs)
+                        self%M_inv_blocks(kb, kb, i) = 1.0d0
+                        self%ipiv_blocks(kb, i) = kb
+                    end do
+                end if
             end do
             !$omp end parallel do
 

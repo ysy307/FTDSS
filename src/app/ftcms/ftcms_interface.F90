@@ -44,6 +44,9 @@ module app_ftcms
 
         class(abst_solver), allocatable :: solver
 
+        integer(int32) :: thermal_start_dof = 0
+        integer(int32) :: hydraulic_start_dof = 0
+
         type(type_control) :: control
         type(type_output_manager) :: output
 

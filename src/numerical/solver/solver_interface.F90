@@ -42,6 +42,7 @@ module numerical_solver_interface
         integer(int32) :: num_nodes = -1
         integer(int32) :: num_dofs_per_node = -1
         real(real64) :: tolerance = 0.0d0
+        real(real64) :: relative_tolerance = 1.0d-6
         integer(int32) :: max_iterations = 0
 
         type(type_vector_dp) :: residual_history
