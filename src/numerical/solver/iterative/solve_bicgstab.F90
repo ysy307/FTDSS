@@ -57,7 +57,7 @@ contains
 
         real(real64) :: rho, rho_old, alpha, beta, omega
         real(real64) :: denom, ratio1, ratio2
-        real(real64) :: resid
+        real(real64) :: resid, resid0
         real(real64) :: norm_r, norm_v, norm_t, norm_s, norm_p
         integer(int32) :: iter
 
@@ -121,6 +121,7 @@ contains
 
         ! Initial convergence check
         resid = vector_norm2(self%r)
+        resid0 = resid
         call self%residual_history%set(MATRIX_OPS%INS, 1, resid)
         if (resid < self%tolerance) then
             self%current_iteration = 0
@@ -294,7 +295,8 @@ contains
             ! 25: ||r_k+1||_2
             resid = vector_norm2(self%r)
             call self%residual_history%set(MATRIX_OPS%INS, iter, resid)
-            if (resid < self%tolerance) then
+            if (resid < self%tolerance .or. &
+                (resid0 > self%tolerance .and. resid < self%relative_tolerance * resid0)) then
                 self%current_iteration = iter
                 self%status = SOLVER_STATUS%SUCCESS%ID
                 if (has_internal_x) call x%copy(self%x)

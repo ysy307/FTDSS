@@ -168,8 +168,10 @@ contains
         real(real64) :: rhs_norm
         type(type_vector_dp) :: diag_vec
         real(real64), pointer :: diag_data(:) => null()
-        integer(int32) :: num_nodes_local
-        logical, save :: first_call = .true.
+        integer(int32) :: num_total_dofs
+        integer(int32) :: ierr
+        real(real64) :: diag_min, diag_max, diag_ratio
+        integer(int32) :: i, n_neg
 
         call self%control%profiler_start(PROFILER_TYPES%SOLVE)
 
@@ -192,32 +194,82 @@ contains
         end if
 
         rhs_norm = vector_norm2(F_ptr)
-        write (*, '(A,ES13.5)') '   [DEBUG] ||F||2 = ', rhs_norm
+        write (*, '(A,ES13.5)') '   [SOLVE] ||F||2 = ', rhs_norm
         if (rhs_norm <= tiny(1.0d0)) then
             write (*, '(A,ES13.5)') 'Warning: RHS norm is near zero before linear solve. ||F||2=', rhs_norm
         end if
 
-        if (first_call) then
-            first_call = .false.
-            call self%domain%get_num_nodes(num_nodes_local)
-            call diag_vec%initialize(num_nodes_local)
-            call diag_vec%zero()
-            call K_ptr%get_diagonal(diag_vec)
-            diag_data => diag_vec%get_data()
-            if (associated(diag_data)) then
-                write (*, '(A,I0,A,ES13.5,A,ES13.5)') &
-                    '   [DEBUG] K diag: n=', size(diag_data), &
-                    ' min=', minval(diag_data), &
-                    ' max=', maxval(diag_data)
-                write (*, '(A,I0)') &
-                    '   [DEBUG] K diag zeros: ', &
-                    count(abs(diag_data) < 1.0d-20)
-            end if
-            nullify (diag_data)
+        ! ------------------------------------------------------------------
+        ! Symmetric diagonal scaling: D^{-1/2} K D^{-1/2} * (D^{1/2} du) = D^{-1/2} F
+        ! This normalizes the diagonal to +-1, dramatically improving condition number
+        ! ------------------------------------------------------------------
+        call self%domain%get_total_dofs(num_total_dofs)
+        call diag_vec%initialize(num_total_dofs)
+        call diag_vec%zero()
+        ierr = 0
+
+        ! Extract diagonal and compute scaling factors
+        call K_ptr%get_diagonal(diag_vec)
+        diag_data => diag_vec%get_data()
+        if (associated(diag_data)) then
+            diag_min = huge(1.0d0)
+            diag_max = 0.0d0
+            n_neg = 0
+            do i = 1, size(diag_data)
+                if (abs(diag_data(i)) > tiny(1.0d0)) then
+                    diag_min = min(diag_min, abs(diag_data(i)))
+                    diag_max = max(diag_max, abs(diag_data(i)))
+                end if
+                if (diag_data(i) < -tiny(1.0d0)) n_neg = n_neg + 1
+            end do
+            diag_ratio = diag_max / max(diag_min, tiny(1.0d0))
+            write (*, '(A,I0,A,I0,A,I0)') &
+                '   [SCALE] ndof=', size(diag_data), &
+                ' n_zero=', count(abs(diag_data) < tiny(1.0d0)), &
+                ' n_neg=', n_neg
+            write (*, '(A,ES10.3,A,ES10.3,A,ES10.3)') &
+                '   [SCALE] diag_min=', diag_min, &
+                ' diag_max=', diag_max, ' ratio=', diag_ratio
+
+            ! Compute scaling vector: d(i) = 1/sqrt(|diag(i)|)
+            ! Guard against near-zero diagonals
+            do i = 1, size(diag_data)
+                if (abs(diag_data(i)) < epsilon(1.0d0)) then
+                    diag_data(i) = 1.0d0
+                else
+                    diag_data(i) = 1.0d0 / sqrt(abs(diag_data(i)))
+                end if
+            end do
+
+            ! Scale matrix: K_s = D^{-1/2} K D^{-1/2}
+            call K_ptr%scale(MATRIX_OPS%SCALE_SYMM_DIAG, diag_vec)
+
+            ! Scale RHS: F_s = D^{-1/2} F
+            do i = 1, size(f_data)
+                f_data(i) = f_data(i) * diag_data(i)
+            end do
         end if
 
+        ! Zero the solution vector before solve (initial guess = 0)
+        call du_ptr%zero()
+
+        ! Solve scaled system: K_s * du_s = F_s
         call self%solver%solve(K_ptr, F_ptr, du_ptr)
         call self%solver%check()
+
+        ! Unscale solution: du = D^{-1/2} * du_s
+        if (associated(diag_data)) then
+            do i = 1, size(du_data)
+                du_data(i) = du_data(i) * diag_data(i)
+            end do
+        end if
+
+        ! Linear solver diagnostics
+        write (*, '(A,L1)') &
+            '   [LINEAR] converged=', self%solver%is_success()
+
+        nullify (diag_data)
+        call diag_vec%destroy()
 
         nullify (K_ptr)
         nullify (F_ptr)

@@ -143,7 +143,8 @@ contains
                                  solver_settings%tolerance, &
                                  solver_settings%max_iterations, &
                                  solver_settings%m_restarts)
-            if (solver_settings%preconditioner_type == PRECONDITIONER_TYPES%ILU%ID) then
+            if (solver_settings%preconditioner_type == PRECONDITIONER_TYPES%ILU%ID .or. &
+                solver_settings%preconditioner_type == PRECONDITIONER_TYPES%JACOBI%ID) then
                 call pc_info%set(solver_settings%preconditioner_type, num_nodes, self%K%get_num_dofs_per_node())
             else
                 call pc_info%set(solver_settings%preconditioner_type, num_total_dofs)
@@ -321,7 +322,7 @@ contains
         if (self%control%is_physics_active(variable_id)) then
             call self%domain%get_num_nodes(num_nodes)
             call self%domain%get_num_dof_per_node(num_dofs_per_node)
-            call self%domain%get_target_dof(variable_id, target_dof)
+            call self%domain%get_start_dof_index(variable_id, target_dof)
 
             call allocate_array(variable, num_nodes)
 
@@ -366,7 +367,7 @@ contains
         if (self%control%is_physics_active(variable_id)) then
             call self%domain%get_num_nodes(num_nodes)
             call self%domain%get_num_dof_per_node(num_dofs_per_node)
-            call self%domain%get_target_dof(variable_id, target_dof)
+            call self%domain%get_start_dof_index(variable_id, target_dof)
 
             call allocate_array(variable, num_nodes)
 
@@ -574,9 +575,10 @@ contains
 
         ! Line search parameters for Newton mode
         real(real64) :: max_du, alpha
-        real(real64), parameter :: MAX_DT_STEP = 5.0d0
-        real(real64), parameter :: MAX_DP_STEP = 1.0d5
+        real(real64), parameter :: MAX_DT_STEP = 2.0d0
+        real(real64), parameter :: MAX_DP_STEP = 1.0d3
         real(real64), parameter :: ALPHA_MIN = 0.1d0
+        integer(int32) :: i
 
         call self%control%profiler_start(PROFILER_TYPES%SETUP)
 
@@ -597,20 +599,24 @@ contains
                 if (allocated(du) .and. size(du) > 0) then
                     if (.not. is_none) then
                         if (is_newton) then
-                            ! Damped Newton: clamp step by max allowable change
+                            ! Per-node clamping: limit each node's dT independently
                             max_du = maxval(abs(du))
-                            if (max_du > MAX_DT_STEP) then
-                                alpha = MAX_DT_STEP / max_du
-                                alpha = max(alpha, ALPHA_MIN)
-                            else
-                                alpha = 1.0d0
-                            end if
-                            relaxation_factor = alpha
-                            write (*, '("   [Newton] Iter:", I3, " Alpha:", F6.4, " max|dT|:", ES10.3)') &
-                                iter, alpha, max_du
-                            ! Apply damped Newton update directly
-                            current(:) = current(:) + relaxation_factor * du(:)
+                            do i = 1, size(du)
+                                if (abs(du(i)) > MAX_DT_STEP) then
+                                    du(i) = sign(MAX_DT_STEP, du(i))
+                                end if
+                            end do
+                            relaxation_factor = 1.0d0
+                            write (*, '("   [Newton] Iter:", I3, " max|dT|:", ES10.3, " (clamped to", F6.2, ")")') &
+                                iter, max_du, MAX_DT_STEP
+                            current(:) = current(:) + du(:)
                         else
+                            ! Per-node clamping before Aitken relaxation
+                            do i = 1, size(du)
+                                if (abs(du(i)) > MAX_DT_STEP) then
+                                    du(i) = sign(MAX_DT_STEP, du(i))
+                                end if
+                            end do
                             call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, du, current)
                             call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
                             write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
@@ -637,19 +643,24 @@ contains
                 if (allocated(du) .and. size(du) > 0) then
                     if (.not. is_none) then
                         if (is_newton) then
-                            ! Damped Newton: clamp step by max allowable pressure change
+                            ! Per-node clamping: limit each node's dP independently
                             max_du = maxval(abs(du))
-                            if (max_du > MAX_DP_STEP) then
-                                alpha = MAX_DP_STEP / max_du
-                                alpha = max(alpha, ALPHA_MIN)
-                            else
-                                alpha = 1.0d0
-                            end if
-                            relaxation_factor = alpha
-                            write (*, '("   [Newton] Iter:", I3, " Alpha:", F6.4, " max|dP|:", ES10.3)') &
-                                iter, alpha, max_du
-                            current(:) = current(:) + relaxation_factor * du(:)
+                            do i = 1, size(du)
+                                if (abs(du(i)) > MAX_DP_STEP) then
+                                    du(i) = sign(MAX_DP_STEP, du(i))
+                                end if
+                            end do
+                            relaxation_factor = 1.0d0
+                            write (*, '("   [Newton] Iter:", I3, " max|dP|:", ES10.3, " (clamped to", ES10.3, ")")') &
+                                iter, max_du, MAX_DP_STEP
+                            current(:) = current(:) + du(:)
                         else
+                            ! Per-node clamping before Aitken relaxation
+                            do i = 1, size(du)
+                                if (abs(du(i)) > MAX_DP_STEP) then
+                                    du(i) = sign(MAX_DP_STEP, du(i))
+                                end if
+                            end do
                             call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, du, current)
                             call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
                             write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor

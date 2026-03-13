@@ -32,11 +32,11 @@ contains
         call self%F%zero()
 
         call self%domain%get_num_colors(num_colors)
-        call self%domain%get_target_dof(PHYSICS_TYPES%THERMAL, thermal_dof)
+        call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, thermal_dof)
 
         do_hydraulic = self%is_active_hydraulic()
         if (do_hydraulic) then
-            call self%domain%get_target_dof(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
+            call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
         end if
 
         use_scatter = .true.

@@ -226,7 +226,8 @@ contains
                 resid = abs(self%g(iter + 1))
                 call self%residual_history%set(MATRIX_OPS%INS, iter_global, resid)
 
-                if (resid < self%tolerance) then
+                if (resid < self%tolerance .or. &
+                    (beta > self%tolerance .and. resid < self%relative_tolerance * beta)) then
                     converged = .true.
                     exit arnoldi_loop
                 end if
