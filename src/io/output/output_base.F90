@@ -1,13 +1,12 @@
 module io_output_base
     use, intrinsic :: iso_fortran_env, only: int32
-    use :: stdlib_strings, only: strip
+    use :: stdlib_strings, only:strip
     implicit none
     private
 
     public :: setup_directory
 
 contains
-
     subroutine setup_directory(dir_path, file_extensions)
         implicit none
         character(*), intent(in) :: dir_path
@@ -17,22 +16,21 @@ contains
         integer(int32) :: i
 
 #ifdef _WIN32
-        command = "mkdir "//'"'//strip(dir_path)//'"'
+            command = "mkdir "//'"'//strip(dir_path)//'"'
 #else
-        command = "mkdir -p "//'"'//strip(dir_path)//'"'
-#endif
-        call execute_safely(strip(command))
-
-        do i = 1, size(file_extensions)
-#ifdef _WIN32
-            command = "del /Q "//'"'//strip(dir_path)//"\*"//strip(file_extensions(i))//'"'
-#else
-            command = "rm -f "//'"'//strip(dir_path)//"*"//strip(file_extensions(i))//'"'
+            command = "mkdir -p "//'"'//strip(dir_path)//'"'
 #endif
             call execute_safely(strip(command))
-        end do
-    end subroutine setup_directory
 
+            do i = 1, size(file_extensions)
+#ifdef _WIN32
+                command = "del /Q "//'"'//strip(dir_path)//"*"//strip(file_extensions(i))//'"'
+#else
+                command = "rm -f "//strip(dir_path)//"*"//strip(file_extensions(i))
+#endif
+                call execute_safely(strip(command))
+            end do
+    end subroutine setup_directory
 
     subroutine execute_safely(command)
         implicit none
@@ -41,8 +39,8 @@ contains
         character(256) :: cmd_msg
 
         exit_stat = 0
-        cmd_stat  = 0
-        cmd_msg   = ""
+        cmd_stat = 0
+        cmd_msg = ""
 
         call execute_command_line(command, wait=.true., exitstat=exit_stat, cmdstat=cmd_stat, cmdmsg=cmd_msg)
 
@@ -54,9 +52,9 @@ contains
             stop 1
         end if
 
-        ! exit_stat is the return code of the command itself.
-        ! Non-zero values are allowed (e.g., rm when no files exist).
-
+        ! Note: exit_stat represents the return code of the command itself.
+        ! Non-zero exit_stat is ignored here because commands like 'del'
+        ! may return non-zero when no files are found.
     end subroutine execute_safely
 
 end module io_output_base

@@ -4,9 +4,11 @@
 !>
 module models_phase_change_manager
     use, intrinsic :: iso_fortran_env
+    use, intrinsic :: ieee_arithmetic, only:ieee_is_finite
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state
-    use :: constitutive_constants, only:latent_heat_fusion_water_0C
+    use :: constitutive_constants, only:latent_heat_fusion_water_0C, &
+        TtoK => celsius_to_kelvin, Rg => universal_gas_constant, Mw => molar_mass_water, rho_std => reference_water_density
     use :: models_phase_change_gcc, only:abst_gcc
     use :: models_wrf, only:abst_wrf
     use :: models_phase_change_fusion, only:type_fusion
@@ -57,6 +59,8 @@ contains
 
         real(real64) :: water_content, ice_content, air_content, vapor_content, porosity
         real(real64) :: relative_humidity
+        real(real64) :: temperature, pressure, temperature_K, exponent
+        logical :: temperature_set, pressure_set
 
         ! Temporary raw values
         real(real64) :: raw_ice_content
@@ -176,6 +180,35 @@ contains
         call state%dQa_dT%set(dQa_dT)
 
         ! 5. Update relative humidity and vapor content (theta_v)
+        call state%temperature%get(temperature, temperature_set)
+        call state%pressure%get(pressure, pressure_set)
+        if (.not. temperature_set .or. .not. pressure_set) then
+            write (*, '(A,L1,A,L1)') 'Error: phase state unset before RH. T_set=', temperature_set, ', P_set=', pressure_set
+            error stop 'update_water_phases: state unset before RH.'
+        end if
+
+        if (.not. ieee_is_finite(temperature) .or. .not. ieee_is_finite(pressure)) then
+            write (*, '(A,2(1X,ES13.5))') 'Error: phase state non-finite before RH T/P =', temperature, pressure
+            error stop 'update_water_phases: non-finite T/P before RH.'
+        end if
+
+        temperature_K = temperature + TtoK
+        if (.not. ieee_is_finite(temperature_K) .or. temperature_K <= tiny(1.0d0)) then
+            write (*, '(A,2(1X,ES13.5))') 'Error: phase invalid absolute temperature T/Tk =', temperature, temperature_K
+            error stop 'update_water_phases: invalid absolute temperature before RH.'
+        end if
+
+        exponent = (pressure * Mw)/(rho_std * Rg * temperature_K)
+        if (.not. ieee_is_finite(exponent)) then
+            write (*, '(A,3(1X,ES13.5))') 'Error: phase RH exponent non-finite P/Tk/exp =', pressure, temperature_K, exponent
+            error stop 'update_water_phases: invalid RH exponent before RH.'
+        end if
+
+        if (abs(exponent) > 700.0d0) then
+            write (*, '(A,3(1X,ES13.5))') 'Error: phase RH exponent out-of-range P/Tk/exp =', pressure, temperature_K, exponent
+            error stop 'update_water_phases: RH exponent outside exp-safe range.'
+        end if
+
         call self%evap%calc_relative_humidity(state, relative_humidity)
         call state%relative_humidity%set(relative_humidity)
 

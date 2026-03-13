@@ -61,12 +61,96 @@ contains
         call domain%get_num_dof_per_node(self%num_dofs_per_node)
         call domain%get_node_adjacency(MATRIX_TYPES%CSR, row, col)
 
+        call ensure_csr_has_diagonal(self%num_nodes, row, col)
+
         self%matrix_type = MATRIX_TYPES%BSR%ID
 
         self%matrix = create_matrix(MATRIX_TYPES%BSR, self%num_nodes, row, col, self%num_dofs_per_node)
 
         deallocate (row, col)
     end subroutine initialize_jacobian_matrix
+
+    subroutine ensure_csr_has_diagonal(num_nodes, row, col)
+        implicit none
+        integer(int32), intent(in) :: num_nodes
+        integer(int32), allocatable, intent(inout) :: row(:)
+        integer(int32), allocatable, intent(inout) :: col(:)
+
+        integer(int32) :: i, j, rs, re, pos, old_nnz, missing_diagonal
+        logical :: has_diagonal
+        integer(int32), allocatable :: new_row(:), new_col(:)
+
+        old_nnz = size(col)
+        missing_diagonal = 0
+
+        do i = 1, num_nodes
+            rs = row(i)
+            re = row(i + 1) - 1
+
+            has_diagonal = .false.
+            do j = rs, re
+                if (col(j) == i) then
+                    has_diagonal = .true.
+                    exit
+                end if
+            end do
+
+            if (.not. has_diagonal) missing_diagonal = missing_diagonal + 1
+        end do
+
+        if (missing_diagonal == 0) return
+
+        allocate (new_row(num_nodes + 1))
+        allocate (new_col(old_nnz + missing_diagonal))
+
+        pos = 1
+        new_row(1) = pos
+        do i = 1, num_nodes
+            rs = row(i)
+            re = row(i + 1) - 1
+
+            has_diagonal = .false.
+            do j = rs, re
+                if (col(j) == i) then
+                    has_diagonal = .true.
+                    exit
+                end if
+            end do
+
+            if (re >= rs) then
+                new_col(pos:pos + (re - rs)) = col(rs:re)
+                pos = pos + (re - rs + 1)
+            end if
+
+            if (.not. has_diagonal) then
+                new_col(pos) = i
+                pos = pos + 1
+            end if
+
+            call sort_int32_segment(new_col(new_row(i):pos - 1))
+            new_row(i + 1) = pos
+        end do
+
+        call move_alloc(new_row, row)
+        call move_alloc(new_col, col)
+    end subroutine ensure_csr_has_diagonal
+
+    subroutine sort_int32_segment(values)
+        implicit none
+        integer(int32), intent(inout) :: values(:)
+
+        integer(int32) :: i, j, key
+
+        do i = 2, size(values)
+            key = values(i)
+            j = i - 1
+            do while (j >= 1 .and. values(j) > key)
+                values(j + 1) = values(j)
+                j = j - 1
+            end do
+            values(j + 1) = key
+        end do
+    end subroutine sort_int32_segment
 
     subroutine build_scatter_map_jacobian(self, domain)
         implicit none
@@ -230,6 +314,12 @@ contains
             ind => matrix%get_ind()
             val_bsr => matrix%get_val()
 
+            if (row_dof < 1 .or. row_dof > size(val_bsr, 1) .or. col_dof < 1 .or. col_dof > size(val_bsr, 2)) then
+                write (*, '(A,2(I0,A),2(I0,A))') 'Error: add_local_jacobian_matrix dof out of range. row_dof=', &
+                    row_dof, ', col_dof=', col_dof, ', bsr_row_blocks=', size(val_bsr, 1), ', bsr_col_blocks=', size(val_bsr, 2)
+                error stop 'Invalid dof block index in add_local_jacobian_matrix.'
+            end if
+
             do i = 1, num_local_nodes
                 row_node = global_connectivity(i)
                 ptr_start = ptr(row_node)
@@ -275,6 +365,13 @@ contains
         select type (matrix => self%matrix)
         type is (type_matrix_bsr)
             val_bsr => matrix%get_val()
+
+            if (row_dof < 1 .or. row_dof > size(val_bsr, 1) .or. col_dof < 1 .or. col_dof > size(val_bsr, 2)) then
+                write (*, '(A,I0,A,2(I0,A),2(I0,A))') 'Error: add_local_fast_jacobian_matrix dof out of range. elem=', &
+                    element_id, ', row_dof=', row_dof, ', col_dof=', col_dof, ', bsr_row_blocks=', size(val_bsr, 1), &
+                    ', bsr_col_blocks=', size(val_bsr, 2)
+                error stop 'Invalid dof block index in add_local_fast_jacobian_matrix.'
+            end if
 
             do i = 1, n_local
                 do j = 1, n_local

@@ -99,6 +99,7 @@ contains
         call self%domain%initialize(config_nodes, config_elements, config_multicoloring, config_boundary_elements, &
                                     input%basic%simulation_settings%calculate_type, config_control_manager%coupling_mode, &
                                     config_control_manager%compute_active)
+
         call self%domain%get_total_dofs(num_total_dofs)
         call self%domain%get_num_nodes(num_nodes)
 
@@ -139,7 +140,11 @@ contains
                                  solver_settings%tolerance, &
                                  solver_settings%max_iterations, &
                                  solver_settings%m_restarts)
-            call pc_info%set(solver_settings%preconditioner_type, num_total_dofs)
+            if (solver_settings%preconditioner_type == PRECONDITIONER_TYPES%ILU%ID) then
+                call pc_info%set(solver_settings%preconditioner_type, num_nodes, self%K%get_num_dofs_per_node())
+            else
+                call pc_info%set(solver_settings%preconditioner_type, num_total_dofs)
+            end if
             call create_solver(self%solver, solver_info, pc_info, ierr)
         end associate
 
@@ -391,30 +396,38 @@ contains
         ! Default: compute physics (for backward compatibility)
         do_calc = .true.
         if (present(calc_physics)) do_calc = calc_physics
-
         call state%reset()
 
         call self%control%get_bdf_coeffs(bdf_order=bdf_order)
 
-        ! Retrieve primary variables and their histories (always executed)
         if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%temperature%get_current(node_id, temperature)
             temperature = min(max(temperature, -80.0d0), 80.0d0)
             call self%temperature%get_current_gradient(node_id, grad_T)
             call self%temperature%get_history(node_id, temperature_history)
-            call state%set(temperature=temperature, &
-                           grad_T=grad_T, &
-                           temperature_history=temperature_history(1:bdf_order + 1))
+        else
+            temperature = 0.0d0
+            call grad_T%reset()
+            temperature_history = 0.0d0
         end if
+        call state%set(temperature=temperature, &
+                       grad_T=grad_T, &
+                       temperature_history=temperature_history(1:bdf_order + 1))
+
         if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
             call self%pressure%get_current(node_id, pressure)
             pressure = min(max(pressure, -1.0d7), 1.0d7)
             call self%pressure%get_current_gradient(node_id, grad_P)
             call self%pressure%get_history(node_id, pressure_history)
-            call state%set(pressure=pressure, &
-                           grad_P=grad_P, &
-                           pressure_history=pressure_history(1:bdf_order + 1))
+        else
+            pressure = 0.0d0
+            call grad_P%reset()
+            pressure_history = 0.0d0
         end if
+        call state%set(pressure=pressure, &
+                       grad_P=grad_P, &
+                       pressure_history=pressure_history(1:bdf_order + 1))
+
         call self%porosity%get_current(node_id, porosity)
         call self%porosity%get_history(node_id, porosity_history)
         call state%set(porosity=porosity, &

@@ -32,7 +32,9 @@ contains
         type(type_vector_dp), intent(inout), optional :: F_H
 
         integer(int32) :: i, j, ierr
-        real(real64) :: bdf0
+        real(real64) :: bdf0, c_abs_max, c_abs_min_nz, d_abs_max, d_abs_min_nz
+        logical :: has_c_nz, has_d_nz
+        logical, save :: debug_coeff_once = .false.
 
         bdf0 = workspace%bdf_coeffs(1)
 
@@ -83,6 +85,24 @@ contains
                 error stop 'Hydraulic advection overflow in local assembly.'
             end if
         end do
+
+        if (.not. debug_coeff_once) then
+            has_c_nz = any(abs(workspace%work_C(:)) > 0.0d0)
+            has_d_nz = any(abs(workspace%work_D(:, :, :)) > 0.0d0)
+
+            c_abs_max = maxval(abs(workspace%work_C(:)))
+            d_abs_max = maxval(abs(workspace%work_D(:, :, :)))
+            c_abs_min_nz = 0.0d0
+            d_abs_min_nz = 0.0d0
+            if (has_c_nz) c_abs_min_nz = minval(abs(workspace%work_C(:)), mask=abs(workspace%work_C(:)) > 0.0d0)
+            if (has_d_nz) d_abs_min_nz = minval(abs(workspace%work_D(:, :, :)), mask=abs(workspace%work_D(:, :, :)) > 0.0d0)
+
+            write (*, '(A,I0,A,ES13.5,A,ES13.5,A,ES13.5,A,ES13.5)') &
+                '   [DEBUG] Hydraulic coeff scale: mat=', workspace%material_id, &
+                ', |C|_max=', c_abs_max, ', |C|_min_nz=', c_abs_min_nz, &
+                ', |D|_max=', d_abs_max, ', |D|_min_nz=', d_abs_min_nz
+            debug_coeff_once = .true.
+        end if
 
         ! 2. Mass Matrix Contribution (Accumulate to K_HH)
         ! K += bdf0 * MassMatrix
@@ -153,7 +173,9 @@ contains
         type(type_vector_dp), intent(inout), optional :: F_H
 
         integer(int32) :: i, j, n_nodes
-        real(real64) :: bdf0
+        real(real64) :: bdf0, c_abs_max, c_abs_min_nz, d_abs_max, d_abs_min_nz
+        logical :: has_c_nz, has_d_nz
+        logical, save :: debug_coeff_once_picard = .false.
         real(real64), allocatable :: local_vec_res(:)
 
         n_nodes = workspace%num_fe_nodes
@@ -175,6 +197,24 @@ contains
                                              workspace%bdf_coeffs(1:workspace%bdf_order + 1), &
                                              workspace%work_d_dt(i))
         end do
+
+        if (.not. debug_coeff_once_picard) then
+            has_c_nz = any(abs(workspace%work_C(:)) > 0.0d0)
+            has_d_nz = any(abs(workspace%work_D(:, :, :)) > 0.0d0)
+
+            c_abs_max = maxval(abs(workspace%work_C(:)))
+            d_abs_max = maxval(abs(workspace%work_D(:, :, :)))
+            c_abs_min_nz = 0.0d0
+            d_abs_min_nz = 0.0d0
+            if (has_c_nz) c_abs_min_nz = minval(abs(workspace%work_C(:)), mask=abs(workspace%work_C(:)) > 0.0d0)
+            if (has_d_nz) d_abs_min_nz = minval(abs(workspace%work_D(:, :, :)), mask=abs(workspace%work_D(:, :, :)) > 0.0d0)
+
+            write (*, '(A,I0,A,ES13.5,A,ES13.5,A,ES13.5,A,ES13.5)') &
+                '   [DEBUG] Hydraulic coeff scale(picard): mat=', workspace%material_id, &
+                ', |C|_max=', c_abs_max, ', |C|_min_nz=', c_abs_min_nz, &
+                ', |D|_max=', d_abs_max, ', |D|_min_nz=', d_abs_min_nz
+            debug_coeff_once_picard = .true.
+        end if
 
         ! 2. Mass Matrix (LHS)
         call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
