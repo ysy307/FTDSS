@@ -59,6 +59,7 @@ contains
         real(real64) :: denom, ratio1, ratio2
         real(real64) :: resid, resid0
         real(real64) :: norm_r, norm_v, norm_t, norm_s, norm_p
+        real(real64) :: norm_vinf, norm_phat, norm_shat, norm_tinf
         integer(int32) :: iter
 
         real(real64), dimension(:), pointer :: b_ptr, r_ptr, x_internal_ptr
@@ -230,6 +231,25 @@ contains
                     end if
                 end if
                 ! 13: p_k = r_k + beta_k(p_(k-1) - omega_k * Av)
+                norm_vinf = vector_norminf(self%v)
+                if (.not. ieee_is_finite(omega) .or. .not. ieee_is_finite(norm_vinf)) then
+                    write (*, '(A,I0,2(A,ES13.5))') 'BiCG breakdown(non-finite p-update): iter=', iter, &
+                        ', omega=', omega, ', ||v||inf=', norm_vinf
+                    self%current_iteration = iter
+                    self%status = SOLVER_STATUS%BREAKDOWN%ID
+                    if (has_internal_x) call x%copy(self%x)
+                    return
+                end if
+                if (norm_vinf >= 1.0d0) then
+                    if (abs(omega) > huge(1.0d0) / norm_vinf) then
+                        write (*, '(A,I0,2(A,ES13.5))') 'BiCG overflow(p-update): iter=', iter, &
+                            ', omega=', omega, ', ||v||inf=', norm_vinf
+                        self%current_iteration = iter
+                        self%status = SOLVER_STATUS%BREAKDOWN%ID
+                        if (has_internal_x) call x%copy(self%x)
+                        return
+                    end if
+                end if
                 call vector_axpy(-omega, self%v, self%p)
                 call vector_scale(beta, self%p)
                 call vector_axpy(1.0d0, self%r, self%p)
@@ -251,6 +271,26 @@ contains
                 return
             end if
             alpha = rho / denom
+
+            norm_vinf = vector_norminf(self%v)
+            if (.not. ieee_is_finite(alpha) .or. .not. ieee_is_finite(norm_vinf)) then
+                write (*, '(A,I0,2(A,ES13.5))') 'BiCG breakdown(non-finite alpha-step): iter=', iter, &
+                    ', alpha=', alpha, ', ||v||inf=', norm_vinf
+                self%current_iteration = iter
+                self%status = SOLVER_STATUS%BREAKDOWN%ID
+                if (has_internal_x) call x%copy(self%x)
+                return
+            end if
+            if (norm_vinf >= 1.0d0) then
+                if (abs(alpha) > huge(1.0d0) / norm_vinf) then
+                    write (*, '(A,I0,2(A,ES13.5))') 'BiCG overflow(alpha-step): iter=', iter, &
+                        ', alpha=', alpha, ', ||v||inf=', norm_vinf
+                    self%current_iteration = iter
+                    self%status = SOLVER_STATUS%BREAKDOWN%ID
+                    if (has_internal_x) call x%copy(self%x)
+                    return
+                end if
+            end if
             ! 18: s = r_k - alpha_k * v
             call vector_axpyz(-alpha, self%v, self%r, self%s)
 
@@ -284,6 +324,51 @@ contains
                 self%status = SOLVER_STATUS%BREAKDOWN%ID
                 if (has_internal_x) call x%copy(self%x)
                 return
+            end if
+
+            norm_phat = vector_norminf(self%phat)
+            norm_shat = vector_norminf(self%shat)
+            norm_tinf = vector_norminf(self%t)
+            if (.not. ieee_is_finite(norm_phat) .or. .not. ieee_is_finite(norm_shat) .or. .not. ieee_is_finite(norm_tinf)) then
+                write (*, '(A,I0,3(A,ES13.5))') 'BiCG breakdown(non-finite update vectors): iter=', iter, &
+                    ', ||phat||inf=', norm_phat, ', ||shat||inf=', norm_shat, ', ||t||inf=', norm_tinf
+                self%current_iteration = iter
+                self%status = SOLVER_STATUS%BREAKDOWN%ID
+                if (has_internal_x) call x%copy(self%x)
+                return
+            end if
+
+            if (norm_phat >= 1.0d0) then
+                if (abs(alpha) > huge(1.0d0) / norm_phat) then
+                    write (*, '(A,I0,2(A,ES13.5))') 'BiCG overflow(x-update alpha): iter=', iter, &
+                        ', alpha=', alpha, ', ||phat||inf=', norm_phat
+                    self%current_iteration = iter
+                    self%status = SOLVER_STATUS%BREAKDOWN%ID
+                    if (has_internal_x) call x%copy(self%x)
+                    return
+                end if
+            end if
+
+            if (norm_shat >= 1.0d0) then
+                if (abs(omega) > huge(1.0d0) / norm_shat) then
+                    write (*, '(A,I0,2(A,ES13.5))') 'BiCG overflow(x-update omega): iter=', iter, &
+                        ', omega=', omega, ', ||shat||inf=', norm_shat
+                    self%current_iteration = iter
+                    self%status = SOLVER_STATUS%BREAKDOWN%ID
+                    if (has_internal_x) call x%copy(self%x)
+                    return
+                end if
+            end if
+
+            if (norm_tinf >= 1.0d0) then
+                if (abs(omega) > huge(1.0d0) / norm_tinf) then
+                    write (*, '(A,I0,2(A,ES13.5))') 'BiCG overflow(r-update omega): iter=', iter, &
+                        ', omega=', omega, ', ||t||inf=', norm_tinf
+                    self%current_iteration = iter
+                    self%status = SOLVER_STATUS%BREAKDOWN%ID
+                    if (has_internal_x) call x%copy(self%x)
+                    return
+                end if
             end if
 
             ! 23: x(i) = x(i-1) + alpha * M^-1 p(i-1) + omega * M^-1 s(i)

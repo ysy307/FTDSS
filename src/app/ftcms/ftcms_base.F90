@@ -186,9 +186,6 @@ contains
         call self%output%initialize(config_output, config_observation, config_overall)
         call self%output_fields()
         call self%output_history()
-
-        ! !
-        ! call global_logger%log_information(message="FTCMS module initialized successfully.")
     end subroutine initialize_type_ftcms
 
     module subroutine output_fields_ftcms(self)
@@ -414,10 +411,14 @@ contains
             temperature = min(max(temperature, -80.0d0), 80.0d0)
             call self%temperature%get_current_gradient(node_id, grad_T)
             call self%temperature%get_history(node_id, temperature_history)
-            call state%set(temperature=temperature, &
-                           grad_T=grad_T, &
-                           temperature_history=temperature_history(1:bdf_order + 1))
+        else
+            temperature = 0.0d0
+            call grad_T%reset()
+            temperature_history = 0.0d0
         end if
+        call state%set(temperature=temperature, &
+                       grad_T=grad_T, &
+                       temperature_history=temperature_history(1:bdf_order + 1))
 
         start_dof_hydraulic = self%hydraulic_start_dof
         if (start_dof_hydraulic > 0) then
@@ -425,10 +426,14 @@ contains
             pressure = min(max(pressure, -1.0d7), 1.0d7)
             call self%pressure%get_current_gradient(node_id, grad_P)
             call self%pressure%get_history(node_id, pressure_history)
-            call state%set(pressure=pressure, &
-                           grad_P=grad_P, &
-                           pressure_history=pressure_history(1:bdf_order + 1))
+        else
+            pressure = 0.0d0
+            call grad_P%reset()
+            pressure_history = 0.0d0
         end if
+        call state%set(pressure=pressure, &
+                       grad_P=grad_P, &
+                       pressure_history=pressure_history(1:bdf_order + 1))
 
         call self%porosity%get_current(node_id, porosity)
         call self%porosity%get_history(node_id, porosity_history)

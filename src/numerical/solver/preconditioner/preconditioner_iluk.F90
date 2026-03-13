@@ -294,10 +294,22 @@ contains
             return
         end if
 
+        if (self%status /= SOLVER_STATUS%SUCCESS%ID) then
+            write (*, *) "Warning: ILU preconditioner setup failed. Applying Identity."
+            call z%copy(r)
+            return
+        end if
+
         if (self%is_block) then
             call self%apply_bsr_ilu0(r, z)
         else
             call self%apply_csr_ilu0(r, z)
+        end if
+
+        if (self%status /= SOLVER_STATUS%SUCCESS%ID) then
+            write (*, *) "Warning: ILU preconditioner apply failed. Applying Identity."
+            call z%copy(r)
+            self%status = SOLVER_STATUS%SUCCESS%ID
         end if
     end subroutine apply_preconditioner_iluk
 
@@ -394,6 +406,10 @@ contains
                         self%val_blocks(:, :, self%diag_ptr(i)), bs, &
                         self%diag_pivots(:, i), &
                         x(idx_i), bs, ierr)
+            if (ierr /= 0) then
+                self%status = SOLVER_STATUS%DECOMPOSITION_FAILURE%ID
+                return
+            end if
         end do
     end subroutine apply_bsr_ilu0
 
