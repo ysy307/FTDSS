@@ -99,6 +99,10 @@ contains
         call self%domain%initialize(config_nodes, config_elements, config_multicoloring, config_boundary_elements, &
                                     input%basic%simulation_settings%calculate_type, config_control_manager%coupling_mode, &
                                     config_control_manager%compute_active)
+
+        call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, self%thermal_start_dof)
+        call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, self%hydraulic_start_dof)
+
         call self%domain%get_total_dofs(num_total_dofs)
         call self%domain%get_num_nodes(num_nodes)
 
@@ -139,7 +143,11 @@ contains
                                  solver_settings%tolerance, &
                                  solver_settings%max_iterations, &
                                  solver_settings%m_restarts)
-            call pc_info%set(solver_settings%preconditioner_type, num_total_dofs)
+            if (solver_settings%preconditioner_type == PRECONDITIONER_TYPES%ILU%ID) then
+                call pc_info%set(solver_settings%preconditioner_type, num_nodes, self%K%get_num_dofs_per_node())
+            else
+                call pc_info%set(solver_settings%preconditioner_type, num_total_dofs)
+            end if
             call create_solver(self%solver, solver_info, pc_info, ierr)
         end associate
 
@@ -382,22 +390,25 @@ contains
 
         integer(int32) :: material_id
         integer(int32) :: bdf_order
+        integer(int32) :: start_dof_thermal, start_dof_hydraulic
         real(real64) :: temperature, pressure, porosity
         type(type_coordinate_dp) :: grad_T, grad_P
         real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
 
         logical :: do_calc
+        logical :: temperature_set, pressure_set
 
         ! Default: compute physics (for backward compatibility)
         do_calc = .true.
         if (present(calc_physics)) do_calc = calc_physics
-
         call state%reset()
 
         call self%control%get_bdf_coeffs(bdf_order=bdf_order)
 
-        ! Retrieve primary variables and their histories (always executed)
-        if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+        ! Use DOF map layout (not runtime activity flags) to ensure state fields
+        ! required by constitutive relations are always initialized consistently.
+        start_dof_thermal = self%thermal_start_dof
+        if (start_dof_thermal > 0) then
             call self%temperature%get_current(node_id, temperature)
             temperature = min(max(temperature, -80.0d0), 80.0d0)
             call self%temperature%get_current_gradient(node_id, grad_T)
@@ -406,7 +417,9 @@ contains
                            grad_T=grad_T, &
                            temperature_history=temperature_history(1:bdf_order + 1))
         end if
-        if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+
+        start_dof_hydraulic = self%hydraulic_start_dof
+        if (start_dof_hydraulic > 0) then
             call self%pressure%get_current(node_id, pressure)
             pressure = min(max(pressure, -1.0d7), 1.0d7)
             call self%pressure%get_current_gradient(node_id, grad_P)
@@ -415,10 +428,22 @@ contains
                            grad_P=grad_P, &
                            pressure_history=pressure_history(1:bdf_order + 1))
         end if
+
         call self%porosity%get_current(node_id, porosity)
         call self%porosity%get_history(node_id, porosity_history)
         call state%set(porosity=porosity, &
                        porosity_history=porosity_history(1:bdf_order + 1))
+
+        call state%temperature%get(temperature, temperature_set)
+        call state%pressure%get(pressure, pressure_set)
+        if (.not. temperature_set .or. .not. pressure_set) then
+            !$omp critical (ftcms_state_diag)
+            write (*, '(A,I0,A,I0,A,L1,A,L1,A,I0,A,I0)') 'Error: set_state_ftcms unset primary state. node=', node_id, &
+                ', elem=', element_id, ', T_set=', temperature_set, ', P_set=', pressure_set, &
+                ', T_dof=', start_dof_thermal, ', H_dof=', start_dof_hydraulic
+            !$omp end critical (ftcms_state_diag)
+            error stop 'set_state_ftcms: temperature/pressure unset before constitutive update.'
+        end if
 
         ! Run expensive physics computations only when flagged
         if (do_calc) then
