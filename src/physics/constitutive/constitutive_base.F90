@@ -85,6 +85,20 @@ module physics_constitutive_base
 
 contains
 
+    pure logical function is_valid_iapws97_liquid_state(T_K, P_abs)
+        implicit none
+        real(real64), intent(in) :: T_K
+        real(real64), intent(in) :: P_abs
+
+        is_valid_iapws97_liquid_state = .false.
+        if (.not. ieee_is_finite(T_K) .or. .not. ieee_is_finite(P_abs)) return
+        if (T_K < water_triple_point_temperature) return
+        if (T_K > water_critical_point_temperature) return
+        if (P_abs < 1.0d3) return
+        if (P_abs > 1.0d8) return
+        is_valid_iapws97_liquid_state = .true.
+    end function is_valid_iapws97_liquid_state
+
     !> Shift temperature from Celsius to Kelvin
     !>
     !> Mathematical definition:
@@ -274,7 +288,7 @@ contains
             density = reference_water_density
             return
         end if
-        if (.not. ieee_is_finite(T_K) .or. .not. ieee_is_finite(P_abs)) then
+        if (.not. is_valid_iapws97_liquid_state(T_K, P_abs)) then
             density = reference_water_density
             return
         end if
@@ -316,7 +330,7 @@ contains
             deriv_density = 0.0d0
             return
         end if
-        if (.not. ieee_is_finite(T_K) .or. .not. ieee_is_finite(P_abs)) then
+        if (.not. is_valid_iapws97_liquid_state(T_K, P_abs)) then
             deriv_density = 0.0d0
             return
         end if
@@ -358,7 +372,7 @@ contains
             deriv_density = 0.0d0
             return
         end if
-        if (.not. ieee_is_finite(T_K) .or. .not. ieee_is_finite(P_abs)) then
+        if (.not. is_valid_iapws97_liquid_state(T_K, P_abs)) then
             deriv_density = 0.0d0
             return
         end if
@@ -400,7 +414,7 @@ contains
             cp = 4181.3d0
             return
         end if
-        if (.not. ieee_is_finite(T_K) .or. .not. ieee_is_finite(P_abs)) then
+        if (.not. is_valid_iapws97_liquid_state(T_K, P_abs)) then
             cp = 4181.3d0
             return
         end if

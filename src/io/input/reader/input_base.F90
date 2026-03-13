@@ -68,9 +68,9 @@ contains
 
         call json%get(key, target_var, var_found)
         call json%print_error_message(output_unit)
+        if (present(found)) found = var_found
 
         if (.not. var_found) then
-            if (present(found)) found = var_found
             if (present(default_value)) then
                 target_var = default_value
             else if (required) then
@@ -125,9 +125,9 @@ contains
 
         call json%get(key, target_var, var_found)
         call json%print_error_message(output_unit)
+        if (present(found)) found = var_found
 
         if (.not. var_found) then
-            if (present(found)) found = var_found
             if (present(default_value)) then
                 target_var = default_value
             else if (required) then
@@ -174,9 +174,9 @@ contains
 
         call json%get(key, target_var, var_found)
         call json%print_error_message(output_unit)
+        if (present(found)) found = var_found
 
         if (.not. var_found) then
-            if (present(found)) found = var_found
             if (present(default_value)) then
                 target_var = default_value
             end if
@@ -220,9 +220,9 @@ contains
 
         call json%get(key, target_var, var_found)
         call json%print_error_message(output_unit)
+        if (present(found)) found = var_found
 
         if (.not. var_found) then
-            if (present(found)) found = var_found
             if (present(default_value)) then
                 target_var = default_value
             else if (required) then
@@ -285,9 +285,9 @@ contains
 
         call json%get(key, target_var, var_found)
         call json%print_error_message(output_unit)
+        if (present(found)) found = var_found
 
         if (.not. var_found) then
-            if (present(found)) found = var_found
             if (present(default_value)) then
                 target_var = default_value
             else if (required) then
@@ -357,9 +357,9 @@ contains
 
         call json%get(key, target_var, var_found)
         call json%print_error_message(output_unit)
+        if (present(found)) found = var_found
 
         if (.not. var_found) then
-            if (present(found)) found = var_found
             if (present(default_value)) then
                 target_var = default_value
             else if (required) then
@@ -429,9 +429,9 @@ contains
 
         call json%get(key, tmp, var_found)
         call json%print_error_message(output_unit)
+        if (present(found)) found = var_found
 
         if (.not. var_found) then
-            if (present(found)) found = var_found
             if (present(default_value)) then
                 if (allocated(target_var)) deallocate (target_var)
                 allocate (character(len=len(default_value(1))) :: target_var(size(default_value)))

@@ -246,14 +246,18 @@ contains
 
         real(real64) :: Klh_r, dgamma_dT
         real(real64) :: temperature, pressure
+        real(real64) :: pressure_head
 
         call state%temperature%get(temperature)
         call state%pressure%get(pressure)
 
+        ! Use pressure head scaling for thermo-osmotic coupling to avoid unit-driven blow-up.
+        pressure_head = pressure/(rho_std * g)
+
         if (allocated(self%base)) then
             call self%base%calc_kr(pressure, Klh_r)
             call calc_derivative_surface_tension(temperature, dgamma_dT)
-            klT = self%config%k_sat * Klh_r * pressure * self%config%gain_factor * (dgamma_dT / gamma_0)
+            klT = self%config%k_sat * Klh_r * pressure_head * self%config%gain_factor * (dgamma_dT / gamma_0)
         else
             klT = 0.0d0
         end if

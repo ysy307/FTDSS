@@ -399,6 +399,7 @@ contains
         ! Retrieve primary variables and their histories (always executed)
         if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
             call self%temperature%get_current(node_id, temperature)
+            temperature = min(max(temperature, -80.0d0), 80.0d0)
             call self%temperature%get_current_gradient(node_id, grad_T)
             call self%temperature%get_history(node_id, temperature_history)
             call state%set(temperature=temperature, &
@@ -407,6 +408,7 @@ contains
         end if
         if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
             call self%pressure%get_current(node_id, pressure)
+            pressure = min(max(pressure, -1.0d7), 1.0d7)
             call self%pressure%get_current_gradient(node_id, grad_P)
             call self%pressure%get_history(node_id, pressure_history)
             call state%set(pressure=pressure, &

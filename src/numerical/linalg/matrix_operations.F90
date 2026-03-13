@@ -453,7 +453,8 @@ contains
         integer(int32) :: i, k, rb, cb, col
         integer(int32) :: R, C
         integer(int32) :: x_idx, y_idx
-        real(real64) :: sum
+        real(real64) :: sum, term
+        real(real64) :: mul_limit
 
         call A%get_info(info)
 
@@ -470,6 +471,7 @@ contains
         ind => A%get_ind()
         ptr => A%get_ptr()
         val => A%get_val()
+        mul_limit = sqrt(huge(1.0d0))
 
         !$omp parallel do private(i, k, col, rb, cb, x_idx, y_idx, sum)
         do i = 1, info%num_nodes ! Iterate over block rows
@@ -482,11 +484,26 @@ contains
                     ! Perform block multiplication for the current local row
                     do cb = 1, C
                         x_idx = (col - 1) * C + cb
-                        sum = sum + val(rb, cb, k) * x(x_idx)
+                        term = sign(min(abs(val(rb, cb, k)), mul_limit), val(rb, cb, k)) * &
+                               sign(min(abs(x(x_idx)), mul_limit), x(x_idx))
+                        if (abs(sum) > huge(1.0d0) - abs(term)) then
+                            sum = sign(0.5d0*huge(1.0d0), sum)
+                        else
+                            sum = sum + term
+                        end if
                     end do
                 end do
                 y_idx = (i - 1) * R + rb
-                y(y_idx) = alpha * sum + beta * y(y_idx)
+                term = sign(min(abs(alpha), mul_limit), alpha) * sign(min(abs(sum), mul_limit), sum)
+                if (abs(beta) > 0.0d0) then
+                    if (abs(term) > huge(1.0d0) - abs(beta*y(y_idx))) then
+                        y(y_idx) = sign(0.5d0*huge(1.0d0), term)
+                    else
+                        y(y_idx) = term + beta * y(y_idx)
+                    end if
+                else
+                    y(y_idx) = term
+                end if
             end do
         end do
         !$omp end parallel do

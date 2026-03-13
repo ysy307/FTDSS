@@ -11,6 +11,7 @@
 !>
 module linalg_vector_operations
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     use :: mpi_f08
     use :: module_core
     use :: linalg_mkl_backend
@@ -366,12 +367,41 @@ contains
         real(real64), intent(in) :: y(:)
         !> The computed dot product.
         real(real64) :: product
+        integer(int32) :: i
+        real(real64) :: term
+        real(real64) :: ax, ay
+        real(real64) :: xv, yv
+        real(real64) :: mul_limit
 
 #ifdef USE_DEBUG
         call check_match_length(x, y, 'dot')
 #endif
         if (.not. is_mkl_initialized) call initialize_mkl_backend()
-        product = compute_dot_product_backend(x, y)
+
+        mul_limit = sqrt(huge(1.0d0))
+        product = 0.0d0
+        do i = 1, size(x)
+            if (x(i) == 0.0d0 .or. y(i) == 0.0d0) cycle
+            if (.not. ieee_is_finite(x(i)) .or. .not. ieee_is_finite(y(i))) cycle
+
+            ax = abs(x(i))
+            ay = abs(y(i))
+
+            xv = sign(min(ax, mul_limit), x(i))
+            yv = sign(min(ay, mul_limit), y(i))
+            term = xv*yv
+
+            if (abs(product) > huge(1.0d0) - abs(term)) then
+                if (product /= 0.0d0) then
+                    product = sign(0.5d0*huge(1.0d0), product)
+                else
+                    product = sign(0.5d0*huge(1.0d0), term)
+                end if
+                exit
+            else
+                product = product + term
+            end if
+        end do
     end function dot_native
 
     !> Computes the dot product of two vector objects, \( \sum x_i y_i \), using the initialized backend.

@@ -67,7 +67,6 @@ contains
         real(real64) :: dQi_dP, dQi_dT
         real(real64) :: dQa_dP, dQa_dT
         real(real64) :: dQv_dP, dQv_dT
-        logical :: is_clipped
 
         ! 1. Get porosity
         call state%porosity%get(porosity)
@@ -131,30 +130,36 @@ contains
         end if
 
         ! 4. Physical projection to avoid negative/oversaturated phase fractions
-        is_clipped = .false.
-
         if (ice_content < 0.0d0) then
             ice_content = 0.0d0
-            is_clipped = .true.
+            dQi_dP = 0.0d0
+            dQi_dT = 0.0d0
         end if
         if (ice_content > porosity) then
             ice_content = porosity
-            is_clipped = .true.
+            dQi_dP = 0.0d0
+            dQi_dT = 0.0d0
         end if
 
         if (water_content < 0.0d0) then
             water_content = 0.0d0
-            is_clipped = .true.
+            dQw_dP = 0.0d0
+            dQw_dT = 0.0d0
         end if
         if (water_content > porosity - ice_content) then
             water_content = max(0.0d0, porosity - ice_content)
-            is_clipped = .true.
+            dQw_dP = -1.0d0 * dQi_dP
+            dQw_dT = -1.0d0 * dQi_dT
         end if
 
         air_content = porosity - water_content - ice_content
         if (air_content < 0.0d0) then
             air_content = 0.0d0
-            is_clipped = .true.
+            dQa_dP = 0.0d0
+            dQa_dT = 0.0d0
+        else
+            dQa_dP = -1.0d0 * (dQw_dP + dQi_dP)
+            dQa_dT = -1.0d0 * (dQw_dT + dQi_dT)
         end if
 
         ! 4. Set values (consistency ensured)
@@ -189,25 +194,8 @@ contains
 
         if (vapor_content < 0.0d0) then
             vapor_content = 0.0d0
-            is_clipped = .true.
-        end if
-
-        if (is_clipped) then
-            ! Keep Jacobian bounded when projection is active.
-            dQw_dP = 0.0d0
-            dQw_dT = 0.0d0
-            dQi_dP = 0.0d0
-            dQi_dT = 0.0d0
-            dQa_dP = 0.0d0
-            dQa_dT = 0.0d0
             dQv_dP = 0.0d0
             dQv_dT = 0.0d0
-            call state%dQi_dP%set(dQi_dP)
-            call state%dQi_dT%set(dQi_dT)
-            call state%dQw_dP%set(dQw_dP)
-            call state%dQw_dT%set(dQw_dT)
-            call state%dQa_dP%set(dQa_dP)
-            call state%dQa_dT%set(dQa_dT)
         end if
 
         call state%vapor_content%set(vapor_content)
