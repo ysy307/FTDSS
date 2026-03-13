@@ -6,6 +6,8 @@
 !>
 module linalg_mkl_backend
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: ieee_arithmetic
+    use, intrinsic :: ieee_exceptions
 #ifdef _MPI
     use :: mpi_f08
 #endif
@@ -68,8 +70,14 @@ contains
         !> The computed 2-norm, \( \sqrt{\sum x_i^2} \).
         real(real64) :: norm_value
 
+        logical :: halt_overflow
+
 #ifdef _MPI
         integer(int32) :: nprocs
+
+        call ieee_get_halting_mode(ieee_overflow, halt_overflow)
+        call ieee_set_halting_mode(ieee_overflow, .false.)
+
         call MPI_Comm_size(MPI_COMM_WORLD, nprocs)
         if (nprocs == 1) then
             norm_value = dnrm2(int(size(x), int32), x, 1)
@@ -77,8 +85,16 @@ contains
             norm_value = pdnrm2(int(size(x), int32), x, 1)
         end if
 #else
+        call ieee_get_halting_mode(ieee_overflow, halt_overflow)
+        call ieee_set_halting_mode(ieee_overflow, .false.)
+
         norm_value = dnrm2(int(size(x), int32), x, 1)
 #endif
+        if (.not. ieee_is_finite(norm_value)) then
+            norm_value = huge(1.0d0)
+        end if
+        call ieee_set_halting_mode(ieee_overflow, halt_overflow)
+        call ieee_set_flag(ieee_overflow, .false.)
     end function norm_2_mkl
 
     !>
@@ -121,11 +137,20 @@ contains
         real(real64) :: product
 
     real(real64) :: local_prod
+    logical :: halt_overflow, halt_invalid
 #ifdef _MPI
     real(real64) :: global_prod
     integer(int32) :: ierr
     integer(int32) :: nprocs
 #endif
+
+    ! Temporarily disable FPE halting for the dot product computation.
+    ! MKL ddot can overflow/produce NaN for ill-conditioned vectors;
+    ! we check the result afterward.
+    call ieee_get_halting_mode(ieee_overflow, halt_overflow)
+    call ieee_get_halting_mode(ieee_invalid, halt_invalid)
+    call ieee_set_halting_mode(ieee_overflow, .false.)
+    call ieee_set_halting_mode(ieee_invalid, .false.)
 
     if (is_contiguous(x) .and. is_contiguous(y)) then
 #ifdef _MPI
@@ -147,6 +172,20 @@ contains
         product = local_prod
 #endif
     end if
+
+    ! Clamp non-finite results to a large finite value preserving sign
+    if (ieee_is_nan(product)) then
+        product = 0.0d0
+    else if (.not. ieee_is_finite(product)) then
+        product = sign(huge(1.0d0), product)
+    end if
+
+    ! Restore original halting mode and clear raised flags
+    call ieee_set_halting_mode(ieee_overflow, halt_overflow)
+    call ieee_set_halting_mode(ieee_invalid, halt_invalid)
+    call ieee_set_flag(ieee_overflow, .false.)
+    call ieee_set_flag(ieee_invalid, .false.)
+
     end function dot_mkl
 #endif
 

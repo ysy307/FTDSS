@@ -82,9 +82,9 @@ contains
         call self%residual_history%zero()
 
         ! ==========================================================
-        ! 2: Set an initial value x0
+        ! 2: Set an initial value x0 (use user's initial guess)
         ! ==========================================================
-        call self%x%zero()
+        call self%x%copy(x)
         x_internal_ptr => self%x%get_data()
         has_internal_x = associated(x_internal_ptr)
 
@@ -119,15 +119,30 @@ contains
         ! ==========================================================
         call self%r0%copy(self%r)
 
+        ! Initial convergence check
+        resid = vector_norm2(self%r)
+        call self%residual_history%set(MATRIX_OPS%INS, 1, resid)
+        if (resid < self%tolerance) then
+            self%current_iteration = 0
+            self%status = SOLVER_STATUS%SUCCESS%ID
+            if (has_internal_x) call x%copy(self%x)
+            return
+        end if
+
         do iter = 1, self%max_iterations
             ! 7: (^r0, rk)
             rho = vector_dot(self%r0, self%r)
-            ! 8: rho check
-            if (rho == 0.0d0) then
+            ! 8: rho check — rho==0 means BiCGStab breakdown (r0* has become orthogonal to r)
+            if (abs(rho) <= tiny(1.0d0)) then
                 self%current_iteration = iter
-                call self%residual_history%set(MATRIX_OPS%INS, iter, vector_norm2(self%r))
+                resid = vector_norm2(self%r)
+                call self%residual_history%set(MATRIX_OPS%INS, iter, resid)
+                if (resid < self%tolerance) then
+                    self%status = SOLVER_STATUS%SUCCESS%ID
+                else
+                    self%status = SOLVER_STATUS%BREAKDOWN%ID
+                end if
                 if (has_internal_x) call x%copy(self%x)
-                self%status = SOLVER_STATUS%SUCCESS%ID
                 return
             end if
 
@@ -258,11 +273,15 @@ contains
             omega = vector_dot(self%t, self%s) / denom
 
             ! 22: omega breakdown check
-            if (omega == 0.0d0) then
+            if (abs(omega) <= tiny(1.0d0)) then
+                ! omega is zero or near-zero — update x with the alpha*phat part at least
+                call vector_axpy(alpha, self%phat, self%x)
                 norm_t = vector_norm2(self%t)
                 norm_s = vector_norm2(self%s)
                 write (*, '(A,I0,2(A,ES13.5))') 'BiCGSTAB breakdown(omega): iter=', iter, ', ||t||2=', norm_t, ', ||s||2=', norm_s
+                self%current_iteration = iter
                 self%status = SOLVER_STATUS%BREAKDOWN%ID
+                if (has_internal_x) call x%copy(self%x)
                 return
             end if
 
