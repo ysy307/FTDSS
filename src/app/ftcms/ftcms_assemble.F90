@@ -24,17 +24,8 @@ contains
         integer(int32), pointer, contiguous, dimension(:) :: elements_list
         real(real64), pointer :: local_matrix_vals(:, :)
         real(real64), pointer :: local_vector_vals(:)
-        real(real64), pointer :: pre_bc_diag_data(:)
         real(real64) :: local_diag_sum, local_tt_diag_sum, local_hh_diag_sum, local_h_scale
-        class(abst_matrix), pointer :: K_ptr
-        type(type_vector_dp) :: pre_bc_diag_vec
-
-        integer(int32) :: probe_tt_elems, probe_hh_elems
-        integer(int32) :: probe_tt_zero_diag_elems, probe_hh_zero_diag_elems
-        integer(int32) :: probe_hh_scaled_elems
-        real(real64) :: probe_tt_diag_abs_sum, probe_hh_diag_abs_sum
-        real(real64) :: probe_hh_scale_sum, probe_hh_scale_min, probe_hh_scale_max
-        real(real64), parameter :: probe_diag_eps = 1.0d-20
+        real(real64), parameter :: local_diag_eps = 1.0d-20
         real(real64), parameter :: hydraulic_scale_eps = 1.0d-30
         real(real64), parameter :: hydraulic_scale_max = 1.0d6
 
@@ -46,8 +37,6 @@ contains
         nullify (elements_list)
         nullify (local_matrix_vals)
         nullify (local_vector_vals)
-        nullify (pre_bc_diag_data)
-        nullify (K_ptr)
 
         call self%K%zero()
         call self%F%zero()
@@ -60,29 +49,15 @@ contains
             call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
         end if
 
-        probe_tt_elems = 0
-        probe_hh_elems = 0
-        probe_tt_zero_diag_elems = 0
-        probe_hh_zero_diag_elems = 0
-        probe_hh_scaled_elems = 0
-        probe_tt_diag_abs_sum = 0.0d0
-        probe_hh_diag_abs_sum = 0.0d0
-        probe_hh_scale_sum = 0.0d0
-        probe_hh_scale_min = huge(1.0d0)
-        probe_hh_scale_max = 1.0d0
-
         use_scatter = .true.
 
-        !$OMP PARALLEL DEFAULT(NONE) &
+        !$OMP PARALLEL IF(do_hydraulic) DEFAULT(NONE) &
         !$OMP SHARED(self, num_colors, elements_list, num_elements_in_color, &
         !$OMP        thermal_dof, hydraulic_dof, use_scatter, do_hydraulic) &
         !$OMP PRIVATE(i_color, i_elem, elem_id, p_connectivity, workspace, &
         !$OMP         local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
         !$OMP         local_F_T, local_F_H, elem_coords, num_nodes_local, local_matrix_vals, local_vector_vals, &
-        !$OMP         local_diag_sum, local_tt_diag_sum, local_hh_diag_sum, local_h_scale, i_local) &
-        !$OMP REDUCTION(+:probe_tt_elems, probe_hh_elems, probe_tt_zero_diag_elems, probe_hh_zero_diag_elems, probe_hh_scaled_elems, &
-        !$OMP&            probe_tt_diag_abs_sum, probe_hh_diag_abs_sum, probe_hh_scale_sum) &
-        !$OMP REDUCTION(MIN:probe_hh_scale_min) REDUCTION(MAX:probe_hh_scale_max)
+        !$OMP         local_diag_sum, local_tt_diag_sum, local_hh_diag_sum, local_h_scale, i_local)
 
         do i_color = 1, num_colors
 
@@ -111,9 +86,6 @@ contains
                         do i_local = 1, workspace%num_fe_nodes
                             local_diag_sum = local_diag_sum + abs(local_matrix_vals(i_local, i_local))
                         end do
-                        probe_tt_elems = probe_tt_elems + 1
-                        probe_tt_diag_abs_sum = probe_tt_diag_abs_sum + local_diag_sum
-                        if (local_diag_sum < probe_diag_eps) probe_tt_zero_diag_elems = probe_tt_zero_diag_elems + 1
                     end if
                     local_tt_diag_sum = local_diag_sum
 
@@ -124,14 +96,11 @@ contains
                             do i_local = 1, workspace%num_fe_nodes
                                 local_diag_sum = local_diag_sum + abs(local_matrix_vals(i_local, i_local))
                             end do
-                            probe_hh_elems = probe_hh_elems + 1
-                            probe_hh_diag_abs_sum = probe_hh_diag_abs_sum + local_diag_sum
-                            if (local_diag_sum < probe_diag_eps) probe_hh_zero_diag_elems = probe_hh_zero_diag_elems + 1
                         end if
                         local_hh_diag_sum = local_diag_sum
 
                         local_h_scale = 1.0d0
-                        if (local_hh_diag_sum > hydraulic_scale_eps .and. local_tt_diag_sum > probe_diag_eps) then
+                        if (local_hh_diag_sum > hydraulic_scale_eps .and. local_tt_diag_sum > local_diag_eps) then
                             local_h_scale = sqrt(local_tt_diag_sum / local_hh_diag_sum)
                         end if
 
@@ -144,17 +113,13 @@ contains
                             local_vector_vals => local_F_H%get_data()
                             if (associated(local_vector_vals)) local_vector_vals(:) = local_h_scale * local_vector_vals(:)
                             nullify (local_vector_vals)
-
-                            probe_hh_scaled_elems = probe_hh_scaled_elems + 1
-                            probe_hh_scale_sum = probe_hh_scale_sum + local_h_scale
-                            probe_hh_scale_min = min(probe_hh_scale_min, local_h_scale)
-                            probe_hh_scale_max = max(probe_hh_scale_max, local_h_scale)
                         end if
                     end if
                     nullify (local_matrix_vals)
 
                     num_nodes_local = workspace%num_fe_nodes
 
+                    ! $OMP CRITICAL(ftcms_global_assembly)
                     if (use_scatter) then
                         call self%K%add(thermal_dof, thermal_dof, elem_id, num_nodes_local, local_K_TT)
                     else
@@ -170,6 +135,7 @@ contains
                         end if
                         call self%F%add(hydraulic_dof, p_connectivity, local_F_H)
                     end if
+                    ! $OMP END CRITICAL(ftcms_global_assembly)
 
                 end do
                 !$OMP END DO
@@ -184,34 +150,6 @@ contains
         if (allocated(elem_coords)) deallocate (elem_coords)
 
         !$OMP END PARALLEL
-
-        write (*, '(A,2(I0,A),ES13.5)') '   [DEBUG] Local K_TT diag probe: elems=', probe_tt_elems, &
-            ', zero_diag_elems=', probe_tt_zero_diag_elems, ', diag_abs_sum=', probe_tt_diag_abs_sum
-        if (do_hydraulic) then
-            write (*, '(A,2(I0,A),ES13.5)') '   [DEBUG] Local K_HH diag probe: elems=', probe_hh_elems, &
-                ', zero_diag_elems=', probe_hh_zero_diag_elems, ', diag_abs_sum=', probe_hh_diag_abs_sum
-            if (probe_hh_scaled_elems > 0) then
-                write (*, '(A,I0,A,3(ES13.5,A))') '   [DEBUG] Hydraulic row scaling: scaled_elems=', probe_hh_scaled_elems, &
-                    ', min=', probe_hh_scale_min, ', max=', probe_hh_scale_max, &
-                    ', avg=', probe_hh_scale_sum/real(probe_hh_scaled_elems, real64), ''
-            else
-                write (*, '(A)') '   [DEBUG] Hydraulic row scaling: scaled_elems=0'
-            end if
-        end if
-
-        K_ptr => self%K%get_matrix()
-        if (associated(K_ptr)) then
-            call pre_bc_diag_vec%initialize(self%K%get_size())
-            call pre_bc_diag_vec%zero()
-            call K_ptr%get_diagonal(pre_bc_diag_vec)
-            pre_bc_diag_data => pre_bc_diag_vec%get_data()
-            if (associated(pre_bc_diag_data)) then
-                write (*, '(A,I0)') '   [DEBUG] K diag zeros (pre-bc): ', count(abs(pre_bc_diag_data) < probe_diag_eps)
-            end if
-            nullify (pre_bc_diag_data)
-            call pre_bc_diag_vec%destroy()
-        end if
-        nullify (K_ptr)
 
         call self%control%profiler_stop(PROFILER_TYPES%ASSEMBLE)
 

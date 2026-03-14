@@ -21,8 +21,8 @@ contains
     !> - Preserves total volume conceptually via weighted sum
     !>
     !> Computational complexity:
-    !> - Memory: O(N_threads)
-    !> - Arithmetic: O(N_nodes * N_neighbors)
+    !> - Memory: \(O(N_\mathrm{threads})\)
+    !> - Arithmetic: \(O(N_\mathrm{nodes} \times N_\mathrm{neighbors})\)
     !>
     !> Failure behavior:
     !> - Assigns zero if isolated node is encountered
@@ -142,7 +142,7 @@ contains
     !> Solve the global linear system
     !>
     !> Mathematical definition:
-    !> - Solves K * du = F
+    !> - Solves \( \mathbf{K} \Delta \mathbf{u} = \mathbf{F} \)
     !>
     !> Assumptions:
     !> - Matrix and vectors are properly assembled
@@ -165,26 +165,19 @@ contains
         type(type_vector_dp), pointer :: du_ptr => null()
         real(real64), pointer :: f_data(:) => null()
         real(real64), pointer :: du_data(:) => null()
-        real(real64) :: rhs_norm
-        type(type_vector_dp) :: diag_vec
-        real(real64), pointer :: diag_data(:) => null()
-
-        integer(int32) :: num_total_dofs
-        integer(int32) :: ierr
-        real(real64) :: diag_min, diag_max, diag_ratio
-        integer(int32) :: i, n_neg
-
-        real(real64), pointer :: r_data(:) => null(), p_data(:) => null()
-        integer(int32) :: num_nodes_local, num_dofs_per_node
-        integer(int32) :: node_id, degree_i, active_dof_i, dof_id, local_dof
-        integer(int32) :: zero_rows, zero_nodes, zero_degree_rows, zero_active_dof_rows
+        type(type_vector_dp) :: scale_vec
+        real(real64), pointer :: scale_data(:) => null()
+        real(real64) :: tt_diag_sum, hh_diag_sum
+        real(real64) :: tt_rhs_sum, hh_rhs_sum
+        real(real64) :: hydraulic_scale
+        integer(int32) :: num_total_dofs, num_dofs_per_node
         integer(int32) :: thermal_dof, hydraulic_dof
-        integer(int32) :: zero_thermal_rows, zero_hydraulic_rows, zero_other_dof_rows
-        integer(int32) :: total_thermal_rows, total_hydraulic_rows, total_other_dof_rows
-        integer(int32), allocatable :: csr_row(:), csr_col(:), node_degree(:), active_diag_dofs(:), node_zero_flag(:)
-        real(real64), allocatable :: diag_block(:, :)
-        real(real64), parameter :: diag_zero_eps = 1.0d-20
-        logical, save :: first_call = .true.
+        integer(int32) :: i, local_dof
+        real(real64), parameter :: diag_eps = 1.0d-30
+        real(real64), parameter :: scale_cap = 1.0d6
+        logical :: do_hydraulic
+        logical :: apply_global_scaling
+        logical, save :: first_scale_report = .true.
 
         call self%control%profiler_start(PROFILER_TYPES%SOLVE)
 
@@ -206,218 +199,87 @@ contains
             du_data => du_ptr%get_data()
         end if
 
-        rhs_norm = vector_norm2(F_ptr)
-        write (*, '(A,ES13.5)') '   [SOLVE] ||F||2 = ', rhs_norm
-        if (rhs_norm <= tiny(1.0d0)) then
-            write (*, '(A,ES13.5)') 'Warning: RHS norm is near zero before linear solve. ||F||2=', rhs_norm
-        end if
-
         call self%domain%get_total_dofs(num_total_dofs)
-        call diag_vec%initialize(num_total_dofs)
-        call diag_vec%zero()
-        ierr = 0
+        num_dofs_per_node = self%K%get_num_dofs_per_node()
+        call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, thermal_dof)
+        call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
+        do_hydraulic = self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)
+        apply_global_scaling = do_hydraulic
 
-        call K_ptr%get_diagonal(diag_vec)
-        diag_data => diag_vec%get_data()
+        call scale_vec%initialize(num_total_dofs)
+        call K_ptr%get_diagonal(scale_vec)
+        scale_data => scale_vec%get_data()
 
-        ! ------------------------------------------------------------------
-        ! Finite element matrix diagnostics (First call only)
-        ! ------------------------------------------------------------------
-        if (first_call .and. associated(diag_data)) then
-            first_call = .false.
-            call self%domain%get_num_nodes(num_nodes_local)
-            num_dofs_per_node = self%K%get_num_dofs_per_node()
-
-            call self%domain%get_node_adjacency(MATRIX_TYPES%CSR, csr_row, csr_col)
-            allocate (node_degree(num_nodes_local), active_diag_dofs(num_nodes_local), node_zero_flag(num_nodes_local))
-            node_zero_flag = 0
-
-            do i = 1, num_nodes_local
-                node_degree(i) = csr_row(i + 1) - csr_row(i)
-            end do
-
-            active_diag_dofs = 0
-            select type (mat => K_ptr)
-            type is (type_matrix_bsr)
-                allocate (diag_block(num_dofs_per_node, num_dofs_per_node))
-                do i = 1, num_nodes_local
-                    call mat%get_diagonal_block(i, diag_block)
-                    active_diag_dofs(i) = 0
-                    do dof_id = 1, num_dofs_per_node
-                        if (abs(diag_block(dof_id, dof_id)) >= diag_zero_eps) active_diag_dofs(i) = active_diag_dofs(i) + 1
-                    end do
-                end do
-                deallocate (diag_block)
-            class default
-                do i = 1, num_nodes_local
-                    active_diag_dofs(i) = num_dofs_per_node
-                end do
-            end select
-
-            write (*, '(A,I0,A,ES13.5,A,ES13.5)') &
-                '   [DEBUG] K diag: n=', size(diag_data), &
-                ' min=', minval(diag_data), &
-                ' max=', maxval(diag_data)
-            write (*, '(A,I0)') &
-                '   [DEBUG] K diag zeros: ', &
-                count(abs(diag_data) < diag_zero_eps)
-
-            thermal_dof = 0
-            hydraulic_dof = 0
-            call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, thermal_dof)
-            call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
-
-            zero_rows = 0
-            zero_nodes = 0
-            zero_degree_rows = 0
-            zero_active_dof_rows = 0
-            zero_thermal_rows = 0
-            zero_hydraulic_rows = 0
-            zero_other_dof_rows = 0
-            total_thermal_rows = 0
-            total_hydraulic_rows = 0
-            total_other_dof_rows = 0
-
-            do i = 1, size(diag_data)
+        tt_diag_sum = 0.0d0
+        hh_diag_sum = 0.0d0
+        tt_rhs_sum = 0.0d0
+        hh_rhs_sum = 0.0d0
+        if (associated(scale_data)) then
+            do i = 1, size(scale_data)
                 local_dof = mod(i - 1, num_dofs_per_node) + 1
                 if (local_dof == thermal_dof) then
-                    total_thermal_rows = total_thermal_rows + 1
+                    tt_diag_sum = tt_diag_sum + abs(scale_data(i))
                 else if (local_dof == hydraulic_dof) then
-                    total_hydraulic_rows = total_hydraulic_rows + 1
-                else
-                    total_other_dof_rows = total_other_dof_rows + 1
+                    hh_diag_sum = hh_diag_sum + abs(scale_data(i))
                 end if
 
-                if (abs(diag_data(i)) >= diag_zero_eps) cycle
-
-                node_id = (i - 1)/num_dofs_per_node + 1
-                if (node_id < 1 .or. node_id > num_nodes_local) cycle
-
-                zero_rows = zero_rows + 1
-                if (node_zero_flag(node_id) == 0) then
-                    node_zero_flag(node_id) = 1
-                    zero_nodes = zero_nodes + 1
-                end if
-
-                degree_i = node_degree(node_id)
-                if (degree_i == 0) zero_degree_rows = zero_degree_rows + 1
-
-                active_dof_i = active_diag_dofs(node_id)
-                if (active_dof_i == 0) zero_active_dof_rows = zero_active_dof_rows + 1
-
-                if (local_dof == thermal_dof) then
-                    zero_thermal_rows = zero_thermal_rows + 1
-                else if (local_dof == hydraulic_dof) then
-                    zero_hydraulic_rows = zero_hydraulic_rows + 1
-                else
-                    zero_other_dof_rows = zero_other_dof_rows + 1
+                if (associated(f_data)) then
+                    if (local_dof == thermal_dof) then
+                        tt_rhs_sum = tt_rhs_sum + abs(f_data(i))
+                    else if (local_dof == hydraulic_dof) then
+                        hh_rhs_sum = hh_rhs_sum + abs(f_data(i))
+                    end if
                 end if
             end do
 
-            write (*, '(A,I0,A,I0)') '   [DEBUG] K diag zero-row stats: rows=', zero_rows, ', unique_nodes=', zero_nodes
-            write (*, '(A,I0,A,I0)') '   [DEBUG] K diag zero-row stats: degree0_rows=', &
-                zero_degree_rows, ', active_dof0_rows=', zero_active_dof_rows
-            write (*, '(A,3(I0,A),2(I0,A))') '   [DEBUG] K diag zero-row by dof: thermal=', zero_thermal_rows, &
-                ', hydraulic=', zero_hydraulic_rows, ', other=', zero_other_dof_rows, &
-                ', T_dof=', thermal_dof, ', H_dof=', hydraulic_dof
-            write (*, '(A,3(I0,A))') '   [DEBUG] K diag total rows by dof: thermal=', total_thermal_rows, &
-                ', hydraulic=', total_hydraulic_rows, ', other=', total_other_dof_rows
+            hydraulic_scale = 1.0d0
+            if (do_hydraulic .and. hh_diag_sum > diag_eps .and. tt_diag_sum > diag_eps) then
+                hydraulic_scale = sqrt(tt_diag_sum / hh_diag_sum)
+                hydraulic_scale = min(max(hydraulic_scale, 1.0d0/scale_cap), scale_cap)
+            else if (do_hydraulic .and. hh_rhs_sum > diag_eps .and. tt_rhs_sum > diag_eps) then
+                hydraulic_scale = sqrt(tt_rhs_sum / hh_rhs_sum)
+                hydraulic_scale = min(max(hydraulic_scale, 1.0d0/scale_cap), scale_cap)
+            end if
 
-            if (allocated(csr_row)) deallocate (csr_row)
-            if (allocated(csr_col)) deallocate (csr_col)
-            if (allocated(node_degree)) deallocate (node_degree)
-            if (allocated(active_diag_dofs)) deallocate (active_diag_dofs)
-            if (allocated(node_zero_flag)) deallocate (node_zero_flag)
+            if (first_scale_report) then
+                write (*, '(A,I0,A,I0,A,I0)') '   [SCALE] ndpn=', num_dofs_per_node, &
+                    ', T_dof=', thermal_dof, ', H_dof=', hydraulic_dof
+                write (*, '(A,5(ES13.5,A),L1)') '   [SCALE] global TT_diag=', tt_diag_sum, ', HH_diag=', hh_diag_sum, &
+                    ', TT_rhs=', tt_rhs_sum, ', HH_rhs=', hh_rhs_sum, ', H_scale=', hydraulic_scale, &
+                    ', hydraulic_active=', do_hydraulic
+                first_scale_report = .false.
+            end if
+
+            if (apply_global_scaling) then
+                scale_data(:) = 1.0d0
+                if (hydraulic_dof > 0) then
+                    do i = 1, size(scale_data)
+                        local_dof = mod(i - 1, num_dofs_per_node) + 1
+                        if (local_dof == hydraulic_dof) then
+                            scale_data(i) = hydraulic_scale
+                        end if
+                    end do
+                end if
+
+                ! Apply block scaling: K' = D K D, F' = D F
+                call K_ptr%scale(MATRIX_OPS%SCALE_SYMM_DIAG, scale_vec)
+                call F_ptr%scale(VECTOR_OPS%SCALE_SYMM_DIAG, scale_vec)
+            end if
         end if
 
-        ! ------------------------------------------------------------------
-        ! Symmetric diagonal scaling
-        ! ------------------------------------------------------------------
-        if (associated(diag_data)) then
-            diag_min = huge(1.0d0)
-            diag_max = 0.0d0
-            n_neg = 0
-            do i = 1, size(diag_data)
-                if (abs(diag_data(i)) > tiny(1.0d0)) then
-                    diag_min = min(diag_min, abs(diag_data(i)))
-                    diag_max = max(diag_max, abs(diag_data(i)))
-                end if
-                if (diag_data(i) < -tiny(1.0d0)) n_neg = n_neg + 1
-            end do
-            diag_ratio = diag_max / max(diag_min, tiny(1.0d0))
-            write (*, '(A,I0,A,I0,A,I0)') &
-                '   [SCALE] ndof=', size(diag_data), &
-                ' n_zero=', count(abs(diag_data) < tiny(1.0d0)), &
-                ' n_neg=', n_neg
-            write (*, '(A,ES10.3,A,ES10.3,A,ES10.3)') &
-                '   [SCALE] diag_min=', diag_min, &
-                ' diag_max=', diag_max, ' ratio=', diag_ratio
-
-            ! Compute scaling vector
-            do i = 1, size(diag_data)
-                if (abs(diag_data(i)) < epsilon(1.0d0)) then
-                    diag_data(i) = 1.0d0
-                else
-                    diag_data(i) = 1.0d0 / sqrt(abs(diag_data(i)))
-                end if
-            end do
-
-            ! Scale matrix
-            call K_ptr%scale(MATRIX_OPS%SCALE_SYMM_DIAG, diag_vec)
-
-            ! Scale RHS
-            do i = 1, size(f_data)
-                f_data(i) = f_data(i) * diag_data(i)
-            end do
-        end if
-
-        ! Zero the solution vector before solve (initial guess = 0)
         call du_ptr%zero()
-
-        ! Solve scaled system
         call self%solver%solve(K_ptr, F_ptr, du_ptr)
-
-        if (.not. self%solver%is_success()) then
-            select type (solver_impl => self%solver)
-            type is (type_solver_bicgstab)
-                r_data => solver_impl%r%get_data()
-                if (associated(r_data)) then
-                    write (*, '(A,4(1X,ES13.5))') '   [DEBUG] BiCG r stats: norm2 normInf min max =', &
-                        vector_norm2(solver_impl%r), vector_norminf(solver_impl%r), minval(r_data), maxval(r_data)
-                end if
-                p_data => solver_impl%p%get_data()
-                if (associated(p_data)) then
-                    write (*, '(A,3(1X,ES13.5))') '   [DEBUG] BiCG p/v/t inf norms =', &
-                        vector_norminf(solver_impl%p), vector_norminf(solver_impl%v), vector_norminf(solver_impl%t)
-                end if
-                nullify (r_data)
-                nullify (p_data)
-            class default
-            end select
-        end if
-
         call self%solver%check()
 
-        ! Unscale solution
-        if (associated(diag_data)) then
-            do i = 1, size(du_data)
-                du_data(i) = du_data(i) * diag_data(i)
+        ! Recover original unknown scale: du = D * du_scaled
+        if (apply_global_scaling .and. associated(scale_data) .and. associated(du_data)) then
+            do i = 1, min(size(scale_data), size(du_data))
+                du_data(i) = du_data(i) * scale_data(i)
             end do
         end if
 
-        ! Linear solver diagnostics
-        write (*, '(A,L1)') &
-            '   [LINEAR] converged=', self%solver%is_success()
-
-        nullify (diag_data)
-        call diag_vec%destroy()
-
-        nullify (K_ptr)
-        nullify (F_ptr)
-        nullify (du_ptr)
-        nullify (f_data)
-        nullify (du_data)
-
+        nullify (scale_data)
+        call scale_vec%destroy()
         call self%control%profiler_stop(PROFILER_TYPES%SOLVE)
 
     end subroutine solve_ftcms
@@ -434,8 +296,8 @@ contains
     !> - No theoretical error bound available
     !>
     !> Computational complexity:
-    !> - Memory: O(N_nodes)
-    !> - Arithmetic: O(N_elems * N_gauss)
+    !> - Memory: \(O(N_{nodes})\)
+    !> - Arithmetic: \(O(N_{elems} \times N_{gauss})\)
     !>
     !> Failure behavior:
     !> - Returns without error
@@ -649,7 +511,7 @@ contains
     !> Calculate liquid water flux vector
     !>
     !> Mathematical definition:
-    !> - q_w = -K_wT * grad_T - K_wP * grad_P - K_wP * rho_w * g * grad_z
+    !> - \( \mathbf{q}_w = -K_\mathrm{wT} \nabla T - K_\mathrm{wP} \nabla P - K_\mathrm{wP} \rho_w g \nabla z \)
     !>
     !> Assumptions:
     !> - Z-axis is aligned vertically with gravity
@@ -658,8 +520,8 @@ contains
     !> - No theoretical error bound available
     !>
     !> Computational complexity:
-    !> - Memory: O(1)
-    !> - Arithmetic: O(1)
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
     !>
     !> Failure behavior:
     !> - Returns without error
@@ -721,7 +583,7 @@ contains
     !> Calculate water vapor flux vector
     !>
     !> Mathematical definition:
-    !> - q_v = -K_vT * grad_T - K_vP * grad_P
+    !> - \( \mathbf{q}_v = -K_\mathrm{vT} \nabla T - K_\mathrm{vP} \nabla P \)
     !>
     !> Assumptions:
     !> - Vapor transport neglects gravity terms
@@ -730,8 +592,8 @@ contains
     !> - No theoretical error bound available
     !>
     !> Computational complexity:
-    !> - Memory: O(1)
-    !> - Arithmetic: O(1)
+    !> - Memory: \(O(1)\)
+    !> - Arithmetic: \(O(1)\)
     !>
     !> Failure behavior:
     !> - Returns without error

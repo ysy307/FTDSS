@@ -143,8 +143,7 @@ contains
                                  solver_settings%tolerance, &
                                  solver_settings%max_iterations, &
                                  solver_settings%m_restarts)
-            if (solver_settings%preconditioner_type == PRECONDITIONER_TYPES%ILU%ID .or. &
-                solver_settings%preconditioner_type == PRECONDITIONER_TYPES%JACOBI%ID) then
+            if (solver_settings%preconditioner_type == PRECONDITIONER_TYPES%ILU%ID) then
                 call pc_info%set(solver_settings%preconditioner_type, num_nodes, self%K%get_num_dofs_per_node())
             else
                 call pc_info%set(solver_settings%preconditioner_type, num_total_dofs)
@@ -186,6 +185,9 @@ contains
         call self%output%initialize(config_output, config_observation, config_overall)
         call self%output_fields()
         call self%output_history()
+
+        ! !
+        ! call global_logger%log_information(message="FTCMS module initialized successfully.")
     end subroutine initialize_type_ftcms
 
     module subroutine output_fields_ftcms(self)
@@ -403,8 +405,6 @@ contains
 
         call self%control%get_bdf_coeffs(bdf_order=bdf_order)
 
-        ! Use DOF map layout (not runtime activity flags) to ensure state fields
-        ! required by constitutive relations are always initialized consistently.
         start_dof_thermal = self%thermal_start_dof
         if (start_dof_thermal > 0) then
             call self%temperature%get_current(node_id, temperature)
@@ -573,6 +573,7 @@ contains
         integer(int32) :: bdf_order
         real(real64), pointer, contiguous, dimension(:) :: current
         real(real64), allocatable :: du(:)
+        real(real64), allocatable :: current_prev(:)
 
         real(real64) :: relaxation_factor
         logical :: is_none
@@ -580,10 +581,13 @@ contains
 
         ! Line search parameters for Newton mode
         real(real64) :: max_du, alpha
-        real(real64), parameter :: MAX_DT_STEP = 2.0d0
-        real(real64), parameter :: MAX_DP_STEP = 1.0d3
+        real(real64), parameter :: MAX_DT_STEP = 5.0d0
+        real(real64), parameter :: MAX_DP_STEP = 1.0d5
         real(real64), parameter :: ALPHA_MIN = 0.1d0
-        integer(int32) :: i
+        real(real64), parameter :: TEMP_MIN_C = -80.0d0
+        real(real64), parameter :: TEMP_MAX_C = 80.0d0
+        real(real64), parameter :: PRESS_MIN_PA = -1.0d7
+        real(real64), parameter :: PRESS_MAX_PA = 1.0d7
 
         call self%control%profiler_start(PROFILER_TYPES%SETUP)
 
@@ -601,38 +605,38 @@ contains
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
             call self%temperature%get_current(current)
             if (associated(current)) then
+                call allocate_array(current_prev, size(current))
+                current_prev(:) = current(:)
+
                 if (allocated(du) .and. size(du) > 0) then
                     if (.not. is_none) then
                         if (is_newton) then
-                            ! Per-node clamping: limit each node's dT independently
+                            ! Damped Newton: clamp step by max allowable change
                             max_du = maxval(abs(du))
-                            do i = 1, size(du)
-                                if (abs(du(i)) > MAX_DT_STEP) then
-                                    du(i) = sign(MAX_DT_STEP, du(i))
-                                end if
-                            end do
-                            relaxation_factor = 1.0d0
-                            write (*, '("   [Newton] Iter:", I3, " max|dT|:", ES10.3, " (clamped to", F6.2, ")")') &
-                                iter, max_du, MAX_DT_STEP
-                            current(:) = current(:) + du(:)
+                            if (max_du > MAX_DT_STEP) then
+                                alpha = MAX_DT_STEP / max_du
+                                alpha = max(alpha, ALPHA_MIN)
+                            else
+                                alpha = 1.0d0
+                            end if
+                            relaxation_factor = alpha
+                            ! Apply damped Newton update directly
+                            current(:) = current(:) + relaxation_factor * du(:)
                         else
-                            ! Per-node clamping before Aitken relaxation
-                            do i = 1, size(du)
-                                if (abs(du(i)) > MAX_DT_STEP) then
-                                    du(i) = sign(MAX_DT_STEP, du(i))
-                                end if
-                            end do
                             call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, du, current)
                             call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
-                            write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                            current(:) = current(:) + relaxation_factor * du(:)
                         end if
                     else
                         relaxation_factor = 1.0d0
+                        current(:) = current(:) + du(:)
                     end if
-                    call self%temperature%set_delta(relaxation_factor * du(:))
-                else
-                    call self%temperature%set_delta(0.0d0 * current)
                 end if
+
+                current(:) = min(max(current(:), TEMP_MIN_C), TEMP_MAX_C)
+                call self%temperature%set_delta(current(:) - current_prev(:))
+
+                call deallocate_array(current_prev)
             end if
 
             call self%calc_gradient_temperature()
@@ -645,38 +649,37 @@ contains
             call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, du)
             call self%pressure%get_current(current)
             if (associated(current)) then
+                call allocate_array(current_prev, size(current))
+                current_prev(:) = current(:)
+
                 if (allocated(du) .and. size(du) > 0) then
                     if (.not. is_none) then
                         if (is_newton) then
-                            ! Per-node clamping: limit each node's dP independently
+                            ! Damped Newton: clamp step by max allowable pressure change
                             max_du = maxval(abs(du))
-                            do i = 1, size(du)
-                                if (abs(du(i)) > MAX_DP_STEP) then
-                                    du(i) = sign(MAX_DP_STEP, du(i))
-                                end if
-                            end do
-                            relaxation_factor = 1.0d0
-                            write (*, '("   [Newton] Iter:", I3, " max|dP|:", ES10.3, " (clamped to", ES10.3, ")")') &
-                                iter, max_du, MAX_DP_STEP
-                            current(:) = current(:) + du(:)
+                            if (max_du > MAX_DP_STEP) then
+                                alpha = MAX_DP_STEP / max_du
+                                alpha = max(alpha, ALPHA_MIN)
+                            else
+                                alpha = 1.0d0
+                            end if
+                            relaxation_factor = alpha
+                            current(:) = current(:) + relaxation_factor * du(:)
                         else
-                            ! Per-node clamping before Aitken relaxation
-                            do i = 1, size(du)
-                                if (abs(du(i)) > MAX_DP_STEP) then
-                                    du(i) = sign(MAX_DP_STEP, du(i))
-                                end if
-                            end do
                             call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, du, current)
                             call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
-                            write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                            current(:) = current(:) + relaxation_factor * du(:)
                         end if
                     else
                         relaxation_factor = 1.0d0
+                        current(:) = current(:) + du(:)
                     end if
-                    call self%pressure%set_delta(relaxation_factor * du(:))
-                else
-                    call self%pressure%set_delta(0.0d0 * current)
                 end if
+
+                current(:) = min(max(current(:), PRESS_MIN_PA), PRESS_MAX_PA)
+                call self%pressure%set_delta(current(:) - current_prev(:))
+
+                call deallocate_array(current_prev)
             end if
 
             call self%calc_gradient_pressure()

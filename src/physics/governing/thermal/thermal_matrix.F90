@@ -64,28 +64,6 @@ contains
             call self%compute_advective_term(workspace%material_id, workspace%state_gp(i), &
                                              workspace%work_V(:, i))
             if (any(abs(workspace%work_V(:, i)) > 1.0d-30)) has_advection = .true.
-
-            if (.not. ieee_is_finite(workspace%work_C(i)) .or. abs(workspace%work_C(i)) > 1.0d120) then
-                write (*, '(A,I0,A,I0,A,ES13.5)') 'Error: Thermal mass term exploded. mat=', &
-                    workspace%material_id, ', gp=', i, ', C=', workspace%work_C(i)
-                error stop 'Thermal mass term overflow in local assembly.'
-            end if
-
-            if (.not. ieee_is_finite(workspace%work_d_dt(i)) .or. abs(workspace%work_d_dt(i)) > 1.0d120) then
-                write (*, '(A,I0,A,I0,A,ES13.5)') 'Error: Thermal transient term exploded. mat=', &
-                    workspace%material_id, ', gp=', i, ', dUdt=', workspace%work_d_dt(i)
-                error stop 'Thermal transient overflow in local assembly.'
-            end if
-
-            if (any(.not. ieee_is_finite(workspace%work_D(:, :, i))) .or. any(abs(workspace%work_D(:, :, i)) > 1.0d120)) then
-                write (*, '(A,I0,A,I0)') 'Error: Thermal diffusion tensor exploded. mat=', workspace%material_id, ', gp=', i
-                error stop 'Thermal diffusion overflow in local assembly.'
-            end if
-
-            if (any(.not. ieee_is_finite(workspace%work_V(:, i))) .or. any(abs(workspace%work_V(:, i)) > 1.0d120)) then
-                write (*, '(A,I0,A,I0)') 'Error: Thermal advection term exploded. mat=', workspace%material_id, ', gp=', i
-                error stop 'Thermal advection overflow in local assembly.'
-            end if
         end do
 
         ! Mass term -> K_TT

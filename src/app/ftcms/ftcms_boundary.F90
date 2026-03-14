@@ -292,8 +292,6 @@ contains
             end if
         end if
 
-        write (*, '(A,1X,A,A,I0,A,I0,A,I0)') '   [DEBUG] Essential BC summary:', trim(physics_type%name), &
-            ' dof_offset=', dof_offset, ', matched_patches=', num_matched_patches, ', dirichlet_nodes=', num_dirichlet_nodes
     end subroutine apply_essential_bc_generic
 
 end submodule ftcms_boundary

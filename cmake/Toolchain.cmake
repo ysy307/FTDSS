@@ -160,7 +160,8 @@ function(enable_build_flags target)
     if(ENABLE_MPI)
         target_compile_definitions(${target} ${KEYWORD} _MPI)
         target_link_libraries(${target} ${KEYWORD}
-            $<LINK_GROUP:RESCAN,MKL::MKL_SCALAPACK,MPI::MPI_Fortran>)
+            MKL::MKL_SCALAPACK
+            MPI::MPI_Fortran)
     else()
         target_link_libraries(${target} ${KEYWORD} MKL::MKL)
     endif()

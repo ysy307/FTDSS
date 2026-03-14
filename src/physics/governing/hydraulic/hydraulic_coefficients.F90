@@ -21,7 +21,7 @@ contains
         dQv_dP = 0.0d0
         drho_w_dP = 0.0d0
         drho_ice_dP = 0.0d0
-        dP_ice_dP_water = 0.0d0
+        dP_ice_dP_water = 1.0d0
 
         call state%water_content%get(Qw)
         call state%ice_content%get(Qi)
@@ -33,6 +33,8 @@ contains
 
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_density_ice(state, rho_i)
+        call self%physics%calc_density_water_derivatives(material_id, state, dden_dP=drho_w_dP)
+        call self%physics%calc_density_ice_derivatives(material_id, state, dden_dP=drho_ice_dP)
 
         ! C_HH = d(rho_eff)/dP
         ! rho_eff = rho_w*Qw + rho_i*Qi + rho_w*Qv

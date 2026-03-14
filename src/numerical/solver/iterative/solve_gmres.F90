@@ -85,7 +85,11 @@ contains
         type(type_vector_dp), intent(inout) :: x
 
         real(real64) :: beta, w_norm, temp_val, resid
+        real(real64) :: resid_prev
         integer(int32) :: i, k, ierr, iter_global, iter
+        integer(int32) :: stagnant_count
+        real(real64), parameter :: STAGNATION_RATIO = 0.999d0
+        integer(int32), parameter :: STAGNATION_PATIENCE = 400
         logical :: converged
 
         ! Initialize
@@ -93,6 +97,8 @@ contains
         self%current_iteration = 0
         self%status = SOLVER_STATUS%SUCCESS%ID
         converged = .false.
+        resid_prev = huge(1.0d0)
+        stagnant_count = 0
 
         ! Clear history
         call self%residual_history%zero()
@@ -232,6 +238,19 @@ contains
                     exit arnoldi_loop
                 end if
 
+                ! Generic stagnation guard: break when residual hardly improves
+                ! over many Krylov iterations to prevent wasted work.
+                if (resid >= STAGNATION_RATIO * resid_prev) then
+                    stagnant_count = stagnant_count + 1
+                else
+                    stagnant_count = 0
+                end if
+                resid_prev = resid
+                if (stagnant_count >= STAGNATION_PATIENCE) then
+                    self%status = SOLVER_STATUS%MAXITER%ID
+                    exit arnoldi_loop
+                end if
+
                 if (iter_global >= self%max_iterations) then
                     self%status = SOLVER_STATUS%MAXITER%ID
                     exit arnoldi_loop
@@ -271,6 +290,10 @@ contains
                     '   [GMRES] beta0=', beta, &
                     ' resid=', resid, ' iters=', iter_global, &
                     ' maxiter=', self%max_iterations
+                if (stagnant_count >= STAGNATION_PATIENCE) then
+                    write (*, '(A,I0,A,ES10.3)') '   [GMRES] stagnation detected: patience=', &
+                        STAGNATION_PATIENCE, ', ratio=', STAGNATION_RATIO
+                end if
                 exit restart_loop
             end if
 

@@ -57,7 +57,7 @@ contains
 
         real(real64) :: rho, rho_old, alpha, beta, omega
         real(real64) :: denom, ratio1, ratio2
-        real(real64) :: resid, resid0
+        real(real64) :: resid
         real(real64) :: norm_r, norm_v, norm_t, norm_s, norm_p
         real(real64) :: norm_vinf, norm_phat, norm_shat, norm_tinf
         integer(int32) :: iter
@@ -83,7 +83,7 @@ contains
         call self%residual_history%zero()
 
         ! ==========================================================
-        ! 2: Set an initial value x0 (use user's initial guess)
+        ! 2: Set an initial value x0 (use caller-provided initial guess)
         ! ==========================================================
         call self%x%copy(x)
         x_internal_ptr => self%x%get_data()
@@ -120,31 +120,15 @@ contains
         ! ==========================================================
         call self%r0%copy(self%r)
 
-        ! Initial convergence check
-        resid = vector_norm2(self%r)
-        resid0 = resid
-        call self%residual_history%set(MATRIX_OPS%INS, 1, resid)
-        if (resid < self%tolerance) then
-            self%current_iteration = 0
-            self%status = SOLVER_STATUS%SUCCESS%ID
-            if (has_internal_x) call x%copy(self%x)
-            return
-        end if
-
         do iter = 1, self%max_iterations
             ! 7: (^r0, rk)
             rho = vector_dot(self%r0, self%r)
-            ! 8: rho check — rho==0 means BiCGStab breakdown (r0* has become orthogonal to r)
-            if (abs(rho) <= tiny(1.0d0)) then
+            ! 8: rho check
+            if (rho == 0.0d0) then
                 self%current_iteration = iter
-                resid = vector_norm2(self%r)
-                call self%residual_history%set(MATRIX_OPS%INS, iter, resid)
-                if (resid < self%tolerance) then
-                    self%status = SOLVER_STATUS%SUCCESS%ID
-                else
-                    self%status = SOLVER_STATUS%BREAKDOWN%ID
-                end if
+                call self%residual_history%set(MATRIX_OPS%INS, iter, vector_norm2(self%r))
                 if (has_internal_x) call x%copy(self%x)
+                self%status = SOLVER_STATUS%BREAKDOWN%ID
                 return
             end if
 
@@ -314,9 +298,7 @@ contains
             omega = vector_dot(self%t, self%s) / denom
 
             ! 22: omega breakdown check
-            if (abs(omega) <= tiny(1.0d0)) then
-                ! omega is zero or near-zero — update x with the alpha*phat part at least
-                call vector_axpy(alpha, self%phat, self%x)
+            if (omega == 0.0d0) then
                 norm_t = vector_norm2(self%t)
                 norm_s = vector_norm2(self%s)
                 write (*, '(A,I0,2(A,ES13.5))') 'BiCGSTAB breakdown(omega): iter=', iter, ', ||t||2=', norm_t, ', ||s||2=', norm_s
@@ -380,8 +362,7 @@ contains
             ! 25: ||r_k+1||_2
             resid = vector_norm2(self%r)
             call self%residual_history%set(MATRIX_OPS%INS, iter, resid)
-            if (resid < self%tolerance .or. &
-                (resid0 > self%tolerance .and. resid < self%relative_tolerance * resid0)) then
+            if (resid < self%tolerance) then
                 self%current_iteration = iter
                 self%status = SOLVER_STATUS%SUCCESS%ID
                 if (has_internal_x) call x%copy(self%x)

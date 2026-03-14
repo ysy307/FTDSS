@@ -387,6 +387,7 @@ contains
         integer(int32), intent(in) :: iter_count
         real(real64), intent(in) :: next_output_time
         real(real64) :: next_dt
+        real(real64) :: fallback_factor
 
         if (success) then
             ! Step converged: advance time and predict next step
@@ -400,6 +401,18 @@ contains
         else
             ! Step failed: shrink dt and reset BDF order to 1 for stability
             call self%ats%calc_retry_dt(self%dt, next_dt)
+
+            ! If configured dt_min blocks reduction (next_dt ~= current dt),
+            ! force an additional generic shrink to keep retry dynamics effective.
+            if (next_dt >= self%dt - EPS_TIME) then
+                fallback_factor = self%ats%scale_retry
+                if (fallback_factor >= 1.0d0 - EPS_TIME) fallback_factor = 0.5d0
+                if (fallback_factor <= EPS_TIME) fallback_factor = 0.5d0
+                next_dt = max(self%dt * fallback_factor, EPS_TIME)
+            end if
+
+            write (*, '(A,ES13.5,A,ES13.5)') '   [ATS] retry dt: old=', self%dt, ', new=', next_dt
+
             self%dt = next_dt
             self%current_bdf_order = 1
         end if
