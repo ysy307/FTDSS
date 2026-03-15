@@ -208,8 +208,8 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: deriv
 
-        ! Non-segregation model: dP_ice/dP_w = 0
-        deriv = 0.0d0
+        ! In non-segregation equilibrium, P_i = P_w - suction(T), so dP_i/dP_w = 1.
+        deriv = 1.0d0
     end subroutine deriv_pressure_ice_water_nonseg
 
     ! ==========================================================================

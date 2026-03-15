@@ -97,6 +97,13 @@ contains
                                 local_diag_sum = local_diag_sum + abs(local_matrix_vals(i_local, i_local))
                             end do
                         end if
+
+                        local_matrix_vals => local_K_HT%get_val()
+                        if (associated(local_matrix_vals)) then
+                            do i_local = 1, workspace%num_fe_nodes
+                                local_diag_sum = local_diag_sum + abs(local_matrix_vals(i_local, i_local))
+                            end do
+                        end if
                         local_hh_diag_sum = local_diag_sum
 
                         local_h_scale = 1.0d0
@@ -110,6 +117,8 @@ contains
                         if (local_h_scale > 1.0d0 + 1.0d-12) then
                             local_matrix_vals => local_K_HH%get_val()
                             if (associated(local_matrix_vals)) local_matrix_vals(:, :) = local_h_scale * local_matrix_vals(:, :)
+                            local_matrix_vals => local_K_HT%get_val()
+                            if (associated(local_matrix_vals)) local_matrix_vals(:, :) = local_h_scale * local_matrix_vals(:, :)
                             local_vector_vals => local_F_H%get_data()
                             if (associated(local_vector_vals)) local_vector_vals(:) = local_h_scale * local_vector_vals(:)
                             nullify (local_vector_vals)
@@ -122,16 +131,20 @@ contains
                     ! $OMP CRITICAL(ftcms_global_assembly)
                     if (use_scatter) then
                         call self%K%add(thermal_dof, thermal_dof, elem_id, num_nodes_local, local_K_TT)
+                        call self%K%add(thermal_dof, hydraulic_dof, elem_id, num_nodes_local, local_K_TH)
                     else
                         call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_K_TT)
+                        call self%K%add(thermal_dof, hydraulic_dof, p_connectivity, local_K_TH)
                     end if
                     call self%F%add(thermal_dof, p_connectivity, local_F_T)
 
                     if (do_hydraulic) then
                         if (use_scatter) then
                             call self%K%add(hydraulic_dof, hydraulic_dof, elem_id, num_nodes_local, local_K_HH)
+                            call self%K%add(hydraulic_dof, thermal_dof, elem_id, num_nodes_local, local_K_HT)
                         else
                             call self%K%add(hydraulic_dof, hydraulic_dof, p_connectivity, local_K_HH)
+                            call self%K%add(hydraulic_dof, thermal_dof, p_connectivity, local_K_HT)
                         end if
                         call self%F%add(hydraulic_dof, p_connectivity, local_F_H)
                     end if

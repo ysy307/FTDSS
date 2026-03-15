@@ -29,6 +29,8 @@ module constitutive_models_manager
         procedure, public :: calc_latent_heat_fusion
         procedure, public :: calc_latent_heat_vaporization
         procedure, public :: calc_pressure_ice_water_derivative
+        procedure, public :: calc_cryogenic_suction
+        procedure, public :: calc_cryogenic_suction_derivatives
     end type type_models_manager
 
 contains
@@ -130,5 +132,29 @@ contains
 
         call self%phase_manager%deriv_pressure_ice_water(state, deriv)
     end subroutine calc_pressure_ice_water_derivative
+
+    subroutine calc_cryogenic_suction(self, state, suction)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: suction
+
+        call self%gcc%calc(state, suction)
+    end subroutine calc_cryogenic_suction
+
+    subroutine calc_cryogenic_suction_derivatives(self, state, deriv_dP, deriv_dT)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout), optional :: deriv_dP
+        real(real64), intent(inout), optional :: deriv_dT
+
+        if (present(deriv_dP)) then
+            call self%gcc%deriv_pressure(state, deriv_dP)
+        end if
+        if (present(deriv_dT)) then
+            call self%gcc%deriv_temperature(state, deriv_dT)
+        end if
+    end subroutine calc_cryogenic_suction_derivatives
 
 end module constitutive_models_manager
