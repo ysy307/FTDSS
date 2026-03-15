@@ -173,7 +173,7 @@ contains
         real(real64) :: temperature, pressure, air_content
         real(real64) :: d_air_content_dP, d_air_content_dT
 
-        real(real64) :: temperature_K, pressure_abs
+        real(real64) :: temperature_K
         real(real64) :: rh, drh_dP, drh_dT
         real(real64) :: rho_sat, drho_sat_dT
         real(real64) :: rho_w, drho_w_dP, drho_w_dT

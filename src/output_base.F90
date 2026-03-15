@@ -13,30 +13,23 @@ contains
         character(*), intent(in) :: file_extensions(:)
 
         character(512) :: command
-        logical :: exists
         integer(int32) :: i
 
-        inquire (file=strip(dir_path), exist=exists)
-
-        if (.not. exists) then
 #ifdef _WIN32
             command = "mkdir "//'"'//strip(dir_path)//'"'
-#endif
-#ifdef __linux__
+#else
             command = "mkdir -p "//'"'//strip(dir_path)//'"'
 #endif
             call execute_safely(strip(command))
-        else
+
             do i = 1, size(file_extensions)
 #ifdef _WIN32
                 command = "del /Q "//'"'//strip(dir_path)//"*"//strip(file_extensions(i))//'"'
-#endif
-#ifdef __linux__
+#else
                 command = "rm -f "//strip(dir_path)//"*"//strip(file_extensions(i))
 #endif
                 call execute_safely(strip(command))
             end do
-        end if
     end subroutine setup_directory
 
     subroutine execute_safely(command)

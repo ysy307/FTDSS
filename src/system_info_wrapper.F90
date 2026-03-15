@@ -49,34 +49,27 @@ contains
         character(:), allocatable :: user_name
 
         character(:), allocatable :: tmp_user_name
-        integer(int32) :: len, status
         integer(int32) :: i
 
-        character(:), allocatable :: user_name_lists(:)
-        integer(int32), parameter :: user_name_lists_length = 4
-
-        allocate (character(len=16) :: user_name_lists(user_name_lists_length))
+        character(len=16) :: user_name_lists(4)
 
         user_name_lists(1) = "USER"
         user_name_lists(2) = "LOGNAME"
         user_name_lists(3) = "LNAME"
         user_name_lists(4) = "USERNAME"
 
-        do i = 1, user_name_lists_length
+        do i = 1, 4
             call get_env_string(user_name_lists(i), &
                                 tmp_user_name)
             if (allocated(tmp_user_name)) then
                 if (len_trim(tmp_user_name) > 0) then
                     user_name = strip(tmp_user_name)
-                    deallocate (user_name_lists)
                     return
                 end if
             end if
         end do
 
         user_name = "Unknown"
-
-        deallocate (user_name_lists)
 
     end function get_username
 
@@ -108,31 +101,24 @@ contains
         character(:), allocatable :: host_name
 
         character(:), allocatable :: tmp_host_name
-        integer(int32) :: len, status
         integer(int32) :: i
 
-        character(:), allocatable :: host_name_lists(:)
-        integer(int32), parameter :: host_name_lists_length = 2
-
-        allocate (character(len=16) :: host_name_lists(host_name_lists_length))
+        character(len=16) :: host_name_lists(2)
         host_name_lists(1) = "HOSTNAME"
         host_name_lists(2) = "COMPUTERNAME"
 
-        do i = 1, host_name_lists_length
+        do i = 1, 2
             call get_env_string(host_name_lists(i), &
                                 tmp_host_name)
             if (allocated(tmp_host_name)) then
                 if (len_trim(tmp_host_name) > 0) then
                     host_name = strip(tmp_host_name)
-                    deallocate (host_name_lists)
                     return
                 end if
             end if
         end do
 
         host_name = "Unknown"
-
-        deallocate (host_name_lists)
 
     end function get_hostname
 
@@ -155,7 +141,6 @@ contains
     function get_compiler_version() result(compiler_version)
         implicit none
         character(:), allocatable :: compiler_version
-        integer(int32) :: year, major, minor
 
 #ifdef __GFORTRAN__
 #ifdef __GNUC__
@@ -164,11 +149,14 @@ contains
         compiler_version = "Unknown Compiler Version"
 #endif
 #elif defined(__INTEL_COMPILER)
-        year = __INTEL_COMPILER / 10000
-        major = mod(__INTEL_COMPILER / 100, 100)
-        minor = mod(__INTEL_COMPILER, 100)
+        block
+            integer(int32) :: year, major, minor
+            year = __INTEL_COMPILER / 10000
+            major = mod(__INTEL_COMPILER / 100, 100)
+            minor = mod(__INTEL_COMPILER, 100)
 
-        compiler_version = to_string(year)//"."//to_string(major)//"."//to_string(minor)
+            compiler_version = to_string(year)//"."//to_string(major)//"."//to_string(minor)
+        end block
 #elif defined(__PGI) || defined(__NVCOMPILER)
         compiler_version = to_string(__NVCOMPILER_MAJOR__)//"."//to_string(__NVCOMPILER_MINOR__)//"."//to_string(__NVCOMPILER_PATCHLEVEL__)
 #else

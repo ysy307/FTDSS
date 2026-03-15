@@ -112,7 +112,7 @@ contains
 
         integer(int32) :: iostat
         integer(int32) :: unit
-        integer(int32) :: iN, iE, idx, i
+        integer(int32) :: iN, iE, idx
 
         character(256) :: output_name
 

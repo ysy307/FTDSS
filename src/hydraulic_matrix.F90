@@ -1,4 +1,5 @@
 submodule(physics_governing_hydraulic) hydraulic_matrix
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
 contains
 
@@ -30,10 +31,20 @@ contains
         type(type_matrix_dense), intent(inout), optional :: K_HT
         type(type_vector_dp), intent(inout), optional :: F_H
 
-        integer(int32) :: i, j, ierr
+        integer(int32) :: i, ierr
         real(real64) :: bdf0
+        real(real64), pointer :: K_HH_val(:, :)
+        real(real64), pointer :: K_HT_val(:, :)
+        real(real64), pointer :: F_H_val(:)
 
         bdf0 = workspace%bdf_coeffs(1)
+        nullify (K_HH_val)
+        nullify (K_HT_val)
+        nullify (F_H_val)
+
+        if (present(K_HH)) K_HH_val => K_HH%get_val()
+        if (present(K_HT)) K_HT_val => K_HT%get_val()
+        if (present(F_H)) F_H_val => F_H%get_data()
 
         ! Initialize Workspaces
         workspace%work_C(:) = 0.0d0 ! Mass Term (C_HH)
@@ -59,62 +70,95 @@ contains
             call self%compute_transient_term(workspace%material_id, workspace%state_gp(i), &
                                              workspace%bdf_coeffs(1:workspace%bdf_order + 1), &
                                              workspace%work_d_dt(i))
+
+            if (.not. ieee_is_finite(workspace%work_C(i)) .or. abs(workspace%work_C(i)) > 1.0d120) then
+                write (*, '(A,I0,A,I0,A,ES13.5)') 'Error: Hydraulic mass term exploded. mat=', &
+                    workspace%material_id, ', gp=', i, ', C=', workspace%work_C(i)
+                error stop 'Hydraulic mass term overflow in local assembly.'
+            end if
+
+            if (.not. ieee_is_finite(workspace%work_d_dt(i)) .or. abs(workspace%work_d_dt(i)) > 1.0d120) then
+                write (*, '(A,I0,A,I0,A,ES13.5)') 'Error: Hydraulic transient term exploded. mat=', &
+                    workspace%material_id, ', gp=', i, ', dUdt=', workspace%work_d_dt(i)
+                error stop 'Hydraulic transient overflow in local assembly.'
+            end if
+
+            if (any(.not. ieee_is_finite(workspace%work_D(:, :, i))) .or. any(abs(workspace%work_D(:, :, i)) > 1.0d120)) then
+                write (*, '(A,I0,A,I0)') 'Error: Hydraulic diffusion tensor exploded. mat=', workspace%material_id, ', gp=', i
+                error stop 'Hydraulic diffusion overflow in local assembly.'
+            end if
+
+            if (any(.not. ieee_is_finite(workspace%work_V(:, i))) .or. any(abs(workspace%work_V(:, i)) > 1.0d120)) then
+                write (*, '(A,I0,A,I0)') 'Error: Hydraulic advection term exploded. mat=', workspace%material_id, ', gp=', i
+                error stop 'Hydraulic advection overflow in local assembly.'
+            end if
         end do
+
 
         ! 2. Mass Matrix Contribution (Accumulate to K_HH)
         ! K += bdf0 * MassMatrix
         call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
-        if (present(K_HH)) then
-            do j = 1, workspace%num_fe_nodes
-                do i = 1, workspace%num_fe_nodes
-                    call K_HH%set(MATRIX_OPS%ADD, i, j, bdf0 * workspace%work_matrix(i, j))
-                end do
-            end do
+        if (associated(K_HH_val)) then
+            K_HH_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) = &
+                K_HH_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) + &
+                bdf0 * workspace%work_matrix(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes)
         end if
 
         ! 3. Transient Residual Contribution (Accumulate to F_H)
         ! F += - Integral(N^T * drho/dt)
-        if (present(F_H)) then
+        if (associated(F_H_val)) then
             workspace%work_vec(:) = 0.0d0
             call workspace%compute_R1(workspace%work_d_dt, workspace%work_vec)
-            do i = 1, workspace%num_fe_nodes
-                call F_H%set(VECTOR_OPS%ADD, i, -workspace%work_vec(i))
-            end do
+            F_H_val(1:workspace%num_fe_nodes) = F_H_val(1:workspace%num_fe_nodes) - &
+                                                workspace%work_vec(1:workspace%num_fe_nodes)
         end if
 
         ! 4. Diffusion Stiffness Contribution (Accumulate to K_HH)
         ! K += Integral(gradN^T * D * gradN)
         call workspace%compute_K2(workspace%work_D, workspace%work_matrix)
-        if (present(K_HH)) then
-            do j = 1, workspace%num_fe_nodes
-                do i = 1, workspace%num_fe_nodes
-                    call K_HH%set(MATRIX_OPS%ADD, i, j, workspace%work_matrix(i, j))
-                end do
-            end do
+        if (associated(K_HH_val)) then
+            K_HH_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) = &
+                K_HH_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) + &
+                workspace%work_matrix(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes)
         end if
 
         ! 5. Diffusion Internal Force Contribution (Accumulate to F_H)
         ! F += - K_diffusion * P_node
-        if (present(F_H)) then
+        if (associated(F_H_val)) then
             workspace%work_vec(:) = 0.0d0
             call matvec(workspace%work_matrix, workspace%P_node, workspace%work_vec, ierr)
-            do i = 1, workspace%num_fe_nodes
-                call F_H%set(VECTOR_OPS%ADD, i, -workspace%work_vec(i))
-            end do
+            F_H_val(1:workspace%num_fe_nodes) = F_H_val(1:workspace%num_fe_nodes) - &
+                                                workspace%work_vec(1:workspace%num_fe_nodes)
         end if
 
-        ! 6. Gravity/Advection Flux Contribution (Accumulate to F_H)
-        ! F += Integral(gradN^T * V_H)
-        ! Note: Weak form term for flux J is -Integral(gradPsi * J).
-        ! J_grav = V_H. So term is -Integral(gradPsi * V_H).
-        ! compute_R2 computes Integral(gradPsi * V).
-        ! So we subtract the result.
-        if (present(F_H)) then
+        ! 6. Temperature Coupling Contribution (Accumulate to K_HT and F_H)
+        do i = 1, workspace%num_fe_gauss
+            call self%compute_temperature_coupling_term(workspace%material_id, workspace%state_gp(i), &
+                                                        workspace%work_D(:, :, i))
+        end do
+
+        call workspace%compute_K2(workspace%work_D, workspace%work_matrix)
+        if (associated(K_HT_val)) then
+            K_HT_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) = &
+                K_HT_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) + &
+                workspace%work_matrix(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes)
+        end if
+
+        if (associated(F_H_val)) then
+            workspace%work_vec(:) = 0.0d0
+            call matvec(workspace%work_matrix, workspace%T_node, workspace%work_vec, ierr)
+            F_H_val(1:workspace%num_fe_nodes) = F_H_val(1:workspace%num_fe_nodes) - &
+                                                workspace%work_vec(1:workspace%num_fe_nodes)
+        end if
+
+        ! 7. Gravity/Advection Flux Contribution (Accumulate to F_H)
+        ! Weak form: residual gets  -∫ ∇ψ · J_grav dΩ  where J_grav = V_H.
+        ! Newton RHS (F = -R) therefore gets  +∫ ∇ψ · V_H dΩ = +compute_R2(V_H).
+        if (associated(F_H_val)) then
             workspace%work_vec(:) = 0.0d0
             call workspace%compute_R2(workspace%work_V, workspace%work_vec)
-            do i = 1, workspace%num_fe_nodes
-                call F_H%set(VECTOR_OPS%ADD, i, -workspace%work_vec(i))
-            end do
+            F_H_val(1:workspace%num_fe_nodes) = F_H_val(1:workspace%num_fe_nodes) + &
+                                                workspace%work_vec(1:workspace%num_fe_nodes)
         end if
 
     end subroutine assemble_local_newton_hydraulic
@@ -129,13 +173,20 @@ contains
         type(type_matrix_dense), intent(inout), optional :: K_HT
         type(type_vector_dp), intent(inout), optional :: F_H
 
-        integer(int32) :: i, j, n_nodes
+        integer(int32) :: i, n_nodes
         real(real64) :: bdf0
         real(real64), allocatable :: local_vec_res(:)
+        real(real64), pointer :: K_HH_val(:, :)
+        real(real64), pointer :: K_HT_val(:, :)
 
         n_nodes = workspace%num_fe_nodes
         allocate (local_vec_res(n_nodes))
         bdf0 = workspace%bdf_coeffs(1)
+        nullify (K_HH_val)
+        nullify (K_HT_val)
+
+        if (present(K_HH)) K_HH_val => K_HH%get_val()
+        if (present(K_HT)) K_HT_val => K_HT%get_val()
 
         workspace%work_C(:) = 0.0d0
         workspace%work_D(:, :, :) = 0.0d0
@@ -155,34 +206,47 @@ contains
 
         ! 2. Mass Matrix (LHS)
         call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
-        if (present(K_HH)) then
-            do j = 1, workspace%num_fe_nodes
-                do i = 1, workspace%num_fe_nodes
-                    call K_HH%set(MATRIX_OPS%ADD, i, j, bdf0 * workspace%work_matrix(i, j))
-                end do
-            end do
+        if (associated(K_HH_val)) then
+            K_HH_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) = &
+                K_HH_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) + &
+                bdf0 * workspace%work_matrix(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes)
         end if
 
         ! 3. Diffusion Matrix (LHS) & Flux Calculation
         call workspace%compute_K2(workspace%work_D, workspace%work_matrix)
-        if (present(K_HH)) then
-            do j = 1, workspace%num_fe_nodes
-                do i = 1, workspace%num_fe_nodes
-                    call K_HH%set(MATRIX_OPS%ADD, i, j, workspace%work_matrix(i, j))
-                end do
-            end do
+        if (associated(K_HH_val)) then
+            K_HH_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) = &
+                K_HH_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) + &
+                workspace%work_matrix(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes)
         end if
 
         ! Calculate Diffusion Flux (Current K * Current P)
         if (present(F_H)) then
             do i = 1, workspace%num_fe_nodes
-                do j = 1, workspace%num_fe_nodes
-                    local_vec_res(i) = local_vec_res(i) + workspace%work_matrix(i, j) * workspace%P_node(j)
-                end do
+                local_vec_res(i) = local_vec_res(i) + dot_product(workspace%work_matrix(i, 1:workspace%num_fe_nodes), &
+                                                                  workspace%P_node(1:workspace%num_fe_nodes))
             end do
         end if
 
-        ! 4. Residual Assembly
+        ! 4. Temperature Coupling Matrix (LHS) and Flux
+        do i = 1, workspace%num_fe_gauss
+            call self%compute_temperature_coupling_term(workspace%material_id, workspace%state_gp(i), &
+                                                        workspace%work_D(:, :, i))
+        end do
+        call workspace%compute_K2(workspace%work_D, workspace%work_matrix)
+        if (associated(K_HT_val)) then
+            K_HT_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) = &
+                K_HT_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) + &
+                workspace%work_matrix(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes)
+        end if
+        if (present(F_H)) then
+            do i = 1, workspace%num_fe_nodes
+                local_vec_res(i) = local_vec_res(i) + dot_product(workspace%work_matrix(i, 1:workspace%num_fe_nodes), &
+                                                                  workspace%T_node(1:workspace%num_fe_nodes))
+            end do
+        end if
+
+        ! 5. Residual Assembly
         if (present(F_H)) then
             ! Add Transient Term
             workspace%work_vec(:) = 0.0d0
@@ -190,9 +254,10 @@ contains
             local_vec_res(:) = local_vec_res(:) + workspace%work_vec(:)
 
             ! Add Gravity Term
+            ! Residual gets  -∫ ∇ψ · V_H dΩ; since F = -residual, subtract here.
             workspace%work_vec(:) = 0.0d0
             call workspace%compute_R2(workspace%work_V, workspace%work_vec)
-            local_vec_res(:) = local_vec_res(:) + workspace%work_vec(:)
+            local_vec_res(:) = local_vec_res(:) - workspace%work_vec(:)
 
             ! F = - Residual
             do i = 1, workspace%num_fe_nodes

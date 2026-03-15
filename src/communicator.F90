@@ -403,8 +403,8 @@ contains
         send_displs_per_proc(0) = 0
         recv_displs_per_proc(0) = 0
         do i = 1, self%num_procs - 1
-            send_displs_per_proc(i) = send_displs_per_proc(i - 1) + send_counts_per_proc(i - 1)
-            recv_displs_per_proc(i) = recv_displs_per_proc(i - 1) + recv_counts_per_proc(i - 1)
+            send_displs_per_proc(i) = send_displs_per_proc(i - 1) + send_counts_per_proc(i)
+            recv_displs_per_proc(i) = recv_displs_per_proc(i - 1) + recv_counts_per_proc(i)
         end do
 
         allocate (gids_others_need_from_me(sum(recv_counts_per_proc)))
@@ -417,7 +417,7 @@ contains
 
         allocate (self%send_indices(size(gids_others_need_from_me)))
         do i = 1, size(gids_others_need_from_me)
-            found_idx = binary_find(gids_others_need_from_me(i), self%sorted_local_gids)
+            found_idx = int(binary_find(gids_others_need_from_me(i), self%sorted_local_gids), int32)
             if (found_idx > 0) then
                 self%send_indices(i) = self%sorted_local_lids(found_idx)
             else

@@ -225,6 +225,7 @@ contains
         integer(int32) :: i, glob_node_id
         integer(int32) :: entity_id, bc_idx
         integer(int32) :: num_matched_patches, num_dirichlet_nodes
+        integer(int32) :: anchor_node_id
         type(type_bc_result) :: bc_result
         type(type_boundary_patch), pointer :: bc_patch
 
@@ -233,6 +234,7 @@ contains
         call self%domain%get_num_bc_patches(num_patches)
         num_matched_patches = 0
         num_dirichlet_nodes = 0
+        anchor_node_id = -1
 
         do i_patch = 1, num_patches
             call self%domain%get_bc_patch(i_patch, bc_patch)
@@ -244,7 +246,17 @@ contains
 
             call self%bc(physics_type%ID)%evaluate(bc_idx, current_time, 0.0d0, bc_result)
 
-            if (.not. bc_result%is_dirichlet) cycle
+            if (anchor_node_id < 0) then
+                if (allocated(bc_patch%connectivity%col_ind)) then
+                    if (size(bc_patch%connectivity%col_ind) > 0) then
+                        anchor_node_id = bc_patch%connectivity%col_ind(1)
+                    end if
+                end if
+            end if
+
+            if (.not. bc_result%is_dirichlet) then
+                cycle
+            end if
 
             if (allocated(bc_patch%connectivity%col_ind)) then
                 do i = 1, size(bc_patch%connectivity%col_ind)
@@ -268,9 +280,18 @@ contains
         end if
 
         if (num_dirichlet_nodes == 0) then
-            write (*, '(A,1X,A)') 'Error: No Dirichlet nodes were constrained for physics:', trim(physics_type%name)
-            error stop 'No essential BC applied. The linear system may be singular.'
+            if (anchor_node_id > 0) then
+                write (*, '(A,1X,A,1X,A,I0)') 'Warning: No Dirichlet BC for physics:', trim(physics_type%name), &
+                    '-> applying gauge anchor at node', anchor_node_id
+                call self%K%zero(anchor_node_id, dof_offset)
+                call self%K%set(dof_offset, dof_offset, anchor_node_id, anchor_node_id, 1.0d0)
+                call self%F%set(dof_offset, anchor_node_id, 0.0d0)
+            else
+                write (*, '(A,1X,A)') 'Error: No Dirichlet nodes were constrained for physics:', trim(physics_type%name)
+                error stop 'No essential BC applied. The linear system may be singular.'
+            end if
         end if
+
     end subroutine apply_essential_bc_generic
 
 end submodule ftcms_boundary

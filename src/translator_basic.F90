@@ -158,29 +158,29 @@ contains
 
             case (SWCC_MODELS%VG%ID)
                 config%n1 = material%n1
-                config%m1 = 1.0d0 - 1.0d0 / material%n1
+                config%m1 = material%m1
 
             case (SWCC_MODELS%MVG%ID)
                 config%n1 = material%n1
-                config%m1 = 1.0d0 - 1.0d0 / material%n1
+                config%m1 = material%m1
                 config%h_crit = material%h_crit
 
             case (SWCC_MODELS%DURNER%ID)
                 config%n1 = material%n1
-                config%m1 = 1.0d0 - 1.0d0 / material%n1
+                config%m1 = material%m1
                 config%alpha2 = material%alpha2
                 config%n2 = material%n2
-                config%m2 = 1.0d0 - 1.0d0 / material%n2
+                config%m2 = material%m2
                 config%w1 = material%w1
-                config%w2 = 1.0d0 - material%w1
+                config%w2 = material%w2
 
             case (SWCC_MODELS%DVGCH%ID)
                 config%n1 = material%n1
-                config%m1 = 1.0d0 - 1.0d0 / material%n1
+                config%m1 = material%m1
                 config%n2 = material%n2
-                config%m2 = 1.0d0 - 1.0d0 / material%n2
+                config%m2 = material%m2
                 config%w1 = material%w1
-                config%w2 = 1.0d0 - material%w1
+                config%w2 = material%w2
 
             end select
 

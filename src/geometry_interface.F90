@@ -34,11 +34,11 @@ module io_input_geometry
             class(type_input_geometry), intent(inout) :: self
         end subroutine initialize_type_input_geometry
 
-        module function collect_fields_from_conditions(self) result(field_list)
+        module subroutine collect_fields_from_conditions(self, field_list)
             implicit none
             class(type_input_geometry), intent(inout) :: self
-            character(:), allocatable :: field_list(:)
-        end function collect_fields_from_conditions
+            character(len=256), allocatable, intent(out) :: field_list(:)
+        end subroutine collect_fields_from_conditions
 
         ! module subroutine display_input_geometry(self)
         !     implicit none

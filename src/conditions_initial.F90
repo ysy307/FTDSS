@@ -16,7 +16,6 @@ contains
         class(type_conditions), intent(inout) :: self
         type(json_file), intent(inout) :: json
         integer(int32) :: i
-        character(:), allocatable :: tmp_string
         character(256) :: buffer(3) = [character(256) :: initial_conditions, "", ""]
 
         select type (p => self%parent)

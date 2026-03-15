@@ -316,7 +316,7 @@ module core_types_algebra_matrix
             type(type_vector_dp), intent(inout) :: diagonal
         end subroutine get_diagonal_dense
 
-        !> Returns a pointer to the dense matrix's value array.
+        !> Returns a pointer to the dense matrix value array.
         module function get_val_dense(self) result(val)
             implicit none
             class(type_matrix_dense), intent(in), target :: self

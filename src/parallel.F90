@@ -1,5 +1,9 @@
-module module_parallel
-    use :: numerical_parallel_communicator
+module control_parallel
+    use :: control_parallel_openmp, only: &
+        initialize_openmp
     implicit none
+    private
 
-end module module_parallel
+    public :: initialize_openmp
+
+end module control_parallel

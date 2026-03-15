@@ -215,8 +215,6 @@ contains
 
         integer(int32) :: nb
         integer(int32), allocatable :: target_indices(:)
-        integer(int32) :: i
-        logical :: error_found
 
         if (.not. VECTOR_OPS%is_valid(op)) then
             self%status = VECTOR_STATUS%ILL_OPERATIONS
@@ -260,7 +258,6 @@ contains
         type(type_constant_id), intent(in) :: op
         class(type_vector_dp), intent(in) :: alpha
 
-        integer(int32) :: i
         real(real64), dimension(:), pointer :: alpha_data
 
         if (.not. VECTOR_OPS%is_valid(op)) then

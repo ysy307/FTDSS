@@ -253,31 +253,36 @@ contains
         implicit none
         !> Scalar \( \alpha \)
         real(real64), intent(in) :: alpha
-        !> Dense matrix A (contiguous)
-        real(real64), intent(in), contiguous :: A(:, :)
-        !> Input vector x (contiguous)
-        real(real64), intent(in), contiguous :: x(:)
+        !> Dense matrix A
+        real(real64), intent(in) :: A(:, :)
+        !> Input vector x
+        real(real64), intent(in) :: x(:)
         !> Scalar \( \beta \)
         real(real64), intent(in) :: beta
-        !> Input/Output vector y (contiguous)
-        real(real64), intent(inout), contiguous :: y(:)
+        !> Input/Output vector y
+        real(real64), intent(inout) :: y(:)
         !> Error status
         integer(int32), intent(inout) :: ierr
 
-        integer(int32) :: i
         integer(int32) :: num_row, num_col
+        integer(int32) :: j
 
         num_row = size(A, 1)
         num_col = size(A, 2)
 #ifdef _MKL
-        ! Warning (406) fixed by declaring A as contiguous
-        call dgemv('N', num_row, num_col, alpha, A, num_row, x, 1, beta, y, 1)
+        if (is_contiguous(A) .and. is_contiguous(x) .and. is_contiguous(y)) then
+            call dgemv('N', num_row, num_col, alpha, A, num_row, x, 1, beta, y, 1)
+        else
+            y = beta * y
+            do j = 1, num_col
+                y = y + alpha * x(j) * A(:, j)
+            end do
+        end if
 #else
-        !$omp parallel do private(i)
-        do i = 1, num_row
-            y(i) = alpha * dot_product(A(i, :), x) + beta * y(i)
+        y = beta * y
+        do j = 1, num_col
+            y = y + alpha * x(j) * A(:, j)
         end do
-        !$omp end parallel do
 #endif
         ierr = MATRIX_STATUS%SUCCESS%ID
 
@@ -301,7 +306,6 @@ contains
         integer(int32), intent(inout) :: ierr
 
         type(type_matrix_info) :: info
-        integer(int32) :: i
 
 #ifdef _MKL
         real(real64), dimension(:, :), pointer :: val_ptr
@@ -313,16 +317,13 @@ contains
         end if
 
         val_ptr => A%get_val()
-        ! Ensure pointer target is handled correctly by MKL
-        call dgemv('N', info%num_rows, info%num_cols, alpha, val_ptr, info%num_rows, x, 1, beta, y, 1)
+        call gemv_matrix_real64(alpha, val_ptr, x, beta, y, ierr)
 #else
         call A%get_info(info)
-        !$omp parallel do private(i)
-        do i = 1, info%num_rows
-            y(i) = alpha * dot_product(A%val(i, :), x) + beta * y(i)
-        end do
-        !$omp end parallel do
+        call gemv_matrix_real64(alpha, A%val, x, beta, y, ierr)
 #endif
+        if (ierr /= MATRIX_STATUS%SUCCESS%ID) return
+
         ierr = MATRIX_STATUS%SUCCESS%ID
 
     end subroutine gemv_matrix_dense
@@ -452,7 +453,8 @@ contains
         integer(int32) :: i, k, rb, cb, col
         integer(int32) :: R, C
         integer(int32) :: x_idx, y_idx
-        real(real64) :: sum
+        real(real64) :: sum, term
+        real(real64) :: mul_limit
 
         call A%get_info(info)
 
@@ -469,6 +471,7 @@ contains
         ind => A%get_ind()
         ptr => A%get_ptr()
         val => A%get_val()
+        mul_limit = sqrt(huge(1.0d0))
 
         !$omp parallel do private(i, k, col, rb, cb, x_idx, y_idx, sum)
         do i = 1, info%num_nodes ! Iterate over block rows
@@ -481,11 +484,26 @@ contains
                     ! Perform block multiplication for the current local row
                     do cb = 1, C
                         x_idx = (col - 1) * C + cb
-                        sum = sum + val(rb, cb, k) * x(x_idx)
+                        term = sign(min(abs(val(rb, cb, k)), mul_limit), val(rb, cb, k)) * &
+                               sign(min(abs(x(x_idx)), mul_limit), x(x_idx))
+                        if (abs(sum) > huge(1.0d0) - abs(term)) then
+                            sum = sign(0.5d0*huge(1.0d0), sum)
+                        else
+                            sum = sum + term
+                        end if
                     end do
                 end do
                 y_idx = (i - 1) * R + rb
-                y(y_idx) = alpha * sum + beta * y(y_idx)
+                term = sign(min(abs(alpha), mul_limit), alpha) * sign(min(abs(sum), mul_limit), sum)
+                if (abs(beta) > 0.0d0) then
+                    if (abs(term) > huge(1.0d0) - abs(beta*y(y_idx))) then
+                        y(y_idx) = sign(0.5d0*huge(1.0d0), term)
+                    else
+                        y(y_idx) = term + beta * y(y_idx)
+                    end if
+                else
+                    y(y_idx) = term
+                end if
             end do
         end do
         !$omp end parallel do
@@ -536,7 +554,7 @@ contains
 
     !> Compute the inverse of a square matrix A.
     !> The result overwrites A (In-place).
-    !> Uses analytical formulas (Cramer's rule variant) for N <= 3.
+    !> Uses analytical formulas (Cramer rule variant) for N <= 3.
     !> For N > 3: Uses LAPACK (dgetrf/dgetri) if _MKL is defined.
     !> [FIX] Corrected fallback implementation (Gauss-Jordan with identity augmentation) for non-MKL case.
     subroutine matrix_inverse_real64(A, ierr)

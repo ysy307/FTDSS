@@ -5,19 +5,17 @@ contains
     module subroutine initialize_type_ftcms(self)
         implicit none
         class(type_ftcms), intent(inout) :: self
-
-        type(type_input) :: input
+        type(type_input), save :: input
         type(type_ic_manager) :: ic
 
         integer(int32) :: max_bdf_order
         integer(int32), allocatable :: active_region_ids(:)
         integer(int32) :: num_nodes
         integer(int32) :: i
-        character(len=10), allocatable :: profiler_labels(:)
-        real(real64) :: current_time
         integer(int32) :: computation_dimension
         integer(int32) :: num_total_dofs
         integer(int32) :: ierr
+        real(real64), pointer, contiguous, dimension(:) :: phase_values
 
         type(type_config_control_manager) :: config_control_manager
         type(type_config_iteration) :: config_iteration
@@ -101,6 +99,10 @@ contains
         call self%domain%initialize(config_nodes, config_elements, config_multicoloring, config_boundary_elements, &
                                     input%basic%simulation_settings%calculate_type, config_control_manager%coupling_mode, &
                                     config_control_manager%compute_active)
+
+        call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, self%thermal_start_dof)
+        call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, self%hydraulic_start_dof)
+
         call self%domain%get_total_dofs(num_total_dofs)
         call self%domain%get_num_nodes(num_nodes)
 
@@ -141,12 +143,32 @@ contains
                                  solver_settings%tolerance, &
                                  solver_settings%max_iterations, &
                                  solver_settings%m_restarts)
-            call pc_info%set(solver_settings%preconditioner_type, num_total_dofs)
+            if (solver_settings%preconditioner_type == PRECONDITIONER_TYPES%ILU%ID) then
+                call pc_info%set(solver_settings%preconditioner_type, num_nodes, self%K%get_num_dofs_per_node())
+            else
+                call pc_info%set(solver_settings%preconditioner_type, num_total_dofs)
+            end if
             call create_solver(self%solver, solver_info, pc_info, ierr)
         end associate
 
         ! Apply initial Dirichlet boundary conditions to field variables
         call self%apply_bc()
+
+        ! Populate initial phase variables from initial T/P/porosity before first output.
+        call self%update_variables()
+        nullify (phase_values)
+        call self%Qw%get_current(phase_values)
+        if (associated(phase_values)) call self%Qw%set_previous(phase_values)
+        nullify (phase_values)
+        call self%Qi%get_current(phase_values)
+        if (associated(phase_values)) call self%Qi%set_previous(phase_values)
+        nullify (phase_values)
+        call self%Qa%get_current(phase_values)
+        if (associated(phase_values)) call self%Qa%set_previous(phase_values)
+        nullify (phase_values)
+        call self%Qv%get_current(phase_values)
+        if (associated(phase_values)) call self%Qv%set_previous(phase_values)
+        nullify (phase_values)
 
         call input_translator%execute(input, config_output)
         call input_translator%execute(input, config_observation)
@@ -299,7 +321,7 @@ contains
         if (self%control%is_physics_active(variable_id)) then
             call self%domain%get_num_nodes(num_nodes)
             call self%domain%get_num_dof_per_node(num_dofs_per_node)
-            call self%domain%get_target_dof(variable_id, target_dof)
+            call self%domain%get_start_dof_index(variable_id, target_dof)
 
             call allocate_array(variable, num_nodes)
 
@@ -344,7 +366,7 @@ contains
         if (self%control%is_physics_active(variable_id)) then
             call self%domain%get_num_nodes(num_nodes)
             call self%domain%get_num_dof_per_node(num_dofs_per_node)
-            call self%domain%get_target_dof(variable_id, target_dof)
+            call self%domain%get_start_dof_index(variable_id, target_dof)
 
             call allocate_array(variable, num_nodes)
 
@@ -368,41 +390,66 @@ contains
 
         integer(int32) :: material_id
         integer(int32) :: bdf_order
+        integer(int32) :: start_dof_thermal, start_dof_hydraulic
         real(real64) :: temperature, pressure, porosity
         type(type_coordinate_dp) :: grad_T, grad_P
         real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
 
         logical :: do_calc
+        logical :: temperature_set, pressure_set
 
         ! Default: compute physics (for backward compatibility)
         do_calc = .true.
         if (present(calc_physics)) do_calc = calc_physics
-
         call state%reset()
 
         call self%control%get_bdf_coeffs(bdf_order=bdf_order)
 
-        ! Retrieve primary variables and their histories (always executed)
-        if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
+        start_dof_thermal = self%thermal_start_dof
+        if (start_dof_thermal > 0) then
             call self%temperature%get_current(node_id, temperature)
+            temperature = min(max(temperature, -80.0d0), 80.0d0)
             call self%temperature%get_current_gradient(node_id, grad_T)
             call self%temperature%get_history(node_id, temperature_history)
-            call state%set(temperature=temperature, &
-                           grad_T=grad_T, &
-                           temperature_history=temperature_history(1:bdf_order + 1))
+        else
+            temperature = 0.0d0
+            call grad_T%reset()
+            temperature_history = 0.0d0
         end if
-        if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
+        call state%set(temperature=temperature, &
+                       grad_T=grad_T, &
+                       temperature_history=temperature_history(1:bdf_order + 1))
+
+        start_dof_hydraulic = self%hydraulic_start_dof
+        if (start_dof_hydraulic > 0) then
             call self%pressure%get_current(node_id, pressure)
+            pressure = min(max(pressure, -1.0d7), 1.0d7)
             call self%pressure%get_current_gradient(node_id, grad_P)
             call self%pressure%get_history(node_id, pressure_history)
-            call state%set(pressure=pressure, &
-                           grad_P=grad_P, &
-                           pressure_history=pressure_history(1:bdf_order + 1))
+        else
+            pressure = 0.0d0
+            call grad_P%reset()
+            pressure_history = 0.0d0
         end if
+        call state%set(pressure=pressure, &
+                       grad_P=grad_P, &
+                       pressure_history=pressure_history(1:bdf_order + 1))
+
         call self%porosity%get_current(node_id, porosity)
         call self%porosity%get_history(node_id, porosity_history)
         call state%set(porosity=porosity, &
                        porosity_history=porosity_history(1:bdf_order + 1))
+
+        call state%temperature%get(temperature, temperature_set)
+        call state%pressure%get(pressure, pressure_set)
+        if (.not. temperature_set .or. .not. pressure_set) then
+            !$omp critical (ftcms_state_diag)
+            write (*, '(A,I0,A,I0,A,L1,A,L1,A,I0,A,I0)') 'Error: set_state_ftcms unset primary state. node=', node_id, &
+                ', elem=', element_id, ', T_set=', temperature_set, ', P_set=', pressure_set, &
+                ', T_dof=', start_dof_thermal, ', H_dof=', start_dof_hydraulic
+            !$omp end critical (ftcms_state_diag)
+            error stop 'set_state_ftcms: temperature/pressure unset before constitutive update.'
+        end if
 
         ! Run expensive physics computations only when flagged
         if (do_calc) then
@@ -422,18 +469,7 @@ contains
 
         integer(int32) :: i, node_id
         integer(int32) :: material_id
-        integer(int32) :: bdf_order
-        real(real64), pointer, contiguous :: T_current(:), P_current(:), phi_current(:)
-        type(type_coordinate_array_dp), pointer :: grad_T_array, grad_P_array
-        type(type_coordinate_dp) :: grad_T, grad_P
-        real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
         logical :: do_calc
-
-        nullify (T_current)
-        nullify (P_current)
-        nullify (phi_current)
-        nullify (grad_T_array)
-        nullify (grad_P_array)
 
         if (size(states) /= size(connectivity)) then
             error stop 'set_states_from_connectivity_ftcms: size(states) /= size(connectivity)'
@@ -442,41 +478,13 @@ contains
         do_calc = .true.
         if (present(calc_physics)) do_calc = calc_physics
 
-        call self%control%get_bdf_coeffs(bdf_order=bdf_order)
-
-        if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
-            call self%temperature%get_current(T_current)
-            call self%temperature%get_current_gradient(grad_T_array)
-        end if
-        if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
-            call self%pressure%get_current(P_current)
-            call self%pressure%get_current_gradient(grad_P_array)
-        end if
-        call self%porosity%get_current(phi_current)
-
         do i = 1, size(connectivity)
             node_id = connectivity(i)
-            call states(i)%reset()
-
-            if (self%control%is_physics_active(PHYSICS_TYPES%THERMAL)) then
-                call grad_T%set(grad_T_array%x(node_id), grad_T_array%y(node_id), grad_T_array%z(node_id))
-                call self%temperature%get_history(node_id, temperature_history)
-                call states(i)%set(temperature=T_current(node_id), &
-                                   grad_T=grad_T, &
-                                   temperature_history=temperature_history(1:bdf_order + 1))
+            if (node_id < 1) then
+                write (*, '(A, I0, A, I0, A, I0)') 'invalid node_id=', node_id, ', elem=', element_id, ', local=', i
+                error stop 'set_states_from_connectivity_ftcms: node_id out of range'
             end if
-
-            if (self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)) then
-                call grad_P%set(grad_P_array%x(node_id), grad_P_array%y(node_id), grad_P_array%z(node_id))
-                call self%pressure%get_history(node_id, pressure_history)
-                call states(i)%set(pressure=P_current(node_id), &
-                                   grad_P=grad_P, &
-                                   pressure_history=pressure_history(1:bdf_order + 1))
-            end if
-
-            call self%porosity%get_history(node_id, porosity_history)
-            call states(i)%set(porosity=phi_current(node_id), &
-                               porosity_history=porosity_history(1:bdf_order + 1))
+            call self%set_state(node_id, element_id, states(i), calc_physics=.false.)
         end do
 
         if (do_calc) then
@@ -565,6 +573,7 @@ contains
         integer(int32) :: bdf_order
         real(real64), pointer, contiguous, dimension(:) :: current
         real(real64), allocatable :: du(:)
+        real(real64), allocatable :: current_prev(:)
 
         real(real64) :: relaxation_factor
         logical :: is_none
@@ -575,6 +584,10 @@ contains
         real(real64), parameter :: MAX_DT_STEP = 5.0d0
         real(real64), parameter :: MAX_DP_STEP = 1.0d5
         real(real64), parameter :: ALPHA_MIN = 0.1d0
+        real(real64), parameter :: TEMP_MIN_C = -80.0d0
+        real(real64), parameter :: TEMP_MAX_C = 80.0d0
+        real(real64), parameter :: PRESS_MIN_PA = -1.0d7
+        real(real64), parameter :: PRESS_MAX_PA = 1.0d7
 
         call self%control%profiler_start(PROFILER_TYPES%SETUP)
 
@@ -592,6 +605,9 @@ contains
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
             call self%temperature%get_current(current)
             if (associated(current)) then
+                call allocate_array(current_prev, size(current))
+                current_prev(:) = current(:)
+
                 if (allocated(du) .and. size(du) > 0) then
                     if (.not. is_none) then
                         if (is_newton) then
@@ -604,22 +620,23 @@ contains
                                 alpha = 1.0d0
                             end if
                             relaxation_factor = alpha
-                            write (*, '("   [Newton] Iter:", I3, " Alpha:", F6.4, " max|dT|:", ES10.3)') &
-                                iter, alpha, max_du
                             ! Apply damped Newton update directly
                             current(:) = current(:) + relaxation_factor * du(:)
                         else
                             call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, du, current)
                             call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
-                            write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                            current(:) = current(:) + relaxation_factor * du(:)
                         end if
                     else
                         relaxation_factor = 1.0d0
+                        current(:) = current(:) + du(:)
                     end if
-                    call self%temperature%set_delta(relaxation_factor * du(:))
-                else
-                    call self%temperature%set_delta(0.0d0 * current)
                 end if
+
+                current(:) = min(max(current(:), TEMP_MIN_C), TEMP_MAX_C)
+                call self%temperature%set_delta(current(:) - current_prev(:))
+
+                call deallocate_array(current_prev)
             end if
 
             call self%calc_gradient_temperature()
@@ -632,6 +649,9 @@ contains
             call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, du)
             call self%pressure%get_current(current)
             if (associated(current)) then
+                call allocate_array(current_prev, size(current))
+                current_prev(:) = current(:)
+
                 if (allocated(du) .and. size(du) > 0) then
                     if (.not. is_none) then
                         if (is_newton) then
@@ -644,21 +664,22 @@ contains
                                 alpha = 1.0d0
                             end if
                             relaxation_factor = alpha
-                            write (*, '("   [Newton] Iter:", I3, " Alpha:", F6.4, " max|dP|:", ES10.3)') &
-                                iter, alpha, max_du
                             current(:) = current(:) + relaxation_factor * du(:)
                         else
                             call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, du, current)
                             call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
-                            write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+                            current(:) = current(:) + relaxation_factor * du(:)
                         end if
                     else
                         relaxation_factor = 1.0d0
+                        current(:) = current(:) + du(:)
                     end if
-                    call self%pressure%set_delta(relaxation_factor * du(:))
-                else
-                    call self%pressure%set_delta(0.0d0 * current)
                 end if
+
+                current(:) = min(max(current(:), PRESS_MIN_PA), PRESS_MAX_PA)
+                call self%pressure%set_delta(current(:) - current_prev(:))
+
+                call deallocate_array(current_prev)
             end if
 
             call self%calc_gradient_pressure()

@@ -16,18 +16,9 @@ contains
         !> The newly created and allocated first-order side element object.
         class(abst_fe), allocatable :: fe
 
-        character(len=*), parameter :: cell_name = "Line"
-        integer(int32) :: vtk_type
-        integer(int32) :: num_nodes
-        integer(int32) :: dimension
-        integer(int32) :: order
-        integer(int32) :: num_gauss
-
         allocate (type_side_first :: fe)
 
-        call vtk_constants%get_cell_info_from_cell_name(cell_name, vtk_type, num_nodes, dimension, order)
-
-        call fe%initialize(type=vtk_type, dimension=dimension, order=order, num_nodes=num_nodes, &
+        call fe%initialize(type=FE_TYPE%LINE%ID, dimension=1, order=1, num_nodes=2, &
                            integration_order=integration_order)
 
     end function construct_side_first
@@ -40,8 +31,6 @@ contains
         class(type_side_first), intent(in) :: self
         real(real64), intent(in) :: node_coords(:, :)
         real(real64), intent(inout) :: measure
-        integer(int32) :: node1_id
-        integer(int32) :: node2_id
         real(real64) :: dx
         real(real64) :: dy
         real(real64) :: dz
@@ -106,7 +95,6 @@ contains
         real(real64), intent(inout) :: tangent_vec(:)
 
         integer(int32) :: i
-        integer(int32) :: node_id
         integer(int32) :: nn
         real(real64) :: dpsi_val
 
@@ -152,8 +140,6 @@ contains
         real(real64) :: w(3)
         real(real64) :: t
         real(real64) :: v_dot_v
-        integer(int32) :: node1_id
-        integer(int32) :: node2_id
         real(real64), parameter :: tol = 1.0e-9
 
         ! Vector from node 1 to node 2

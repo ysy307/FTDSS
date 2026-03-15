@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">25 statements</a>
+                 title=" 0.0% of total for procedures.">29 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -180,7 +180,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~470"></span>
+              <span class="anchor" id="variable-self~902"></span>
               class(<a href='../type/type_jacobian_matrix.html'>type_jacobian_matrix</a>),
             </td>
 <td>intent(inout)</td>
@@ -225,7 +225,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-element_id~4"></span>
+              <span class="anchor" id="variable-element_id~5"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -661,7 +661,14 @@ large graphs.</div>
 <span class="w">        </span><span class="k">type is</span><span class="w"> </span><span class="p">(</span><span class="n">type_matrix_bsr</span><span class="p">)</span>
 <span class="w">            </span><span class="n">val_bsr</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">matrix</span><span class="p">%</span><span class="n">get_val</span><span class="p">()</span>
 
-<span class="w">            </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_local</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">row_dof</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">row_dof</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">val_bsr</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">col_dof</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">col_dof</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">val_bsr</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(A,I0,A,2(I0,A),2(I0,A))&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;Error: add_local_fast_jacobian_matrix dof out of range. elem=&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">element_id</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;, row_dof=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">row_dof</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;, col_dof=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">col_dof</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;, bsr_row_blocks=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">val_bsr</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="s1">&#39;, bsr_col_blocks=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">val_bsr</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span>
+<span class="w">                </span><span class="k">error stop</span><span class="w"> </span><span class="s1">&#39;Invalid dof block index in add_local_fast_jacobian_matrix.&#39;</span>
+<span class="w">            </span><span class="k">end if</span>
+
+<span class="k">            do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_local</span>
 <span class="w">                </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_local</span>
 <span class="w">                    </span><span class="n">block_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">scatter_data</span><span class="p">(</span><span class="n">offset</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">n_local</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">j</span><span class="p">)</span>
 <span class="w">                    </span><span class="n">val_bsr</span><span class="p">(</span><span class="n">row_dof</span><span class="p">,</span><span class="w"> </span><span class="n">col_dof</span><span class="p">,</span><span class="w"> </span><span class="n">block_index</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">&amp;</span>
@@ -693,7 +700,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-12 08:04 +0000             </p>
+ on 2026-03-15 13:15 +0000             </p>
           </div>
         </div>
         <br>

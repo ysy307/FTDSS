@@ -1,4 +1,4 @@
-submodule(numerical_solver_interface) solve_type_solver_gmres
+submodule(numerical_solver_interface) impl_solve_type_solver_gmres
     implicit none
 contains
 
@@ -85,13 +85,20 @@ contains
         type(type_vector_dp), intent(inout) :: x
 
         real(real64) :: beta, w_norm, temp_val, resid
-        integer(int32) :: i, j, k, ierr, iter_global, iter
+        real(real64) :: resid_prev
+        integer(int32) :: i, k, ierr, iter_global, iter
+        integer(int32) :: stagnant_count
+        real(real64), parameter :: STAGNATION_RATIO = 0.999d0
+        integer(int32), parameter :: STAGNATION_PATIENCE = 400
         logical :: converged
 
         ! Initialize
         iter_global = 0
         self%current_iteration = 0
+        self%status = SOLVER_STATUS%SUCCESS%ID
         converged = .false.
+        resid_prev = huge(1.0d0)
+        stagnant_count = 0
 
         ! Clear history
         call self%residual_history%zero()
@@ -176,7 +183,20 @@ contains
                 ! Happy Breakdown check
                 if (w_norm < 1.0d-20) then
                     self%h(iter + 1, iter) = 0.0d0
-                    ! Cannot extend basis further; break loop (residual should be small)
+
+                    ! Still need to apply Givens rotations to this column
+                    do i = 1, iter - 1
+                        temp_val = self%cs(i) * self%h(i, iter) + self%sn(i) * self%h(i + 1, iter)
+                        self%h(i + 1, iter) = -self%sn(i) * self%h(i, iter) + self%cs(i) * self%h(i + 1, iter)
+                        self%h(i, iter) = temp_val
+                    end do
+                    call generate_givens_rotation(self%h(iter, iter), self%h(iter + 1, iter), self%cs(iter), self%sn(iter))
+                    self%h(iter, iter) = self%cs(iter) * self%h(iter, iter) + self%sn(iter) * self%h(iter + 1, iter)
+                    self%h(iter + 1, iter) = 0.0d0
+                    self%g(iter + 1) = -self%sn(iter) * self%g(iter)
+                    self%g(iter) = self%cs(iter) * self%g(iter)
+
+                    converged = .true.
                     exit arnoldi_loop
                 else
                     self%h(iter + 1, iter) = w_norm
@@ -212,8 +232,22 @@ contains
                 resid = abs(self%g(iter + 1))
                 call self%residual_history%set(MATRIX_OPS%INS, iter_global, resid)
 
-                if (resid < self%tolerance) then
+                if (resid < self%tolerance .or. &
+                    (beta > self%tolerance .and. resid < self%relative_tolerance * beta)) then
                     converged = .true.
+                    exit arnoldi_loop
+                end if
+
+                ! Generic stagnation guard: break when residual hardly improves
+                ! over many Krylov iterations to prevent wasted work.
+                if (resid >= STAGNATION_RATIO * resid_prev) then
+                    stagnant_count = stagnant_count + 1
+                else
+                    stagnant_count = 0
+                end if
+                resid_prev = resid
+                if (stagnant_count >= STAGNATION_PATIENCE) then
+                    self%status = SOLVER_STATUS%MAXITER%ID
                     exit arnoldi_loop
                 end if
 
@@ -252,6 +286,14 @@ contains
             end if
 
             if (self%status == SOLVER_STATUS%MAXITER%ID) then
+                write (*, '(A,ES13.5,A,ES13.5,A,I0,A,I0)') &
+                    '   [GMRES] beta0=', beta, &
+                    ' resid=', resid, ' iters=', iter_global, &
+                    ' maxiter=', self%max_iterations
+                if (stagnant_count >= STAGNATION_PATIENCE) then
+                    write (*, '(A,I0,A,ES10.3)') '   [GMRES] stagnation detected: patience=', &
+                        STAGNATION_PATIENCE, ', ratio=', STAGNATION_RATIO
+                end if
                 exit restart_loop
             end if
 
@@ -278,6 +320,7 @@ contains
         end if
 
         call self%r%destroy()
+        call self%w%destroy()
         call self%z%destroy()
         call self%x_update%destroy()
 
@@ -343,8 +386,12 @@ contains
             do j = i + 1, n
                 sum_val = sum_val - H(i, j) * y(j)
             end do
-            y(i) = sum_val / H(i, i)
+            if (abs(H(i, i)) > tiny(1.0d0)) then
+                y(i) = sum_val / H(i, i)
+            else
+                y(i) = 0.0d0
+            end if
         end do
     end subroutine backward_substitution
 
-end submodule solve_type_solver_gmres
+end submodule impl_solve_type_solver_gmres

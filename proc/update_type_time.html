@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">19 statements</a>
+                 title=" 0.0% of total for procedures.">27 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -181,7 +181,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~841"></span>
+              <span class="anchor" id="variable-self~1912"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(inout)</td>
@@ -196,7 +196,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-success"></span>
+              <span class="anchor" id="variable-success~2"></span>
               logical,
             </td>
 <td>intent(in)</td>
@@ -211,7 +211,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-iter_count"></span>
+              <span class="anchor" id="variable-iter_count~3"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -604,6 +604,7 @@ large graphs.</div>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iter_count</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">next_output_time</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">next_dt</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">fallback_factor</span>
 
 <span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">success</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 <span class="w">            </span><span class="c">! Step converged: advance time and predict next step</span>
@@ -617,6 +618,18 @@ large graphs.</div>
 <span class="w">        </span><span class="k">else</span>
 <span class="w">            </span><span class="c">! Step failed: shrink dt and reset BDF order to 1 for stability</span>
 <span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">ats</span><span class="p">%</span><span class="n">calc_retry_dt</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">dt</span><span class="p">,</span><span class="w"> </span><span class="n">next_dt</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c">! If configured dt_min blocks reduction (next_dt ~= current dt),</span>
+<span class="w">            </span><span class="c">! force an additional generic shrink to keep retry dynamics effective.</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">next_dt</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">dt</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">EPS_TIME</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">fallback_factor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ats</span><span class="p">%</span><span class="n">scale_retry</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fallback_factor</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">EPS_TIME</span><span class="p">)</span><span class="w"> </span><span class="n">fallback_factor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5d0</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fallback_factor</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">EPS_TIME</span><span class="p">)</span><span class="w"> </span><span class="n">fallback_factor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5d0</span>
+<span class="w">                </span><span class="n">next_dt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">dt</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">fallback_factor</span><span class="p">,</span><span class="w"> </span><span class="n">EPS_TIME</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end if</span>
+
+<span class="k">            write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(A,ES13.5,A,ES13.5)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;   [ATS] retry dt: old=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">dt</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;, new=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">next_dt</span>
+
 <span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">dt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">next_dt</span>
 <span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">current_bdf_order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
 <span class="w">        </span><span class="k">end if</span>
@@ -645,7 +658,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-12 08:04 +0000             </p>
+ on 2026-03-15 13:15 +0000             </p>
           </div>
         </div>
         <br>

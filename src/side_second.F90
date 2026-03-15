@@ -15,18 +15,9 @@ contains
         integer(int32), intent(in) :: integration_order
         class(abst_fe), allocatable :: fe
 
-        character(len=*), parameter :: cell_name = "QuadraticEdge"
-        integer(int32) :: vtk_type
-        integer(int32) :: num_nodes
-        integer(int32) :: dimension
-        integer(int32) :: order
-        integer(int32) :: num_gauss
-
         allocate (type_side_second :: fe)
 
-        call vtk_constants%get_cell_info_from_cell_name(cell_name, vtk_type, num_nodes, dimension, order)
-
-        call fe%initialize(type=vtk_type, dimension=dimension, order=order, num_nodes=num_nodes, &
+        call fe%initialize(type=FE_TYPE%QUADRATIC_EDGE%ID, dimension=1, order=2, num_nodes=3, &
                            integration_order=integration_order)
 
     end function construct_side_second
@@ -176,7 +167,6 @@ contains
         real(real64) :: psi_val
         integer(int32) :: iter
         integer(int32) :: i
-        integer(int32) :: node_id
         integer(int32) :: nn
         logical :: converged
         real(real64), parameter :: tol = 1.0e-9

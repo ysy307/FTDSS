@@ -6,7 +6,10 @@
 !> Calculations are performed in Pascal [Pa].
 !>
 submodule(models_phase_change_gcc) gcc_base
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
+
+    real(real64), parameter :: MAX_REASONABLE_DENSITY = 1.0d6
 
 contains
 
@@ -102,13 +105,25 @@ contains
 
         real(real64) :: temperature, temperature_K
         real(real64) :: rho_water
+        real(real64) :: temperature_ratio
 
         call state%temperature%get(temperature)
         call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_water(state, rho_water)
 
+        if (.not. ieee_is_finite(temperature) .or. .not. ieee_is_finite(temperature_K) .or. &
+            .not. ieee_is_finite(rho_water) .or. abs(rho_water) > MAX_REASONABLE_DENSITY) then
+            suction = 0.0d0
+            return
+        end if
+
         if (temperature <= Tf0) then
-            suction = -lf * rho_water * log(temperature_K / Tf0_K)
+            if (.not. ieee_is_finite(temperature_K) .or. temperature_K <= 1.0d0) then
+                temperature_ratio = 1.0d0 / Tf0_K
+            else
+                temperature_ratio = temperature_K / Tf0_K
+            end if
+            suction = -lf * rho_water * log(temperature_ratio)
         else
             suction = 0.0d0
         end if
@@ -122,13 +137,25 @@ contains
 
         real(real64) :: temperature, temperature_K
         real(real64) :: rho_water
+        real(real64) :: temperature_safe
 
         call state%temperature%get(temperature)
         call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_water(state, rho_water)
 
+        if (.not. ieee_is_finite(temperature) .or. .not. ieee_is_finite(temperature_K) .or. &
+            .not. ieee_is_finite(rho_water) .or. abs(rho_water) > MAX_REASONABLE_DENSITY) then
+            suction_derivative = 0.0d0
+            return
+        end if
+
         if (temperature <= Tf0) then
-            suction_derivative = -lf * rho_water / temperature_K
+            if (.not. ieee_is_finite(temperature_K) .or. temperature_K <= 1.0d0) then
+                temperature_safe = 1.0d0
+            else
+                temperature_safe = temperature_K
+            end if
+            suction_derivative = -lf * rho_water / temperature_safe
         else
             suction_derivative = 0.0d0
         end if
@@ -151,13 +178,25 @@ contains
 
         real(real64) :: temperature, temperature_K
         real(real64) :: rho_water
+        real(real64) :: temperature_safe
 
         call state%temperature%get(temperature)
         call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_water(state, rho_water)
 
+        if (.not. ieee_is_finite(temperature) .or. .not. ieee_is_finite(temperature_K) .or. &
+            .not. ieee_is_finite(rho_water) .or. abs(rho_water) > MAX_REASONABLE_DENSITY) then
+            suction_derivative = 0.0d0
+            return
+        end if
+
         if (temperature <= Tf0) then
-            suction_derivative = lf * rho_water / (temperature_K * temperature_K)
+            if (.not. ieee_is_finite(temperature_K) .or. temperature_K <= 1.0d0) then
+                temperature_safe = 1.0d0
+            else
+                temperature_safe = temperature_K
+            end if
+            suction_derivative = lf * rho_water / (temperature_safe * temperature_safe)
         else
             suction_derivative = 0.0d0
         end if
@@ -169,8 +208,8 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: deriv
 
-        ! Non-segregation model: dP_ice/dP_w = 0
-        deriv = 0.0d0
+        ! In non-segregation equilibrium, P_i = P_w - suction(T), so dP_i/dP_w = 1.
+        deriv = 1.0d0
     end subroutine deriv_pressure_ice_water_nonseg
 
     ! ==========================================================================
@@ -186,6 +225,7 @@ contains
         real(real64) :: temperature, temperature_K
         real(real64) :: pressure
         real(real64) :: rho_water, rho_ice
+        real(real64) :: temperature_ratio
 
         call state%temperature%get(temperature)
         call state%pressure%get(pressure)
@@ -193,8 +233,20 @@ contains
         call self%calc_rho_water(state, rho_water)
         call self%calc_rho_ice(state, rho_ice)
 
+        if (.not. ieee_is_finite(temperature) .or. .not. ieee_is_finite(temperature_K) .or. &
+            .not. ieee_is_finite(pressure) .or. .not. ieee_is_finite(rho_water) .or. .not. ieee_is_finite(rho_ice) .or. &
+            abs(rho_water) > MAX_REASONABLE_DENSITY .or. abs(rho_ice) > MAX_REASONABLE_DENSITY) then
+            suction = 0.0d0
+            return
+        end if
+
         if (temperature <= Tf0) then
-            suction = (rho_ice / rho_water - 1.0d0) * pressure - lf * rho_ice * log(temperature_K / Tf0_K)
+            if (.not. ieee_is_finite(temperature_K) .or. temperature_K <= 1.0d0) then
+                temperature_ratio = 1.0d0 / Tf0_K
+            else
+                temperature_ratio = temperature_K / Tf0_K
+            end if
+            suction = (rho_ice / rho_water - 1.0d0) * pressure - lf * rho_ice * log(temperature_ratio)
         else
             suction = 0.0d0
         end if
@@ -208,13 +260,25 @@ contains
 
         real(real64) :: temperature, temperature_K
         real(real64) :: rho_ice
+        real(real64) :: temperature_safe
 
         call state%temperature%get(temperature)
         call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_ice(state, rho_ice)
 
+        if (.not. ieee_is_finite(temperature) .or. .not. ieee_is_finite(temperature_K) .or. &
+            .not. ieee_is_finite(rho_ice) .or. abs(rho_ice) > MAX_REASONABLE_DENSITY) then
+            suction_derivative = 0.0d0
+            return
+        end if
+
         if (temperature <= Tf0) then
-            suction_derivative = (-lf * rho_ice / temperature_K)
+            if (.not. ieee_is_finite(temperature_K) .or. temperature_K <= 1.0d0) then
+                temperature_safe = 1.0d0
+            else
+                temperature_safe = temperature_K
+            end if
+            suction_derivative = (-lf * rho_ice / temperature_safe)
         else
             suction_derivative = 0.0d0
         end if
@@ -250,13 +314,25 @@ contains
 
         real(real64) :: temperature, temperature_K
         real(real64) :: rho_ice
+        real(real64) :: temperature_safe
 
         call state%temperature%get(temperature)
         call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_ice(state, rho_ice)
 
+        if (.not. ieee_is_finite(temperature) .or. .not. ieee_is_finite(temperature_K) .or. &
+            .not. ieee_is_finite(rho_ice) .or. abs(rho_ice) > MAX_REASONABLE_DENSITY) then
+            suction_derivative = 0.0d0
+            return
+        end if
+
         if (temperature <= Tf0) then
-            suction_derivative = (lf * rho_ice / (temperature_K * temperature_K))
+            if (.not. ieee_is_finite(temperature_K) .or. temperature_K <= 1.0d0) then
+                temperature_safe = 1.0d0
+            else
+                temperature_safe = temperature_K
+            end if
+            suction_derivative = (lf * rho_ice / (temperature_safe * temperature_safe))
         else
             suction_derivative = 0.0d0
         end if

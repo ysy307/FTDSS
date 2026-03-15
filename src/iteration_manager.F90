@@ -174,9 +174,10 @@ contains
 
         is_ok = self%settings%check_convergence(physics_type, self%nonlinear_iter, residual_vector, update_vector)
 
-        ! Update convergence/divergence state from the check result
+        ! Update convergence state from the check result
+        ! Note: "not converged" does NOT imply "diverged".
+        ! Divergence is set only by explicit detection (NaN, stagnation, etc.)
         call self%set_converged(physics_type, is_ok)
-        call self%set_diverged(physics_type, .not. is_ok)
     end subroutine check_convergence_iteration
 
     pure function is_converged_iteration(self) result(is_converged)

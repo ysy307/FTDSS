@@ -36,7 +36,6 @@ contains
         ! Removed resize logic; trust num_nodes set in initialize
 
         self%status = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-
         select type (A)
         type is (type_matrix_dense)
             self%is_block = .false.
@@ -93,7 +92,7 @@ contains
         class(type_preconditioner_jacobi), intent(inout) :: self
         class(abst_matrix), intent(in) :: A
 
-        integer(int32) :: i, ierr, bs, num_blocks
+        integer(int32) :: i, ierr, bs, num_blocks, kb
 
         bs = self%block_size
         ! Number of blocks = total DOFs / block_size
@@ -112,6 +111,14 @@ contains
                 call A%get_diagonal_block(i, self%M_inv_blocks(:, :, i))
                 call dgetrf(bs, bs, self%M_inv_blocks(:, :, i), bs, &
                             self%ipiv_blocks(:, i), ierr)
+                if (ierr /= 0) then
+                    ! Fallback to identity for singular blocks
+                    self%M_inv_blocks(:, :, i) = 0.0d0
+                    do kb = 1, bs
+                        self%M_inv_blocks(kb, kb, i) = 1.0d0
+                        self%ipiv_blocks(kb, i) = kb
+                    end do
+                end if
             end do
             !$omp end parallel do
 

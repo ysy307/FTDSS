@@ -92,20 +92,20 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">29 statements</a>
+                 title=" 0.1% of total for procedures.">97 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/overall_interface.F90"> Source File</a>
+              <a href="../src/matrix_interface.F90"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/overall_interface.f90.html'>overall_interface.F90</a></li>
-                <li class="breadcrumb-item"><a href='../module/io_output_overall.html'>io_output_overall</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/matrix_interface.f90.html'>matrix_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_algebra_matrix.html'>core_types_algebra_matrix</a></li>
             <li class="breadcrumb-item active" aria-current="page">abst_initialize</li>
           </ol>
         </nav>
@@ -155,7 +155,7 @@
     
     <div class="col-md-9" id='text'>
       <h2>interface <br>
-      private  subroutine abst_initialize(self, dir_output, config)  
+      private  subroutine abst_initialize(self, num_nodes, row, col, row_blocks, col_blocks)  
 </h2>    
 
     
@@ -173,8 +173,8 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~338"></span>
-              class(<a href='../type/abst_output_overall.html'>abst_output_overall</a>),
+              <span class="anchor" id="variable-self~1328"></span>
+              class(<a href='../type/abst_matrix.html'>abst_matrix</a>),
             </td>
 <td>intent(inout)</td>
               <td></td>            <td>
@@ -183,42 +183,90 @@
             <td>::</td>
             <td><strong>self</strong></td>
             <td>
-                
+                <p>The matrix object to initialize.</p>
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-dir_output~3"></span>
-              character(len=*),
+              <span class="anchor" id="variable-num_nodes~45"></span>
+              integer(kind=int32),
             </td>
 <td>intent(in)</td>
               <td></td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>dir_output</strong></td>
+            <td><strong>num_nodes</strong></td>
             <td>
-                
+                <p>The number of nodes.</p>
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-config~10"></span>
-              type(<a href='../type/type_config_overall.html'>type_config_overall</a>),
+              <span class="anchor" id="variable-row~18"></span>
+              integer(kind=int32),
             </td>
-<td>intent(in)</td>
-              <td></td>            <td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
               
             </td>
             <td>::</td>
-            <td><strong>config</strong></td>
+            <td><strong>row</strong>(:)</td>
             <td>
-                
+                <p>Optional node-level CSR <code>ptr</code> array to define sparsity.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col~16"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col</strong>(:)</td>
+            <td>
+                <p>Optional node-level CSR <code>ind</code> array to define sparsity.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-row_blocks~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>row_blocks</strong></td>
+            <td>
+                <p>Optional DOF-level CSR <code>ptr</code> array to define sparsity.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-col_blocks~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>col_blocks</strong></td>
+            <td>
+                <p>Optional DOF-level CSR <code>ind</code> array to define sparsity.</p>
             </td>
         </tr>
     </tbody>
   </table>
 
+    <h3>Description</h3>
+    <p>Initializes the matrix structure based on the number of nodes and DOFs.
+For sparse matrices, a sparsity pattern can be provided.</p>
     <br>
 
  </div>
@@ -239,7 +287,7 @@
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-12 08:04 +0000             </p>
+ on 2026-03-15 13:15 +0000             </p>
           </div>
         </div>
         <br>

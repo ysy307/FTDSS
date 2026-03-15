@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">13 statements</a>
+                 title=" 0.0% of total for procedures.">23 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -163,7 +163,7 @@
 </h2>
     
 
-    <p>Computes the 2-norm (Euclidean norm) of a vector using MKL's NRM2 function.</p>
+    <p>Computes the 2-norm (Euclidean norm) of a vector using the MKL NRM2 function.</p>
 
 
     <h3>Arguments</h3>
@@ -179,12 +179,12 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-x~17"></span>
+              <span class="anchor" id="variable-x~24"></span>
               real(kind=real64),
             </td>
-<td>intent(in),</td>
+<td>intent(in)</td>
               <td></td>            <td>
-              contiguous
+              
             </td>
             <td>::</td>
             <td><strong>x</strong>(:)</td>
@@ -367,12 +367,18 @@ large graphs.</div>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">function </span><span class="n">norm_2_mkl</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">norm_value</span><span class="p">)</span>
 <span class="w">        </span><span class="k">implicit none</span>
 <span class="w">        </span><span class="c">!&gt; The input vector.</span>
-<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">contiguous</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">x</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">x</span><span class="p">(:)</span>
 <span class="w">        </span><span class="c">!&gt; The computed 2-norm, \( \sqrt{\sum x_i^2} \).</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">norm_value</span>
 
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">halt_overflow</span>
+
 <span class="cp">#ifdef _MPI</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nprocs</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">ieee_get_halting_mode</span><span class="p">(</span><span class="n">ieee_overflow</span><span class="p">,</span><span class="w"> </span><span class="n">halt_overflow</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">ieee_set_halting_mode</span><span class="p">(</span><span class="n">ieee_overflow</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.)</span>
+
 <span class="w">        </span><span class="k">call </span><span class="n">MPI_Comm_size</span><span class="p">(</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="w"> </span><span class="n">nprocs</span><span class="p">)</span>
 <span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">nprocs</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 <span class="k">            </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dnrm2</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
@@ -380,8 +386,16 @@ large graphs.</div>
 <span class="k">            </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pdnrm2</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
 <span class="w">        </span><span class="k">end if</span>
 <span class="cp">#else</span>
+<span class="w">        </span><span class="k">call </span><span class="n">ieee_get_halting_mode</span><span class="p">(</span><span class="n">ieee_overflow</span><span class="p">,</span><span class="w"> </span><span class="n">halt_overflow</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">ieee_set_halting_mode</span><span class="p">(</span><span class="n">ieee_overflow</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.)</span>
+
 <span class="w">        </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dnrm2</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
 <span class="cp">#endif</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">ieee_is_finite</span><span class="p">(</span><span class="n">norm_value</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">norm_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mf">1.0d0</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">        call </span><span class="n">ieee_set_halting_mode</span><span class="p">(</span><span class="n">ieee_overflow</span><span class="p">,</span><span class="w"> </span><span class="n">halt_overflow</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">ieee_set_flag</span><span class="p">(</span><span class="n">ieee_overflow</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.)</span>
 <span class="w">    </span><span class="k">end function </span><span class="n">norm_2_mkl</span>
 </pre></div>
 
@@ -406,7 +420,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-12 08:04 +0000             </p>
+ on 2026-03-15 13:15 +0000             </p>
           </div>
         </div>
         <br>

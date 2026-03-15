@@ -29,6 +29,8 @@ module constitutive_models_manager
         procedure, public :: calc_latent_heat_fusion
         procedure, public :: calc_latent_heat_vaporization
         procedure, public :: calc_pressure_ice_water_derivative
+        procedure, public :: calc_cryogenic_suction
+        procedure, public :: calc_cryogenic_suction_derivatives
     end type type_models_manager
 
 contains
@@ -74,7 +76,26 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: Kflh
 
-        call self%hcf%p%calc_Kflh(state, Kflh)
+        real(real64) :: pressure, psi_cap, psi_cryo
+        type(type_state) :: local_state
+
+        ! When cryogenic suction (psi_cryo) exceeds the capillary suction (psi_cap),
+        ! the soil is in the frozen regime.  In that case the liquid-water pressure is
+        ! effectively -psi_cryo (Clausius-Clapeyron), which strongly reduces the
+        ! relative permeability.  Use this effective pressure for the HCF evaluation
+        ! so that the frozen zone becomes a hydraulic barrier and drives flow toward
+        ! the freezing front.
+        call state%pressure%get(pressure)
+        psi_cap = max(0.0d0, -pressure)
+        call self%gcc%calc(state, psi_cryo)
+
+        if (psi_cryo > psi_cap) then
+            call local_state%copy(state)
+            call local_state%pressure%set(-psi_cryo)
+            call self%hcf%p%calc_Kflh(local_state, Kflh)
+        else
+            call self%hcf%p%calc_Kflh(state, Kflh)
+        end if
     end subroutine calc_Kflh
 
     subroutine calc_KlT(self, state, KlT)
@@ -130,5 +151,29 @@ contains
 
         call self%phase_manager%deriv_pressure_ice_water(state, deriv)
     end subroutine calc_pressure_ice_water_derivative
+
+    subroutine calc_cryogenic_suction(self, state, suction)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: suction
+
+        call self%gcc%calc(state, suction)
+    end subroutine calc_cryogenic_suction
+
+    subroutine calc_cryogenic_suction_derivatives(self, state, deriv_dP, deriv_dT)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout), optional :: deriv_dP
+        real(real64), intent(inout), optional :: deriv_dT
+
+        if (present(deriv_dP)) then
+            call self%gcc%deriv_pressure(state, deriv_dP)
+        end if
+        if (present(deriv_dT)) then
+            call self%gcc%deriv_temperature(state, deriv_dT)
+        end if
+    end subroutine calc_cryogenic_suction_derivatives
 
 end module constitutive_models_manager
