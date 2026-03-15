@@ -154,7 +154,7 @@ contains
         integer(int32) :: i, j, k, n_elem, start_idx, end_idx, n_nodes
 
         n_elem = size(conn_ind) - 1
-        count = 1
+        count = 0
 
         do i = 1, n_elem
             start_idx = conn_ind(i)
@@ -165,10 +165,9 @@ contains
             ! Enumerate all node pairs within each element
             do j = 1, n_nodes
                 do k = 1, n_nodes
-                    ! Subtract 1 to prevent index offset
+                    count = count + 1
                     pairs(1, count) = conn_val(start_idx + j - 1)
                     pairs(2, count) = conn_val(start_idx + k - 1)
-                    count = count + 1
                 end do
             end do
         end do

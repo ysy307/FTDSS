@@ -36,10 +36,10 @@ module boundary_strategy
     end type abst_bc
 
     abstract interface
-        pure elemental subroutine abst_evaluate(self, current_time, u_curr, result)
+        subroutine abst_evaluate(self, current_time, u_curr, result)
             import :: abst_bc, real64, type_bc_result
             implicit none
-            class(abst_bc), intent(in) :: self
+            class(abst_bc), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
             type(type_bc_result), intent(inout) :: result
@@ -100,57 +100,57 @@ module boundary_strategy
             class(abst_bc), intent(inout) :: self
         end subroutine destroy_abst_bc
 
-        module pure elemental subroutine evaluate_dirichlet_bc(self, current_time, u_curr, result)
+        module subroutine evaluate_dirichlet_bc(self, current_time, u_curr, result)
             implicit none
-            class(type_bc_dirichlet), intent(in) :: self
+            class(type_bc_dirichlet), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
             type(type_bc_result), intent(inout) :: result
         end subroutine evaluate_dirichlet_bc
 
-        module pure elemental subroutine evaluate_flux_bc(self, current_time, u_curr, result)
+        module subroutine evaluate_flux_bc(self, current_time, u_curr, result)
             implicit none
-            class(type_bc_flux), intent(in) :: self
+            class(type_bc_flux), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
             type(type_bc_result), intent(inout) :: result
         end subroutine evaluate_flux_bc
 
-        module pure elemental subroutine evaluate_robin_bc(self, current_time, u_curr, result)
+        module subroutine evaluate_robin_bc(self, current_time, u_curr, result)
             implicit none
-            class(type_bc_robin), intent(in) :: self
+            class(type_bc_robin), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
             type(type_bc_result), intent(inout) :: result
         end subroutine evaluate_robin_bc
 
-        module pure elemental subroutine evaluate_atmospheric_bc(self, current_time, u_curr, result)
+        module subroutine evaluate_atmospheric_bc(self, current_time, u_curr, result)
             implicit none
-            class(type_bc_atmospheric), intent(in) :: self
+            class(type_bc_atmospheric), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
             type(type_bc_result), intent(inout) :: result
         end subroutine evaluate_atmospheric_bc
 
-        module pure elemental subroutine evaluate_radiation_bc(self, current_time, u_curr, result)
+        module subroutine evaluate_radiation_bc(self, current_time, u_curr, result)
             implicit none
-            class(type_bc_radiation), intent(in) :: self
+            class(type_bc_radiation), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
             type(type_bc_result), intent(inout) :: result
         end subroutine evaluate_radiation_bc
 
-        module pure elemental subroutine evaluate_convective_bc(self, current_time, u_curr, result)
+        module subroutine evaluate_convective_bc(self, current_time, u_curr, result)
             implicit none
-            class(type_bc_convective), intent(in) :: self
+            class(type_bc_convective), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
             type(type_bc_result), intent(inout) :: result
         end subroutine evaluate_convective_bc
 
-        module pure elemental subroutine evaluate_seepage_bc(self, current_time, u_curr, result)
+        module subroutine evaluate_seepage_bc(self, current_time, u_curr, result)
             implicit none
-            class(type_bc_seepage), intent(in) :: self
+            class(type_bc_seepage), intent(inout) :: self
             real(real64), intent(in) :: current_time
             real(real64), intent(in) :: u_curr
             type(type_bc_result), intent(inout) :: result

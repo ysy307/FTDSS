@@ -37,6 +37,7 @@ contains
         real(real64), intent(in) :: current_time
         real(real64), intent(inout) :: values(3)
 
+        values = 0.0d0
         values(1:self%data_size) = self%constant_values(1:self%data_size)
 
     end subroutine get_data_bc_data_constant

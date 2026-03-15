@@ -21,7 +21,7 @@ contains
         dQv_dP = 0.0d0
         drho_w_dP = 0.0d0
         drho_ice_dP = 0.0d0
-        dP_ice_dP_water = 0.0d0
+        dP_ice_dP_water = 1.0d0
 
         call state%water_content%get(Qw)
         call state%ice_content%get(Qi)
@@ -33,6 +33,9 @@ contains
 
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_density_ice(state, rho_i)
+        call self%physics%calc_density_water_derivatives(material_id, state, dden_dP=drho_w_dP)
+        call self%physics%calc_density_ice_derivatives(material_id, state, dden_dP=drho_ice_dP)
+        call self%physics%calc_pressure_ice_water_derivative(material_id, state, dP_ice_dP_water)
 
         ! C_HH = d(rho_eff)/dP
         ! rho_eff = rho_w*Qw + rho_i*Qi + rho_w*Qv
@@ -76,6 +79,46 @@ contains
 
     end subroutine compute_diffusion_term_hydraulic
 
+    !> @brief Calculate Temperature Coupling Term D_HT for cryogenic suction transport
+    !> @details
+    !>   J_m_cryo = D_HT * grad T
+    !>   D_HT = (K_liquid / g) * d(psi_cryo)/dT when cryogenic suction is active
+    module subroutine compute_temperature_coupling_term_hydraulic(self, material_id, state, D_HT)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(inout) :: state
+        real(real64), intent(inout) :: D_HT(:, :)
+
+        real(real64) :: K_flh
+        real(real64) :: pressure, psi_cap, psi_cryo
+        real(real64) :: dpsi_cryo_dT
+        real(real64) :: coeff_HT
+        integer(int32) :: i
+
+        call self%physics%calc_Kflh(material_id, state, K_flh)
+        call state%pressure%get(pressure)
+        call self%physics%calc_cryogenic_suction(material_id, state, psi_cryo)
+        call self%physics%calc_cryogenic_suction_derivatives(material_id, state, deriv_dT=dpsi_cryo_dT)
+
+        if (pressure < 0.0d0) then
+            psi_cap = -pressure
+        else
+            psi_cap = 0.0d0
+        end if
+
+        coeff_HT = 0.0d0
+        if (psi_cryo > psi_cap) then
+            coeff_HT = (K_flh / g) * dpsi_cryo_dT
+        end if
+
+        D_HT(:, :) = 0.0d0
+        do i = 1, self%computation_dimension
+            D_HT(i, i) = coeff_HT
+        end do
+
+    end subroutine compute_temperature_coupling_term_hydraulic
+
     !> @brief Calculate Advective (Gravity) Term V_H
     !> @details
     !>   J_m_grav = V_H
@@ -106,9 +149,8 @@ contains
         case (COMP_TYPES%XYZ_3D%ID)
             V_H(3) = -grav_flux_mag ! z-direction
         case (COMP_TYPES%XY_2D%ID)
-            ! Usually gravity is perpendicular to XY plane or handled differently
-            ! Assuming XY implies horizontal plane, gravity term might be zero or handled externally
-            V_H(:) = 0.0d0
+            ! No gravity contribution in XY_2D.
+            ! Keep the thermo-osmotic term accumulated above.
         end select
 
     end subroutine compute_advective_term_hydraulic

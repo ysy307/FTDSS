@@ -128,7 +128,7 @@ contains
 
             do i = 1, overall%num_total_cells
                 config%offsets(i) = overall%CELLS(i)%num_nodes_in_cell
-                config%cell_types(i) = overall%CELLS(i)%cell_type
+                config%cell_types(i) = int(overall%CELLS(i)%cell_type, int8)
             end do
             total = sum(config%offsets(:))
 

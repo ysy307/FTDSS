@@ -4,7 +4,7 @@
 !> - Volume-weighted smoothing of element-wise state variables to nodes
 !> - Solving the global linear system
 !> - L2 projection (lumped mass) for nodal gradient calculations
-!> - Evaluation of water and vapor fluxes based on Darcy's law
+!> - Evaluation of water and vapor fluxes based on the Darcy law
 submodule(app_ftcms) ftcms_compute
     implicit none
 contains
@@ -165,7 +165,19 @@ contains
         type(type_vector_dp), pointer :: du_ptr => null()
         real(real64), pointer :: f_data(:) => null()
         real(real64), pointer :: du_data(:) => null()
-        real(real64) :: rhs_norm
+        type(type_vector_dp) :: scale_vec
+        real(real64), pointer :: scale_data(:) => null()
+        real(real64) :: tt_diag_sum, hh_diag_sum
+        real(real64) :: tt_rhs_sum, hh_rhs_sum
+        real(real64) :: hydraulic_scale
+        integer(int32) :: num_total_dofs, num_dofs_per_node
+        integer(int32) :: thermal_dof, hydraulic_dof
+        integer(int32) :: i, local_dof
+        real(real64), parameter :: diag_eps = 1.0d-30
+        real(real64), parameter :: scale_cap = 1.0d6
+        logical :: do_hydraulic
+        logical :: apply_global_scaling
+        logical, save :: first_scale_report = .true.
 
         call self%control%profiler_start(PROFILER_TYPES%SOLVE)
 
@@ -187,20 +199,87 @@ contains
             du_data => du_ptr%get_data()
         end if
 
-        rhs_norm = vector_norm2(F_ptr)
-        if (rhs_norm <= tiny(1.0d0)) then
-            write (*, '(A,ES13.5)') 'Warning: RHS norm is near zero before linear solve. ||F||2=', rhs_norm
+        call self%domain%get_total_dofs(num_total_dofs)
+        num_dofs_per_node = self%K%get_num_dofs_per_node()
+        call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, thermal_dof)
+        call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
+        do_hydraulic = self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)
+        apply_global_scaling = do_hydraulic
+
+        call scale_vec%initialize(num_total_dofs)
+        call K_ptr%get_diagonal(scale_vec)
+        scale_data => scale_vec%get_data()
+
+        tt_diag_sum = 0.0d0
+        hh_diag_sum = 0.0d0
+        tt_rhs_sum = 0.0d0
+        hh_rhs_sum = 0.0d0
+        if (associated(scale_data)) then
+            do i = 1, size(scale_data)
+                local_dof = mod(i - 1, num_dofs_per_node) + 1
+                if (local_dof == thermal_dof) then
+                    tt_diag_sum = tt_diag_sum + abs(scale_data(i))
+                else if (local_dof == hydraulic_dof) then
+                    hh_diag_sum = hh_diag_sum + abs(scale_data(i))
+                end if
+
+                if (associated(f_data)) then
+                    if (local_dof == thermal_dof) then
+                        tt_rhs_sum = tt_rhs_sum + abs(f_data(i))
+                    else if (local_dof == hydraulic_dof) then
+                        hh_rhs_sum = hh_rhs_sum + abs(f_data(i))
+                    end if
+                end if
+            end do
+
+            hydraulic_scale = 1.0d0
+            if (do_hydraulic .and. hh_diag_sum > diag_eps .and. tt_diag_sum > diag_eps) then
+                hydraulic_scale = sqrt(tt_diag_sum / hh_diag_sum)
+                hydraulic_scale = min(max(hydraulic_scale, 1.0d0/scale_cap), scale_cap)
+            else if (do_hydraulic .and. hh_rhs_sum > diag_eps .and. tt_rhs_sum > diag_eps) then
+                hydraulic_scale = sqrt(tt_rhs_sum / hh_rhs_sum)
+                hydraulic_scale = min(max(hydraulic_scale, 1.0d0/scale_cap), scale_cap)
+            end if
+
+            if (first_scale_report) then
+                write (*, '(A,I0,A,I0,A,I0)') '   [SCALE] ndpn=', num_dofs_per_node, &
+                    ', T_dof=', thermal_dof, ', H_dof=', hydraulic_dof
+                write (*, '(A,5(ES13.5,A),L1)') '   [SCALE] global TT_diag=', tt_diag_sum, ', HH_diag=', hh_diag_sum, &
+                    ', TT_rhs=', tt_rhs_sum, ', HH_rhs=', hh_rhs_sum, ', H_scale=', hydraulic_scale, &
+                    ', hydraulic_active=', do_hydraulic
+                first_scale_report = .false.
+            end if
+
+            if (apply_global_scaling) then
+                scale_data(:) = 1.0d0
+                if (hydraulic_dof > 0) then
+                    do i = 1, size(scale_data)
+                        local_dof = mod(i - 1, num_dofs_per_node) + 1
+                        if (local_dof == hydraulic_dof) then
+                            scale_data(i) = hydraulic_scale
+                        end if
+                    end do
+                end if
+
+                ! Apply block scaling: K' = D K D, F' = D F
+                call K_ptr%scale(MATRIX_OPS%SCALE_SYMM_DIAG, scale_vec)
+                call F_ptr%scale(VECTOR_OPS%SCALE_SYMM_DIAG, scale_vec)
+            end if
         end if
 
+        call du_ptr%zero()
         call self%solver%solve(K_ptr, F_ptr, du_ptr)
         call self%solver%check()
 
-        nullify (K_ptr)
-        nullify (F_ptr)
-        nullify (du_ptr)
-        nullify (f_data)
-        nullify (du_data)
+        ! Recover original unknown scale: du = D * du_scaled
+        if (apply_global_scaling .and. associated(scale_data) .and. associated(du_data)) then
+            do i = 1, min(size(scale_data), size(du_data))
+                du_data(i) = du_data(i) * scale_data(i)
+            end do
+        end if
 
+        nullify (scale_data)
+        call scale_vec%destroy()
         call self%control%profiler_stop(PROFILER_TYPES%SOLVE)
 
     end subroutine solve_ftcms
@@ -483,7 +562,7 @@ contains
         call self%thermal%calc_density_water(state, rho_w)
         gravity_term = K_wP * rho_w * g
 
-        ! --- Flux calculation (Darcy's law: q = -K_wT*grad_T - K_wP*grad_P - K*grad_z) ---
+        ! --- Flux calculation (Darcy law: q = -K_wT*grad_T - K_wP*grad_P - K*grad_z) ---
         select case (computation_type%ID)
         case (COMP_TYPES%XY_2D%ID)
             water_flux%x = -K_wT * grad_T%x - K_wP * grad_P%x

@@ -65,7 +65,7 @@ endif()
 
 if(ENABLE_MPI AND NOT TARGET SCALAPACK::SCALAPACK)
     add_library(SCALAPACK::SCALAPACK INTERFACE IMPORTED)
-    target_link_libraries(SCALAPACK::SCALAPACK INTERFACE MKL::MKL_SCALAPACK)
+    target_link_libraries(SCALAPACK::SCALAPACK INTERFACE MKL::MKL_SCALAPACK MPI::MPI_Fortran)
 endif()
 
 # 6. Find third-party libraries
@@ -97,7 +97,10 @@ function(enable_build_flags target)
             $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:GNU>>:
             -std=f2018 -cpp
             $<$<CONFIG:Release>:-O3 -march=native>
-            $<$<CONFIG:Debug>:-g -fbacktrace -fcheck=all -ffpe-trap=invalid,zero,overflow -finit-real=snan -finit-integer=-9999999 -Wall -Wextra -pedantic>
+            $<$<CONFIG:Debug>:-g -fbacktrace -fcheck=all -ffpe-trap=invalid,zero,overflow -finit-real=snan -finit-integer=-9999999
+            -Wall -Wextra -Werror
+            -Wno-maybe-uninitialized -Wno-uninitialized -Wno-c-binding-type -Wno-surprising
+            -Wno-unused-dummy-argument -Wno-compare-reals -Wno-unused-function -Wno-unused-value>
             >
             # Fortran: NVHPC
             $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:NVHPC,PGI>>:
@@ -156,7 +159,9 @@ function(enable_build_flags target)
 
     if(ENABLE_MPI)
         target_compile_definitions(${target} ${KEYWORD} _MPI)
-        target_link_libraries(${target} ${KEYWORD} MPI::MPI_Fortran MKL::MKL_SCALAPACK)
+        target_link_libraries(${target} ${KEYWORD}
+            MKL::MKL_SCALAPACK
+            MPI::MPI_Fortran)
     else()
         target_link_libraries(${target} ${KEYWORD} MKL::MKL)
     endif()

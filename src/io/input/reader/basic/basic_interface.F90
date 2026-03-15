@@ -78,20 +78,20 @@ module io_input_basic
     !!------------------------------------------------------------------------------------------------------------------------------
 
     type :: type_materials_water_characteristic_curve
-        integer(int32) :: model_number
-        integer(int32) :: unit
-        real(real64) :: theta_s
-        real(real64) :: theta_r
-        real(real64) :: alpha1
-        real(real64) :: n1
-        ! real(real64) :: m1
-        real(real64) :: w1
-        real(real64) :: h_crit
-        real(real64) :: alpha2
-        real(real64) :: n2
-        ! real(real64) :: m2
-        ! real(real64) :: w2
-        real(real64) :: l
+        integer(int32) :: model_number = -1
+        integer(int32) :: unit = -1
+        real(real64) :: theta_s = 0.0d0
+        real(real64) :: theta_r = 0.0d0
+        real(real64) :: alpha1 = 0.0d0
+        real(real64) :: n1 = 0.0d0
+        real(real64) :: m1 = 0.0d0
+        real(real64) :: w1 = 0.0d0
+        real(real64) :: h_crit = 0.0d0
+        real(real64) :: alpha2 = 0.0d0
+        real(real64) :: n2 = 0.0d0
+        real(real64) :: m2 = 0.0d0
+        real(real64) :: w2 = 0.0d0
+        real(real64) :: l = 0.0d0
     end type type_materials_water_characteristic_curve
 
     type :: type_equilibrium_model

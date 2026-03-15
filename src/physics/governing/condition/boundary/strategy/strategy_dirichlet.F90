@@ -2,9 +2,9 @@ submodule(boundary_strategy) strategy_dirichlet
     implicit none
 contains
 
-    module pure elemental subroutine evaluate_dirichlet_bc(self, current_time, u_curr, result)
+    module subroutine evaluate_dirichlet_bc(self, current_time, u_curr, result)
         implicit none
-        class(type_bc_dirichlet), intent(in) :: self
+        class(type_bc_dirichlet), intent(inout) :: self
         real(real64), intent(in) :: current_time
         real(real64), intent(in) :: u_curr
         type(type_bc_result), intent(inout) :: result

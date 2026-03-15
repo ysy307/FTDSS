@@ -33,7 +33,7 @@ contains
     end subroutine initialize_dense
 
     !>
-    !> Deallocates the dense matrix's internal value array.
+    !> Deallocates the dense matrix internal value array.
     !>
     module subroutine destroy_dense(self)
         implicit none

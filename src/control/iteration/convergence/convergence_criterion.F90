@@ -75,11 +75,6 @@ contains
             self%norms_history(NORM_TYPES%L1%ID, iter) = vector_norm1(vector)
             self%norms_history(NORM_TYPES%L2%ID, iter) = vector_norm2(vector)
             self%norms_history(NORM_TYPES%LINF%ID, iter) = vector_norminf(vector)
-
-            write (*, '(A, I6, A, F12.6, A, F12.6, A, F12.6)') '    [Debug] Iteration:', iter, ' Norms - L1:', &
-                self%norms_history(NORM_TYPES%L1%ID, iter), &
-                ' L2:', self%norms_history(NORM_TYPES%L2%ID, iter), &
-                ' LInf:', self%norms_history(NORM_TYPES%LINF%ID, iter)
         end if
 
         if (.not. self%should_check) then

@@ -76,7 +76,8 @@ module io_output_overall
             type(type_config_overall), intent(in) :: config
         end subroutine abst_initialize
 
-        subroutine abst_write_fields(self, file_counts, temperature, water_content, ice_content, vapor_content, pressure, water_flux)
+        subroutine abst_write_fields(self, file_counts, temperature, &
+                water_content, ice_content, vapor_content, pressure, water_flux)
             import :: abst_output_overall, type_coordinate_array_dp, real64, int32
             implicit none
             class(abst_output_overall), intent(inout) :: self

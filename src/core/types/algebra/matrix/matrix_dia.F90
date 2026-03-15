@@ -140,7 +140,7 @@ contains
         end do
 
         if (main_diag_idx /= -1) then
-            ! Use type_vector_dp's set method instead of direct access
+            ! Use type_vector_dp set method instead of direct access
             do i = 1, self%num_rows
                 call diagonal%set(VECTOR_OPS%INS, i, self%val(i, main_diag_idx))
             end do
@@ -232,7 +232,7 @@ contains
         integer(int32), intent(in) :: row_block, col_block
         real(real64), intent(in) :: value
 
-        ! DIA doesn't support blocks, treat as scalar
+        ! DIA does not support blocks, treat as scalar
         call self%set_value(op, row, col, value)
     end subroutine set_value_block_dia
 

@@ -648,21 +648,21 @@ contains
             cell_type = VTK_QUADRATIC_WEDGE
         case ("QuadraticPyramid")
             cell_type = VTK_QUADRATIC_PYRAMID
-        case ("BiquadraticQuad")
+        case ("BiQuadraticQuad")
             cell_type = VTK_BIQUADRATIC_QUAD
-        case ("TriquadraticHexahedron")
+        case ("TriQuadraticHexahedron")
             cell_type = VTK_TRIQUADRATIC_HEXAHEDRON
-        case ("TriquadraticPyramid")
+        case ("TriQuadraticPyramid")
             cell_type = VTK_TRIQUADRATIC_PYRAMID
         case ("QuadraticLinearQuad")
             cell_type = VTK_QUADRATIC_LINEAR_QUAD
         case ("QuadraticLinearWedge")
             cell_type = VTK_QUADRATIC_LINEAR_WEDGE
-        case ("BiquadraticQuadraticWedge")
+        case ("BiQuadraticQuadraticWedge")
             cell_type = VTK_BIQUADRATIC_QUADRATIC_WEDGE
-        case ("BiquadraticQuadraticHexahedron")
+        case ("BiQuadraticQuadraticHexahedron")
             cell_type = VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON
-        case ("BiquadraticTriangle")
+        case ("BiQuadraticTriangle")
             cell_type = VTK_BIQUADRATIC_TRIANGLE
         case ("CubicLine")
             cell_type = VTK_CUBIC_LINE

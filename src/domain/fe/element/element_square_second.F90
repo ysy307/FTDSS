@@ -17,18 +17,9 @@ contains
         !> The newly created element object.
         class(abst_fe), allocatable :: fe
 
-        character(len=*), parameter :: cell_name = "QuadraticQuad"
-        integer(int32) :: vtk_type
-        integer(int32) :: num_nodes
-        integer(int32) :: dimension
-        integer(int32) :: order
-        integer(int32) :: num_gauss
-
         allocate (type_square_second :: fe)
 
-        call vtk_constants%get_cell_info_from_cell_name(cell_name, vtk_type, num_nodes, dimension, order)
-
-        call fe%initialize(type=vtk_type, dimension=dimension, order=order, num_nodes=num_nodes, &
+        call fe%initialize(type=FE_TYPE%QUADRATIC_QUAD%ID, dimension=2, order=2, num_nodes=8, &
                            integration_order=integration_order)
 
     end function construct_square_second

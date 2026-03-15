@@ -100,12 +100,8 @@ contains
         integer(int32), intent(in) :: integration_order
         class(abst_fe), allocatable :: fe
 
-        character(len=*), parameter :: cell_name = "TriQuadraticHexahedron"
-        integer(int32) :: vtk_type, num_nodes_info, dim_info, order_info
-
         allocate (type_hexa_second :: fe)
-        call vtk_constants%get_cell_info_from_cell_name(cell_name, vtk_type, num_nodes_info, dim_info, order_info)
-        call fe%initialize(type=vtk_type, dimension=3, order=2, num_nodes=27, &
+        call fe%initialize(type=FE_TYPE%TRIQUADRATIC_HEXAHEDRON%ID, dimension=3, order=2, num_nodes=27, &
                            integration_order=integration_order)
     end function construct_hexa_second
 

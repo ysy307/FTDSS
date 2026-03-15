@@ -41,7 +41,6 @@ contains
         class(type_conditions), intent(inout) :: self
         type(json_file), intent(inout) :: json !! JSON parser
         character(256) :: buffer(3)
-        character(:), allocatable :: tmp_string
 
         buffer(1) = time_controls
         buffer(2) = simulation_period
@@ -73,7 +72,6 @@ contains
         class(type_conditions), intent(inout) :: self
         type(json_file), intent(inout) :: json !! JSON parser
         character(256) :: buffer(3)
-        character(:), allocatable :: tmp_string
 
         buffer(1) = time_controls
         buffer(2) = time_stepping
@@ -147,7 +145,6 @@ contains
         !> This is a type-bound procedure for 'type_time_control'.
         implicit none
         class(type_time_controls), intent(in) :: self
-        integer(int32) :: n_points
 
         write (*, '(/a)') "======================================================================"
         write (*, '(a)') "                     Time Control Settings"

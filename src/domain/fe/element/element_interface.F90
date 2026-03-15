@@ -18,14 +18,18 @@ module domain_fe_element
     public :: type_triangle_third
     public :: type_square_first
     public :: type_square_second
+    public :: type_square_second_lagrange
     public :: type_square_third
+    public :: type_square_third_serendipity
 
     public :: construct_triangle_first
     public :: construct_square_first
     public :: construct_triangle_second
     public :: construct_square_second
+    public :: construct_square_second_lagrange
     public :: construct_triangle_third
     public :: construct_square_third
+    public :: construct_square_third_serendipity
 
     ! ====================================================================================
     !   Type Definitions
@@ -80,6 +84,18 @@ module domain_fe_element
     end type type_square_second
 
     !>
+    !> Represents a second-order quadrilateral Lagrange element (9 nodes).
+    !>
+    type, extends(abst_fe) :: type_square_second_lagrange
+    contains
+        procedure, pass(self) :: calc_measure => calc_area_square_second_lagrange
+        procedure, pass(self) :: calc_psi => calc_psi_square_second_lagrange
+        procedure, pass(self) :: calc_dpsi => calc_dpsi_square_second_lagrange
+        procedure, pass(self) :: calc_jacobian => calc_jacobian_square_second_lagrange
+        procedure, pass(self) :: is_inside => is_in_square_second_lagrange
+    end type type_square_second_lagrange
+
+    !>
     !> Represents a third-order triangular element (10 nodes, Lagrange P3).
     !>
     type, extends(abst_fe) :: type_triangle_third
@@ -102,6 +118,18 @@ module domain_fe_element
         procedure, pass(self) :: calc_jacobian => calc_jacobian_square_third
         procedure, pass(self) :: is_inside => is_in_square_third
     end type type_square_third
+
+    !>
+    !> Represents a third-order quadrilateral Serendipity element (12 nodes).
+    !>
+    type, extends(abst_fe) :: type_square_third_serendipity
+    contains
+        procedure, pass(self) :: calc_measure => calc_area_square_third_serendipity
+        procedure, pass(self) :: calc_psi => calc_psi_square_third_serendipity
+        procedure, pass(self) :: calc_dpsi => calc_dpsi_square_third_serendipity
+        procedure, pass(self) :: calc_jacobian => calc_jacobian_square_third_serendipity
+        procedure, pass(self) :: is_inside => is_in_square_third_serendipity
+    end type type_square_third_serendipity
 
     ! ====================================================================================
     !   Interface Definitions for Submodule Implementation
@@ -416,6 +444,54 @@ module domain_fe_element
             logical, intent(inout) :: is_in
         end subroutine is_in_square_second
 
+        ! --- Square Second Order Lagrange (9-node) ---
+        module function construct_square_second_lagrange(integration_order) result(fe)
+            implicit none
+            integer(int32), intent(in) :: integration_order
+            class(abst_fe), allocatable :: fe
+        end function construct_square_second_lagrange
+
+        module subroutine calc_area_square_second_lagrange(self, node_coords, measure)
+            implicit none
+            class(type_square_second_lagrange), intent(in) :: self
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64), intent(inout) :: measure
+        end subroutine calc_area_square_second_lagrange
+
+        pure elemental module subroutine calc_psi_square_second_lagrange(self, i, r, psi_val)
+            implicit none
+            class(type_square_second_lagrange), intent(in) :: self
+            integer(int32), intent(in) :: i
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(inout) :: psi_val
+        end subroutine calc_psi_square_second_lagrange
+
+        pure elemental module subroutine calc_dpsi_square_second_lagrange(self, i, j, r, dpsi_val)
+            implicit none
+            class(type_square_second_lagrange), intent(in) :: self
+            integer(int32), intent(in) :: i
+            integer(int32), intent(in) :: j
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(inout) :: dpsi_val
+        end subroutine calc_dpsi_square_second_lagrange
+
+        pure module subroutine calc_jacobian_square_second_lagrange(self, r, node_coords, jac)
+            implicit none
+            class(type_square_second_lagrange), intent(in) :: self
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64), intent(inout) :: jac(:, :)
+        end subroutine calc_jacobian_square_second_lagrange
+
+        module subroutine is_in_square_second_lagrange(self, cartesian, normalized, node_coords, is_in)
+            implicit none
+            class(type_square_second_lagrange), intent(in) :: self
+            type(type_coordinate_dp), intent(in) :: cartesian
+            type(type_coordinate_dp), intent(inout) :: normalized
+            real(real64), intent(in) :: node_coords(:, :)
+            logical, intent(inout) :: is_in
+        end subroutine is_in_square_second_lagrange
+
         ! --- Triangle Third Order ---
         module function construct_triangle_third(integration_order) result(fe)
             implicit none
@@ -511,6 +587,54 @@ module domain_fe_element
             real(real64), intent(in) :: node_coords(:, :)
             logical, intent(inout) :: is_in
         end subroutine is_in_square_third
+
+        ! --- Square Third Order Serendipity (12-node) ---
+        module function construct_square_third_serendipity(integration_order) result(fe)
+            implicit none
+            integer(int32), intent(in) :: integration_order
+            class(abst_fe), allocatable :: fe
+        end function construct_square_third_serendipity
+
+        module subroutine calc_area_square_third_serendipity(self, node_coords, measure)
+            implicit none
+            class(type_square_third_serendipity), intent(in) :: self
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64), intent(inout) :: measure
+        end subroutine calc_area_square_third_serendipity
+
+        pure elemental module subroutine calc_psi_square_third_serendipity(self, i, r, psi_val)
+            implicit none
+            class(type_square_third_serendipity), intent(in) :: self
+            integer(int32), intent(in) :: i
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(inout) :: psi_val
+        end subroutine calc_psi_square_third_serendipity
+
+        pure elemental module subroutine calc_dpsi_square_third_serendipity(self, i, j, r, dpsi_val)
+            implicit none
+            class(type_square_third_serendipity), intent(in) :: self
+            integer(int32), intent(in) :: i
+            integer(int32), intent(in) :: j
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(inout) :: dpsi_val
+        end subroutine calc_dpsi_square_third_serendipity
+
+        pure module subroutine calc_jacobian_square_third_serendipity(self, r, node_coords, jac)
+            implicit none
+            class(type_square_third_serendipity), intent(in) :: self
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(in) :: node_coords(:, :)
+            real(real64), intent(inout) :: jac(:, :)
+        end subroutine calc_jacobian_square_third_serendipity
+
+        module subroutine is_in_square_third_serendipity(self, cartesian, normalized, node_coords, is_in)
+            implicit none
+            class(type_square_third_serendipity), intent(in) :: self
+            type(type_coordinate_dp), intent(in) :: cartesian
+            type(type_coordinate_dp), intent(inout) :: normalized
+            real(real64), intent(in) :: node_coords(:, :)
+            logical, intent(inout) :: is_in
+        end subroutine is_in_square_third_serendipity
 
     end interface
 

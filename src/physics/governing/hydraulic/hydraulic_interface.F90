@@ -28,6 +28,7 @@ module physics_governing_hydraulic
         ! --- Coefficient Computation Procedures ---
         procedure, pass(self), private :: compute_mass_term => compute_mass_term_hydraulic
         procedure, pass(self), private :: compute_diffusion_term => compute_diffusion_term_hydraulic
+        procedure, pass(self), private :: compute_temperature_coupling_term => compute_temperature_coupling_term_hydraulic
         procedure, pass(self), private :: compute_advective_term => compute_advective_term_hydraulic
         procedure, pass(self), private :: compute_transient_term => compute_transient_term_hydraulic
 
@@ -101,6 +102,14 @@ module physics_governing_hydraulic
             type(type_state), intent(inout) :: state
             real(real64), intent(inout) :: D_HH(:, :)
         end subroutine compute_diffusion_term_hydraulic
+
+        module subroutine compute_temperature_coupling_term_hydraulic(self, material_id, state, D_HT)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: state
+            real(real64), intent(inout) :: D_HT(:, :)
+        end subroutine compute_temperature_coupling_term_hydraulic
 
         module subroutine compute_advective_term_hydraulic(self, material_id, state, V_H)
             implicit none

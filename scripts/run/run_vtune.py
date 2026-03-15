@@ -17,8 +17,8 @@ def main():
     # 最終的なレポートの保存先（マウントボリューム）
     workspace_vtune_dir = "/workspaces/FTCMS/log/vtune"
     
-    # VTuneの生データ保存先（コンテナ内のネイティブパス）デッドロック回避のため必須
-    local_vtune_dir = "/tmp/vtune_results"
+    # VTuneの生データ保存先（ワークスペース内）
+    local_vtune_dir = "/workspaces/FTCMS/log/vtune/raw"
     tmp_dir = os.path.join(local_vtune_dir, "tmp")
 
     os.makedirs(workspace_vtune_dir, exist_ok=True)
@@ -43,7 +43,7 @@ def main():
             break
         next_idx += 1
     
-    # 実際の計測ディレクトリは /tmp 以下
+    # 実際の計測ディレクトリは log/vtune/raw 以下
     result_dir = os.path.join(local_vtune_dir, result_base)
     print(f"Target Result Directory (Local): {result_dir}")
 
@@ -69,7 +69,7 @@ def main():
     
     subprocess.run(vtune_cmd, env=env, check=False)
 
-    # Find the actually created directory in /tmp
+    # Find the actually created directory in log/vtune/raw
     created_dirs = glob.glob(os.path.join(local_vtune_dir, f"{result_base}*"))
     valid_dirs = [d for d in created_dirs if os.path.isdir(d)]
     
@@ -110,7 +110,7 @@ def main():
 
     with open(out_md, "w", encoding="utf-8") as md:
         md.write("# VTune Profiling Summary\n\n")
-        md.write(f"Result directory (Raw data in container `/tmp`): `{latest_dir_local}`\n\n")
+        md.write(f"Result directory (Raw data): `{latest_dir_local}`\n\n")
 
         # Top Functions
         if os.path.isfile(report_csv) and os.path.getsize(report_csv) > 0:

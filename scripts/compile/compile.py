@@ -51,6 +51,14 @@ def main():
         "-G", "Ninja"
     ]
 
+    # GNU compiler requires system OpenMPI (Intel MPI's mpi_f08.mod is incompatible with gfortran)
+    if args.compiler == "gnu":
+        config_cmd += [
+            "-DMPI_Fortran_COMPILER=/usr/bin/mpifort.openmpi",
+            "-DMPI_C_COMPILER=/usr/bin/mpicc.openmpi",
+            "-DMPI_CXX_COMPILER=/usr/bin/mpicxx.openmpi",
+        ]
+
     build_cmd = [
         "cmake", "--build", build_dir,
         "--target", f"test_{args.target}",

@@ -15,7 +15,7 @@ module core_types_discretization_dof_map
         integer(int32), private :: num_dofs_per_node = 0
         !> Number of DOFs for each individual physics type.
         integer(int32), private :: num_dofs_of_physics(PHYSICS_TYPES%NUM_ID) = 0
-        !> The starting index for each physics' DOFs within the block of DOFs for a single node.
+        !> The starting index for each physics DOFs within the block of DOFs for a single node.
         integer(int32), private :: start_dof_index(PHYSICS_TYPES%NUM_ID) = 0
     contains
         ! ---- Lifecycle ----

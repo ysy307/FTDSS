@@ -3,7 +3,7 @@
 !> Uses error constants defined in core_constants_error
 !>
 module core_validation_error
-    use, intrinsic :: iso_fortran_env, only: int32
+    use, intrinsic :: iso_fortran_env, only: int32, error_unit
     use :: stdlib_strings, only:to_string, strip
     use :: core_constants, only:ERROR_CODES, type_constant_error
     implicit none
@@ -18,7 +18,7 @@ contains
     !> Usage:
     !>   call raise_error(ERROR_CODES%FILE_MISSING, opt="data.txt", scope="mod:sub", line=__LINE__)
     !>
-    pure subroutine raise_error(err, opt, scope, line)
+    subroutine raise_error(err, opt, scope, line)
         implicit none
         !> The error constant object (e.g. ERROR_CODES%FILE_MISSING)
         type(type_constant_error), intent(in) :: err
@@ -69,9 +69,10 @@ contains
             full_msg = strip(full_msg)//"]"
         end if
 
-        ! 4. STOP Execution
+        ! 4. Print detailed context and stop execution
+        write (error_unit, '(A)') strip(full_msg)
+        flush (error_unit)
         error stop err%ID
-        ! error stop strip(full_msg)
 
     end subroutine raise_error
 

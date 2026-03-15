@@ -9,17 +9,14 @@ contains
         implicit none
         class(type_input_geometry), intent(inout) :: self
 
-        character(:), allocatable :: fields_to_read(:)
+        character(len=256), allocatable :: fields_to_read(:)
 
         character(len=256) :: fullpath
 
         select type (p => self%parent)
         type is (type_input)
 
-            ! 1. Get list of field names to read from initial conditions
-            !    (internally checks basic analysis flags)
-            ! (internally checks basic analysis flags)
-            fields_to_read = self%collect_fields_from_conditions()
+            call self%collect_fields_from_conditions(fields_to_read)
 
             fullpath = trim(p%input_path)//trim(p%basic%geometry_settings%file_name)
 
@@ -90,10 +87,10 @@ contains
 
     end subroutine initialize_type_input_geometry
 
-    module function collect_fields_from_conditions(self) result(field_list)
+    module subroutine collect_fields_from_conditions(self, field_list)
         implicit none
         class(type_input_geometry), intent(inout) :: self
-        character(:), allocatable :: field_list(:)
+        character(len=256), allocatable, intent(out) :: field_list(:)
 
         character(len=256) :: temp_list(IC_TARGETS%NUM_ID)
         character(len=256) :: current_field_name
@@ -138,13 +135,13 @@ contains
 
             ! Allocate return array with collected field names
             if (num_fields > 0) then
-                allocate (character(len=256) :: field_list(num_fields))
+                allocate (field_list(num_fields))
                 field_list = temp_list(1:num_fields)
             else
                 ! If none found, allocate size-0 array and return
-                allocate (character(len=256) :: field_list(0))
+                allocate (field_list(0))
             end if
         end select
-    end function collect_fields_from_conditions
+    end subroutine collect_fields_from_conditions
 
 end submodule input_geometry_base

@@ -22,8 +22,8 @@ module linalg_mkl_interface
     interface
 
         !>
-        !> Computes the sum of the absolute values of a distributed vector's
-        !> elements (1-norm) in parallel.
+        !> Computes the 1-norm (sum of absolute values) of a distributed
+        !> vector in parallel.
         !>
         function pdasum(n, x, incx)
             implicit none
@@ -72,7 +72,7 @@ module linalg_mkl_interface
         end function
 
         !>
-        !> Computes the sum of the absolute values of a vector's elements (1-norm).
+        !> Computes the 1-norm (sum of absolute values) of a vector.
         !>
         function dasum(n, x, incx)
             implicit none

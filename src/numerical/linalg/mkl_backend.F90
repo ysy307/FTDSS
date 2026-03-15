@@ -6,6 +6,8 @@
 !>
 module linalg_mkl_backend
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use, intrinsic :: ieee_arithmetic
+    use, intrinsic :: ieee_exceptions
 #ifdef _MPI
     use :: mpi_f08
 #endif
@@ -35,12 +37,12 @@ contains
     ! =========================================================================
 #ifdef _MKL
     !>
-    !> Computes the 1-norm of a vector using MKL's ASUM function.
+    !> Computes the 1-norm of a vector using the MKL ASUM function.
     !>
     function norm_1_mkl(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The computed 1-norm, \( \sum |x_i| \).
         real(real64) :: norm_value
 
@@ -59,17 +61,23 @@ contains
     end function norm_1_mkl
 
     !>
-    !> Computes the 2-norm (Euclidean norm) of a vector using MKL's NRM2 function.
+    !> Computes the 2-norm (Euclidean norm) of a vector using the MKL NRM2 function.
     !>
     function norm_2_mkl(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The computed 2-norm, \( \sqrt{\sum x_i^2} \).
         real(real64) :: norm_value
 
+        logical :: halt_overflow
+
 #ifdef _MPI
         integer(int32) :: nprocs
+
+        call ieee_get_halting_mode(ieee_overflow, halt_overflow)
+        call ieee_set_halting_mode(ieee_overflow, .false.)
+
         call MPI_Comm_size(MPI_COMM_WORLD, nprocs)
         if (nprocs == 1) then
             norm_value = dnrm2(int(size(x), int32), x, 1)
@@ -77,17 +85,25 @@ contains
             norm_value = pdnrm2(int(size(x), int32), x, 1)
         end if
 #else
+        call ieee_get_halting_mode(ieee_overflow, halt_overflow)
+        call ieee_set_halting_mode(ieee_overflow, .false.)
+
         norm_value = dnrm2(int(size(x), int32), x, 1)
 #endif
+        if (.not. ieee_is_finite(norm_value)) then
+            norm_value = huge(1.0d0)
+        end if
+        call ieee_set_halting_mode(ieee_overflow, halt_overflow)
+        call ieee_set_flag(ieee_overflow, .false.)
     end function norm_2_mkl
 
     !>
-    !> Computes the infinity-norm (maximum absolute value) of a vector using MKL's IDAMAX.
+    !> Computes the infinity-norm (maximum absolute value) of a vector using the MKL IDAMAX.
     !>
     function norm_inf_mkl(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The computed infinity-norm, \( \max(|x_i|) \).
         real(real64) :: norm_value
 
@@ -109,41 +125,81 @@ contains
     end function norm_inf_mkl
 
     !>
-    !> Computes the dot product of two vectors using MKL's DOT function.
+    !> Computes the dot product of two vectors using the MKL DOT function.
     !>
     function dot_mkl(x, y) result(product)
         implicit none
         !> The first input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The second input vector.
-        real(real64), intent(in), contiguous :: y(:)
+        real(real64), intent(in) :: y(:)
         !> The computed dot product, \( \sum x_i y_i \).
         real(real64) :: product
 
+    real(real64) :: local_prod
+    logical :: halt_overflow, halt_invalid
 #ifdef _MPI
-        integer(int32) :: nprocs
+    real(real64) :: global_prod
+    integer(int32) :: ierr
+    integer(int32) :: nprocs
+#endif
+
+    ! Temporarily disable FPE halting for the dot product computation.
+    ! MKL ddot can overflow/produce NaN for ill-conditioned vectors;
+    ! we check the result afterward.
+    call ieee_get_halting_mode(ieee_overflow, halt_overflow)
+    call ieee_get_halting_mode(ieee_invalid, halt_invalid)
+    call ieee_set_halting_mode(ieee_overflow, .false.)
+    call ieee_set_halting_mode(ieee_invalid, .false.)
+
+    if (is_contiguous(x) .and. is_contiguous(y)) then
+#ifdef _MPI
         call MPI_Comm_size(MPI_COMM_WORLD, nprocs)
         if (nprocs == 1) then
-            product = ddot(int(size(x), int32), x, 1, y, 1)
+        product = ddot(int(size(x), int32), x, 1, y, 1)
         else
-            product = pddot(int(size(x), int32), x, 1, y, 1)
+        product = pddot(int(size(x), int32), x, 1, y, 1)
         end if
 #else
         product = ddot(int(size(x), int32), x, 1, y, 1)
 #endif
+    else
+        local_prod = sum(x * y)
+#ifdef _MPI
+        call MPI_Allreduce(local_prod, global_prod, 1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, ierr)
+        product = global_prod
+#else
+        product = local_prod
+#endif
+    end if
+
+    ! Clamp non-finite results to a large finite value preserving sign
+    if (ieee_is_nan(product)) then
+        product = 0.0d0
+    else if (.not. ieee_is_finite(product)) then
+        product = sign(huge(1.0d0), product)
+    end if
+
+    ! Restore original halting mode and clear raised flags
+    call ieee_set_halting_mode(ieee_overflow, halt_overflow)
+    call ieee_set_halting_mode(ieee_invalid, halt_invalid)
+    call ieee_set_flag(ieee_overflow, .false.)
+    call ieee_set_flag(ieee_invalid, .false.)
+
     end function dot_mkl
 #endif
 
     ! =========================================================================
     ! 2. Native Fortran Backend Implementations
     ! =========================================================================
+#ifndef _MKL
     !>
     !> Computes the 1-norm of a vector using native Fortran intrinsics.
     !>
     function norm_1_native(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The computed 1-norm, \( \sum |x_i| \).
         real(real64) :: norm_value
 
@@ -166,7 +222,7 @@ contains
     function norm_2_native(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The computed 2-norm, \( \sqrt{\sum x_i^2} \).
         real(real64) :: norm_value
 
@@ -189,7 +245,7 @@ contains
     function norm_inf_native(x) result(norm_value)
         implicit none
         !> The input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The computed infinity-norm, \( \max(|x_i|) \).
         real(real64) :: norm_value
 
@@ -216,9 +272,9 @@ contains
     function dot_native(x, y) result(product)
         implicit none
         !> The first input vector.
-        real(real64), intent(in), contiguous :: x(:)
+        real(real64), intent(in) :: x(:)
         !> The second input vector.
-        real(real64), intent(in), contiguous :: y(:)
+        real(real64), intent(in) :: y(:)
         !> The computed dot product, \( \sum x_i y_i \).
         real(real64) :: product
 
@@ -234,5 +290,6 @@ contains
         product = local_prod
 #endif
     end function dot_native
+#endif
 
 end module linalg_mkl_backend

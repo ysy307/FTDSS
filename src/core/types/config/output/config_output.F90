@@ -1,6 +1,7 @@
 module types_config_output
     use, intrinsic :: iso_fortran_env
     use :: core_types_config_base, only:abst_config
+    use :: core_memory, only:deallocate_array
     use :: types_config_observation, only:type_config_observation, type_config_observation_geometry
     use :: types_config_overall, only:type_config_overall
     implicit none

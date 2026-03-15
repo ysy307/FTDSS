@@ -1,4 +1,5 @@
 submodule(physics_governing_thermal) thermal_matrix
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
 contains
 

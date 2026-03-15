@@ -164,7 +164,7 @@ contains
 
         ! Replace backslashes with forward slashes
         do i = 1, len(path)
-            if (path(i:i) == '\') then
+            if (path(i:i) == achar(92)) then
                 path(i:i) = '/'
             end if
         end do

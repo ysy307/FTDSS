@@ -118,7 +118,7 @@ module core_interop_vtk
             integer(int32) :: order
         end function type_vtk_cell_get_order
 
-        !> Returns the number of nodes in the cell's connectivity.
+        !> Returns the number of nodes in the cell connectivity.
         module function type_vtk_cell_get_size_connectivity(self) result(size)
             !> The vtk_cell object to query.
             class(type_vtk_cell), intent(in) :: self

@@ -397,11 +397,11 @@ contains
         !> Overwritten on exit
         real(real64), intent(inout) :: current_time
 
-        integer(int32) :: count, rate
-
 #ifdef _OPENMP
         current_time = omp_get_wtime()
 #else
+        integer(int32) :: count, rate
+
         call system_clock(count=count, count_rate=rate)
         current_time = real(count, kind=real64) / real(rate, kind=real64)
 #endif

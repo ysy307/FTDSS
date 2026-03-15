@@ -247,7 +247,7 @@ contains
         !> Status (0: Normal, 1: Midnight Sun, -1: Polar Night)
         integer(int32), intent(inout) :: status
 
-        real(real64) :: jd, t, ecl, obl, ra, dec, gmst
+        real(real64) :: jd, t, ecl, obl, ra, dec
         real(real64) :: eq_time, sun_noon_utc, ha_deg, cos_ha
         real(real64) :: zenith_rad, y_val, mean_l, mean_a
         real(real64) :: latitude_rad, dec_rad, sin_alt_noon

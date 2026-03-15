@@ -47,7 +47,6 @@ contains
         type(type_config_observation), intent(in) :: config_observation
         type(type_config_overall), intent(in) :: config_overall
 
-        integer(int32) :: i
         character(:), allocatable :: project_path_env
         character(8) :: output_extentions(3) = [".dat", ".csv", ".log"]
         character(8) :: output_file_extentions(5) = [".dat", ".csv", ".vtk", ".vtu", ".log"]

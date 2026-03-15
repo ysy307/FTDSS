@@ -25,7 +25,7 @@ module core_types_geometry_coordinate
     contains
         procedure, private, pass(self) :: set_coordinate_dp
         procedure, private, pass(self) :: set_coordinate_dp_array
-        !> Generic interface to set the coordinate's components.
+        !> Generic interface to set coordinate components.
         generic, public :: set => set_coordinate_dp, set_coordinate_dp_array
         procedure, public, pass(self) :: reset => reset_coordinate_dp
         procedure, public, pass(self) :: to_array => to_array_coordinate_dp
@@ -45,7 +45,7 @@ module core_types_geometry_coordinate
     contains
         procedure, private, pass(self) :: set_coordinate_int
         procedure, private, pass(self) :: set_coordinate_int_array
-        !> Generic interface to set the coordinate's components.
+        !> Generic interface to set coordinate components.
         generic, public :: set => set_coordinate_int, set_coordinate_int_array
         procedure, public, pass(self) :: reset => reset_coordinate_int
         procedure, public, pass(self) :: to_array => to_array_coordinate_int

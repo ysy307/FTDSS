@@ -28,7 +28,6 @@ contains
         logical :: found
         integer(int32) :: i, j
         character(256) :: buffer(2)
-        character(:), dimension(:), pointer :: valid_list
 
         type(type_constant_id) :: physics_type
         integer(int32) :: idx
