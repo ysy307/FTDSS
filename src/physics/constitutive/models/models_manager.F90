@@ -76,7 +76,26 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: Kflh
 
-        call self%hcf%p%calc_Kflh(state, Kflh)
+        real(real64) :: pressure, psi_cap, psi_cryo
+        type(type_state) :: local_state
+
+        ! When cryogenic suction (psi_cryo) exceeds the capillary suction (psi_cap),
+        ! the soil is in the frozen regime.  In that case the liquid-water pressure is
+        ! effectively -psi_cryo (Clausius-Clapeyron), which strongly reduces the
+        ! relative permeability.  Use this effective pressure for the HCF evaluation
+        ! so that the frozen zone becomes a hydraulic barrier and drives flow toward
+        ! the freezing front.
+        call state%pressure%get(pressure)
+        psi_cap = max(0.0d0, -pressure)
+        call self%gcc%calc(state, psi_cryo)
+
+        if (psi_cryo > psi_cap) then
+            call local_state%copy(state)
+            call local_state%pressure%set(-psi_cryo)
+            call self%hcf%p%calc_Kflh(local_state, Kflh)
+        else
+            call self%hcf%p%calc_Kflh(state, Kflh)
+        end if
     end subroutine calc_Kflh
 
     subroutine calc_KlT(self, state, KlT)

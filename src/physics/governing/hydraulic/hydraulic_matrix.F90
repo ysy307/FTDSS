@@ -152,15 +152,12 @@ contains
         end if
 
         ! 7. Gravity/Advection Flux Contribution (Accumulate to F_H)
-        ! F += Integral(gradN^T * V_H)
-        ! Note: Weak form term for flux J is -Integral(gradPsi * J).
-        ! J_grav = V_H. So term is -Integral(gradPsi * V_H).
-        ! compute_R2 computes Integral(gradPsi * V).
-        ! So we subtract the result.
+        ! Weak form: residual gets  -∫ ∇ψ · J_grav dΩ  where J_grav = V_H.
+        ! Newton RHS (F = -R) therefore gets  +∫ ∇ψ · V_H dΩ = +compute_R2(V_H).
         if (associated(F_H_val)) then
             workspace%work_vec(:) = 0.0d0
             call workspace%compute_R2(workspace%work_V, workspace%work_vec)
-            F_H_val(1:workspace%num_fe_nodes) = F_H_val(1:workspace%num_fe_nodes) - &
+            F_H_val(1:workspace%num_fe_nodes) = F_H_val(1:workspace%num_fe_nodes) + &
                                                 workspace%work_vec(1:workspace%num_fe_nodes)
         end if
 
@@ -257,9 +254,10 @@ contains
             local_vec_res(:) = local_vec_res(:) + workspace%work_vec(:)
 
             ! Add Gravity Term
+            ! Residual gets  -∫ ∇ψ · V_H dΩ; since F = -residual, subtract here.
             workspace%work_vec(:) = 0.0d0
             call workspace%compute_R2(workspace%work_V, workspace%work_vec)
-            local_vec_res(:) = local_vec_res(:) + workspace%work_vec(:)
+            local_vec_res(:) = local_vec_res(:) - workspace%work_vec(:)
 
             ! F = - Residual
             do i = 1, workspace%num_fe_nodes
