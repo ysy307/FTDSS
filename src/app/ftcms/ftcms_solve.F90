@@ -209,8 +209,11 @@ contains
         real(real64), allocatable :: P_old(:)
         real(real64), pointer, contiguous :: T_cur(:) => null()
         real(real64), pointer, contiguous :: P_cur(:) => null()
+        integer(int32) :: bdf_order
+        real(real64) :: mean_pressure
         real(real64) :: T_scale, P_scale
         integer(int32) :: num_nodes
+        logical :: linear_failed
 
         is_step_converged = .false.
 
@@ -227,6 +230,7 @@ contains
 
         ! Outer coupling iteration loop
         coupling_loop: do coupling_iter = 1, merge(MAX_COUPLING_ITER, 1, do_staggered)
+            linear_failed = .false.
 
             ! Save solution before inner nonlinear solve for coupling check
             if (do_staggered .and. coupling_iter > 1) then
@@ -263,6 +267,7 @@ contains
 
                 ! If linear solver failed, mark as diverged and exit
                 if (.not. self%solver%is_success()) then
+                    linear_failed = .true.
                     if (self%is_active_thermal()) then
                         call self%control%set_converged( &
                             PHYSICS_TYPES%THERMAL, .false.)
@@ -298,23 +303,47 @@ contains
                 h_res = 0.0d0
                 h_inc = 0.0d0
                 if (self%is_active_thermal()) then
-                    call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, NONLINEAR_NORM_CRITERIA%RESIDUAL, &
-                                                       NORM_TYPES%LINF, t_res)
-                    call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, NONLINEAR_NORM_CRITERIA%UPDATE, &
-                                                       NORM_TYPES%LINF, t_inc)
+                    if (.not. linear_failed) then
+                        call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, NONLINEAR_NORM_CRITERIA%RESIDUAL, &
+                                                           NORM_TYPES%LINF, t_res)
+                        call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, NONLINEAR_NORM_CRITERIA%UPDATE, &
+                                                           NORM_TYPES%LINF, t_inc)
+                    end if
                 end if
                 if (self%is_active_hydraulic()) then
-                    call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, NONLINEAR_NORM_CRITERIA%RESIDUAL, &
-                                                       NORM_TYPES%LINF, h_res)
-                    call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, NONLINEAR_NORM_CRITERIA%UPDATE, &
-                                                       NORM_TYPES%LINF, h_inc)
+                    if (.not. linear_failed) then
+                        call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, NONLINEAR_NORM_CRITERIA%RESIDUAL, &
+                                                           NORM_TYPES%LINF, h_res)
+                        call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, NONLINEAR_NORM_CRITERIA%UPDATE, &
+                                                           NORM_TYPES%LINF, h_inc)
+                    end if
                 end if
-                write (*, '(A,I0,A,L1,A,4(ES11.3,1X))') '   [NONLINEAR] failed: iter=', iter_nl, ', diverged=', &
-                    self%control%is_diverged(), ', T_res/T_inc/H_res/H_inc=', t_res, t_inc, h_res, h_inc
+                if (linear_failed) then
+                    write (*, '(A,I0,A,L1,A)') '   [NONLINEAR] failed: iter=', iter_nl, ', diverged=', &
+                        self%control%is_diverged(), ', linear solver failure before nonlinear norm update.'
+                else
+                    write (*, '(A,I0,A,L1,A,4(ES11.3,1X))') '   [NONLINEAR] failed: iter=', iter_nl, ', diverged=', &
+                        self%control%is_diverged(), ', T_res/T_inc/H_res/H_inc=', t_res, t_inc, h_res, h_inc
+                end if
             end if
 
             ! If inner solve failed, skip coupling check
             if (.not. is_step_converged) exit coupling_loop
+
+            ! Remove hydraulic gauge mode globally after nonlinear convergence
+            ! (all-Neumann transient case): p <- p - mean(p)
+            if (self%is_active_hydraulic()) then
+                bdf_order = 0
+                call self%control%get_bdf_coeffs(bdf_order=bdf_order)
+                if (.not. self%hydraulic_has_dirichlet_bc .and. bdf_order >= 1) then
+                    call self%pressure%get_current(P_cur)
+                    if (associated(P_cur)) then
+                        mean_pressure = sum(P_cur(:)) / real(size(P_cur), real64)
+                        P_cur(:) = P_cur(:) - mean_pressure
+                    end if
+                    nullify (P_cur)
+                end if
+            end if
 
             ! On first coupling iteration or if not staggered, exit
             if (.not. do_staggered .or. coupling_iter == 1) exit coupling_loop

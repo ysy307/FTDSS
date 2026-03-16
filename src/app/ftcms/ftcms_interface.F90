@@ -46,6 +46,7 @@ module app_ftcms
 
         integer(int32) :: thermal_start_dof = 0
         integer(int32) :: hydraulic_start_dof = 0
+        logical :: hydraulic_has_dirichlet_bc = .false.
 
         type(type_control) :: control
         type(type_output_manager) :: output

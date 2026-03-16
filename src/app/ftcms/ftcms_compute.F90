@@ -170,9 +170,10 @@ contains
         real(real64) :: tt_diag_sum, hh_diag_sum
         real(real64) :: tt_rhs_sum, hh_rhs_sum
         real(real64) :: hydraulic_scale
+        real(real64) :: rhs_mean_h
         integer(int32) :: num_total_dofs, num_dofs_per_node
         integer(int32) :: thermal_dof, hydraulic_dof
-        integer(int32) :: i, local_dof
+        integer(int32) :: i, local_dof, h_count
         real(real64), parameter :: diag_eps = 1.0d-30
         real(real64), parameter :: scale_cap = 1.0d6
         logical :: do_hydraulic
@@ -205,6 +206,27 @@ contains
         call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
         do_hydraulic = self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)
         apply_global_scaling = do_hydraulic
+
+        if (do_hydraulic .and. (.not. self%hydraulic_has_dirichlet_bc) .and. associated(f_data)) then
+            rhs_mean_h = 0.0d0
+            h_count = 0
+            do i = 1, size(f_data)
+                local_dof = mod(i - 1, num_dofs_per_node) + 1
+                if (local_dof == hydraulic_dof) then
+                    rhs_mean_h = rhs_mean_h + f_data(i)
+                    h_count = h_count + 1
+                end if
+            end do
+            if (h_count > 0) then
+                rhs_mean_h = rhs_mean_h / real(h_count, real64)
+                do i = 1, size(f_data)
+                    local_dof = mod(i - 1, num_dofs_per_node) + 1
+                    if (local_dof == hydraulic_dof) then
+                        f_data(i) = f_data(i) - rhs_mean_h
+                    end if
+                end do
+            end if
+        end if
 
         call scale_vec%initialize(num_total_dofs)
         call K_ptr%get_diagonal(scale_vec)

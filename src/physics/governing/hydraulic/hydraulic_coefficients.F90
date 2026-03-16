@@ -1,5 +1,9 @@
 submodule(physics_governing_hydraulic) hydraulic_coefficients
     implicit none
+
+    ! Must match constitutive effective suction blending scale in fusion model [Pa].
+    real(real64), parameter :: SUCTION_BLEND_EPS = 1.0d4
+
 contains
 
     !> @brief Calculate Mass Term C_HH = d(rho_eff)/dP
@@ -92,6 +96,8 @@ contains
 
         real(real64) :: K_flh
         real(real64) :: pressure, psi_cap, psi_cryo
+        real(real64) :: delta_psi, blend_denom
+        real(real64) :: dpsi_eff_dpsi_cryo
         real(real64) :: dpsi_cryo_dT
         real(real64) :: coeff_HT
         integer(int32) :: i
@@ -107,10 +113,11 @@ contains
             psi_cap = 0.0d0
         end if
 
-        coeff_HT = 0.0d0
-        if (psi_cryo > psi_cap) then
-            coeff_HT = (K_flh / g) * dpsi_cryo_dT
-        end if
+        delta_psi = psi_cap - psi_cryo
+        blend_denom = sqrt(delta_psi*delta_psi + SUCTION_BLEND_EPS*SUCTION_BLEND_EPS)
+        dpsi_eff_dpsi_cryo = 0.5d0*(1.0d0 - delta_psi/blend_denom)
+
+        coeff_HT = (K_flh / g) * dpsi_eff_dpsi_cryo * dpsi_cryo_dT
 
         D_HT(:, :) = 0.0d0
         do i = 1, self%computation_dimension
