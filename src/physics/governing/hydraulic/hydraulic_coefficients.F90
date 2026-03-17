@@ -1,8 +1,6 @@
 submodule(physics_governing_hydraulic) hydraulic_coefficients
+    use :: constitutive_constants, only: SUCTION_BLEND_EPS => suction_blend_eps
     implicit none
-
-    ! Must match constitutive effective suction blending scale in fusion model [Pa].
-    real(real64), parameter :: SUCTION_BLEND_EPS = 1.0d4
 
 contains
 

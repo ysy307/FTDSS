@@ -289,6 +289,20 @@ contains
                 ! Update solution with relaxation (Aitken for Picard, damped for Newton)
                 call self%reflect_variables()
 
+                ! Enforce global pressure gauge each nonlinear iteration for all-Neumann hydraulic systems.
+                if (self%is_active_hydraulic()) then
+                    bdf_order = 0
+                    call self%control%get_bdf_coeffs(bdf_order=bdf_order)
+                    if (.not. self%hydraulic_has_dirichlet_bc .and. bdf_order >= 1) then
+                        call self%pressure%get_current(P_cur)
+                        if (associated(P_cur)) then
+                            mean_pressure = sum(P_cur(:)) / real(size(P_cur), real64)
+                            P_cur(:) = P_cur(:) - mean_pressure
+                        end if
+                        nullify (P_cur)
+                    end if
+                end if
+
                 ! Force exit after one iteration when config is NONE (linear solve)
                 if (self%control%is_none()) exit nonlinear
 
@@ -329,21 +343,6 @@ contains
 
             ! If inner solve failed, skip coupling check
             if (.not. is_step_converged) exit coupling_loop
-
-            ! Remove hydraulic gauge mode globally after nonlinear convergence
-            ! (all-Neumann transient case): p <- p - mean(p)
-            if (self%is_active_hydraulic()) then
-                bdf_order = 0
-                call self%control%get_bdf_coeffs(bdf_order=bdf_order)
-                if (.not. self%hydraulic_has_dirichlet_bc .and. bdf_order >= 1) then
-                    call self%pressure%get_current(P_cur)
-                    if (associated(P_cur)) then
-                        mean_pressure = sum(P_cur(:)) / real(size(P_cur), real64)
-                        P_cur(:) = P_cur(:) - mean_pressure
-                    end if
-                    nullify (P_cur)
-                end if
-            end if
 
             ! On first coupling iteration or if not staggered, exit
             if (.not. do_staggered .or. coupling_iter == 1) exit coupling_loop
@@ -392,7 +391,7 @@ contains
         integer(int32) :: consecutive_failures
         integer(int32) :: step_counter
         integer(int32) :: nl_iter
-        real(real64) :: time_s
+        real(real64) :: time_s, dt_s
         integer(int32), parameter :: MAX_CONSECUTIVE_FAILURES = 50
 
         consecutive_failures = 0
@@ -423,6 +422,13 @@ contains
             else
                 ! Retry with smaller dt
                 consecutive_failures = consecutive_failures + 1
+
+                if (self%control%is_min_dt()) then
+                    call self%control%get_dt(dt_s)
+                    write (*, '(A,ES13.5,A)') '   [ERROR] Step failed at minimum dt=', dt_s, '. Stopping retry loop.'
+                    exit time_loop
+                end if
+
                 write (*, '("   [WARNING] Step Failed (",I0,"/",I0,"). Retrying with smaller dt...")') &
                     consecutive_failures, MAX_CONSECUTIVE_FAILURES
                 if (consecutive_failures >= MAX_CONSECUTIVE_FAILURES) then

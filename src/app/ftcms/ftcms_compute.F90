@@ -171,13 +171,20 @@ contains
         real(real64) :: tt_rhs_sum, hh_rhs_sum
         real(real64) :: hydraulic_scale
         real(real64) :: rhs_mean_h
+        real(real64) :: retry_diag
+        real(real64) :: retry_scale, hh_diag_max
         integer(int32) :: num_total_dofs, num_dofs_per_node
         integer(int32) :: thermal_dof, hydraulic_dof
-        integer(int32) :: i, local_dof, h_count
+        integer(int32) :: i, local_dof, h_count, num_nodes, retry_iter
         real(real64), parameter :: diag_eps = 1.0d-30
         real(real64), parameter :: scale_cap = 1.0d6
+        real(real64), parameter :: retry_diag_factor = 1.0d-1
+        real(real64), parameter :: retry_diag_min = 1.0d-2
+        integer(int32), parameter :: max_retry_iters = 3
         logical :: do_hydraulic
         logical :: apply_global_scaling
+        logical :: retried_with_damping
+        logical, save :: printed_scale_warning = .false.
         logical, save :: first_scale_report = .true.
 
         call self%control%profiler_start(PROFILER_TYPES%SOLVE)
@@ -205,7 +212,8 @@ contains
         call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, thermal_dof)
         call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
         do_hydraulic = self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)
-        apply_global_scaling = do_hydraulic
+        apply_global_scaling = .false.
+        retried_with_damping = .false.
 
         if (do_hydraulic .and. (.not. self%hydraulic_has_dirichlet_bc) .and. associated(f_data)) then
             rhs_mean_h = 0.0d0
@@ -234,6 +242,7 @@ contains
 
         tt_diag_sum = 0.0d0
         hh_diag_sum = 0.0d0
+        hh_diag_max = 0.0d0
         tt_rhs_sum = 0.0d0
         hh_rhs_sum = 0.0d0
         if (associated(scale_data)) then
@@ -243,6 +252,7 @@ contains
                     tt_diag_sum = tt_diag_sum + abs(scale_data(i))
                 else if (local_dof == hydraulic_dof) then
                     hh_diag_sum = hh_diag_sum + abs(scale_data(i))
+                    hh_diag_max = max(hh_diag_max, abs(scale_data(i)))
                 end if
 
                 if (associated(f_data)) then
@@ -272,6 +282,14 @@ contains
                 first_scale_report = .false.
             end if
 
+            if (do_hydraulic .and. (.not. printed_scale_warning)) then
+                if (hydraulic_scale > 1.0d2 .or. hydraulic_scale < 1.0d-2) then
+                    write (*, '(A,ES13.5,A)') '   [SCALE] Notice: strong T/H scale disparity detected (H_scale=', &
+                        hydraulic_scale, '). Consider revisiting input-unit scaling.'
+                    printed_scale_warning = .true.
+                end if
+            end if
+
             if (apply_global_scaling) then
                 scale_data(:) = 1.0d0
                 if (hydraulic_dof > 0) then
@@ -293,11 +311,33 @@ contains
         call self%solver%solve(K_ptr, F_ptr, du_ptr)
         call self%solver%check()
 
+        if ((.not. self%solver%is_success()) .and. do_hydraulic .and. (.not. self%hydraulic_has_dirichlet_bc)) then
+            call self%domain%get_num_nodes(num_nodes)
+            retry_scale = 1.0d0
+            do retry_iter = 1, max_retry_iters
+                retry_diag = max(retry_diag_min, retry_diag_factor*retry_scale*max(diag_eps, hh_diag_max))
+                do i = 1, num_nodes
+                    call self%K%add(hydraulic_dof, hydraulic_dof, i, i, retry_diag)
+                end do
+
+                call du_ptr%zero()
+                call self%solver%solve(K_ptr, F_ptr, du_ptr)
+                call self%solver%check()
+                retried_with_damping = .true.
+                if (self%solver%is_success()) exit
+                retry_scale = retry_scale*10.0d0
+            end do
+        end if
+
         ! Recover original unknown scale: du = D * du_scaled
         if (apply_global_scaling .and. associated(scale_data) .and. associated(du_data)) then
             do i = 1, min(size(scale_data), size(du_data))
                 du_data(i) = du_data(i) * scale_data(i)
             end do
+        end if
+
+        if (retried_with_damping .and. self%solver%is_success()) then
+            write (*, '(A,ES13.5)') '   [SOLVE] all-Neumann hydraulic retry succeeded with global diagonal damping=', retry_diag
         end if
 
         nullify (scale_data)

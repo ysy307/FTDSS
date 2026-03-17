@@ -54,4 +54,12 @@ module constitutive_constants
 
     real(real64), parameter, public :: min_vapor_density = 1.0d-8
 
+    !------------------------------------------------------------------------------------------
+    ! For phase change models
+    !------------------------------------------------------------------------------------------
+    !> Smooth blending scale [Pa] for effective suction max(psi_cap, psi_cryo)
+    real(real64), parameter, public :: suction_blend_eps = 1.0d4
+    !> Half-width [K] of the smooth freezing activation band around Tf0
+    real(real64), parameter, public :: freezing_smooth_band = 0.25d0
+
 end module constitutive_constants
