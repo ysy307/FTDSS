@@ -131,10 +131,14 @@ contains
                     ! $OMP CRITICAL(ftcms_global_assembly)
                     if (use_scatter) then
                         call self%K%add(thermal_dof, thermal_dof, elem_id, num_nodes_local, local_K_TT)
-                        call self%K%add(thermal_dof, hydraulic_dof, elem_id, num_nodes_local, local_K_TH)
+                        if (do_hydraulic) then
+                            call self%K%add(thermal_dof, hydraulic_dof, elem_id, num_nodes_local, local_K_TH)
+                        end if
                     else
                         call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_K_TT)
-                        call self%K%add(thermal_dof, hydraulic_dof, p_connectivity, local_K_TH)
+                        if (do_hydraulic) then
+                            call self%K%add(thermal_dof, hydraulic_dof, p_connectivity, local_K_TH)
+                        end if
                     end if
                     call self%F%add(thermal_dof, p_connectivity, local_F_T)
 

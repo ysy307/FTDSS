@@ -22,6 +22,9 @@ contains
         self%num_nodes = solver_settings%num_nodes
         self%tolerance = solver_settings%tolerance
         self%max_iterations = solver_settings%max_iterations
+        self%projection_enabled = solver_settings%projection_enabled
+        self%projection_offset = solver_settings%projection_offset
+        self%projection_stride = solver_settings%projection_stride
 
         call self%p%initialize(self%num_nodes)
         call self%phat%initialize(self%num_nodes)
@@ -86,6 +89,7 @@ contains
         ! 2: Set an initial value x0 (use caller-provided initial guess)
         ! ==========================================================
         call self%x%copy(x)
+        call project_component_mean_zero(self%x, self%projection_enabled, self%projection_offset, self%projection_stride)
         x_internal_ptr => self%x%get_data()
         has_internal_x = associated(x_internal_ptr)
 
@@ -109,6 +113,7 @@ contains
             ! Fallback: if RHS data is unavailable, treat b as zero vector.
             r_ptr = -r_ptr
         end if
+        call project_component_mean_zero(self%r, self%projection_enabled, self%projection_offset, self%projection_stride)
 
         ! ==========================================================
         ! 4: Create preconditioned matrix
@@ -135,6 +140,7 @@ contains
             if (iter == 1) then
                 ! 10: p0 = r0
                 call self%p%copy(self%r)
+                call project_component_mean_zero(self%p, self%projection_enabled, self%projection_offset, self%projection_stride)
             else
                 if (.not. ieee_is_finite(rho_old) .or. .not. ieee_is_finite(omega) .or. &
                     .not. ieee_is_finite(alpha) .or. abs(rho_old) <= tiny(1.0d0) .or. abs(omega) <= tiny(1.0d0)) then
@@ -237,11 +243,14 @@ contains
                 call vector_axpy(-omega, self%v, self%p)
                 call vector_scale(beta, self%p)
                 call vector_axpy(1.0d0, self%r, self%p)
+                call project_component_mean_zero(self%p, self%projection_enabled, self%projection_offset, self%projection_stride)
             end if
             ! 15: phat = M^-1 * p
             call self%pc%apply(self%p, self%phat)
+            call project_component_mean_zero(self%phat, self%projection_enabled, self%projection_offset, self%projection_stride)
             ! 16: v = A * phat
             call matvec(A, self%phat, self%v, ierr)
+            call project_component_mean_zero(self%v, self%projection_enabled, self%projection_offset, self%projection_stride)
             ! 17: alpha_k = rho / (^r0, v)
             denom = vector_dot(self%r0, self%v)
             if (abs(denom) <= tiny(1.0d0)) then
@@ -277,11 +286,14 @@ contains
             end if
             ! 18: s = r_k - alpha_k * v
             call vector_axpyz(-alpha, self%v, self%r, self%s)
+            call project_component_mean_zero(self%s, self%projection_enabled, self%projection_offset, self%projection_stride)
 
             ! 19: shat = M^-1 * s
             call self%pc%apply(self%s, self%shat)
+            call project_component_mean_zero(self%shat, self%projection_enabled, self%projection_offset, self%projection_stride)
             ! 20: t = A * shat
             call matvec(A, self%shat, self%t, ierr)
+            call project_component_mean_zero(self%t, self%projection_enabled, self%projection_offset, self%projection_stride)
 
             ! 21: omega_k = (t,s)/(t,t)
             denom = vector_dot(self%t, self%t)
@@ -357,7 +369,9 @@ contains
             ! 24: r(i) = s(i-1) - omega * AM^-1 s(i-1)
             call vector_axpy(alpha, self%phat, self%x)
             call vector_axpy(omega, self%shat, self%x)
+            call project_component_mean_zero(self%x, self%projection_enabled, self%projection_offset, self%projection_stride)
             call vector_axpyz(-omega, self%t, self%s, self%r)
+            call project_component_mean_zero(self%r, self%projection_enabled, self%projection_offset, self%projection_stride)
 
             ! 25: ||r_k+1||_2
             resid = vector_norm2(self%r)
@@ -378,6 +392,41 @@ contains
         if (has_internal_x) call x%copy(self%x)
 
     end subroutine solve_type_solver_bicgstab
+
+    subroutine project_component_mean_zero(vec, enabled, offset, stride)
+        implicit none
+        type(type_vector_dp), intent(inout) :: vec
+        logical, intent(in) :: enabled
+        integer(int32), intent(in) :: offset, stride
+
+        real(real64), pointer :: data(:)
+        real(real64) :: mean_val
+        integer(int32) :: i, count, first_idx
+
+        if (.not. enabled) return
+        if (stride <= 0 .or. offset <= 0) return
+
+        data => vec%get_data()
+        if (.not. associated(data)) return
+
+        first_idx = offset
+        if (first_idx > size(data)) return
+
+        mean_val = 0.0d0
+        count = 0
+        do i = first_idx, size(data), stride
+            mean_val = mean_val + data(i)
+            count = count + 1
+        end do
+        if (count <= 0) return
+
+        mean_val = mean_val/real(count, real64)
+        do i = first_idx, size(data), stride
+            data(i) = data(i) - mean_val
+        end do
+
+        nullify (data)
+    end subroutine project_component_mean_zero
 
     !> Finalize the solver instance and release memory.
     module subroutine destroy_type_solver_bicgstab(self)

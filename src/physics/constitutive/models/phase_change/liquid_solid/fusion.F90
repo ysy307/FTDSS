@@ -4,7 +4,8 @@ module models_phase_change_fusion
     use :: module_core, only:type_state
     use :: constitutive_constants, only: &
         lf => latent_heat_fusion_water_0c, &
-        T_to_K => celsius_to_kelvin
+        T_to_K => celsius_to_kelvin, &
+        Tf0 => water_freezing_point_at_standard_atmospheric_pressure
     use :: physics_constitutive_base, only:abst_constitutive
     use :: models_wrf, only:abst_wrf
     use :: models_phase_change_gcc, only:abst_gcc
@@ -16,6 +17,8 @@ module models_phase_change_fusion
     ! Smooth blending scale [Pa] for effective suction max(psi_cap, psi_cryo).
     ! A small positive epsilon avoids non-differentiable switching at psi_cap=psi_cryo.
     real(real64), parameter :: SUCTION_BLEND_EPS = 1.0d4
+    real(real64), parameter :: FREEZING_SMOOTH_BAND = 0.25d0
+    real(real64), parameter :: DPW_DT_LIMIT = 1.0d8
 
     !>
     !> @brief Model for fusion (melting/freezing) physics.
@@ -57,6 +60,36 @@ contains
         end if
     end subroutine compute_effective_suction
 
+    pure subroutine compute_freezing_activation(temperature, activation, dactivation_dT)
+        implicit none
+        real(real64), intent(in) :: temperature
+        real(real64), intent(inout) :: activation
+        real(real64), intent(inout), optional :: dactivation_dT
+
+        real(real64) :: arg, sech2
+
+        arg = (temperature - Tf0) / FREEZING_SMOOTH_BAND
+        activation = 0.5d0*(1.0d0 - tanh(arg))
+
+        if (present(dactivation_dT)) then
+            sech2 = 1.0d0 - tanh(arg)*tanh(arg)
+            dactivation_dT = -0.5d0*sech2/FREEZING_SMOOTH_BAND
+        end if
+    end subroutine compute_freezing_activation
+
+    pure subroutine bound_symmetric(value_in, bound, value_out)
+        implicit none
+        real(real64), intent(in) :: value_in, bound
+        real(real64), intent(inout) :: value_out
+
+        if (bound <= 0.0d0) then
+            value_out = value_in
+            return
+        end if
+
+        value_out = value_in / (1.0d0 + abs(value_in)/bound)
+    end subroutine bound_symmetric
+
     !>
     !> @brief Initialize fusion model.
     !>
@@ -87,12 +120,14 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: ice_content
 
-        real(real64) :: pressure
+        real(real64) :: pressure, temperature
         real(real64) :: psi_cap, psi_cryo, psi_eff
         real(real64) :: d_theta_liquid_dPress
+        real(real64) :: freezing_activation
         real(real64) :: rho_water, rho_ice, density_ratio
 
         call state%pressure%get(pressure)
+        call state%temperature%get(temperature)
 
         psi_cap = max(0.0d0, -pressure)
         call self%gcc%calc(state, psi_cryo)
@@ -109,8 +144,10 @@ contains
             density_ratio = 1.0d0
         end if
 
+        call compute_freezing_activation(temperature, freezing_activation)
+
         if (psi_cryo > 0.0d0) then
-            ice_content = max(0.0d0, density_ratio * d_theta_liquid_dPress * psi_cryo)
+            ice_content = max(0.0d0, freezing_activation * density_ratio * d_theta_liquid_dPress * psi_cryo)
         else
             ice_content = 0.0d0
         end if
@@ -132,7 +169,8 @@ contains
         real(real64) :: d_psi_cryo_dP, d_psi_cryo_dT
         real(real64) :: d_theta_liquid_dPress
         real(real64) :: dPi_dT
-        real(real64) :: dPw_dP, dPw_dT
+        real(real64) :: dPw_dP, dPw_dT, dPw_dT_bounded
+        real(real64) :: freezing_activation, d_freezing_activation_dT
         real(real64) :: rho_w, rho_i, density_ratio
 
         call state%pressure%get(pressure)
@@ -165,10 +203,14 @@ contains
 
         ! Chain-rule mapping for the capacity formulation.
         dPw_dT = density_ratio * dPi_dT + rho_w*lf/temperature_K
+        call bound_symmetric(dPw_dT, DPW_DT_LIMIT, dPw_dT_bounded)
+
+        call compute_freezing_activation(temperature, freezing_activation, d_freezing_activation_dT)
 
         if (psi_cryo > 0.0d0) then
-            dice_dP = -density_ratio * d_theta_liquid_dPress * dPw_dP
-            dice_dT = -density_ratio * d_theta_liquid_dPress * dPw_dT
+            dice_dP = freezing_activation * (-density_ratio * d_theta_liquid_dPress * dPw_dP)
+            dice_dT = freezing_activation * (-density_ratio * d_theta_liquid_dPress * dPw_dT_bounded) + &
+                      d_freezing_activation_dT * (density_ratio * d_theta_liquid_dPress * psi_cryo)
         else
             dice_dP = 0.0d0
             dice_dT = 0.0d0

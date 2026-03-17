@@ -290,8 +290,6 @@ contains
                 printed_no_dirichlet_hydraulic_notice = .true.
             end if
 
-            ! All-Neumann transient systems still retain a constant nullspace mode;
-            ! apply weak global diagonal regularization instead of local node fixing.
             call self%domain%get_num_nodes(num_nodes)
             do node_id = 1, num_nodes
                 call self%K%add(dof_offset, dof_offset, node_id, node_id, NULLSPACE_REG_EPS)

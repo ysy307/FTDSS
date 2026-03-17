@@ -15,6 +15,9 @@ contains
         integer(int32) :: computation_dimension
         integer(int32) :: num_total_dofs
         integer(int32) :: ierr
+        integer(int32) :: solver_type_selected, preconditioner_type_selected, m_restart_selected
+        integer(int32) :: projection_offset_selected, projection_stride_selected
+        logical :: projection_enabled_selected
         real(real64), pointer, contiguous, dimension(:) :: phase_values
 
         type(type_config_control_manager) :: config_control_manager
@@ -136,23 +139,40 @@ contains
         call self%thermal%initialize(input, active_region_ids)
         call self%hydraulic%initialize(input, active_region_ids)
 
-        ! Initialize solver
+        ! Apply initial Dirichlet boundary conditions to field variables
+        call self%apply_bc()
+
+        ! Initialize solver strictly from input settings.
         associate (solver_settings => input%basic%solver_settings%linear_solver)
-            call solver_info%set(solver_settings%solver_type, &
+            solver_type_selected = solver_settings%solver_type
+            preconditioner_type_selected = solver_settings%preconditioner_type
+            m_restart_selected = solver_settings%m_restarts
+            projection_enabled_selected = .false.
+            projection_offset_selected = 0
+            projection_stride_selected = 0
+
+            if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc)) then
+                projection_enabled_selected = .true.
+                projection_offset_selected = self%hydraulic_start_dof
+                projection_stride_selected = self%K%get_num_dofs_per_node()
+                write (*, '(A)') 'Notice: Enabling mean-zero nullspace projection for all-Neumann hydraulic component.'
+            end if
+
+            call solver_info%set(solver_type_selected, &
                                  num_total_dofs, &
                                  solver_settings%tolerance, &
                                  solver_settings%max_iterations, &
-                                 solver_settings%m_restarts)
-            if (solver_settings%preconditioner_type == PRECONDITIONER_TYPES%ILU%ID) then
-                call pc_info%set(solver_settings%preconditioner_type, num_nodes, self%K%get_num_dofs_per_node())
+                                 m_restart_selected, &
+                                 projection_enabled=projection_enabled_selected, &
+                                 projection_offset=projection_offset_selected, &
+                                 projection_stride=projection_stride_selected)
+            if (preconditioner_type_selected == PRECONDITIONER_TYPES%ILU%ID) then
+                call pc_info%set(preconditioner_type_selected, num_nodes, self%K%get_num_dofs_per_node())
             else
-                call pc_info%set(solver_settings%preconditioner_type, num_total_dofs)
+                call pc_info%set(preconditioner_type_selected, num_total_dofs)
             end if
             call create_solver(self%solver, solver_info, pc_info, ierr)
         end associate
-
-        ! Apply initial Dirichlet boundary conditions to field variables
-        call self%apply_bc()
 
         ! Populate initial phase variables from initial T/P/porosity before first output.
         call self%update_variables()

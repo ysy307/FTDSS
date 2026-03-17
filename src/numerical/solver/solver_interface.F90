@@ -22,6 +22,9 @@ module numerical_solver_interface
         real(real64) :: tolerance
         integer(int32) :: max_iterations
         integer(int32) :: m_restart
+        logical :: projection_enabled = .false.
+        integer(int32) :: projection_offset = 0
+        integer(int32) :: projection_stride = 0
 
         integer(int32) :: num_nodes
         integer(int32) :: num_dofs_per_node
@@ -44,6 +47,9 @@ module numerical_solver_interface
         real(real64) :: tolerance = 0.0d0
         real(real64) :: relative_tolerance = 1.0d-6
         integer(int32) :: max_iterations = 0
+        logical :: projection_enabled = .false.
+        integer(int32) :: projection_offset = 0
+        integer(int32) :: projection_stride = 0
 
         type(type_vector_dp) :: residual_history
         integer(int32) :: current_iteration = 0
@@ -178,7 +184,8 @@ module numerical_solver_interface
     end interface
 
 contains
-    subroutine set_solver_settings(self, id, num_nodes, tolerance, max_iterations, m_restart)
+    subroutine set_solver_settings(self, id, num_nodes, tolerance, max_iterations, m_restart, &
+                                   projection_enabled, projection_offset, projection_stride)
         implicit none
         class(type_solver_settings), intent(inout) :: self
         integer(int32), intent(in) :: id
@@ -186,11 +193,21 @@ contains
         real(real64), intent(in) :: tolerance
         integer(int32), intent(in) :: max_iterations
         integer(int32), intent(in), optional :: m_restart
+        logical, intent(in), optional :: projection_enabled
+        integer(int32), intent(in), optional :: projection_offset
+        integer(int32), intent(in), optional :: projection_stride
 
         self%ID = id
         self%num_nodes = num_nodes
         self%tolerance = tolerance
         self%max_iterations = max_iterations
+        self%projection_enabled = .false.
+        self%projection_offset = 0
+        self%projection_stride = 0
+
+        if (present(projection_enabled)) self%projection_enabled = projection_enabled
+        if (present(projection_offset)) self%projection_offset = projection_offset
+        if (present(projection_stride)) self%projection_stride = projection_stride
 
         select case (self%ID)
         case (LINEAR_SOLVER_TYPES%GMRES_M%ID)
