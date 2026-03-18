@@ -68,7 +68,7 @@ contains
         ! Vapor phase (Include Latent Heat of Vaporization)
         if (Qv > 0.0d0) then
             if (.not. has_rho_w) then
-                ! Reference density for vapor is typically liquid phase
+                ! Qv is stored as liquid-equivalent content, so rho_w is used consistently.
                 call self%physics%calc_density_water(state, rho_w)
                 has_rho_w = .true.
             end if
@@ -222,6 +222,7 @@ contains
         ! Tangent variables
         real(real64) :: porosity, Qw, Qi, Qv
         real(real64) :: rho_s, rho_w, rho_i
+        real(real64) :: drho_w_dT, drho_ice_dT
         real(real64) :: c_s, c_w, c_i, c_v
         real(real64) :: dQi_dT, dQv_dT, Lf, Lv
         logical :: has_rho_w
@@ -267,6 +268,8 @@ contains
 
         C_TT = 0.0d0
         has_rho_w = .false.
+        drho_w_dT = 0.0d0
+        drho_ice_dT = 0.0d0
 
         if (use_scheme == SCHEME_SECANT) then
             ! --- Secant Method (Average/Effective Heat Capacity) ---
@@ -313,7 +316,8 @@ contains
                 call self%physics%calc_density_water(state, rho_w)
                 has_rho_w = .true.
                 call self%physics%calc_specific_heat_water(state, c_w)
-                C_TT = C_TT + rho_w * c_w * Qw
+                call self%physics%calc_density_water_derivatives(material_id, state, dden_dT=drho_w_dT)
+                C_TT = C_TT + rho_w * c_w * Qw + c_w * Qw * temperature * drho_w_dT
             end if
 
             ! Ice (including latent heat derivative)
@@ -322,7 +326,9 @@ contains
                 call self%physics%calc_specific_heat_ice(state, c_i)
                 call self%physics%calc_latent_heat_fusion(material_id, state, Lf)
                 call state%dQi_dT%get(dQi_dT)
-                C_TT = C_TT + rho_i * c_i * Qi - Lf * rho_i * dQi_dT
+                call self%physics%calc_density_ice_derivatives(material_id, state, dden_dT=drho_ice_dT)
+                C_TT = C_TT + rho_i * c_i * Qi + c_i * Qi * temperature * drho_ice_dT &
+                       - Lf * (rho_i * dQi_dT + Qi * drho_ice_dT)
             end if
 
             ! Vapor (including latent heat derivative)
@@ -334,7 +340,9 @@ contains
                 call self%physics%calc_specific_heat_vapor(state, c_v)
                 call self%physics%calc_latent_heat_vaporization(material_id, state, Lv)
                 call state%dQv_dT%get(dQv_dT)
-                C_TT = C_TT + rho_w * c_v * Qv + Lv * rho_w * dQv_dT
+                call self%physics%calc_density_water_derivatives(material_id, state, dden_dT=drho_w_dT)
+                C_TT = C_TT + rho_w * c_v * Qv + c_v * Qv * temperature * drho_w_dT &
+                       + Lv * (rho_w * dQv_dT + Qv * drho_w_dT)
             end if
         end if
 

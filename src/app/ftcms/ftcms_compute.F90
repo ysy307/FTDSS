@@ -210,8 +210,12 @@ contains
         call self%domain%get_total_dofs(num_total_dofs)
         num_dofs_per_node = self%K%get_num_dofs_per_node()
         call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, thermal_dof)
-        call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
         do_hydraulic = self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)
+        if (do_hydraulic) then
+            call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
+        else
+            hydraulic_dof = -1
+        end if
         apply_global_scaling = .false.
         retried_with_damping = .false.
 
@@ -338,6 +342,10 @@ contains
 
         if (retried_with_damping .and. self%solver%is_success()) then
             write (*, '(A,ES13.5)') '   [SOLVE] all-Neumann hydraulic retry succeeded with global diagonal damping=', retry_diag
+        end if
+
+        if (.not. self%solver%is_success()) then
+            write (*, '(A)') '   [SOLVE] Warning: linear solver did not converge or encountered breakdown.'
         end if
 
         nullify (scale_data)

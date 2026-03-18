@@ -1,6 +1,9 @@
 submodule(physics_governing_hydraulic) hydraulic_coefficients
-    use :: constitutive_constants, only: SUCTION_BLEND_EPS => suction_blend_eps
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
+
+    ! Must match constitutive effective suction blending scale in fusion model [Pa].
+    real(real64), parameter :: HYDRAULIC_SUCTION_BLEND_EPS = 1.0d4
 
 contains
 
@@ -38,6 +41,10 @@ contains
         call self%physics%calc_density_water_derivatives(material_id, state, dden_dP=drho_w_dP)
         call self%physics%calc_density_ice_derivatives(material_id, state, dden_dP=drho_ice_dP)
         call self%physics%calc_pressure_ice_water_derivative(material_id, state, dP_ice_dP_water)
+
+        ! Guard unphysical derivative values before assembling C_HH.
+        if (.not. ieee_is_finite(dP_ice_dP_water)) dP_ice_dP_water = 1.0d0
+        if (dP_ice_dP_water < 0.0d0) dP_ice_dP_water = 0.0d0
 
         ! C_HH = d(rho_eff)/dP
         ! rho_eff = rho_w*Qw + rho_i*Qi + rho_w*Qv
@@ -112,7 +119,7 @@ contains
         end if
 
         delta_psi = psi_cap - psi_cryo
-        blend_denom = sqrt(delta_psi*delta_psi + SUCTION_BLEND_EPS*SUCTION_BLEND_EPS)
+        blend_denom = sqrt(delta_psi*delta_psi + HYDRAULIC_SUCTION_BLEND_EPS*HYDRAULIC_SUCTION_BLEND_EPS)
         dpsi_eff_dpsi_cryo = 0.5d0*(1.0d0 - delta_psi/blend_denom)
 
         coeff_HT = (K_flh / g) * dpsi_eff_dpsi_cryo * dpsi_cryo_dT

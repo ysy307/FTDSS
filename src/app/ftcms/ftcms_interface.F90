@@ -11,7 +11,6 @@ module app_ftcms
 
     use :: module_control, only:type_control
     use :: module_domain
-    ! use :: module_boundary, only:
     use :: module_initial, only:type_ic_manager
     use :: module_system, only:type_jacobian_matrix, type_residual_vector
     use :: module_constitutive, only:g => gravity_acceleration

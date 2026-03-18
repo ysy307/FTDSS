@@ -1,21 +1,16 @@
+!> Implementation of Generalized Clausius-Clapeyron models.
 !>
-!> @brief Implementation of GCC models.
-!>
-!> This submodule implements the methods for calculating suction and its derivatives
-!> for both non-segregation and segregation GCC models.
-!> Calculations are performed in Pascal [Pa].
-!>
+!> Algorithm overview:
+!> - Evaluates the algebraic Generalized Clausius-Clapeyron formulas.
+!> - Non-segregation utilizes: \( \psi = -L_f \rho_w \ln(T / T_{f0}) \)
+!> - Segregation utilizes: \( \psi = \left(\frac{\rho_i}{\rho_w} - 1\right) P - L_f \rho_i \ln(T / T_{f0}) \)
 submodule(models_phase_change_gcc) gcc_base
-    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
-
-    real(real64), parameter :: MAX_REASONABLE_DENSITY = 1.0d6
 
 contains
 
-    !>
-    !> @brief Initialize the GCC holder object.
-    !>
+    !> Initialize the polymorphic GCC holder.
+    !> Allocates the specific GCC model based on the configuration ID.
     module subroutine initialize_holder_gccs(self, material_id, config, water, ice)
         implicit none
         class(holder_gccs), intent(inout) :: self
@@ -36,15 +31,18 @@ contains
         end if
     end subroutine initialize_holder_gccs
 
-    ! --------------------------------------------------------------------------
+    ! ==========================================================================
     ! Holder Wrapper Methods
-    ! --------------------------------------------------------------------------
+    ! ==========================================================================
 
+    !> Dispatch calculation of suction to the allocated model.
+    !> Assigns zero if no model is allocated.
     module subroutine calc_holder(self, state, suction)
         implicit none
         class(holder_gccs), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: suction
+
         if (allocated(self%p)) then
             call self%p%calc(state, suction)
         else
@@ -52,11 +50,14 @@ contains
         end if
     end subroutine calc_holder
 
+    !> Dispatch calculation of temperature derivative to the allocated model.
+    !> Assigns zero if no model is allocated.
     module subroutine deriv_temperature_holder(self, state, deriv)
         implicit none
         class(holder_gccs), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: deriv
+
         if (allocated(self%p)) then
             call self%p%deriv_temperature(state, deriv)
         else
@@ -64,11 +65,14 @@ contains
         end if
     end subroutine deriv_temperature_holder
 
+    !> Dispatch calculation of pressure derivative to the allocated model.
+    !> Assigns zero if no model is allocated.
     module subroutine deriv_pressure_holder(self, state, deriv)
         implicit none
         class(holder_gccs), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: deriv
+
         if (allocated(self%p)) then
             call self%p%deriv_pressure(state, deriv)
         else
@@ -76,9 +80,8 @@ contains
         end if
     end subroutine deriv_pressure_holder
 
-    !>
-    !> @brief Initialize the abstract GCC base.
-    !>
+    !> Initialize the abstract GCC base component.
+    !> Sets the material ID and establishes pointers to the IAPWS models.
     module subroutine initialize_abst_gcc(self, material_id, water, ice)
         implicit none
         class(abst_gcc), intent(inout) :: self
@@ -89,7 +92,6 @@ contains
         self%material_id = material_id
         self%water => water
         self%ice => ice
-
         self%initialized = .true.
     end subroutine initialize_abst_gcc
 
@@ -97,6 +99,8 @@ contains
     ! Non-Segregation Implementation
     ! ==========================================================================
 
+    !> Calculate suction for the non-segregation model.
+    !> Suction is calculated solely from the temperature depression below the freezing point.
     module subroutine calc_gcc_nonseg(self, state, suction)
         implicit none
         class(type_gcc_non_segregation), intent(in) :: self
@@ -111,24 +115,16 @@ contains
         call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_water(state, rho_water)
 
-        if (.not. ieee_is_finite(temperature) .or. .not. ieee_is_finite(temperature_K) .or. &
-            .not. ieee_is_finite(rho_water) .or. abs(rho_water) > MAX_REASONABLE_DENSITY) then
-            suction = 0.0d0
-            return
-        end if
-
         if (temperature <= Tf0) then
-            if (.not. ieee_is_finite(temperature_K) .or. temperature_K <= 1.0d0) then
-                temperature_ratio = 1.0d0 / Tf0_K
-            else
-                temperature_ratio = temperature_K / Tf0_K
-            end if
+            temperature_ratio = max(temperature_K, 1.0d0) / Tf0_K
             suction = -lf * rho_water * log(temperature_ratio)
         else
             suction = 0.0d0
         end if
     end subroutine calc_gcc_nonseg
 
+    !> Calculate temperature derivative of suction for the non-segregation model.
+    !> Uses the exact derivative of the logarithmic function.
     module subroutine deriv_temp_gcc_nonseg(self, state, suction_derivative)
         implicit none
         class(type_gcc_non_segregation), intent(in) :: self
@@ -143,33 +139,26 @@ contains
         call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_water(state, rho_water)
 
-        if (.not. ieee_is_finite(temperature) .or. .not. ieee_is_finite(temperature_K) .or. &
-            .not. ieee_is_finite(rho_water) .or. abs(rho_water) > MAX_REASONABLE_DENSITY) then
-            suction_derivative = 0.0d0
-            return
-        end if
-
         if (temperature <= Tf0) then
-            if (.not. ieee_is_finite(temperature_K) .or. temperature_K <= 1.0d0) then
-                temperature_safe = 1.0d0
-            else
-                temperature_safe = temperature_K
-            end if
+            temperature_safe = max(temperature_K, 1.0d0)
             suction_derivative = -lf * rho_water / temperature_safe
         else
             suction_derivative = 0.0d0
         end if
     end subroutine deriv_temp_gcc_nonseg
 
+    !> Calculate pressure derivative of suction for the non-segregation model.
+    !> Since suction is independent of macroscopic pressure, this always returns zero.
     module subroutine deriv_pres_gcc_nonseg(self, state, suction_derivative)
         implicit none
         class(type_gcc_non_segregation), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: suction_derivative
-        ! Non-segregation model: d(Suction)/dP = 0
+
         suction_derivative = 0.0d0
     end subroutine deriv_pres_gcc_nonseg
 
+    !> Calculate second derivative of suction w.r.t temperature for the non-segregation model.
     module subroutine deriv2_temp_gcc_nonseg(self, state, suction_derivative)
         implicit none
         class(type_gcc_non_segregation), intent(in) :: self
@@ -184,31 +173,22 @@ contains
         call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_water(state, rho_water)
 
-        if (.not. ieee_is_finite(temperature) .or. .not. ieee_is_finite(temperature_K) .or. &
-            .not. ieee_is_finite(rho_water) .or. abs(rho_water) > MAX_REASONABLE_DENSITY) then
-            suction_derivative = 0.0d0
-            return
-        end if
-
         if (temperature <= Tf0) then
-            if (.not. ieee_is_finite(temperature_K) .or. temperature_K <= 1.0d0) then
-                temperature_safe = 1.0d0
-            else
-                temperature_safe = temperature_K
-            end if
+            temperature_safe = max(temperature_K, 1.0d0)
             suction_derivative = lf * rho_water / (temperature_safe * temperature_safe)
         else
             suction_derivative = 0.0d0
         end if
     end subroutine deriv2_temp_gcc_nonseg
 
+    !> Calculate derivative of ice pressure w.r.t water pressure for the non-segregation model.
+    !> Assumes equilibrium where \( P_i = P_w - \psi(T) \), hence the derivative is exactly 1.
     module subroutine deriv_pressure_ice_water_nonseg(self, state, deriv)
         implicit none
         class(type_gcc_non_segregation), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: deriv
 
-        ! In non-segregation equilibrium, P_i = P_w - suction(T), so dP_i/dP_w = 1.
         deriv = 1.0d0
     end subroutine deriv_pressure_ice_water_nonseg
 
@@ -216,6 +196,8 @@ contains
     ! Segregation Implementation
     ! ==========================================================================
 
+    !> Calculate suction for the segregation model.
+    !> Incorporates both temperature and macroscopic pressure dependencies.
     module subroutine calc_gcc_seg(self, state, suction)
         implicit none
         class(type_gcc_segregation), intent(in) :: self
@@ -233,25 +215,16 @@ contains
         call self%calc_rho_water(state, rho_water)
         call self%calc_rho_ice(state, rho_ice)
 
-        if (.not. ieee_is_finite(temperature) .or. .not. ieee_is_finite(temperature_K) .or. &
-            .not. ieee_is_finite(pressure) .or. .not. ieee_is_finite(rho_water) .or. .not. ieee_is_finite(rho_ice) .or. &
-            abs(rho_water) > MAX_REASONABLE_DENSITY .or. abs(rho_ice) > MAX_REASONABLE_DENSITY) then
-            suction = 0.0d0
-            return
-        end if
-
         if (temperature <= Tf0) then
-            if (.not. ieee_is_finite(temperature_K) .or. temperature_K <= 1.0d0) then
-                temperature_ratio = 1.0d0 / Tf0_K
-            else
-                temperature_ratio = temperature_K / Tf0_K
-            end if
+            temperature_ratio = max(temperature_K, 1.0d0) / Tf0_K
             suction = (rho_ice / rho_water - 1.0d0) * pressure - lf * rho_ice * log(temperature_ratio)
         else
             suction = 0.0d0
         end if
     end subroutine calc_gcc_seg
 
+    !> Calculate temperature derivative of suction for the segregation model.
+    !> Accounts for the temperature-dependent term in the GCC equation.
     module subroutine deriv_temp_gcc_seg(self, state, suction_derivative)
         implicit none
         class(type_gcc_segregation), intent(in) :: self
@@ -266,24 +239,16 @@ contains
         call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_ice(state, rho_ice)
 
-        if (.not. ieee_is_finite(temperature) .or. .not. ieee_is_finite(temperature_K) .or. &
-            .not. ieee_is_finite(rho_ice) .or. abs(rho_ice) > MAX_REASONABLE_DENSITY) then
-            suction_derivative = 0.0d0
-            return
-        end if
-
         if (temperature <= Tf0) then
-            if (.not. ieee_is_finite(temperature_K) .or. temperature_K <= 1.0d0) then
-                temperature_safe = 1.0d0
-            else
-                temperature_safe = temperature_K
-            end if
+            temperature_safe = max(temperature_K, 1.0d0)
             suction_derivative = (-lf * rho_ice / temperature_safe)
         else
             suction_derivative = 0.0d0
         end if
     end subroutine deriv_temp_gcc_seg
 
+    !> Calculate pressure derivative of suction for the segregation model.
+    !> Evaluates the density ratio component \( (\rho_i / \rho_w - 1) \).
     module subroutine deriv_pres_gcc_seg(self, state, suction_derivative)
         implicit none
         class(type_gcc_segregation), intent(in) :: self
@@ -295,17 +260,16 @@ contains
 
         call state%temperature%get(temperature)
 
-        ! Pressure derivative is nonzero only in the frozen state (zero when unfrozen since suction is fixed at 0)
         if (temperature <= Tf0) then
             call self%calc_rho_water(state, rho_water)
             call self%calc_rho_ice(state, rho_ice)
-            ! d(Suction)/dP = (rho_ice / rho_water - 1.0)
             suction_derivative = (rho_ice / rho_water - 1.0d0)
         else
             suction_derivative = 0.0d0
         end if
     end subroutine deriv_pres_gcc_seg
 
+    !> Calculate second derivative of suction w.r.t temperature for the segregation model.
     module subroutine deriv2_temp_gcc_seg(self, state, suction_derivative)
         implicit none
         class(type_gcc_segregation), intent(in) :: self
@@ -320,24 +284,16 @@ contains
         call self%shift_temperature_absolute(temperature, temperature_K)
         call self%calc_rho_ice(state, rho_ice)
 
-        if (.not. ieee_is_finite(temperature) .or. .not. ieee_is_finite(temperature_K) .or. &
-            .not. ieee_is_finite(rho_ice) .or. abs(rho_ice) > MAX_REASONABLE_DENSITY) then
-            suction_derivative = 0.0d0
-            return
-        end if
-
         if (temperature <= Tf0) then
-            if (.not. ieee_is_finite(temperature_K) .or. temperature_K <= 1.0d0) then
-                temperature_safe = 1.0d0
-            else
-                temperature_safe = temperature_K
-            end if
+            temperature_safe = max(temperature_K, 1.0d0)
             suction_derivative = (lf * rho_ice / (temperature_safe * temperature_safe))
         else
             suction_derivative = 0.0d0
         end if
     end subroutine deriv2_temp_gcc_seg
 
+    !> Calculate derivative of ice pressure w.r.t water pressure for the segregation model.
+    !> Assumes equilibrium state where the derivative depends on the density ratio.
     module subroutine deriv_pressure_ice_water_seg(self, state, deriv)
         implicit none
         class(type_gcc_segregation), intent(in) :: self
@@ -349,11 +305,9 @@ contains
 
         call state%temperature%get(temperature)
 
-        ! Nonzero only in frozen state (zero when unfrozen since suction is fixed at 0)
         if (temperature <= Tf0) then
             call self%calc_rho_water(state, rho_water)
             call self%calc_rho_ice(state, rho_ice)
-            ! dP_ice/dP_w = rho_ice / rho_water
             deriv = rho_ice / rho_water
         else
             deriv = 0.0d0
