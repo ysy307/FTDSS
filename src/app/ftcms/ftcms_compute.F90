@@ -32,7 +32,7 @@ contains
         class(type_ftcms), intent(inout) :: self
 
         integer(int32) :: i_node, i_elem, j
-        integer(int32) :: num_nodes, num_neighbors, material_id
+        integer(int32) :: num_nodes, num_neighbors
         integer(int32), pointer, contiguous :: element_list(:)
 
         ! Thread-local state variables for parallelization
@@ -64,7 +64,7 @@ contains
         !$OMP PARALLEL DEFAULT(NONE) &
         !$OMP SHARED(self, num_nodes, states) &
         !$OMP PRIVATE(i_node, element_list, num_neighbors, j, i_elem, &
-        !$OMP         elem_vol, material_id, elem_qw, elem_qi, elem_qa, elem_qv, &
+        !$OMP         elem_vol, elem_qw, elem_qi, elem_qa, elem_qv, &
         !$OMP         sum_vol, sum_qw_vol, sum_qi_vol, sum_qa_vol, sum_qv_vol, &
         !$OMP         tid)
 
@@ -98,7 +98,6 @@ contains
                     call self%domain%calc_measure(i_elem, elem_vol)
 
                     ! Update and retrieve state variables using thread-specific state
-                    call self%domain%get_material_id(i_elem, material_id)
                     call self%set_state(i_node, i_elem, states(tid))
 
                     ! Retrieve volumetric contents for each phase from the state

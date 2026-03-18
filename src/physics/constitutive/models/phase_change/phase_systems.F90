@@ -29,7 +29,7 @@ module models_phase_change_manager
         procedure, public :: update_water_phases
         procedure, public :: calc_latent_heat_fusion
         procedure, public :: calc_latent_heat_vaporization
-        procedure, public :: deriv_pressure_ice_water
+        ! procedure, public :: deriv_pressure_ice_water
         ! procedure, public :: update_phases_array ! Implement as needed
     end type type_phase_manager
 
@@ -133,14 +133,14 @@ contains
 
     end subroutine calc_latent_heat_vaporization
 
-    subroutine deriv_pressure_ice_water(self, state, deriv)
-        implicit none
-        class(type_phase_manager), intent(in) :: self
-        type(type_state), intent(in) :: state
-        real(real64), intent(inout) :: deriv
+    ! subroutine deriv_pressure_ice_water(self, state, deriv)
+    !     implicit none
+    !     class(type_phase_manager), intent(in) :: self
+    !     type(type_state), intent(in) :: state
+    !     real(real64), intent(inout) :: deriv
 
-        call self%fusion%deriv_pressure_ice_water(state, deriv)
+    !     call self%fusion%deriv_pressure_ice_water(state, deriv)
 
-    end subroutine deriv_pressure_ice_water
+    ! end subroutine deriv_pressure_ice_water
 
 end module models_phase_change_manager

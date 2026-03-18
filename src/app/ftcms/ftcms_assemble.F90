@@ -77,8 +77,8 @@ contains
                                                   local_F_T=local_F_T, local_F_H=local_F_H, &
                                                   coordinates=elem_coords, connectivity=p_connectivity)
 
-                    call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
-                                             local_F_T, local_F_H)
+                    call self%assemble_element_matrix(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
+                                                      local_F_T, local_F_H)
 
                     local_diag_sum = 0.0d0
                     local_matrix_vals => local_K_TT%get_val()
@@ -282,6 +282,52 @@ contains
         end if
 
     end subroutine assemble_local_ftcms
+
+    module subroutine assemble_element_matrix_ftcms(self, workspace, local_K_TT, local_K_TH, &
+                                                    local_K_HH, local_K_HT, local_F_T, local_F_H)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        type(type_assemble_workspace), intent(inout) :: workspace
+        type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
+        type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
+
+        integer(int32) :: i_gp
+        type(type_coordinate_dp) :: water_flux, vapor_flux
+        type(type_coordinate_dp), pointer :: grad_T, grad_P
+        type(type_coordinate_dp), target :: zero_grad
+
+        nullify (grad_T)
+        nullify (grad_P)
+        call zero_grad%set(0.0d0, 0.0d0, 0.0d0)
+
+        ! Evaluate phase composition at each integration point using local state history.
+        do i_gp = 1, workspace%num_fe_gauss
+            if (self%is_active_thermal()) then
+                call self%thermal%update_water_phases(workspace%material_id, workspace%state_gp(i_gp))
+            else if (self%is_active_hydraulic()) then
+                call self%hydraulic%update_water_phases(workspace%material_id, workspace%state_gp(i_gp))
+            end if
+
+            if (self%is_active_hydraulic()) then
+                call workspace%state_gp(i_gp)%grad_T%get(grad_T)
+                call workspace%state_gp(i_gp)%grad_P%get(grad_P)
+
+                if (.not. associated(grad_T)) grad_T => zero_grad
+                if (.not. associated(grad_P)) grad_P => zero_grad
+
+                call self%calc_water_flux(workspace%material_id, workspace%state_gp(i_gp), grad_T, grad_P, water_flux)
+                call self%calc_vapor_flux(workspace%material_id, workspace%state_gp(i_gp), grad_T, grad_P, vapor_flux)
+                call workspace%state_gp(i_gp)%set(water_flux=water_flux, vapor_flux=vapor_flux)
+
+                nullify (grad_T)
+                nullify (grad_P)
+            end if
+        end do
+
+        ! Capacity and coupling matrices are assembled from updated Gauss-point states.
+        call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, local_F_T, local_F_H)
+
+    end subroutine assemble_element_matrix_ftcms
 
     module subroutine assemble_destroy_ftcms(self, workspace, local_K_TT, local_K_TH, &
                                              local_K_HH, local_K_HT, local_F_T, local_F_H)

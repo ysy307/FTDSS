@@ -20,7 +20,7 @@ def run_and_log(cmd, log_file_obj):
         raise subprocess.CalledProcessError(p.returncode, cmd)
 
 def main():
-    parser = argparse.ArgumentParser(description="Build and Analyze FTDSS.")
+    parser = argparse.ArgumentParser(description="Build and Analyze FTCMS.")
     parser.add_argument("-t", "--target", default="main", help="Target test module")
     parser.add_argument("-c", "--compiler", default="intel", choices=["intel", "gnu", "nvidia"], help="Compiler toolchain")
     args = parser.parse_args()
@@ -35,7 +35,7 @@ def main():
     cc = compilers[args.compiler]["cc"]
     cxx = compilers[args.compiler]["cxx"]
 
-    log_dir = Path("/workspaces/FTDSS/log")
+    log_dir = Path("/workspaces/FTCMS/log")
     log_dir.mkdir(parents=True, exist_ok=True)
     log_file = log_dir / "compile.log"
     build_dir = f"CMakeBuild/{args.compiler}"

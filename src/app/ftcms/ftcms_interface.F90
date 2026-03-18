@@ -99,6 +99,7 @@ module app_ftcms
 
         procedure, public, pass(self) :: update_variables => update_variables_ftcms
         procedure, public, pass(self) :: assemble_local => assemble_local_ftcms
+        procedure, private, pass(self) :: assemble_element_matrix => assemble_element_matrix_ftcms
         procedure, public, pass(self) :: assemble => assemble_ftcms
         procedure, private, pass(self) :: assemble_initialize => assemble_initialize_ftcms
         procedure, private, pass(self) :: assemble_destroy => assemble_destroy_ftcms
@@ -271,6 +272,17 @@ module app_ftcms
             type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
 
         end subroutine assemble_local_ftcms
+
+        module subroutine assemble_element_matrix_ftcms(self, workspace, local_K_TT, local_K_TH, &
+                                                        local_K_HH, local_K_HT, local_F_T, local_F_H)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            type(type_assemble_workspace), intent(inout) :: workspace
+            type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
+            type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
+
+        end subroutine assemble_element_matrix_ftcms
+
         module subroutine assemble_initialize_ftcms(self, element_id, workspace, local_K_TT, local_K_TH, &
                                                     local_K_HH, local_K_HT, local_F_T, local_F_H, &
                                                     coordinates, connectivity)

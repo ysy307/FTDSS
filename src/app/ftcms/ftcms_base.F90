@@ -411,7 +411,7 @@ contains
         integer(int32) :: material_id
         integer(int32) :: bdf_order
         integer(int32) :: start_dof_thermal, start_dof_hydraulic
-        real(real64) :: temperature, pressure, porosity
+        real(real64) :: temperature, pressure, porosity, ice_content
         type(type_coordinate_dp) :: grad_T, grad_P
         real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
 
@@ -457,8 +457,10 @@ contains
 
         call self%porosity%get_current(node_id, porosity)
         call self%porosity%get_history(node_id, porosity_history)
+        call self%Qi%get_current(node_id, ice_content)
         call state%set(porosity=porosity, &
-                       porosity_history=porosity_history(1:bdf_order + 1))
+                   porosity_history=porosity_history(1:bdf_order + 1), &
+                   ice_content=ice_content)
 
         call state%temperature%get(temperature, temperature_set)
         call state%pressure%get(pressure, pressure_set)

@@ -149,7 +149,7 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: deriv
 
-        call self%phase_manager%deriv_pressure_ice_water(state, deriv)
+        call self%gcc%p%deriv_pressure_ice_water(state, deriv)
     end subroutine calc_pressure_ice_water_derivative
 
     subroutine calc_cryogenic_suction(self, state, suction)

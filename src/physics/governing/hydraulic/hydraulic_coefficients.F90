@@ -243,6 +243,7 @@ contains
         real(real64) :: Qw, Qi, Qv
         real(real64) :: rho_w, rho_i
         real(real64) :: Uj
+        real(real64) :: ice_content
         integer(int32) :: j, n
 
         nullify (temperature_history)
@@ -257,10 +258,12 @@ contains
 
         n = min(size(bdf_coeffs), size(temperature_history), size(pressure_history))
         call local_state%copy(state)
+        call state%ice_content%get(ice_content)
 
         do j = 1, n
             call local_state%temperature%set(temperature_history(j))
             call local_state%pressure%set(pressure_history(j))
+            call local_state%ice_content%set(ice_content)
 
             call self%update_water_phases(material_id, local_state)
 

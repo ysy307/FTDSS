@@ -171,6 +171,7 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: pressure_history
         real(real64), pointer, contiguous, dimension(:) :: porosity_history
         real(real64) :: Uj
+        real(real64) :: ice_content
         integer(int32) :: j, n_hist
 
         call state%get(temperature_history=temperature_history, &
@@ -181,12 +182,14 @@ contains
         if (.not. associated(temperature_history)) return
         if (.not. associated(pressure_history)) return
         if (.not. associated(porosity_history)) return
+        call state%ice_content%get(ice_content)
         n_hist = min(size(bdf_coeffs), size(temperature_history), size(pressure_history), size(porosity_history))
         do j = 1, n_hist
             ! Reconstruct state from history data and recalculate enthalpy
             call local_state%temperature%set(temperature_history(j))
             call local_state%pressure%set(pressure_history(j))
             call local_state%porosity%set(porosity_history(j))
+            call local_state%ice_content%set(ice_content)
             call self%update_water_phases(material_id, local_state)
             call self%calc_enthalpy_density(material_id, local_state, Uj)
 
@@ -229,6 +232,7 @@ contains
 
         ! Secant variables
         real(real64) :: C_TT_current, C_TT_old, dT
+        real(real64) :: ice_content
         type(type_state) :: temp_state
         integer(int32) :: use_scheme
 
@@ -270,6 +274,7 @@ contains
         has_rho_w = .false.
         drho_w_dT = 0.0d0
         drho_ice_dT = 0.0d0
+        call state%ice_content%get(ice_content)
 
         if (use_scheme == SCHEME_SECANT) then
             ! --- Secant Method (Average/Effective Heat Capacity) ---
@@ -290,6 +295,7 @@ contains
             call temp_state%temperature%set(temperature_history(2))
             call temp_state%pressure%set(pressure_history(2))
             call temp_state%porosity%set(porosity_history(2))
+            call temp_state%ice_content%set(ice_content)
             call self%update_water_phases(material_id, temp_state)
             call self%calc_enthalpy_density(material_id, temp_state, C_TT_old)
 

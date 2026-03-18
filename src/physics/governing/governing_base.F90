@@ -268,9 +268,11 @@ contains
 
         real(real64), pointer, contiguous, dimension(:) :: work_history_ptr
         real(real64) :: work_value
+        real(real64) :: ice_sum, ice_node_mean
 
         logical :: is_set
         integer(int32) :: history_len
+        integer(int32) :: ice_count
 
         nullify (gp)
         nullify (work_history_ptr)
@@ -382,6 +384,28 @@ contains
                 call self%fe%lerp(gp(j), self%work_node(k, 1:self%num_fe_nodes), self%work_bdf_buffer(k))
             end do
             call self%state_gp(j)%porosity_history%set(self%work_bdf_buffer)
+        end do
+
+        ! 4. Ice content history carrier (element-mean from nodal Qi)
+        ice_sum = 0.0d0
+        ice_count = 0
+        do i = 1, self%num_fe_nodes
+            is_set = .false.
+            call self%state(i)%ice_content%get(work_value, is_set=is_set)
+            if (is_set) then
+                ice_sum = ice_sum + work_value
+                ice_count = ice_count + 1
+            end if
+        end do
+
+        if (ice_count > 0) then
+            ice_node_mean = ice_sum / real(ice_count, real64)
+        else
+            ice_node_mean = 0.0d0
+        end if
+
+        do i = 1, self%num_fe_gauss
+            call self%state_gp(i)%ice_content%set(ice_node_mean)
         end do
 
         nullify (gp)
