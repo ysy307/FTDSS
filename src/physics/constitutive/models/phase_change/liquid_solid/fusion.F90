@@ -3,9 +3,9 @@ module models_phase_change_fusion
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state
     use :: constitutive_constants, only: &
-        lf => latent_heat_fusion_water_0c, &
-        T_to_K => celsius_to_kelvin, &
-        Tf0 => water_freezing_point_at_standard_atmospheric_pressure
+        Tf0 => water_freezing_point_at_standard_atmospheric_pressure, &
+        SUCTION_BLEND_EPS => suction_blend_eps, &
+        FREEZING_SMOOTH_BAND => freezing_smooth_band
     use :: physics_constitutive_base, only:abst_constitutive
     use :: models_wrf, only:abst_wrf
     use :: models_phase_change_gcc, only:abst_gcc
@@ -13,12 +13,6 @@ module models_phase_change_fusion
     private
 
     public :: type_fusion
-
-    ! Smooth blending scale [Pa] for effective suction max(psi_cap, psi_cryo).
-    ! A small positive epsilon avoids non-differentiable switching at psi_cap=psi_cryo.
-    real(real64), parameter :: SUCTION_BLEND_EPS = 1.0d4
-    real(real64), parameter :: FREEZING_SMOOTH_BAND = 0.25d0
-    real(real64), parameter :: DPW_DT_LIMIT = 1.0d8
 
     !>
     !> @brief Model for fusion (melting/freezing) physics.
@@ -76,19 +70,6 @@ contains
             dactivation_dT = -0.5d0*sech2/FREEZING_SMOOTH_BAND
         end if
     end subroutine compute_freezing_activation
-
-    pure subroutine bound_symmetric(value_in, bound, value_out)
-        implicit none
-        real(real64), intent(in) :: value_in, bound
-        real(real64), intent(inout) :: value_out
-
-        if (bound <= 0.0d0) then
-            value_out = value_in
-            return
-        end if
-
-        value_out = value_in / (1.0d0 + abs(value_in)/bound)
-    end subroutine bound_symmetric
 
     !>
     !> @brief Initialize fusion model.
@@ -164,12 +145,10 @@ contains
         real(real64), intent(inout) :: dice_dP
         real(real64), intent(inout) :: dice_dT
 
-        real(real64) :: pressure, temperature, temperature_K
+        real(real64) :: pressure, temperature
         real(real64) :: psi_cap, psi_cryo, psi_eff
         real(real64) :: d_psi_cryo_dP, d_psi_cryo_dT
         real(real64) :: d_theta_liquid_dPress
-        real(real64) :: dPi_dT
-        real(real64) :: dPw_dP, dPw_dT, dPw_dT_bounded
         real(real64) :: freezing_activation, d_freezing_activation_dT
         real(real64) :: rho_w, rho_i, density_ratio
 
@@ -193,24 +172,14 @@ contains
         call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
         call self%wrf%deriv(-psi_eff, d_theta_liquid_dPress)
 
-        temperature_K = max(1.0d0, temperature + T_to_K)
-
-        ! Pressure state variable is water pressure itself.
-        dPw_dP = 1.0d0
-
-        ! GCC identity in this codebase: psi_cryo = P_w - P_i.
-        dPi_dT = -d_psi_cryo_dT
-
-        ! Chain-rule mapping for the capacity formulation.
-        dPw_dT = density_ratio * dPi_dT + rho_w*lf/temperature_K
-        call bound_symmetric(dPw_dT, DPW_DT_LIMIT, dPw_dT_bounded)
-
         call compute_freezing_activation(temperature, freezing_activation, d_freezing_activation_dT)
 
         if (psi_cryo > 0.0d0) then
-            dice_dP = freezing_activation * (-density_ratio * d_theta_liquid_dPress * dPw_dP)
-            dice_dT = freezing_activation * (-density_ratio * d_theta_liquid_dPress * dPw_dT_bounded) + &
-                      d_freezing_activation_dT * (density_ratio * d_theta_liquid_dPress * psi_cryo)
+            ! d(theta_i)/dP = f * (rho_w/rho_i) * C * d(psi_cryo)/dP
+            dice_dP = freezing_activation * density_ratio * d_theta_liquid_dPress * d_psi_cryo_dP
+            ! d(theta_i)/dT = f * (rho_w/rho_i) * C * d(psi_cryo)/dT + df/dT * (rho_w/rho_i) * C * psi_cryo
+            dice_dT = freezing_activation * density_ratio * d_theta_liquid_dPress * d_psi_cryo_dT + &
+                      d_freezing_activation_dT * density_ratio * d_theta_liquid_dPress * psi_cryo
         else
             dice_dP = 0.0d0
             dice_dT = 0.0d0
