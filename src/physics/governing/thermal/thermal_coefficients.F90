@@ -357,6 +357,58 @@ contains
 
     end subroutine compute_mass_term_thermal
 
+    !> Calculate pressure coupling coefficient C_TH = dU/dP
+    module subroutine compute_coupling_mass_term_thermal(self, material_id, state, C_TH)
+        implicit none
+        class(type_thermal), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: C_TH
+
+        real(real64) :: temperature
+        real(real64) :: rho_w, rho_i
+        real(real64) :: c_w, c_i, c_v
+        real(real64) :: Lf, Lv
+        real(real64) :: dQw_dP, dQi_dP, dQv_dP
+        logical :: has_rho_w
+
+        call state%temperature%get(temperature)
+        call state%dQw_dP%get(dQw_dP)
+        call state%dQi_dP%get(dQi_dP)
+        call state%dQv_dP%get(dQv_dP)
+
+        C_TH = 0.0d0
+        has_rho_w = .false.
+
+        ! Water phase contribution
+        if (abs(dQw_dP) > 0.0d0) then
+            call self%physics%calc_density_water(state, rho_w)
+            call self%physics%calc_specific_heat_water(state, c_w)
+            has_rho_w = .true.
+            C_TH = C_TH + rho_w * c_w * temperature * dQw_dP
+        end if
+
+        ! Ice phase contribution (includes latent heat of fusion)
+        if (abs(dQi_dP) > 0.0d0) then
+            call self%physics%calc_density_ice(state, rho_i)
+            call self%physics%calc_specific_heat_ice(state, c_i)
+            call self%physics%calc_latent_heat_fusion(material_id, state, Lf)
+            C_TH = C_TH + (rho_i * c_i * temperature - Lf * rho_i) * dQi_dP
+        end if
+
+        ! Vapor phase contribution (includes latent heat of vaporization)
+        if (abs(dQv_dP) > 0.0d0) then
+            if (.not. has_rho_w) then
+                call self%physics%calc_density_water(state, rho_w)
+                has_rho_w = .true.
+            end if
+            call self%physics%calc_specific_heat_vapor(state, c_v)
+            call self%physics%calc_latent_heat_vaporization(material_id, state, Lv)
+            C_TH = C_TH + rho_w * (c_v * temperature + Lv) * dQv_dP
+        end if
+
+    end subroutine compute_coupling_mass_term_thermal
+
     ! ==========================================================================
     ! Flux Terms (Diffusion / Advection / Latent Source)
     ! ==========================================================================

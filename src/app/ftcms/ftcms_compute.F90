@@ -50,6 +50,12 @@ contains
         ! OpenMP variables
         integer(int32) :: num_threads, tid
 
+        ! Post-convergence ice content update variables
+        real(real64), pointer, contiguous :: Qw_prev(:), Qi_prev(:)
+        real(real64) :: theta_w_new, theta_w_old, theta_i_old, theta_i_new
+        real(real64) :: porosity_node, d_theta_w, delta_qi
+        real(real64) :: rho_w_node, rho_i_node
+
         call self%control%profiler_start(PROFILER_TYPES%SETUP)
 
         call self%domain%get_num_nodes(num_nodes)
@@ -131,6 +137,40 @@ contains
         !$OMP END DO
 
         !$OMP END PARALLEL
+
+        ! Post-convergence ice content update from mass conservation.
+        ! shift() has already moved t_n Qw/Qi to previous before this subroutine is called.
+        nullify (Qw_prev, Qi_prev)
+        call self%Qw%get_previous(Qw_prev)
+        call self%Qi%get_previous(Qi_prev)
+
+        if (associated(Qw_prev) .and. associated(Qi_prev)) then
+            do i_node = 1, num_nodes
+                call self%Qw%get_current(i_node, theta_w_new)
+                theta_w_old = Qw_prev(i_node)
+                theta_i_old = Qi_prev(i_node)
+                call self%porosity%get_current(i_node, porosity_node)
+
+                d_theta_w = theta_w_new - theta_w_old
+
+                if (theta_w_new + theta_i_old >= porosity_node) then
+                    ! Saturated: volume constraint; no density ratio correction
+                    delta_qi = -d_theta_w
+                else
+                    ! Unsaturated: apply density ratio rho_w / rho_i
+                    call states(1)%water_content%set(theta_w_new)
+                    call states(1)%ice_content%set(theta_i_old)
+                    call self%thermal%calc_density_water(states(1), rho_w_node)
+                    call self%thermal%calc_density_ice(states(1), rho_i_node)
+                    delta_qi = -(rho_w_node / max(rho_i_node, 1.0d0)) * d_theta_w
+                end if
+
+                theta_i_new = max(0.0d0, min(porosity_node, theta_i_old + delta_qi))
+                call self%Qi%set_current(i_node, theta_i_new)
+            end do
+        end if
+
+        nullify (Qw_prev, Qi_prev)
 
         if (allocated(states)) deallocate (states)
 
