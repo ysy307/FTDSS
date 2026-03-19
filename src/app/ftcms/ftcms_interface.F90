@@ -11,6 +11,7 @@ module app_ftcms
 
     use :: module_control, only:type_control
     use :: module_domain
+    ! use :: module_boundary, only:
     use :: module_initial, only:type_ic_manager
     use :: module_system, only:type_jacobian_matrix, type_residual_vector
     use :: module_constitutive, only:g => gravity_acceleration
@@ -45,7 +46,6 @@ module app_ftcms
 
         integer(int32) :: thermal_start_dof = 0
         integer(int32) :: hydraulic_start_dof = 0
-        logical :: hydraulic_has_dirichlet_bc = .false.
 
         type(type_control) :: control
         type(type_output_manager) :: output
@@ -99,7 +99,6 @@ module app_ftcms
 
         procedure, public, pass(self) :: update_variables => update_variables_ftcms
         procedure, public, pass(self) :: assemble_local => assemble_local_ftcms
-        procedure, private, pass(self) :: assemble_element_matrix => assemble_element_matrix_ftcms
         procedure, public, pass(self) :: assemble => assemble_ftcms
         procedure, private, pass(self) :: assemble_initialize => assemble_initialize_ftcms
         procedure, private, pass(self) :: assemble_destroy => assemble_destroy_ftcms
@@ -272,17 +271,6 @@ module app_ftcms
             type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
 
         end subroutine assemble_local_ftcms
-
-        module subroutine assemble_element_matrix_ftcms(self, workspace, local_K_TT, local_K_TH, &
-                                                        local_K_HH, local_K_HT, local_F_T, local_F_H)
-            implicit none
-            class(type_ftcms), intent(inout) :: self
-            type(type_assemble_workspace), intent(inout) :: workspace
-            type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
-            type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
-
-        end subroutine assemble_element_matrix_ftcms
-
         module subroutine assemble_initialize_ftcms(self, element_id, workspace, local_K_TT, local_K_TH, &
                                                     local_K_HH, local_K_HT, local_F_T, local_F_H, &
                                                     coordinates, connectivity)

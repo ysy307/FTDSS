@@ -387,7 +387,6 @@ contains
         integer(int32), intent(in) :: iter_count
         real(real64), intent(in) :: next_output_time
         real(real64) :: next_dt
-        real(real64) :: fallback_factor
 
         if (success) then
             ! Step converged: advance time and predict next step
@@ -401,21 +400,6 @@ contains
         else
             ! Step failed: shrink dt and reset BDF order to 1 for stability
             call self%ats%calc_retry_dt(self%dt, next_dt)
-
-            ! If configured dt_min blocks reduction (next_dt ~= current dt),
-            ! force an additional generic shrink to keep retry dynamics effective.
-            if (next_dt >= self%dt - EPS_TIME) then
-                fallback_factor = self%ats%scale_retry
-                if (fallback_factor >= 1.0d0 - EPS_TIME) fallback_factor = 0.5d0
-                if (fallback_factor <= EPS_TIME) fallback_factor = 0.5d0
-                next_dt = self%dt * fallback_factor
-            end if
-
-            ! Never violate configured ATS bounds on retry.
-            next_dt = max(self%ats%dt_min, min(next_dt, self%ats%dt_max))
-
-            write (*, '(A,ES13.5,A,ES13.5)') '   [ATS] retry dt: old=', self%dt, ', new=', next_dt
-
             self%dt = next_dt
             self%current_bdf_order = 1
         end if
@@ -441,16 +425,8 @@ contains
             ! (Adjustment might have been insufficient in the previous step; decide to force alignment or error.)
             ! Determine policy: issue warning and force alignment, or ignore if too small.
 
-            if (time_to_output < self%ats%dt_min) then
-                write (*, '(A,ES13.5,A,ES13.5)') '   [ATS] output-sync limited by dt_min: target=', &
-                    time_to_output, ', using dt_min=', self%ats%dt_min
-                self%dt = self%ats%dt_min
-            else
-                self%dt = time_to_output
-            end if
+            self%dt = time_to_output
         end if
-
-        self%dt = max(self%ats%dt_min, min(self%dt, self%ats%dt_max))
     end subroutine sync_with_output
 
     !> Check if the time control has been initialized.

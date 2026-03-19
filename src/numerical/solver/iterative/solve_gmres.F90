@@ -22,9 +22,6 @@ contains
         self%tolerance = solver_settings%tolerance
         self%max_iterations = solver_settings%max_iterations
         self%m_restart = solver_settings%m_restart
-        self%projection_enabled = solver_settings%projection_enabled
-        self%projection_offset = solver_settings%projection_offset
-        self%projection_stride = solver_settings%projection_stride
 
         ! Check default restart value
         if (self%m_restart <= 0) self%m_restart = 30
@@ -88,12 +85,7 @@ contains
         type(type_vector_dp), intent(inout) :: x
 
         real(real64) :: beta, w_norm, temp_val, resid
-        real(real64) :: resid_prev
         integer(int32) :: i, k, ierr, iter_global, iter
-        integer(int32) :: stagnant_count
-        real(real64), parameter :: STAGNATION_RATIO = 0.9999d0
-        integer(int32), parameter :: STAGNATION_PATIENCE = 3000
-        real(real64), parameter :: ACCEPT_REL_RESIDUAL = 0.97d0
         logical :: converged
 
         ! Initialize
@@ -101,8 +93,6 @@ contains
         self%current_iteration = 0
         self%status = SOLVER_STATUS%SUCCESS%ID
         converged = .false.
-        resid_prev = huge(1.0d0)
-        stagnant_count = 0
 
         ! Clear history
         call self%residual_history%zero()
@@ -122,7 +112,6 @@ contains
             call self%r%zero()
             call matvec(A, x, self%r, ierr)
             call vector_axpyz(-1.0d0, self%r, b, self%r)
-            call project_component_mean_zero(self%r, self%projection_enabled, self%projection_offset, self%projection_stride)
 
             ! beta = ||r0||_2
             beta = vector_norm2(self%r)
@@ -166,11 +155,9 @@ contains
                 ! --------------------------------------------------
                 ! 1. Preconditioning: z = M^-1 * v(iter)
                 call self%pc%apply(self%v(iter), self%z)
-                call project_component_mean_zero(self%z, self%projection_enabled, self%projection_offset, self%projection_stride)
 
                 ! 2. Matrix-Vector Product: w = A * z
                 call matvec(A, self%z, self%w, ierr)
-                call project_component_mean_zero(self%w, self%projection_enabled, self%projection_offset, self%projection_stride)
 
                 ! --------------------------------------------------
                 ! Step 6-9: Modified Gram-Schmidt (MGS)
@@ -245,19 +232,6 @@ contains
                     exit arnoldi_loop
                 end if
 
-                ! Generic stagnation guard: break when residual hardly improves
-                ! over many Krylov iterations to prevent wasted work.
-                if (resid >= STAGNATION_RATIO * resid_prev) then
-                    stagnant_count = stagnant_count + 1
-                else
-                    stagnant_count = 0
-                end if
-                resid_prev = resid
-                if (stagnant_count >= STAGNATION_PATIENCE) then
-                    self%status = SOLVER_STATUS%MAXITER%ID
-                    exit arnoldi_loop
-                end if
-
                 if (iter_global >= self%max_iterations) then
                     self%status = SOLVER_STATUS%MAXITER%ID
                     exit arnoldi_loop
@@ -280,11 +254,9 @@ contains
 
             ! 3. Map to preconditioned space: z = M^-1 * x_update
             call self%pc%apply(self%x_update, self%z)
-            call project_component_mean_zero(self%z, self%projection_enabled, self%projection_offset, self%projection_stride)
 
             ! 4. Update true solution: x = x + z
             call vector_axpy(1.0d0, self%z, x)
-            call project_component_mean_zero(x, self%projection_enabled, self%projection_offset, self%projection_stride)
 
             ! ======================================================
             ! Restart Check
@@ -295,61 +267,16 @@ contains
             end if
 
             if (self%status == SOLVER_STATUS%MAXITER%ID) then
-                if (beta > self%tolerance .and. resid <= ACCEPT_REL_RESIDUAL*beta) then
-                    self%status = SOLVER_STATUS%SUCCESS%ID
-                    write (*, '(A,ES13.5,A,ES13.5,A,F7.4)') '   [GMRES] accepting inexact solve: beta0=', beta, &
-                        ' resid=', resid, ' ratio=', resid/max(beta, tiny(1.0d0))
-                    exit restart_loop
-                end if
                 write (*, '(A,ES13.5,A,ES13.5,A,I0,A,I0)') &
                     '   [GMRES] beta0=', beta, &
                     ' resid=', resid, ' iters=', iter_global, &
                     ' maxiter=', self%max_iterations
-                if (stagnant_count >= STAGNATION_PATIENCE) then
-                    write (*, '(A,I0,A,ES10.3)') '   [GMRES] stagnation detected: patience=', &
-                        STAGNATION_PATIENCE, ', ratio=', STAGNATION_RATIO
-                end if
                 exit restart_loop
             end if
 
         end do restart_loop
 
     end subroutine solve_type_solver_gmres
-
-    subroutine project_component_mean_zero(vec, enabled, offset, stride)
-        implicit none
-        type(type_vector_dp), intent(inout) :: vec
-        logical, intent(in) :: enabled
-        integer(int32), intent(in) :: offset, stride
-
-        real(real64), pointer :: data(:)
-        real(real64) :: mean_val
-        integer(int32) :: i, count, first_idx
-
-        if (.not. enabled) return
-        if (stride <= 0 .or. offset <= 0) return
-
-        data => vec%get_data()
-        if (.not. associated(data)) return
-
-        first_idx = offset
-        if (first_idx > size(data)) return
-
-        mean_val = 0.0d0
-        count = 0
-        do i = first_idx, size(data), stride
-            mean_val = mean_val + data(i)
-            count = count + 1
-        end do
-        if (count <= 0) return
-
-        mean_val = mean_val / real(count, real64)
-        do i = first_idx, size(data), stride
-            data(i) = data(i) - mean_val
-        end do
-
-        nullify (data)
-    end subroutine project_component_mean_zero
 
     !> Finalize the GMRES solver instance and release memory.
     module subroutine destroy_type_solver_gmres(self)

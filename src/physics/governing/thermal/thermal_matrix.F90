@@ -33,17 +33,14 @@ contains
         integer(int32) :: ierr
         real(real64) :: bdf0
         real(real64), pointer :: K_TT_val(:, :)
-        real(real64), pointer :: K_TH_val(:, :)
         real(real64), pointer :: F_T_val(:)
         logical :: has_advection
 
         bdf0 = workspace%bdf_coeffs(1)
         nullify (K_TT_val)
-        nullify (K_TH_val)
         nullify (F_T_val)
 
         if (present(K_TT)) K_TT_val => K_TT%get_val()
-        if (present(K_TH)) K_TH_val => K_TH%get_val()
         if (present(F_T)) F_T_val => F_T%get_data()
 
         workspace%work_C(:) = 0.0d0
@@ -67,6 +64,28 @@ contains
             call self%compute_advective_term(workspace%material_id, workspace%state_gp(i), &
                                              workspace%work_V(:, i))
             if (any(abs(workspace%work_V(:, i)) > 1.0d-30)) has_advection = .true.
+
+            if (.not. ieee_is_finite(workspace%work_C(i)) .or. abs(workspace%work_C(i)) > 1.0d120) then
+                write (*, '(A,I0,A,I0,A,ES13.5)') 'Error: Thermal mass term exploded. mat=', &
+                    workspace%material_id, ', gp=', i, ', C=', workspace%work_C(i)
+                error stop 'Thermal mass term overflow in local assembly.'
+            end if
+
+            if (.not. ieee_is_finite(workspace%work_d_dt(i)) .or. abs(workspace%work_d_dt(i)) > 1.0d120) then
+                write (*, '(A,I0,A,I0,A,ES13.5)') 'Error: Thermal transient term exploded. mat=', &
+                    workspace%material_id, ', gp=', i, ', dUdt=', workspace%work_d_dt(i)
+                error stop 'Thermal transient overflow in local assembly.'
+            end if
+
+            if (any(.not. ieee_is_finite(workspace%work_D(:, :, i))) .or. any(abs(workspace%work_D(:, :, i)) > 1.0d120)) then
+                write (*, '(A,I0,A,I0)') 'Error: Thermal diffusion tensor exploded. mat=', workspace%material_id, ', gp=', i
+                error stop 'Thermal diffusion overflow in local assembly.'
+            end if
+
+            if (any(.not. ieee_is_finite(workspace%work_V(:, i))) .or. any(abs(workspace%work_V(:, i)) > 1.0d120)) then
+                write (*, '(A,I0,A,I0)') 'Error: Thermal advection term exploded. mat=', workspace%material_id, ', gp=', i
+                error stop 'Thermal advection overflow in local assembly.'
+            end if
         end do
 
         ! Mass term -> K_TT
@@ -117,20 +136,6 @@ contains
             end if
         end if
 
-        ! Pressure coupling mass term -> K_TH
-        if (associated(K_TH_val)) then
-            workspace%work_C(:) = 0.0d0
-            do i = 1, workspace%num_fe_gauss
-                call self%compute_coupling_mass_term(workspace%material_id, &
-                                                     workspace%state_gp(i), &
-                                                     workspace%work_C(i))
-            end do
-            call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
-            K_TH_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) = &
-                K_TH_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) + &
-                bdf0 * workspace%work_matrix(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes)
-        end if
-
     end subroutine assemble_local_newton_thermal
 
     module subroutine assemble_local_picard_thermal(self, control, workspace, K_TT, K_TH, F_T)
@@ -146,7 +151,6 @@ contains
         integer(int32) :: ierr
         real(real64) :: val_T, bdf0
         real(real64), pointer :: K_TT_val(:, :)
-        real(real64), pointer :: K_TH_val(:, :)
         real(real64), pointer :: F_T_val(:)
 
         real(real64), allocatable :: local_vec_transient(:)
@@ -173,11 +177,9 @@ contains
 
         bdf0 = workspace%bdf_coeffs(1)
         nullify (K_TT_val)
-        nullify (K_TH_val)
         nullify (F_T_val)
 
         if (present(K_TT)) K_TT_val => K_TT%get_val()
-        if (present(K_TH)) K_TH_val => K_TH%get_val()
         if (present(F_T)) F_T_val => F_T%get_data()
 
         do i = 1, workspace%num_fe_gauss
@@ -235,20 +237,6 @@ contains
         if (allocated(local_vec_transient)) deallocate (local_vec_transient)
         if (allocated(local_vec_diff_flux)) deallocate (local_vec_diff_flux)
         if (allocated(local_vec_adv_flux)) deallocate (local_vec_adv_flux)
-
-        ! Pressure coupling mass term -> K_TH
-        if (associated(K_TH_val)) then
-            workspace%work_C(:) = 0.0d0
-            do i = 1, workspace%num_fe_gauss
-                call self%compute_coupling_mass_term(workspace%material_id, &
-                                                     workspace%state_gp(i), &
-                                                     workspace%work_C(i))
-            end do
-            call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
-            K_TH_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) = &
-                K_TH_val(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes) + &
-                bdf0 * workspace%work_matrix(1:workspace%num_fe_nodes, 1:workspace%num_fe_nodes)
-        end if
 
     end subroutine assemble_local_picard_thermal
 

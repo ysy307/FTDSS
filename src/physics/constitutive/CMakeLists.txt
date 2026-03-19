@@ -63,8 +63,7 @@ target_sources(SOLVER_CONSTITUTIVE PRIVATE
     models/phase_change/liquid_solid/gcc_interface.F90
     models/phase_change/liquid_solid/gcc_base.F90
     models/phase_change/liquid_solid/fusion.F90
-    models/phase_change/liquid_vapor/vaporization_interface.F90
-    models/phase_change/liquid_vapor/vaporization_base.F90
+    models/phase_change/liquid_vapor/vaporization.F90
     models/phase_change/phase_systems.F90
 
     models/models_manager.F90

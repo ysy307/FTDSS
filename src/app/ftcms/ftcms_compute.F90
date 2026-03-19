@@ -32,7 +32,7 @@ contains
         class(type_ftcms), intent(inout) :: self
 
         integer(int32) :: i_node, i_elem, j
-        integer(int32) :: num_nodes, num_neighbors
+        integer(int32) :: num_nodes, num_neighbors, material_id
         integer(int32), pointer, contiguous :: element_list(:)
 
         ! Thread-local state variables for parallelization
@@ -50,12 +50,6 @@ contains
         ! OpenMP variables
         integer(int32) :: num_threads, tid
 
-        ! Post-convergence ice content update variables
-        real(real64), pointer, contiguous :: Qw_prev(:), Qi_prev(:)
-        real(real64) :: theta_w_new, theta_w_old, theta_i_old, theta_i_new
-        real(real64) :: porosity_node, d_theta_w, delta_qi
-        real(real64) :: rho_w_node, rho_i_node
-
         call self%control%profiler_start(PROFILER_TYPES%SETUP)
 
         call self%domain%get_num_nodes(num_nodes)
@@ -70,7 +64,7 @@ contains
         !$OMP PARALLEL DEFAULT(NONE) &
         !$OMP SHARED(self, num_nodes, states) &
         !$OMP PRIVATE(i_node, element_list, num_neighbors, j, i_elem, &
-        !$OMP         elem_vol, elem_qw, elem_qi, elem_qa, elem_qv, &
+        !$OMP         elem_vol, material_id, elem_qw, elem_qi, elem_qa, elem_qv, &
         !$OMP         sum_vol, sum_qw_vol, sum_qi_vol, sum_qa_vol, sum_qv_vol, &
         !$OMP         tid)
 
@@ -104,6 +98,7 @@ contains
                     call self%domain%calc_measure(i_elem, elem_vol)
 
                     ! Update and retrieve state variables using thread-specific state
+                    call self%domain%get_material_id(i_elem, material_id)
                     call self%set_state(i_node, i_elem, states(tid))
 
                     ! Retrieve volumetric contents for each phase from the state
@@ -138,40 +133,6 @@ contains
 
         !$OMP END PARALLEL
 
-        ! Post-convergence ice content update from mass conservation.
-        ! shift() has already moved t_n Qw/Qi to previous before this subroutine is called.
-        nullify (Qw_prev, Qi_prev)
-        call self%Qw%get_previous(Qw_prev)
-        call self%Qi%get_previous(Qi_prev)
-
-        if (associated(Qw_prev) .and. associated(Qi_prev)) then
-            do i_node = 1, num_nodes
-                call self%Qw%get_current(i_node, theta_w_new)
-                theta_w_old = Qw_prev(i_node)
-                theta_i_old = Qi_prev(i_node)
-                call self%porosity%get_current(i_node, porosity_node)
-
-                d_theta_w = theta_w_new - theta_w_old
-
-                if (theta_w_new + theta_i_old >= porosity_node) then
-                    ! Saturated: volume constraint; no density ratio correction
-                    delta_qi = -d_theta_w
-                else
-                    ! Unsaturated: apply density ratio rho_w / rho_i
-                    call states(1)%water_content%set(theta_w_new)
-                    call states(1)%ice_content%set(theta_i_old)
-                    call self%thermal%calc_density_water(states(1), rho_w_node)
-                    call self%thermal%calc_density_ice(states(1), rho_i_node)
-                    delta_qi = -(rho_w_node / max(rho_i_node, 1.0d0)) * d_theta_w
-                end if
-
-                theta_i_new = max(0.0d0, min(porosity_node, theta_i_old + delta_qi))
-                call self%Qi%set_current(i_node, theta_i_new)
-            end do
-        end if
-
-        nullify (Qw_prev, Qi_prev)
-
         if (allocated(states)) deallocate (states)
 
         call self%control%profiler_stop(PROFILER_TYPES%SETUP)
@@ -204,27 +165,13 @@ contains
         type(type_vector_dp), pointer :: du_ptr => null()
         real(real64), pointer :: f_data(:) => null()
         real(real64), pointer :: du_data(:) => null()
-        type(type_vector_dp) :: scale_vec
-        real(real64), pointer :: scale_data(:) => null()
-        real(real64) :: tt_diag_sum, hh_diag_sum
-        real(real64) :: tt_rhs_sum, hh_rhs_sum
-        real(real64) :: hydraulic_scale
-        real(real64) :: rhs_mean_h
-        real(real64) :: retry_diag
-        real(real64) :: retry_scale, hh_diag_max
-        integer(int32) :: num_total_dofs, num_dofs_per_node
-        integer(int32) :: thermal_dof, hydraulic_dof
-        integer(int32) :: i, local_dof, h_count, num_nodes, retry_iter
-        real(real64), parameter :: diag_eps = 1.0d-30
-        real(real64), parameter :: scale_cap = 1.0d6
-        real(real64), parameter :: retry_diag_factor = 1.0d-1
-        real(real64), parameter :: retry_diag_min = 1.0d-2
-        integer(int32), parameter :: max_retry_iters = 3
-        logical :: do_hydraulic
-        logical :: apply_global_scaling
-        logical :: retried_with_damping
-        logical, save :: printed_scale_warning = .false.
-        logical, save :: first_scale_report = .true.
+        real(real64) :: rhs_norm
+        type(type_vector_dp) :: diag_vec
+        real(real64), pointer :: diag_data(:) => null()
+        integer(int32) :: num_total_dofs
+        integer(int32) :: ierr
+        real(real64) :: diag_min, diag_max, diag_ratio
+        integer(int32) :: i, n_neg
 
         call self%control%profiler_start(PROFILER_TYPES%SOLVE)
 
@@ -246,149 +193,90 @@ contains
             du_data => du_ptr%get_data()
         end if
 
+        rhs_norm = vector_norm2(F_ptr)
+        write (*, '(A,ES13.5)') '   [SOLVE] ||F||2 = ', rhs_norm
+        if (rhs_norm <= tiny(1.0d0)) then
+            write (*, '(A,ES13.5)') 'Warning: RHS norm is near zero before linear solve. ||F||2=', rhs_norm
+        end if
+
+        ! ------------------------------------------------------------------
+        ! Symmetric diagonal scaling: D^{-1/2} K D^{-1/2} * (D^{1/2} du) = D^{-1/2} F
+        ! This normalizes the diagonal to +-1, dramatically improving condition number
+        ! ------------------------------------------------------------------
         call self%domain%get_total_dofs(num_total_dofs)
-        num_dofs_per_node = self%K%get_num_dofs_per_node()
-        call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, thermal_dof)
-        do_hydraulic = self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)
-        if (do_hydraulic) then
-            call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
-        else
-            hydraulic_dof = -1
-        end if
-        apply_global_scaling = .false.
-        retried_with_damping = .false.
+        call diag_vec%initialize(num_total_dofs)
+        call diag_vec%zero()
+        ierr = 0
 
-        if (do_hydraulic .and. (.not. self%hydraulic_has_dirichlet_bc) .and. associated(f_data)) then
-            rhs_mean_h = 0.0d0
-            h_count = 0
+        ! Extract diagonal and compute scaling factors
+        call K_ptr%get_diagonal(diag_vec)
+        diag_data => diag_vec%get_data()
+        if (associated(diag_data)) then
+            diag_min = huge(1.0d0)
+            diag_max = 0.0d0
+            n_neg = 0
+            do i = 1, size(diag_data)
+                if (abs(diag_data(i)) > tiny(1.0d0)) then
+                    diag_min = min(diag_min, abs(diag_data(i)))
+                    diag_max = max(diag_max, abs(diag_data(i)))
+                end if
+                if (diag_data(i) < -tiny(1.0d0)) n_neg = n_neg + 1
+            end do
+            diag_ratio = diag_max / max(diag_min, tiny(1.0d0))
+            write (*, '(A,I0,A,I0,A,I0)') &
+                '   [SCALE] ndof=', size(diag_data), &
+                ' n_zero=', count(abs(diag_data) < tiny(1.0d0)), &
+                ' n_neg=', n_neg
+            write (*, '(A,ES10.3,A,ES10.3,A,ES10.3)') &
+                '   [SCALE] diag_min=', diag_min, &
+                ' diag_max=', diag_max, ' ratio=', diag_ratio
+
+            ! Compute scaling vector: d(i) = 1/sqrt(|diag(i)|)
+            ! Guard against near-zero diagonals
+            do i = 1, size(diag_data)
+                if (abs(diag_data(i)) < epsilon(1.0d0)) then
+                    diag_data(i) = 1.0d0
+                else
+                    diag_data(i) = 1.0d0 / sqrt(abs(diag_data(i)))
+                end if
+            end do
+
+            ! Scale matrix: K_s = D^{-1/2} K D^{-1/2}
+            call K_ptr%scale(MATRIX_OPS%SCALE_SYMM_DIAG, diag_vec)
+
+            ! Scale RHS: F_s = D^{-1/2} F
             do i = 1, size(f_data)
-                local_dof = mod(i - 1, num_dofs_per_node) + 1
-                if (local_dof == hydraulic_dof) then
-                    rhs_mean_h = rhs_mean_h + f_data(i)
-                    h_count = h_count + 1
-                end if
+                f_data(i) = f_data(i) * diag_data(i)
             end do
-            if (h_count > 0) then
-                rhs_mean_h = rhs_mean_h / real(h_count, real64)
-                do i = 1, size(f_data)
-                    local_dof = mod(i - 1, num_dofs_per_node) + 1
-                    if (local_dof == hydraulic_dof) then
-                        f_data(i) = f_data(i) - rhs_mean_h
-                    end if
-                end do
-            end if
         end if
 
-        call scale_vec%initialize(num_total_dofs)
-        call K_ptr%get_diagonal(scale_vec)
-        scale_data => scale_vec%get_data()
-
-        tt_diag_sum = 0.0d0
-        hh_diag_sum = 0.0d0
-        hh_diag_max = 0.0d0
-        tt_rhs_sum = 0.0d0
-        hh_rhs_sum = 0.0d0
-        if (associated(scale_data)) then
-            do i = 1, size(scale_data)
-                local_dof = mod(i - 1, num_dofs_per_node) + 1
-                if (local_dof == thermal_dof) then
-                    tt_diag_sum = tt_diag_sum + abs(scale_data(i))
-                else if (local_dof == hydraulic_dof) then
-                    hh_diag_sum = hh_diag_sum + abs(scale_data(i))
-                    hh_diag_max = max(hh_diag_max, abs(scale_data(i)))
-                end if
-
-                if (associated(f_data)) then
-                    if (local_dof == thermal_dof) then
-                        tt_rhs_sum = tt_rhs_sum + abs(f_data(i))
-                    else if (local_dof == hydraulic_dof) then
-                        hh_rhs_sum = hh_rhs_sum + abs(f_data(i))
-                    end if
-                end if
-            end do
-
-            hydraulic_scale = 1.0d0
-            if (do_hydraulic .and. hh_diag_sum > diag_eps .and. tt_diag_sum > diag_eps) then
-                hydraulic_scale = sqrt(tt_diag_sum / hh_diag_sum)
-                hydraulic_scale = min(max(hydraulic_scale, 1.0d0/scale_cap), scale_cap)
-            else if (do_hydraulic .and. hh_rhs_sum > diag_eps .and. tt_rhs_sum > diag_eps) then
-                hydraulic_scale = sqrt(tt_rhs_sum / hh_rhs_sum)
-                hydraulic_scale = min(max(hydraulic_scale, 1.0d0/scale_cap), scale_cap)
-            end if
-
-            if (first_scale_report) then
-                write (*, '(A,I0,A,I0,A,I0)') '   [SCALE] ndpn=', num_dofs_per_node, &
-                    ', T_dof=', thermal_dof, ', H_dof=', hydraulic_dof
-                write (*, '(A,5(ES13.5,A),L1)') '   [SCALE] global TT_diag=', tt_diag_sum, ', HH_diag=', hh_diag_sum, &
-                    ', TT_rhs=', tt_rhs_sum, ', HH_rhs=', hh_rhs_sum, ', H_scale=', hydraulic_scale, &
-                    ', hydraulic_active=', do_hydraulic
-                first_scale_report = .false.
-            end if
-
-            if (do_hydraulic .and. (.not. printed_scale_warning)) then
-                if (hydraulic_scale > 1.0d2 .or. hydraulic_scale < 1.0d-2) then
-                    write (*, '(A,ES13.5,A)') '   [SCALE] Notice: strong T/H scale disparity detected (H_scale=', &
-                        hydraulic_scale, '). Consider revisiting input-unit scaling.'
-                    printed_scale_warning = .true.
-                end if
-            end if
-
-            if (apply_global_scaling) then
-                scale_data(:) = 1.0d0
-                if (hydraulic_dof > 0) then
-                    do i = 1, size(scale_data)
-                        local_dof = mod(i - 1, num_dofs_per_node) + 1
-                        if (local_dof == hydraulic_dof) then
-                            scale_data(i) = hydraulic_scale
-                        end if
-                    end do
-                end if
-
-                ! Apply block scaling: K' = D K D, F' = D F
-                call K_ptr%scale(MATRIX_OPS%SCALE_SYMM_DIAG, scale_vec)
-                call F_ptr%scale(VECTOR_OPS%SCALE_SYMM_DIAG, scale_vec)
-            end if
-        end if
-
+        ! Zero the solution vector before solve (initial guess = 0)
         call du_ptr%zero()
+
+        ! Solve scaled system: K_s * du_s = F_s
         call self%solver%solve(K_ptr, F_ptr, du_ptr)
         call self%solver%check()
 
-        if ((.not. self%solver%is_success()) .and. do_hydraulic .and. (.not. self%hydraulic_has_dirichlet_bc)) then
-            call self%domain%get_num_nodes(num_nodes)
-            retry_scale = 1.0d0
-            do retry_iter = 1, max_retry_iters
-                retry_diag = max(retry_diag_min, retry_diag_factor*retry_scale*max(diag_eps, hh_diag_max))
-                do i = 1, num_nodes
-                    call self%K%add(hydraulic_dof, hydraulic_dof, i, i, retry_diag)
-                end do
-
-                call du_ptr%zero()
-                call self%solver%solve(K_ptr, F_ptr, du_ptr)
-                call self%solver%check()
-                retried_with_damping = .true.
-                if (self%solver%is_success()) exit
-                retry_scale = retry_scale*10.0d0
+        ! Unscale solution: du = D^{-1/2} * du_s
+        if (associated(diag_data)) then
+            do i = 1, size(du_data)
+                du_data(i) = du_data(i) * diag_data(i)
             end do
         end if
 
-        ! Recover original unknown scale: du = D * du_scaled
-        if (apply_global_scaling .and. associated(scale_data) .and. associated(du_data)) then
-            do i = 1, min(size(scale_data), size(du_data))
-                du_data(i) = du_data(i) * scale_data(i)
-            end do
-        end if
+        ! Linear solver diagnostics
+        write (*, '(A,L1)') &
+            '   [LINEAR] converged=', self%solver%is_success()
 
-        if (retried_with_damping .and. self%solver%is_success()) then
-            write (*, '(A,ES13.5)') '   [SOLVE] all-Neumann hydraulic retry succeeded with global diagonal damping=', retry_diag
-        end if
+        nullify (diag_data)
+        call diag_vec%destroy()
 
-        if (.not. self%solver%is_success()) then
-            write (*, '(A)') '   [SOLVE] Warning: linear solver did not converge or encountered breakdown.'
-        end if
+        nullify (K_ptr)
+        nullify (F_ptr)
+        nullify (du_ptr)
+        nullify (f_data)
+        nullify (du_data)
 
-        nullify (scale_data)
-        call scale_vec%destroy()
         call self%control%profiler_stop(PROFILER_TYPES%SOLVE)
 
     end subroutine solve_ftcms

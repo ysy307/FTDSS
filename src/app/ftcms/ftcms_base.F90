@@ -15,9 +15,6 @@ contains
         integer(int32) :: computation_dimension
         integer(int32) :: num_total_dofs
         integer(int32) :: ierr
-        integer(int32) :: solver_type_selected, preconditioner_type_selected, m_restart_selected
-        integer(int32) :: projection_offset_selected, projection_stride_selected
-        logical :: projection_enabled_selected
         real(real64), pointer, contiguous, dimension(:) :: phase_values
 
         type(type_config_control_manager) :: config_control_manager
@@ -139,40 +136,24 @@ contains
         call self%thermal%initialize(input, active_region_ids)
         call self%hydraulic%initialize(input, active_region_ids)
 
-        ! Apply initial Dirichlet boundary conditions to field variables
-        call self%apply_bc()
-
-        ! Initialize solver strictly from input settings.
+        ! Initialize solver
         associate (solver_settings => input%basic%solver_settings%linear_solver)
-            solver_type_selected = solver_settings%solver_type
-            preconditioner_type_selected = solver_settings%preconditioner_type
-            m_restart_selected = solver_settings%m_restarts
-            projection_enabled_selected = .false.
-            projection_offset_selected = 0
-            projection_stride_selected = 0
-
-            if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc)) then
-                projection_enabled_selected = .true.
-                projection_offset_selected = self%hydraulic_start_dof
-                projection_stride_selected = self%K%get_num_dofs_per_node()
-                write (*, '(A)') 'Notice: Enabling mean-zero nullspace projection for all-Neumann hydraulic component.'
-            end if
-
-            call solver_info%set(solver_type_selected, &
+            call solver_info%set(solver_settings%solver_type, &
                                  num_total_dofs, &
                                  solver_settings%tolerance, &
                                  solver_settings%max_iterations, &
-                                 m_restart_selected, &
-                                 projection_enabled=projection_enabled_selected, &
-                                 projection_offset=projection_offset_selected, &
-                                 projection_stride=projection_stride_selected)
-            if (preconditioner_type_selected == PRECONDITIONER_TYPES%ILU%ID) then
-                call pc_info%set(preconditioner_type_selected, num_nodes, self%K%get_num_dofs_per_node())
+                                 solver_settings%m_restarts)
+            if (solver_settings%preconditioner_type == PRECONDITIONER_TYPES%ILU%ID .or. &
+                solver_settings%preconditioner_type == PRECONDITIONER_TYPES%JACOBI%ID) then
+                call pc_info%set(solver_settings%preconditioner_type, num_nodes, self%K%get_num_dofs_per_node())
             else
-                call pc_info%set(preconditioner_type_selected, num_total_dofs)
+                call pc_info%set(solver_settings%preconditioner_type, num_total_dofs)
             end if
             call create_solver(self%solver, solver_info, pc_info, ierr)
         end associate
+
+        ! Apply initial Dirichlet boundary conditions to field variables
+        call self%apply_bc()
 
         ! Populate initial phase variables from initial T/P/porosity before first output.
         call self%update_variables()
@@ -411,7 +392,7 @@ contains
         integer(int32) :: material_id
         integer(int32) :: bdf_order
         integer(int32) :: start_dof_thermal, start_dof_hydraulic
-        real(real64) :: temperature, pressure, porosity, ice_content
+        real(real64) :: temperature, pressure, porosity
         type(type_coordinate_dp) :: grad_T, grad_P
         real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
 
@@ -425,20 +406,18 @@ contains
 
         call self%control%get_bdf_coeffs(bdf_order=bdf_order)
 
+        ! Use DOF map layout (not runtime activity flags) to ensure state fields
+        ! required by constitutive relations are always initialized consistently.
         start_dof_thermal = self%thermal_start_dof
         if (start_dof_thermal > 0) then
             call self%temperature%get_current(node_id, temperature)
             temperature = min(max(temperature, -80.0d0), 80.0d0)
             call self%temperature%get_current_gradient(node_id, grad_T)
             call self%temperature%get_history(node_id, temperature_history)
-        else
-            temperature = 0.0d0
-            call grad_T%reset()
-            temperature_history = 0.0d0
+            call state%set(temperature=temperature, &
+                           grad_T=grad_T, &
+                           temperature_history=temperature_history(1:bdf_order + 1))
         end if
-        call state%set(temperature=temperature, &
-                       grad_T=grad_T, &
-                       temperature_history=temperature_history(1:bdf_order + 1))
 
         start_dof_hydraulic = self%hydraulic_start_dof
         if (start_dof_hydraulic > 0) then
@@ -446,21 +425,15 @@ contains
             pressure = min(max(pressure, -1.0d7), 1.0d7)
             call self%pressure%get_current_gradient(node_id, grad_P)
             call self%pressure%get_history(node_id, pressure_history)
-        else
-            pressure = 0.0d0
-            call grad_P%reset()
-            pressure_history = 0.0d0
+            call state%set(pressure=pressure, &
+                           grad_P=grad_P, &
+                           pressure_history=pressure_history(1:bdf_order + 1))
         end if
-        call state%set(pressure=pressure, &
-                       grad_P=grad_P, &
-                       pressure_history=pressure_history(1:bdf_order + 1))
 
         call self%porosity%get_current(node_id, porosity)
         call self%porosity%get_history(node_id, porosity_history)
-        call self%Qi%get_current(node_id, ice_content)
         call state%set(porosity=porosity, &
-                   porosity_history=porosity_history(1:bdf_order + 1), &
-                   ice_content=ice_content)
+                       porosity_history=porosity_history(1:bdf_order + 1))
 
         call state%temperature%get(temperature, temperature_set)
         call state%pressure%get(pressure, pressure_set)
@@ -595,7 +568,6 @@ contains
         integer(int32) :: bdf_order
         real(real64), pointer, contiguous, dimension(:) :: current
         real(real64), allocatable :: du(:)
-        real(real64), allocatable :: current_prev(:)
 
         real(real64) :: relaxation_factor
         logical :: is_none
@@ -603,13 +575,10 @@ contains
 
         ! Line search parameters for Newton mode
         real(real64) :: max_du, alpha
-        real(real64), parameter :: MAX_DT_STEP = 5.0d0
-        real(real64), parameter :: MAX_DP_STEP = 1.0d5
+        real(real64), parameter :: MAX_DT_STEP = 2.0d0
+        real(real64), parameter :: MAX_DP_STEP = 1.0d3
         real(real64), parameter :: ALPHA_MIN = 0.1d0
-        real(real64), parameter :: TEMP_MIN_C = -80.0d0
-        real(real64), parameter :: TEMP_MAX_C = 80.0d0
-        real(real64), parameter :: PRESS_MIN_PA = -1.0d7
-        real(real64), parameter :: PRESS_MAX_PA = 1.0d7
+        integer(int32) :: i
 
         call self%control%profiler_start(PROFILER_TYPES%SETUP)
 
@@ -627,38 +596,38 @@ contains
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
             call self%temperature%get_current(current)
             if (associated(current)) then
-                call allocate_array(current_prev, size(current))
-                current_prev(:) = current(:)
-
                 if (allocated(du) .and. size(du) > 0) then
                     if (.not. is_none) then
                         if (is_newton) then
-                            ! Damped Newton: clamp step by max allowable change
+                            ! Per-node clamping: limit each node's dT independently
                             max_du = maxval(abs(du))
-                            if (max_du > MAX_DT_STEP) then
-                                alpha = MAX_DT_STEP / max_du
-                                alpha = max(alpha, ALPHA_MIN)
-                            else
-                                alpha = 1.0d0
-                            end if
-                            relaxation_factor = alpha
-                            ! Apply damped Newton update directly
-                            current(:) = current(:) + relaxation_factor * du(:)
+                            do i = 1, size(du)
+                                if (abs(du(i)) > MAX_DT_STEP) then
+                                    du(i) = sign(MAX_DT_STEP, du(i))
+                                end if
+                            end do
+                            relaxation_factor = 1.0d0
+                            write (*, '("   [Newton] Iter:", I3, " max|dT|:", ES10.3, " (clamped to", F6.2, ")")') &
+                                iter, max_du, MAX_DT_STEP
+                            current(:) = current(:) + du(:)
                         else
+                            ! Per-node clamping before Aitken relaxation
+                            do i = 1, size(du)
+                                if (abs(du(i)) > MAX_DT_STEP) then
+                                    du(i) = sign(MAX_DT_STEP, du(i))
+                                end if
+                            end do
                             call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, du, current)
                             call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
-                            current(:) = current(:) + relaxation_factor * du(:)
+                            write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
                         end if
                     else
                         relaxation_factor = 1.0d0
-                        current(:) = current(:) + du(:)
                     end if
+                    call self%temperature%set_delta(relaxation_factor * du(:))
+                else
+                    call self%temperature%set_delta(0.0d0 * current)
                 end if
-
-                current(:) = min(max(current(:), TEMP_MIN_C), TEMP_MAX_C)
-                call self%temperature%set_delta(current(:) - current_prev(:))
-
-                call deallocate_array(current_prev)
             end if
 
             call self%calc_gradient_temperature()
@@ -671,37 +640,38 @@ contains
             call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, du)
             call self%pressure%get_current(current)
             if (associated(current)) then
-                call allocate_array(current_prev, size(current))
-                current_prev(:) = current(:)
-
                 if (allocated(du) .and. size(du) > 0) then
                     if (.not. is_none) then
                         if (is_newton) then
-                            ! Damped Newton: clamp step by max allowable pressure change
+                            ! Per-node clamping: limit each node's dP independently
                             max_du = maxval(abs(du))
-                            if (max_du > MAX_DP_STEP) then
-                                alpha = MAX_DP_STEP / max_du
-                                alpha = max(alpha, ALPHA_MIN)
-                            else
-                                alpha = 1.0d0
-                            end if
-                            relaxation_factor = alpha
-                            current(:) = current(:) + relaxation_factor * du(:)
+                            do i = 1, size(du)
+                                if (abs(du(i)) > MAX_DP_STEP) then
+                                    du(i) = sign(MAX_DP_STEP, du(i))
+                                end if
+                            end do
+                            relaxation_factor = 1.0d0
+                            write (*, '("   [Newton] Iter:", I3, " max|dP|:", ES10.3, " (clamped to", ES10.3, ")")') &
+                                iter, max_du, MAX_DP_STEP
+                            current(:) = current(:) + du(:)
                         else
+                            ! Per-node clamping before Aitken relaxation
+                            do i = 1, size(du)
+                                if (abs(du(i)) > MAX_DP_STEP) then
+                                    du(i) = sign(MAX_DP_STEP, du(i))
+                                end if
+                            end do
                             call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, du, current)
                             call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
-                            current(:) = current(:) + relaxation_factor * du(:)
+                            write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
                         end if
                     else
                         relaxation_factor = 1.0d0
-                        current(:) = current(:) + du(:)
                     end if
+                    call self%pressure%set_delta(relaxation_factor * du(:))
+                else
+                    call self%pressure%set_delta(0.0d0 * current)
                 end if
-
-                current(:) = min(max(current(:), PRESS_MIN_PA), PRESS_MAX_PA)
-                call self%pressure%set_delta(current(:) - current_prev(:))
-
-                call deallocate_array(current_prev)
             end if
 
             call self%calc_gradient_pressure()

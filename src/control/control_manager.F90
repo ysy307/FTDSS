@@ -91,8 +91,6 @@ module control_control_manager
         procedure, public, pass(self) :: get_tolerances => get_tolerances_control
         ! - time
         procedure, public, pass(self) :: get_time => get_time_control
-        procedure, public, pass(self) :: get_dt => get_dt_control
-        procedure, public, pass(self) :: is_min_dt => is_min_dt_control
         ! - acceleration
         procedure, public, pass(self) :: get_current_relaxation => get_current_relaxation_control
         procedure, public, pass(self) :: get_previous_relaxation => get_previous_relaxation_control
@@ -519,23 +517,6 @@ contains
         call self%time%get_time(time)
 
     end subroutine get_time_control
-
-    subroutine get_dt_control(self, dt)
-        implicit none
-        class(type_control), intent(in) :: self
-        real(real64), intent(inout) :: dt
-
-        call self%time%get_dt(dt)
-
-    end subroutine get_dt_control
-
-    pure function is_min_dt_control(self) result(is_min_dt)
-        implicit none
-        class(type_control), intent(in) :: self
-        logical :: is_min_dt
-
-        is_min_dt = self%time%is_min_dt()
-    end function is_min_dt_control
 
     subroutine display_profiler_control(self, unit_in)
         implicit none

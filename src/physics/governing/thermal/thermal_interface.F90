@@ -36,7 +36,6 @@ module physics_governing_thermal
         procedure, pass(self), private :: assemble_local_picard => assemble_local_picard_thermal
 
         procedure, pass(self), private :: compute_mass_term => compute_mass_term_thermal
-        procedure, pass(self), private :: compute_coupling_mass_term => compute_coupling_mass_term_thermal
         procedure, pass(self), private :: compute_diffusion_term => compute_diffusion_term_thermal
         procedure, pass(self), private :: compute_advective_term => compute_advective_term_thermal
         procedure, pass(self), private :: compute_latent_term => compute_latent_term_thermal
@@ -111,29 +110,7 @@ module physics_governing_thermal
             integer(int32), intent(in), optional :: scheme_opt
 
         end subroutine compute_mass_term_thermal
-
-        !> @brief Calculate pressure coupling coefficient C_TH = dU/dP for thermal equation.
-        !>
-        !> @details
-        !>   \[ C_{TH} = \frac{\partial U}{\partial P}
-        !>      = \rho_w c_w T \frac{\partial \theta_w}{\partial P}
-        !>      + (\rho_i c_i T - L_f \rho_i) \frac{\partial \theta_i}{\partial P}
-        !>      + \rho_w (c_v T + L_v) \frac{\partial \theta_v}{\partial P} \]
-        !>
-        !> @note Requires update_water_phases to be called beforehand to populate
-        !>   state dQw_dP, dQi_dP, dQv_dP.
-        module subroutine compute_coupling_mass_term_thermal(self, material_id, state, C_TH)
-            implicit none
-            class(type_thermal), intent(in) :: self
-            !> Material identifier
-            integer(int32), intent(in) :: material_id
-            !> Thermodynamic state; dQw_dP, dQi_dP, dQv_dP must be set
-            type(type_state), intent(in) :: state
-            !> Coupling coefficient \( \partial U / \partial P \) [J/m\(^3\)/Pa]; overwritten on exit
-            real(real64), intent(inout) :: C_TH
-
-        end subroutine compute_coupling_mass_term_thermal
-
+        
         module subroutine compute_diffusion_term_thermal(self, material_id, state, D_TT)
             implicit none
             class(type_thermal), intent(in) :: self

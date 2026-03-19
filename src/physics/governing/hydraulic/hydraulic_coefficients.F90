@@ -1,10 +1,5 @@
 submodule(physics_governing_hydraulic) hydraulic_coefficients
-    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
-
-    ! Must match constitutive effective suction blending scale in fusion model [Pa].
-    real(real64), parameter :: HYDRAULIC_SUCTION_BLEND_EPS = 1.0d4
-
 contains
 
     !> @brief Calculate Mass Term C_HH = d(rho_eff)/dP
@@ -26,7 +21,7 @@ contains
         dQv_dP = 0.0d0
         drho_w_dP = 0.0d0
         drho_ice_dP = 0.0d0
-        dP_ice_dP_water = 1.0d0
+        dP_ice_dP_water = 0.0d0
 
         call state%water_content%get(Qw)
         call state%ice_content%get(Qi)
@@ -38,13 +33,6 @@ contains
 
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_density_ice(state, rho_i)
-        call self%physics%calc_density_water_derivatives(material_id, state, dden_dP=drho_w_dP)
-        call self%physics%calc_density_ice_derivatives(material_id, state, dden_dP=drho_ice_dP)
-        call self%physics%calc_pressure_ice_water_derivative(material_id, state, dP_ice_dP_water)
-
-        ! Guard unphysical derivative values before assembling C_HH.
-        if (.not. ieee_is_finite(dP_ice_dP_water)) dP_ice_dP_water = 1.0d0
-        if (dP_ice_dP_water < 0.0d0) dP_ice_dP_water = 0.0d0
 
         ! C_HH = d(rho_eff)/dP
         ! rho_eff = rho_w*Qw + rho_i*Qi + rho_w*Qv
@@ -88,49 +76,6 @@ contains
 
     end subroutine compute_diffusion_term_hydraulic
 
-    !> @brief Calculate Temperature Coupling Term D_HT for cryogenic suction transport
-    !> @details
-    !>   J_m_cryo = D_HT * grad T
-    !>   D_HT = (K_liquid / g) * d(psi_cryo)/dT when cryogenic suction is active
-    module subroutine compute_temperature_coupling_term_hydraulic(self, material_id, state, D_HT)
-        implicit none
-        class(type_hydraulic), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_state), intent(inout) :: state
-        real(real64), intent(inout) :: D_HT(:, :)
-
-        real(real64) :: K_flh
-        real(real64) :: pressure, psi_cap, psi_cryo
-        real(real64) :: delta_psi, blend_denom
-        real(real64) :: dpsi_eff_dpsi_cryo
-        real(real64) :: dpsi_cryo_dT
-        real(real64) :: coeff_HT
-        integer(int32) :: i
-
-        call self%physics%calc_Kflh(material_id, state, K_flh)
-        call state%pressure%get(pressure)
-        call self%physics%calc_cryogenic_suction(material_id, state, psi_cryo)
-        call self%physics%calc_cryogenic_suction_derivatives(material_id, state, deriv_dT=dpsi_cryo_dT)
-
-        if (pressure < 0.0d0) then
-            psi_cap = -pressure
-        else
-            psi_cap = 0.0d0
-        end if
-
-        delta_psi = psi_cap - psi_cryo
-        blend_denom = sqrt(delta_psi*delta_psi + HYDRAULIC_SUCTION_BLEND_EPS*HYDRAULIC_SUCTION_BLEND_EPS)
-        dpsi_eff_dpsi_cryo = 0.5d0*(1.0d0 - delta_psi/blend_denom)
-
-        coeff_HT = (K_flh / g) * dpsi_eff_dpsi_cryo * dpsi_cryo_dT
-
-        D_HT(:, :) = 0.0d0
-        do i = 1, self%computation_dimension
-            D_HT(i, i) = coeff_HT
-        end do
-
-    end subroutine compute_temperature_coupling_term_hydraulic
-
     !> @brief Calculate Advective (Gravity) Term V_H
     !> @details
     !>   J_m_grav = V_H
@@ -161,8 +106,9 @@ contains
         case (COMP_TYPES%XYZ_3D%ID)
             V_H(3) = -grav_flux_mag ! z-direction
         case (COMP_TYPES%XY_2D%ID)
-            ! No gravity contribution in XY_2D.
-            ! Keep the thermo-osmotic term accumulated above.
+            ! Usually gravity is perpendicular to XY plane or handled differently
+            ! Assuming XY implies horizontal plane, gravity term might be zero or handled externally
+            V_H(:) = 0.0d0
         end select
 
     end subroutine compute_advective_term_hydraulic
@@ -243,7 +189,6 @@ contains
         real(real64) :: Qw, Qi, Qv
         real(real64) :: rho_w, rho_i
         real(real64) :: Uj
-        real(real64) :: ice_content
         integer(int32) :: j, n
 
         nullify (temperature_history)
@@ -258,12 +203,10 @@ contains
 
         n = min(size(bdf_coeffs), size(temperature_history), size(pressure_history))
         call local_state%copy(state)
-        call state%ice_content%get(ice_content)
 
         do j = 1, n
             call local_state%temperature%set(temperature_history(j))
             call local_state%pressure%set(pressure_history(j))
-            call local_state%ice_content%set(ice_content)
 
             call self%update_water_phases(material_id, local_state)
 

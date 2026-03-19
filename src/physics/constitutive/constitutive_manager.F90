@@ -47,8 +47,6 @@ module physics_constitutive_manager
         procedure, public :: calc_latent_heat_fusion
         procedure, public :: calc_latent_heat_vaporization
         procedure, public :: calc_pressure_ice_water_derivative
-        procedure, public :: calc_cryogenic_suction
-        procedure, public :: calc_cryogenic_suction_derivatives
 
         procedure, public :: update_water_phases
         procedure, public :: calc_Kflh
@@ -396,27 +394,6 @@ contains
 
         call self%models(self%materials_id_map(material_id))%calc_pressure_ice_water_derivative(state, deriv)
     end subroutine calc_pressure_ice_water_derivative
-
-    subroutine calc_cryogenic_suction(self, material_id, state, suction)
-        implicit none
-        class(type_constitutive_manager), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_state), intent(in) :: state
-        real(real64), intent(inout) :: suction
-
-        call self%models(self%materials_id_map(material_id))%calc_cryogenic_suction(state, suction)
-    end subroutine calc_cryogenic_suction
-
-    subroutine calc_cryogenic_suction_derivatives(self, material_id, state, deriv_dP, deriv_dT)
-        implicit none
-        class(type_constitutive_manager), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_state), intent(in) :: state
-        real(real64), intent(inout), optional :: deriv_dP
-        real(real64), intent(inout), optional :: deriv_dT
-
-        call self%models(self%materials_id_map(material_id))%calc_cryogenic_suction_derivatives(state, deriv_dP, deriv_dT)
-    end subroutine calc_cryogenic_suction_derivatives
 
     ! subroutine update_water_phases(self, material_id, state)
     subroutine update_water_phases(self, material_id, state)

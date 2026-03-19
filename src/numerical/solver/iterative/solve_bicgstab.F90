@@ -22,9 +22,6 @@ contains
         self%num_nodes = solver_settings%num_nodes
         self%tolerance = solver_settings%tolerance
         self%max_iterations = solver_settings%max_iterations
-        self%projection_enabled = solver_settings%projection_enabled
-        self%projection_offset = solver_settings%projection_offset
-        self%projection_stride = solver_settings%projection_stride
 
         call self%p%initialize(self%num_nodes)
         call self%phat%initialize(self%num_nodes)
@@ -60,9 +57,8 @@ contains
 
         real(real64) :: rho, rho_old, alpha, beta, omega
         real(real64) :: denom, ratio1, ratio2
-        real(real64) :: resid
+        real(real64) :: resid, resid0
         real(real64) :: norm_r, norm_v, norm_t, norm_s, norm_p
-        real(real64) :: norm_vinf, norm_phat, norm_shat, norm_tinf
         integer(int32) :: iter
 
         real(real64), dimension(:), pointer :: b_ptr, r_ptr, x_internal_ptr
@@ -86,10 +82,9 @@ contains
         call self%residual_history%zero()
 
         ! ==========================================================
-        ! 2: Set an initial value x0 (use caller-provided initial guess)
+        ! 2: Set an initial value x0 (use user's initial guess)
         ! ==========================================================
         call self%x%copy(x)
-        call project_component_mean_zero(self%x, self%projection_enabled, self%projection_offset, self%projection_stride)
         x_internal_ptr => self%x%get_data()
         has_internal_x = associated(x_internal_ptr)
 
@@ -113,7 +108,6 @@ contains
             ! Fallback: if RHS data is unavailable, treat b as zero vector.
             r_ptr = -r_ptr
         end if
-        call project_component_mean_zero(self%r, self%projection_enabled, self%projection_offset, self%projection_stride)
 
         ! ==========================================================
         ! 4: Create preconditioned matrix
@@ -125,22 +119,37 @@ contains
         ! ==========================================================
         call self%r0%copy(self%r)
 
+        ! Initial convergence check
+        resid = vector_norm2(self%r)
+        resid0 = resid
+        call self%residual_history%set(MATRIX_OPS%INS, 1, resid)
+        if (resid < self%tolerance) then
+            self%current_iteration = 0
+            self%status = SOLVER_STATUS%SUCCESS%ID
+            if (has_internal_x) call x%copy(self%x)
+            return
+        end if
+
         do iter = 1, self%max_iterations
             ! 7: (^r0, rk)
             rho = vector_dot(self%r0, self%r)
-            ! 8: rho check
-            if (rho == 0.0d0) then
+            ! 8: rho check — rho==0 means BiCGStab breakdown (r0* has become orthogonal to r)
+            if (abs(rho) <= tiny(1.0d0)) then
                 self%current_iteration = iter
-                call self%residual_history%set(MATRIX_OPS%INS, iter, vector_norm2(self%r))
+                resid = vector_norm2(self%r)
+                call self%residual_history%set(MATRIX_OPS%INS, iter, resid)
+                if (resid < self%tolerance) then
+                    self%status = SOLVER_STATUS%SUCCESS%ID
+                else
+                    self%status = SOLVER_STATUS%BREAKDOWN%ID
+                end if
                 if (has_internal_x) call x%copy(self%x)
-                self%status = SOLVER_STATUS%BREAKDOWN%ID
                 return
             end if
 
             if (iter == 1) then
                 ! 10: p0 = r0
                 call self%p%copy(self%r)
-                call project_component_mean_zero(self%p, self%projection_enabled, self%projection_offset, self%projection_stride)
             else
                 if (.not. ieee_is_finite(rho_old) .or. .not. ieee_is_finite(omega) .or. &
                     .not. ieee_is_finite(alpha) .or. abs(rho_old) <= tiny(1.0d0) .or. abs(omega) <= tiny(1.0d0)) then
@@ -221,36 +230,14 @@ contains
                     end if
                 end if
                 ! 13: p_k = r_k + beta_k(p_(k-1) - omega_k * Av)
-                norm_vinf = vector_norminf(self%v)
-                if (.not. ieee_is_finite(omega) .or. .not. ieee_is_finite(norm_vinf)) then
-                    write (*, '(A,I0,2(A,ES13.5))') 'BiCG breakdown(non-finite p-update): iter=', iter, &
-                        ', omega=', omega, ', ||v||inf=', norm_vinf
-                    self%current_iteration = iter
-                    self%status = SOLVER_STATUS%BREAKDOWN%ID
-                    if (has_internal_x) call x%copy(self%x)
-                    return
-                end if
-                if (norm_vinf >= 1.0d0) then
-                    if (abs(omega) > huge(1.0d0) / norm_vinf) then
-                        write (*, '(A,I0,2(A,ES13.5))') 'BiCG overflow(p-update): iter=', iter, &
-                            ', omega=', omega, ', ||v||inf=', norm_vinf
-                        self%current_iteration = iter
-                        self%status = SOLVER_STATUS%BREAKDOWN%ID
-                        if (has_internal_x) call x%copy(self%x)
-                        return
-                    end if
-                end if
                 call vector_axpy(-omega, self%v, self%p)
                 call vector_scale(beta, self%p)
                 call vector_axpy(1.0d0, self%r, self%p)
-                call project_component_mean_zero(self%p, self%projection_enabled, self%projection_offset, self%projection_stride)
             end if
             ! 15: phat = M^-1 * p
             call self%pc%apply(self%p, self%phat)
-            call project_component_mean_zero(self%phat, self%projection_enabled, self%projection_offset, self%projection_stride)
             ! 16: v = A * phat
             call matvec(A, self%phat, self%v, ierr)
-            call project_component_mean_zero(self%v, self%projection_enabled, self%projection_offset, self%projection_stride)
             ! 17: alpha_k = rho / (^r0, v)
             denom = vector_dot(self%r0, self%v)
             if (abs(denom) <= tiny(1.0d0)) then
@@ -264,36 +251,13 @@ contains
                 return
             end if
             alpha = rho / denom
-
-            norm_vinf = vector_norminf(self%v)
-            if (.not. ieee_is_finite(alpha) .or. .not. ieee_is_finite(norm_vinf)) then
-                write (*, '(A,I0,2(A,ES13.5))') 'BiCG breakdown(non-finite alpha-step): iter=', iter, &
-                    ', alpha=', alpha, ', ||v||inf=', norm_vinf
-                self%current_iteration = iter
-                self%status = SOLVER_STATUS%BREAKDOWN%ID
-                if (has_internal_x) call x%copy(self%x)
-                return
-            end if
-            if (norm_vinf >= 1.0d0) then
-                if (abs(alpha) > huge(1.0d0) / norm_vinf) then
-                    write (*, '(A,I0,2(A,ES13.5))') 'BiCG overflow(alpha-step): iter=', iter, &
-                        ', alpha=', alpha, ', ||v||inf=', norm_vinf
-                    self%current_iteration = iter
-                    self%status = SOLVER_STATUS%BREAKDOWN%ID
-                    if (has_internal_x) call x%copy(self%x)
-                    return
-                end if
-            end if
             ! 18: s = r_k - alpha_k * v
             call vector_axpyz(-alpha, self%v, self%r, self%s)
-            call project_component_mean_zero(self%s, self%projection_enabled, self%projection_offset, self%projection_stride)
 
             ! 19: shat = M^-1 * s
             call self%pc%apply(self%s, self%shat)
-            call project_component_mean_zero(self%shat, self%projection_enabled, self%projection_offset, self%projection_stride)
             ! 20: t = A * shat
             call matvec(A, self%shat, self%t, ierr)
-            call project_component_mean_zero(self%t, self%projection_enabled, self%projection_offset, self%projection_stride)
 
             ! 21: omega_k = (t,s)/(t,t)
             denom = vector_dot(self%t, self%t)
@@ -310,7 +274,9 @@ contains
             omega = vector_dot(self%t, self%s) / denom
 
             ! 22: omega breakdown check
-            if (omega == 0.0d0) then
+            if (abs(omega) <= tiny(1.0d0)) then
+                ! omega is zero or near-zero — update x with the alpha*phat part at least
+                call vector_axpy(alpha, self%phat, self%x)
                 norm_t = vector_norm2(self%t)
                 norm_s = vector_norm2(self%s)
                 write (*, '(A,I0,2(A,ES13.5))') 'BiCGSTAB breakdown(omega): iter=', iter, ', ||t||2=', norm_t, ', ||s||2=', norm_s
@@ -320,63 +286,17 @@ contains
                 return
             end if
 
-            norm_phat = vector_norminf(self%phat)
-            norm_shat = vector_norminf(self%shat)
-            norm_tinf = vector_norminf(self%t)
-            if (.not. ieee_is_finite(norm_phat) .or. .not. ieee_is_finite(norm_shat) .or. .not. ieee_is_finite(norm_tinf)) then
-                write (*, '(A,I0,3(A,ES13.5))') 'BiCG breakdown(non-finite update vectors): iter=', iter, &
-                    ', ||phat||inf=', norm_phat, ', ||shat||inf=', norm_shat, ', ||t||inf=', norm_tinf
-                self%current_iteration = iter
-                self%status = SOLVER_STATUS%BREAKDOWN%ID
-                if (has_internal_x) call x%copy(self%x)
-                return
-            end if
-
-            if (norm_phat >= 1.0d0) then
-                if (abs(alpha) > huge(1.0d0) / norm_phat) then
-                    write (*, '(A,I0,2(A,ES13.5))') 'BiCG overflow(x-update alpha): iter=', iter, &
-                        ', alpha=', alpha, ', ||phat||inf=', norm_phat
-                    self%current_iteration = iter
-                    self%status = SOLVER_STATUS%BREAKDOWN%ID
-                    if (has_internal_x) call x%copy(self%x)
-                    return
-                end if
-            end if
-
-            if (norm_shat >= 1.0d0) then
-                if (abs(omega) > huge(1.0d0) / norm_shat) then
-                    write (*, '(A,I0,2(A,ES13.5))') 'BiCG overflow(x-update omega): iter=', iter, &
-                        ', omega=', omega, ', ||shat||inf=', norm_shat
-                    self%current_iteration = iter
-                    self%status = SOLVER_STATUS%BREAKDOWN%ID
-                    if (has_internal_x) call x%copy(self%x)
-                    return
-                end if
-            end if
-
-            if (norm_tinf >= 1.0d0) then
-                if (abs(omega) > huge(1.0d0) / norm_tinf) then
-                    write (*, '(A,I0,2(A,ES13.5))') 'BiCG overflow(r-update omega): iter=', iter, &
-                        ', omega=', omega, ', ||t||inf=', norm_tinf
-                    self%current_iteration = iter
-                    self%status = SOLVER_STATUS%BREAKDOWN%ID
-                    if (has_internal_x) call x%copy(self%x)
-                    return
-                end if
-            end if
-
             ! 23: x(i) = x(i-1) + alpha * M^-1 p(i-1) + omega * M^-1 s(i)
             ! 24: r(i) = s(i-1) - omega * AM^-1 s(i-1)
             call vector_axpy(alpha, self%phat, self%x)
             call vector_axpy(omega, self%shat, self%x)
-            call project_component_mean_zero(self%x, self%projection_enabled, self%projection_offset, self%projection_stride)
             call vector_axpyz(-omega, self%t, self%s, self%r)
-            call project_component_mean_zero(self%r, self%projection_enabled, self%projection_offset, self%projection_stride)
 
             ! 25: ||r_k+1||_2
             resid = vector_norm2(self%r)
             call self%residual_history%set(MATRIX_OPS%INS, iter, resid)
-            if (resid < self%tolerance) then
+            if (resid < self%tolerance .or. &
+                (resid0 > self%tolerance .and. resid < self%relative_tolerance * resid0)) then
                 self%current_iteration = iter
                 self%status = SOLVER_STATUS%SUCCESS%ID
                 if (has_internal_x) call x%copy(self%x)
@@ -392,41 +312,6 @@ contains
         if (has_internal_x) call x%copy(self%x)
 
     end subroutine solve_type_solver_bicgstab
-
-    subroutine project_component_mean_zero(vec, enabled, offset, stride)
-        implicit none
-        type(type_vector_dp), intent(inout) :: vec
-        logical, intent(in) :: enabled
-        integer(int32), intent(in) :: offset, stride
-
-        real(real64), pointer :: data(:)
-        real(real64) :: mean_val
-        integer(int32) :: i, count, first_idx
-
-        if (.not. enabled) return
-        if (stride <= 0 .or. offset <= 0) return
-
-        data => vec%get_data()
-        if (.not. associated(data)) return
-
-        first_idx = offset
-        if (first_idx > size(data)) return
-
-        mean_val = 0.0d0
-        count = 0
-        do i = first_idx, size(data), stride
-            mean_val = mean_val + data(i)
-            count = count + 1
-        end do
-        if (count <= 0) return
-
-        mean_val = mean_val/real(count, real64)
-        do i = first_idx, size(data), stride
-            data(i) = data(i) - mean_val
-        end do
-
-        nullify (data)
-    end subroutine project_component_mean_zero
 
     !> Finalize the solver instance and release memory.
     module subroutine destroy_type_solver_bicgstab(self)

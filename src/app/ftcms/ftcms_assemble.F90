@@ -1,5 +1,4 @@
 submodule(app_ftcms) ftcms_assemble
-    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
 
 contains
@@ -15,19 +14,12 @@ contains
         real(real64), allocatable :: elem_coords(:, :)
 
         integer(int32) :: i_color, i_elem, elem_id
-        integer(int32) :: i_local
         integer(int32), pointer, contiguous, dimension(:) :: p_connectivity
         integer(int32) :: thermal_dof, hydraulic_dof
         integer(int32) :: num_nodes_local
 
         integer(int32) :: num_colors, num_elements_in_color
         integer(int32), pointer, contiguous, dimension(:) :: elements_list
-        real(real64), pointer :: local_matrix_vals(:, :)
-        real(real64), pointer :: local_vector_vals(:)
-        real(real64) :: local_diag_sum, local_tt_diag_sum, local_hh_diag_sum, local_h_scale
-        real(real64), parameter :: local_diag_eps = 1.0d-20
-        real(real64), parameter :: hydraulic_scale_eps = 1.0d-30
-        real(real64), parameter :: hydraulic_scale_max = 1.0d6
 
         logical :: use_scatter, do_hydraulic
 
@@ -35,8 +27,6 @@ contains
 
         nullify (p_connectivity)
         nullify (elements_list)
-        nullify (local_matrix_vals)
-        nullify (local_vector_vals)
 
         call self%K%zero()
         call self%F%zero()
@@ -51,13 +41,12 @@ contains
 
         use_scatter = .true.
 
-        !$OMP PARALLEL IF(do_hydraulic) DEFAULT(NONE) &
+        !$OMP PARALLEL DEFAULT(NONE) &
         !$OMP SHARED(self, num_colors, elements_list, num_elements_in_color, &
         !$OMP        thermal_dof, hydraulic_dof, use_scatter, do_hydraulic) &
         !$OMP PRIVATE(i_color, i_elem, elem_id, p_connectivity, workspace, &
         !$OMP         local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
-        !$OMP         local_F_T, local_F_H, elem_coords, num_nodes_local, local_matrix_vals, local_vector_vals, &
-        !$OMP         local_diag_sum, local_tt_diag_sum, local_hh_diag_sum, local_h_scale, i_local)
+        !$OMP         local_F_T, local_F_H, elem_coords, num_nodes_local)
 
         do i_color = 1, num_colors
 
@@ -77,82 +66,26 @@ contains
                                                   local_F_T=local_F_T, local_F_H=local_F_H, &
                                                   coordinates=elem_coords, connectivity=p_connectivity)
 
-                    call self%assemble_element_matrix(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
-                                                      local_F_T, local_F_H)
-
-                    local_diag_sum = 0.0d0
-                    local_matrix_vals => local_K_TT%get_val()
-                    if (associated(local_matrix_vals)) then
-                        do i_local = 1, workspace%num_fe_nodes
-                            local_diag_sum = local_diag_sum + abs(local_matrix_vals(i_local, i_local))
-                        end do
-                    end if
-                    local_tt_diag_sum = local_diag_sum
-
-                    if (do_hydraulic) then
-                        local_diag_sum = 0.0d0
-                        local_matrix_vals => local_K_HH%get_val()
-                        if (associated(local_matrix_vals)) then
-                            do i_local = 1, workspace%num_fe_nodes
-                                local_diag_sum = local_diag_sum + abs(local_matrix_vals(i_local, i_local))
-                            end do
-                        end if
-
-                        local_matrix_vals => local_K_HT%get_val()
-                        if (associated(local_matrix_vals)) then
-                            do i_local = 1, workspace%num_fe_nodes
-                                local_diag_sum = local_diag_sum + abs(local_matrix_vals(i_local, i_local))
-                            end do
-                        end if
-                        local_hh_diag_sum = local_diag_sum
-
-                        local_h_scale = 1.0d0
-                        if (local_hh_diag_sum > hydraulic_scale_eps .and. local_tt_diag_sum > local_diag_eps) then
-                            local_h_scale = sqrt(local_tt_diag_sum / local_hh_diag_sum)
-                        end if
-
-                        if (.not. ieee_is_finite(local_h_scale) .or. local_h_scale < 1.0d0) local_h_scale = 1.0d0
-                        if (local_h_scale > hydraulic_scale_max) local_h_scale = hydraulic_scale_max
-
-                        if (local_h_scale > 1.0d0 + 1.0d-12) then
-                            local_matrix_vals => local_K_HH%get_val()
-                            if (associated(local_matrix_vals)) local_matrix_vals(:, :) = local_h_scale * local_matrix_vals(:, :)
-                            local_matrix_vals => local_K_HT%get_val()
-                            if (associated(local_matrix_vals)) local_matrix_vals(:, :) = local_h_scale * local_matrix_vals(:, :)
-                            local_vector_vals => local_F_H%get_data()
-                            if (associated(local_vector_vals)) local_vector_vals(:) = local_h_scale * local_vector_vals(:)
-                            nullify (local_vector_vals)
-                        end if
-                    end if
-                    nullify (local_matrix_vals)
+                    call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
+                                             local_F_T, local_F_H)
 
                     num_nodes_local = workspace%num_fe_nodes
 
-                    ! $OMP CRITICAL(ftcms_global_assembly)
                     if (use_scatter) then
                         call self%K%add(thermal_dof, thermal_dof, elem_id, num_nodes_local, local_K_TT)
-                        if (do_hydraulic) then
-                            call self%K%add(thermal_dof, hydraulic_dof, elem_id, num_nodes_local, local_K_TH)
-                        end if
                     else
                         call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_K_TT)
-                        if (do_hydraulic) then
-                            call self%K%add(thermal_dof, hydraulic_dof, p_connectivity, local_K_TH)
-                        end if
                     end if
                     call self%F%add(thermal_dof, p_connectivity, local_F_T)
 
                     if (do_hydraulic) then
                         if (use_scatter) then
                             call self%K%add(hydraulic_dof, hydraulic_dof, elem_id, num_nodes_local, local_K_HH)
-                            call self%K%add(hydraulic_dof, thermal_dof, elem_id, num_nodes_local, local_K_HT)
                         else
                             call self%K%add(hydraulic_dof, hydraulic_dof, p_connectivity, local_K_HH)
-                            call self%K%add(hydraulic_dof, thermal_dof, p_connectivity, local_K_HT)
                         end if
                         call self%F%add(hydraulic_dof, p_connectivity, local_F_H)
                     end if
-                    ! $OMP END CRITICAL(ftcms_global_assembly)
 
                 end do
                 !$OMP END DO
@@ -209,12 +142,14 @@ contains
         call workspace%lerp()
 
         call self%update_physical_properties_bulk(material_id, workspace%state_gp)
+
         call fe%get_num_nodes(num_nodes)
 
         if (present(local_K_TT)) call check_initialize_matrix(local_K_TT, num_nodes)
         if (present(local_K_TH)) call check_initialize_matrix(local_K_TH, num_nodes)
         if (present(local_K_HH)) call check_initialize_matrix(local_K_HH, num_nodes)
         if (present(local_K_HT)) call check_initialize_matrix(local_K_HT, num_nodes)
+
         if (present(local_F_T)) call check_initialize_vector(local_F_T, num_nodes)
         if (present(local_F_H)) call check_initialize_vector(local_F_H, num_nodes)
 
@@ -282,52 +217,6 @@ contains
         end if
 
     end subroutine assemble_local_ftcms
-
-    module subroutine assemble_element_matrix_ftcms(self, workspace, local_K_TT, local_K_TH, &
-                                                    local_K_HH, local_K_HT, local_F_T, local_F_H)
-        implicit none
-        class(type_ftcms), intent(inout) :: self
-        type(type_assemble_workspace), intent(inout) :: workspace
-        type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
-        type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
-
-        integer(int32) :: i_gp
-        type(type_coordinate_dp) :: water_flux, vapor_flux
-        type(type_coordinate_dp), pointer :: grad_T, grad_P
-        type(type_coordinate_dp), target :: zero_grad
-
-        nullify (grad_T)
-        nullify (grad_P)
-        call zero_grad%set(0.0d0, 0.0d0, 0.0d0)
-
-        ! Evaluate phase composition at each integration point using local state history.
-        do i_gp = 1, workspace%num_fe_gauss
-            if (self%is_active_thermal()) then
-                call self%thermal%update_water_phases(workspace%material_id, workspace%state_gp(i_gp))
-            else if (self%is_active_hydraulic()) then
-                call self%hydraulic%update_water_phases(workspace%material_id, workspace%state_gp(i_gp))
-            end if
-
-            if (self%is_active_hydraulic()) then
-                call workspace%state_gp(i_gp)%grad_T%get(grad_T)
-                call workspace%state_gp(i_gp)%grad_P%get(grad_P)
-
-                if (.not. associated(grad_T)) grad_T => zero_grad
-                if (.not. associated(grad_P)) grad_P => zero_grad
-
-                call self%calc_water_flux(workspace%material_id, workspace%state_gp(i_gp), grad_T, grad_P, water_flux)
-                call self%calc_vapor_flux(workspace%material_id, workspace%state_gp(i_gp), grad_T, grad_P, vapor_flux)
-                call workspace%state_gp(i_gp)%set(water_flux=water_flux, vapor_flux=vapor_flux)
-
-                nullify (grad_T)
-                nullify (grad_P)
-            end if
-        end do
-
-        ! Capacity and coupling matrices are assembled from updated Gauss-point states.
-        call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, local_F_T, local_F_H)
-
-    end subroutine assemble_element_matrix_ftcms
 
     module subroutine assemble_destroy_ftcms(self, workspace, local_K_TT, local_K_TH, &
                                              local_K_HH, local_K_HT, local_F_T, local_F_H)
