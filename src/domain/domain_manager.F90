@@ -294,7 +294,8 @@ contains
         real(real64), intent(inout), allocatable :: coordinates(:, :)
 
         integer(int32), pointer, contiguous :: connectivity(:)
-        integer(int32) :: num_nodes, n_dim
+        integer(int32) :: num_nodes, n_dim, comp_dim
+        real(real64), allocatable :: raw_coords(:, :)
         logical :: need_reallocate
 
         call self%get_fe_connectivity(element_id, connectivity)
@@ -305,21 +306,42 @@ contains
 
         num_nodes = size(connectivity)
         call self%nodes%get_dimension(n_dim)
+        comp_dim = self%computation_dimension
 
+        ! Read full coordinates from node storage
+        if (allocated(raw_coords)) deallocate (raw_coords)
+        allocate (raw_coords(n_dim, num_nodes))
+        call self%nodes%get_coordinate(connectivity, raw_coords)
+
+        ! Remap to computation coordinate system
         need_reallocate = .true.
-
         if (allocated(coordinates)) then
-            if (size(coordinates, 1) == n_dim .and. size(coordinates, 2) == num_nodes) then
+            if (size(coordinates, 1) == comp_dim .and. size(coordinates, 2) == num_nodes) then
                 need_reallocate = .false.
             end if
         end if
 
         if (need_reallocate) then
             if (allocated(coordinates)) deallocate (coordinates)
-            allocate (coordinates(n_dim, num_nodes))
+            allocate (coordinates(comp_dim, num_nodes))
         end if
 
-        call self%nodes%get_coordinate(connectivity, coordinates)
+        select case (self%computation_type%ID)
+        case (COMP_TYPES%XY_2D%ID)
+            coordinates(1, :) = raw_coords(1, :)
+            coordinates(2, :) = raw_coords(2, :)
+        case (COMP_TYPES%XZ_2D%ID)
+            coordinates(1, :) = raw_coords(1, :)
+            coordinates(2, :) = raw_coords(3, :)
+        case (COMP_TYPES%XYZ_3D%ID)
+            coordinates(1, :) = raw_coords(1, :)
+            coordinates(2, :) = raw_coords(2, :)
+            coordinates(3, :) = raw_coords(3, :)
+        case default
+            coordinates = raw_coords(1:comp_dim, :)
+        end select
+
+        deallocate (raw_coords)
 
     end subroutine get_fe_coordinate_domain
 
