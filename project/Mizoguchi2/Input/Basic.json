@@ -1,7 +1,7 @@
 {
     "simulation_settings": {
         "title": "Mizoguchi`s example",
-        "calculate_type": 1
+        "calculate_type": 2
     },
     "analysis_controls": {
         "calculate_thermal": true,
@@ -11,7 +11,7 @@
         "partitioning": true
     },
     "geometry_settings": {
-        "mesh_file_name": "Mizoguchi_unsaturated_@RANK@.vtu",
+        "mesh_file_name": "Mizoguchi_unsaturated_v_@RANK@.vtu",
         "global_node_id_key": "global_node_id",
         "node_type_key": "node_type",
         "num_sharing_ranks_key": "num_sharing_ranks",
@@ -87,7 +87,7 @@
             },
             "phase_change": {
                 "equilibrium_model": {
-                    "segregation": false
+                    "segregation": true
                 }
             },
             "water_characteristic_curve": {
