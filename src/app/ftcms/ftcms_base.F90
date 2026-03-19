@@ -437,7 +437,8 @@ contains
 
         call state%temperature%get(temperature, temperature_set)
         call state%pressure%get(pressure, pressure_set)
-        if (.not. temperature_set .or. .not. pressure_set) then
+        if ((.not. temperature_set .and. start_dof_thermal > 0) .or. &
+            (.not. pressure_set .and. start_dof_hydraulic > 0)) then
             !$omp critical (ftcms_state_diag)
             write (*, '(A,I0,A,I0,A,L1,A,L1,A,I0,A,I0)') 'Error: set_state_ftcms unset primary state. node=', node_id, &
                 ', elem=', element_id, ', T_set=', temperature_set, ', P_set=', pressure_set, &

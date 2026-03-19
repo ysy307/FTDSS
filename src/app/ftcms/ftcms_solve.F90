@@ -334,26 +334,6 @@ contains
             if (is_step_converged) then
                 consecutive_failures = 0
 
-                ! DEBUG: report min/max T and P after convergence
-                block
-                    real(real64), pointer, contiguous, dimension(:) :: dbg_T, dbg_P
-                    nullify(dbg_T, dbg_P)
-                    if (self%is_active_thermal()) then
-                        call self%temperature%get_current(dbg_T)
-                        if (associated(dbg_T)) then
-                            write(*,'(A,2ES12.4)') '   [DBG] T min/max:', minval(dbg_T), maxval(dbg_T)
-                            nullify(dbg_T)
-                        end if
-                    end if
-                    if (self%is_active_hydraulic()) then
-                        call self%pressure%get_current(dbg_P)
-                        if (associated(dbg_P)) then
-                            write(*,'(A,2ES12.4)') '   [DBG] P min/max:', minval(dbg_P), maxval(dbg_P)
-                            nullify(dbg_P)
-                        end if
-                    end if
-                end block
-
                 ! Shift variable history on convergence
                 call self%shift()
 

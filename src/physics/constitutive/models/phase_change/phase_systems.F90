@@ -182,9 +182,12 @@ contains
         ! 5. Update relative humidity and vapor content (theta_v)
         call state%temperature%get(temperature, temperature_set)
         call state%pressure%get(pressure, pressure_set)
-        if (.not. temperature_set .or. .not. pressure_set) then
+        if (.not. temperature_set) then
             write (*, '(A,L1,A,L1)') 'Error: phase state unset before RH. T_set=', temperature_set, ', P_set=', pressure_set
-            error stop 'update_water_phases: state unset before RH.'
+            error stop 'update_water_phases: temperature unset before RH.'
+        end if
+        if (.not. pressure_set) then
+            pressure = 0.0d0
         end if
 
         if (.not. ieee_is_finite(temperature) .or. .not. ieee_is_finite(pressure)) then

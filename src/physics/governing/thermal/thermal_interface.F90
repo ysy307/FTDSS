@@ -41,6 +41,7 @@ module physics_governing_thermal
         procedure, pass(self), private :: compute_latent_term => compute_latent_term_thermal
         procedure, pass(self), private :: compute_transient_term => compute_transient_term_thermal
         procedure, pass(self), private :: compute_history_term => compute_history_term_thermal
+        procedure, pass(self), private :: compute_coupling_mass_term => compute_coupling_mass_term_thermal
 
         procedure, pass(self), public :: calc_enthalpy_density => calc_enthalpy_density_thermal
         procedure, pass(self), public :: calc_density_water => calc_density_water_thermal
@@ -148,6 +149,14 @@ module physics_governing_thermal
             real(real64), intent(inout) :: history_term
 
         end subroutine compute_history_term_thermal
+
+        module subroutine compute_coupling_mass_term_thermal(self, material_id, state, C_TH)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: C_TH
+        end subroutine compute_coupling_mass_term_thermal
 
         module subroutine cache_enthalpy_history_thermal(self, num_nodes, num_hist, material_ids, &
                                                          temperature_all, pressure_all, porosity_all)

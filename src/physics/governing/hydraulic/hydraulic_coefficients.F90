@@ -128,6 +128,62 @@ contains
     end subroutine compute_transient_term_hydraulic
 
     ! ==========================================================================
+    ! Coupling Coefficients
+    ! ==========================================================================
+
+    !> @brief Calculate Coupling Mass Term C_HT = d(rho_eff)/dT
+    module subroutine compute_coupling_mass_term_hydraulic(self, material_id, state, C_HT)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: C_HT
+
+        real(real64) :: rho_w, rho_i
+        real(real64) :: dQw_dT, dQi_dT, dQv_dT
+
+        dQw_dT = 0.0d0
+        dQi_dT = 0.0d0
+        dQv_dT = 0.0d0
+
+        call state%dQw_dT%get(dQw_dT)
+        call state%dQi_dT%get(dQi_dT)
+        call state%dQv_dT%get(dQv_dT)
+
+        call self%physics%calc_density_water(state, rho_w)
+        call self%physics%calc_density_ice(state, rho_i)
+
+        ! C_HT = d(rho_eff)/dT
+        ! rho_eff = rho_w*Qw + rho_i*Qi + rho_w*Qv
+        C_HT = rho_w * dQw_dT + rho_i * dQi_dT + rho_w * dQv_dT
+
+    end subroutine compute_coupling_mass_term_hydraulic
+
+    !> @brief Calculate Coupling Diffusion Term D_HT (Vapor Temperature Diffusivity)
+    !> @details
+    !>   Vapor flux driven by temperature gradient:
+    !>   q_v^(T) = -K_vT * grad T
+    !>   D_HT = K_vT (isotropic diagonal tensor)
+    module subroutine compute_coupling_diffusion_term_hydraulic(self, material_id, state, D_HT)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(inout) :: state
+        real(real64), intent(inout) :: D_HT(:, :)
+
+        real(real64) :: K_vT
+        integer(int32) :: i
+
+        call self%calc_K_vT(material_id, state, K_vT)
+
+        D_HT(:, :) = 0.0d0
+        do i = 1, self%computation_dimension
+            D_HT(i, i) = K_vT
+        end do
+
+    end subroutine compute_coupling_diffusion_term_hydraulic
+
+    ! ==========================================================================
     ! Helper Wrappers (Existing)
     ! ==========================================================================
     module subroutine calc_K_wT_hydraulic(self, target_id, state, K_wT)
