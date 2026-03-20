@@ -159,11 +159,12 @@ contains
 
     end subroutine compute_coupling_mass_term_hydraulic
 
-    !> @brief Calculate Coupling Diffusion Term D_HT (Vapor Temperature Diffusivity)
+    !> @brief Calculate Coupling Diffusion Term D_HT
     !> @details
-    !>   Vapor flux driven by temperature gradient:
-    !>   q_v^(T) = -K_vT * grad T
-    !>   D_HT = K_vT (isotropic diagonal tensor)
+    !>   Total moisture flux driven by temperature gradient:
+    !>   \( J^{(T)} = -(K_{vT} + K_{flh}/g \cdot d\psi_{cryo}/dT) \nabla T \)
+    !>   The cryo-suction liquid flux term \( K_{flh}/g \cdot d\psi_{cryo}/dT \)
+    !>   is the dominant mechanism for water transport toward the freezing front.
     module subroutine compute_coupling_diffusion_term_hydraulic(self, material_id, state, D_HT)
         implicit none
         class(type_hydraulic), intent(in) :: self
@@ -171,14 +172,23 @@ contains
         type(type_state), intent(inout) :: state
         real(real64), intent(inout) :: D_HT(:, :)
 
-        real(real64) :: K_vT
+        real(real64) :: K_vT, K_flh, dpsi_cryo_dT
+        real(real64) :: coeff_D
         integer(int32) :: i
 
         call self%calc_K_vT(material_id, state, K_vT)
+        call self%physics%calc_Kflh(material_id, state, K_flh)
+        call self%physics%calc_cryo_suction_deriv_T(material_id, state, dpsi_cryo_dT)
+
+        ! D_HT = K_vT - K_flh/g * dpsi_cryo/dT
+        ! Derived from total potential: Psi = P_w - psi_cryo + rho_w*g*z
+        ! Flux J = -(K/g)*grad(P) + (K/g)*grad(psi_cryo) - rho_w*K*grad(z)
+        ! Fitting to -D_HT*grad(T): D_HT = K_vT - (K_flh/g)*dpsi_cryo/dT
+        coeff_D = K_vT - K_flh / g * dpsi_cryo_dT
 
         D_HT(:, :) = 0.0d0
         do i = 1, self%computation_dimension
-            D_HT(i, i) = K_vT
+            D_HT(i, i) = coeff_D
         end do
 
     end subroutine compute_coupling_diffusion_term_hydraulic
