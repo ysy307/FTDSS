@@ -12,6 +12,28 @@ module numerical_solver_interface
     public :: type_solver_bicgstab
     public :: type_solver_gmres
     public :: type_solver_fgmres
+    public :: type_solver_cg
+    public :: type_solver_bicg
+    public :: type_solver_cgs
+    public :: type_solver_bicgstab_l
+    public :: type_solver_gpbicg
+    public :: type_solver_tfqmr
+    public :: type_solver_orthomin
+    public :: type_solver_jacobi_iter
+    public :: type_solver_gs
+    public :: type_solver_sor
+    public :: type_solver_bicgsafe
+    public :: type_solver_cr
+    public :: type_solver_bicr
+    public :: type_solver_crs
+    public :: type_solver_bicrstab
+    public :: type_solver_gpbicr
+    public :: type_solver_bicrsafe
+    public :: type_solver_idr_s
+    public :: type_solver_idr1
+    public :: type_solver_minres
+    public :: type_solver_cocg
+    public :: type_solver_cocr
 
     public :: type_solver_settings
     public :: create_solver
@@ -89,6 +111,7 @@ module numerical_solver_interface
 
     end interface
 
+    ! ---- BiCGSTAB ----
     type, extends(abst_solver) :: type_solver_bicgstab
         type(type_vector_dp) :: p
         type(type_vector_dp) :: phat
@@ -130,23 +153,21 @@ module numerical_solver_interface
         end subroutine destroy_type_solver_bicgstab
     end interface
 
+    ! ---- GMRES ----
     type, extends(abst_solver) :: type_solver_gmres
         integer(int32) :: m_restart = 30
 
-        ! --- Vector objects (system size N) ---
-        type(type_vector_dp), allocatable :: v(:) ! Basis vectors V (m+1)
-        type(type_vector_dp) :: r ! Residual vector
-        type(type_vector_dp) :: z ! Work vector (after preconditioning)
-        type(type_vector_dp) :: w ! Work vector (after preconditioning)
-        type(type_vector_dp) :: x_update ! Solution update vector
+        type(type_vector_dp), allocatable :: v(:)
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: z
+        type(type_vector_dp) :: w
+        type(type_vector_dp) :: x_update
 
-        ! --- Scalar / small arrays (size m) ---
-        ! Small (m x m) arrays use Fortran native arrays for efficiency and simplicity
-        real(real64), allocatable :: h(:, :) ! Hessenberg matrix (m+1, m)
-        real(real64), allocatable :: g(:) ! Right-hand side vector g (m+1)
-        real(real64), allocatable :: cs(:) ! Givens rotation cosine (m)
-        real(real64), allocatable :: sn(:) ! Givens rotation sine (m)
-        real(real64), allocatable :: y(:) ! Least-squares solution (m)
+        real(real64), allocatable :: h(:, :)
+        real(real64), allocatable :: g(:)
+        real(real64), allocatable :: cs(:)
+        real(real64), allocatable :: sn(:)
+        real(real64), allocatable :: y(:)
 
     contains
         procedure :: initialize => initialize_type_solver_gmres
@@ -178,21 +199,20 @@ module numerical_solver_interface
         end subroutine destroy_type_solver_gmres
     end interface
 
-    !> Flexible GMRES(m) solver.
-    !> Stores preconditioned vectors z(1:m) per Arnoldi step, allowing variable preconditioners.
+    ! ---- FGMRES ----
     type, extends(abst_solver) :: type_solver_fgmres
         integer(int32) :: m_restart = 30
 
-        type(type_vector_dp), allocatable :: v(:)   ! Krylov basis V(m+1)
-        type(type_vector_dp), allocatable :: zv(:)  ! Preconditioned vectors Z(m)
-        type(type_vector_dp) :: r                    ! Residual
-        type(type_vector_dp) :: w                    ! Work vector
+        type(type_vector_dp), allocatable :: v(:)
+        type(type_vector_dp), allocatable :: zv(:)
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: w
 
-        real(real64), allocatable :: h(:, :)         ! Hessenberg matrix (m+1, m)
-        real(real64), allocatable :: g(:)            ! RHS (m+1)
-        real(real64), allocatable :: cs(:)           ! Givens cos (m)
-        real(real64), allocatable :: sn(:)           ! Givens sin (m)
-        real(real64), allocatable :: y(:)            ! LS solution (m)
+        real(real64), allocatable :: h(:, :)
+        real(real64), allocatable :: g(:)
+        real(real64), allocatable :: cs(:)
+        real(real64), allocatable :: sn(:)
+        real(real64), allocatable :: y(:)
     contains
         procedure :: initialize => initialize_type_solver_fgmres
         procedure :: solve => solve_type_solver_fgmres
@@ -221,6 +241,817 @@ module numerical_solver_interface
         end subroutine destroy_type_solver_fgmres
     end interface
 
+    ! ---- CG ----
+    type, extends(abst_solver) :: type_solver_cg
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: z
+        type(type_vector_dp) :: p
+        type(type_vector_dp) :: q
+    contains
+        procedure :: initialize => initialize_type_solver_cg
+        procedure :: solve => solve_type_solver_cg
+        procedure :: destroy => destroy_type_solver_cg
+    end type type_solver_cg
+
+    interface
+        module subroutine initialize_type_solver_cg(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_cg), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_cg
+
+        module subroutine solve_type_solver_cg(self, A, b, x)
+            implicit none
+            class(type_solver_cg), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_cg
+
+        module subroutine destroy_type_solver_cg(self)
+            implicit none
+            class(type_solver_cg), intent(inout) :: self
+        end subroutine destroy_type_solver_cg
+    end interface
+
+    ! ---- BiCG ----
+    type, extends(abst_solver) :: type_solver_bicg
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: r0
+        type(type_vector_dp) :: p
+        type(type_vector_dp) :: p0
+        type(type_vector_dp) :: z
+        type(type_vector_dp) :: z0
+        type(type_vector_dp) :: q
+        type(type_vector_dp) :: q0
+    contains
+        procedure :: initialize => initialize_type_solver_bicg
+        procedure :: solve => solve_type_solver_bicg
+        procedure :: destroy => destroy_type_solver_bicg
+    end type type_solver_bicg
+
+    interface
+        module subroutine initialize_type_solver_bicg(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_bicg), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_bicg
+
+        module subroutine solve_type_solver_bicg(self, A, b, x)
+            implicit none
+            class(type_solver_bicg), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_bicg
+
+        module subroutine destroy_type_solver_bicg(self)
+            implicit none
+            class(type_solver_bicg), intent(inout) :: self
+        end subroutine destroy_type_solver_bicg
+    end interface
+
+    ! ---- CGS ----
+    type, extends(abst_solver) :: type_solver_cgs
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: r0
+        type(type_vector_dp) :: p
+        type(type_vector_dp) :: phat
+        type(type_vector_dp) :: u
+        type(type_vector_dp) :: uhat
+        type(type_vector_dp) :: q
+        type(type_vector_dp) :: qhat
+        type(type_vector_dp) :: v
+    contains
+        procedure :: initialize => initialize_type_solver_cgs
+        procedure :: solve => solve_type_solver_cgs
+        procedure :: destroy => destroy_type_solver_cgs
+    end type type_solver_cgs
+
+    interface
+        module subroutine initialize_type_solver_cgs(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_cgs), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_cgs
+
+        module subroutine solve_type_solver_cgs(self, A, b, x)
+            implicit none
+            class(type_solver_cgs), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_cgs
+
+        module subroutine destroy_type_solver_cgs(self)
+            implicit none
+            class(type_solver_cgs), intent(inout) :: self
+        end subroutine destroy_type_solver_cgs
+    end interface
+
+    ! ---- BiCGSTAB(l) ----
+    type, extends(abst_solver) :: type_solver_bicgstab_l
+        integer(int32) :: ell = 2
+        type(type_vector_dp) :: r0
+        type(type_vector_dp), allocatable :: u(:)
+        type(type_vector_dp), allocatable :: rr(:)
+        type(type_vector_dp) :: z
+        real(real64), allocatable :: gamma(:)
+        real(real64), allocatable :: gamma_p(:)
+        real(real64), allocatable :: gamma_pp(:)
+        real(real64), allocatable :: tau(:, :)
+        real(real64), allocatable :: sigma(:)
+    contains
+        procedure :: initialize => initialize_type_solver_bicgstab_l
+        procedure :: solve => solve_type_solver_bicgstab_l
+        procedure :: destroy => destroy_type_solver_bicgstab_l
+    end type type_solver_bicgstab_l
+
+    interface
+        module subroutine initialize_type_solver_bicgstab_l(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_bicgstab_l), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_bicgstab_l
+
+        module subroutine solve_type_solver_bicgstab_l(self, A, b, x)
+            implicit none
+            class(type_solver_bicgstab_l), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_bicgstab_l
+
+        module subroutine destroy_type_solver_bicgstab_l(self)
+            implicit none
+            class(type_solver_bicgstab_l), intent(inout) :: self
+        end subroutine destroy_type_solver_bicgstab_l
+    end interface
+
+    ! ---- GPBiCG ----
+    type, extends(abst_solver) :: type_solver_gpbicg
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: r0
+        type(type_vector_dp) :: p
+        type(type_vector_dp) :: t
+        type(type_vector_dp) :: u
+        type(type_vector_dp) :: w
+        type(type_vector_dp) :: z
+        type(type_vector_dp) :: Ap
+        type(type_vector_dp) :: At
+    contains
+        procedure :: initialize => initialize_type_solver_gpbicg
+        procedure :: solve => solve_type_solver_gpbicg
+        procedure :: destroy => destroy_type_solver_gpbicg
+    end type type_solver_gpbicg
+
+    interface
+        module subroutine initialize_type_solver_gpbicg(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_gpbicg), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_gpbicg
+
+        module subroutine solve_type_solver_gpbicg(self, A, b, x)
+            implicit none
+            class(type_solver_gpbicg), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_gpbicg
+
+        module subroutine destroy_type_solver_gpbicg(self)
+            implicit none
+            class(type_solver_gpbicg), intent(inout) :: self
+        end subroutine destroy_type_solver_gpbicg
+    end interface
+
+    ! ---- TFQMR ----
+    type, extends(abst_solver) :: type_solver_tfqmr
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: r0
+        type(type_vector_dp) :: w
+        type(type_vector_dp) :: u
+        type(type_vector_dp) :: v
+        type(type_vector_dp) :: d
+        type(type_vector_dp) :: Au
+        type(type_vector_dp) :: z
+    contains
+        procedure :: initialize => initialize_type_solver_tfqmr
+        procedure :: solve => solve_type_solver_tfqmr
+        procedure :: destroy => destroy_type_solver_tfqmr
+    end type type_solver_tfqmr
+
+    interface
+        module subroutine initialize_type_solver_tfqmr(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_tfqmr), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_tfqmr
+
+        module subroutine solve_type_solver_tfqmr(self, A, b, x)
+            implicit none
+            class(type_solver_tfqmr), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_tfqmr
+
+        module subroutine destroy_type_solver_tfqmr(self)
+            implicit none
+            class(type_solver_tfqmr), intent(inout) :: self
+        end subroutine destroy_type_solver_tfqmr
+    end interface
+
+    ! ---- Orthomin(m) ----
+    type, extends(abst_solver) :: type_solver_orthomin
+        integer(int32) :: m_restart = 10
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: z
+        type(type_vector_dp) :: Az
+        type(type_vector_dp), allocatable :: p(:)
+        type(type_vector_dp), allocatable :: Ap(:)
+    contains
+        procedure :: initialize => initialize_type_solver_orthomin
+        procedure :: solve => solve_type_solver_orthomin
+        procedure :: destroy => destroy_type_solver_orthomin
+    end type type_solver_orthomin
+
+    interface
+        module subroutine initialize_type_solver_orthomin(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_orthomin), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_orthomin
+
+        module subroutine solve_type_solver_orthomin(self, A, b, x)
+            implicit none
+            class(type_solver_orthomin), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_orthomin
+
+        module subroutine destroy_type_solver_orthomin(self)
+            implicit none
+            class(type_solver_orthomin), intent(inout) :: self
+        end subroutine destroy_type_solver_orthomin
+    end interface
+
+    ! ---- Jacobi (iterative solver) ----
+    type, extends(abst_solver) :: type_solver_jacobi_iter
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: z
+    contains
+        procedure :: initialize => initialize_type_solver_jacobi_iter
+        procedure :: solve => solve_type_solver_jacobi_iter
+        procedure :: destroy => destroy_type_solver_jacobi_iter
+    end type type_solver_jacobi_iter
+
+    interface
+        module subroutine initialize_type_solver_jacobi_iter(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_jacobi_iter), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_jacobi_iter
+
+        module subroutine solve_type_solver_jacobi_iter(self, A, b, x)
+            implicit none
+            class(type_solver_jacobi_iter), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_jacobi_iter
+
+        module subroutine destroy_type_solver_jacobi_iter(self)
+            implicit none
+            class(type_solver_jacobi_iter), intent(inout) :: self
+        end subroutine destroy_type_solver_jacobi_iter
+    end interface
+
+    ! ---- Gauss-Seidel ----
+    type, extends(abst_solver) :: type_solver_gs
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: z
+    contains
+        procedure :: initialize => initialize_type_solver_gs
+        procedure :: solve => solve_type_solver_gs
+        procedure :: destroy => destroy_type_solver_gs
+    end type type_solver_gs
+
+    interface
+        module subroutine initialize_type_solver_gs(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_gs), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_gs
+
+        module subroutine solve_type_solver_gs(self, A, b, x)
+            implicit none
+            class(type_solver_gs), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_gs
+
+        module subroutine destroy_type_solver_gs(self)
+            implicit none
+            class(type_solver_gs), intent(inout) :: self
+        end subroutine destroy_type_solver_gs
+    end interface
+
+    ! ---- SOR ----
+    type, extends(abst_solver) :: type_solver_sor
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: z
+    contains
+        procedure :: initialize => initialize_type_solver_sor
+        procedure :: solve => solve_type_solver_sor
+        procedure :: destroy => destroy_type_solver_sor
+    end type type_solver_sor
+
+    interface
+        module subroutine initialize_type_solver_sor(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_sor), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_sor
+
+        module subroutine solve_type_solver_sor(self, A, b, x)
+            implicit none
+            class(type_solver_sor), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_sor
+
+        module subroutine destroy_type_solver_sor(self)
+            implicit none
+            class(type_solver_sor), intent(inout) :: self
+        end subroutine destroy_type_solver_sor
+    end interface
+
+    ! ---- BiCGSafe ----
+    type, extends(abst_solver) :: type_solver_bicgsafe
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: r0
+        type(type_vector_dp) :: p
+        type(type_vector_dp) :: phat
+        type(type_vector_dp) :: s
+        type(type_vector_dp) :: shat
+        type(type_vector_dp) :: t
+        type(type_vector_dp) :: v
+    contains
+        procedure :: initialize => initialize_type_solver_bicgsafe
+        procedure :: solve => solve_type_solver_bicgsafe
+        procedure :: destroy => destroy_type_solver_bicgsafe
+    end type type_solver_bicgsafe
+
+    interface
+        module subroutine initialize_type_solver_bicgsafe(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_bicgsafe), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_bicgsafe
+
+        module subroutine solve_type_solver_bicgsafe(self, A, b, x)
+            implicit none
+            class(type_solver_bicgsafe), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_bicgsafe
+
+        module subroutine destroy_type_solver_bicgsafe(self)
+            implicit none
+            class(type_solver_bicgsafe), intent(inout) :: self
+        end subroutine destroy_type_solver_bicgsafe
+    end interface
+
+    ! ---- CR ----
+    type, extends(abst_solver) :: type_solver_cr
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: p
+        type(type_vector_dp) :: q
+        type(type_vector_dp) :: Ar
+        type(type_vector_dp) :: Ap
+    contains
+        procedure :: initialize => initialize_type_solver_cr
+        procedure :: solve => solve_type_solver_cr
+        procedure :: destroy => destroy_type_solver_cr
+    end type type_solver_cr
+
+    interface
+        module subroutine initialize_type_solver_cr(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_cr), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_cr
+
+        module subroutine solve_type_solver_cr(self, A, b, x)
+            implicit none
+            class(type_solver_cr), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_cr
+
+        module subroutine destroy_type_solver_cr(self)
+            implicit none
+            class(type_solver_cr), intent(inout) :: self
+        end subroutine destroy_type_solver_cr
+    end interface
+
+    ! ---- BiCR ----
+    type, extends(abst_solver) :: type_solver_bicr
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: r0
+        type(type_vector_dp) :: p
+        type(type_vector_dp) :: p0
+        type(type_vector_dp) :: Ap
+        type(type_vector_dp) :: Ap0
+        type(type_vector_dp) :: Ar
+        type(type_vector_dp) :: Ar0
+    contains
+        procedure :: initialize => initialize_type_solver_bicr
+        procedure :: solve => solve_type_solver_bicr
+        procedure :: destroy => destroy_type_solver_bicr
+    end type type_solver_bicr
+
+    interface
+        module subroutine initialize_type_solver_bicr(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_bicr), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_bicr
+
+        module subroutine solve_type_solver_bicr(self, A, b, x)
+            implicit none
+            class(type_solver_bicr), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_bicr
+
+        module subroutine destroy_type_solver_bicr(self)
+            implicit none
+            class(type_solver_bicr), intent(inout) :: self
+        end subroutine destroy_type_solver_bicr
+    end interface
+
+    ! ---- CRS ----
+    type, extends(abst_solver) :: type_solver_crs
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: r0
+        type(type_vector_dp) :: p
+        type(type_vector_dp) :: phat
+        type(type_vector_dp) :: u
+        type(type_vector_dp) :: uhat
+        type(type_vector_dp) :: q
+        type(type_vector_dp) :: qhat
+        type(type_vector_dp) :: v
+        type(type_vector_dp) :: Ar
+    contains
+        procedure :: initialize => initialize_type_solver_crs
+        procedure :: solve => solve_type_solver_crs
+        procedure :: destroy => destroy_type_solver_crs
+    end type type_solver_crs
+
+    interface
+        module subroutine initialize_type_solver_crs(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_crs), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_crs
+
+        module subroutine solve_type_solver_crs(self, A, b, x)
+            implicit none
+            class(type_solver_crs), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_crs
+
+        module subroutine destroy_type_solver_crs(self)
+            implicit none
+            class(type_solver_crs), intent(inout) :: self
+        end subroutine destroy_type_solver_crs
+    end interface
+
+    ! ---- BiCRSTAB ----
+    type, extends(abst_solver) :: type_solver_bicrstab
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: r0
+        type(type_vector_dp) :: p
+        type(type_vector_dp) :: phat
+        type(type_vector_dp) :: s
+        type(type_vector_dp) :: shat
+        type(type_vector_dp) :: t
+        type(type_vector_dp) :: v
+        type(type_vector_dp) :: Ar
+    contains
+        procedure :: initialize => initialize_type_solver_bicrstab
+        procedure :: solve => solve_type_solver_bicrstab
+        procedure :: destroy => destroy_type_solver_bicrstab
+    end type type_solver_bicrstab
+
+    interface
+        module subroutine initialize_type_solver_bicrstab(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_bicrstab), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_bicrstab
+
+        module subroutine solve_type_solver_bicrstab(self, A, b, x)
+            implicit none
+            class(type_solver_bicrstab), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_bicrstab
+
+        module subroutine destroy_type_solver_bicrstab(self)
+            implicit none
+            class(type_solver_bicrstab), intent(inout) :: self
+        end subroutine destroy_type_solver_bicrstab
+    end interface
+
+    ! ---- GPBiCR ----
+    type, extends(abst_solver) :: type_solver_gpbicr
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: r0
+        type(type_vector_dp) :: p
+        type(type_vector_dp) :: t
+        type(type_vector_dp) :: u
+        type(type_vector_dp) :: w
+        type(type_vector_dp) :: z
+        type(type_vector_dp) :: Ap
+        type(type_vector_dp) :: At
+        type(type_vector_dp) :: Ar
+    contains
+        procedure :: initialize => initialize_type_solver_gpbicr
+        procedure :: solve => solve_type_solver_gpbicr
+        procedure :: destroy => destroy_type_solver_gpbicr
+    end type type_solver_gpbicr
+
+    interface
+        module subroutine initialize_type_solver_gpbicr(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_gpbicr), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_gpbicr
+
+        module subroutine solve_type_solver_gpbicr(self, A, b, x)
+            implicit none
+            class(type_solver_gpbicr), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_gpbicr
+
+        module subroutine destroy_type_solver_gpbicr(self)
+            implicit none
+            class(type_solver_gpbicr), intent(inout) :: self
+        end subroutine destroy_type_solver_gpbicr
+    end interface
+
+    ! ---- BiCRSafe ----
+    type, extends(abst_solver) :: type_solver_bicrsafe
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: r0
+        type(type_vector_dp) :: p
+        type(type_vector_dp) :: phat
+        type(type_vector_dp) :: s
+        type(type_vector_dp) :: shat
+        type(type_vector_dp) :: t
+        type(type_vector_dp) :: v
+        type(type_vector_dp) :: Ar
+    contains
+        procedure :: initialize => initialize_type_solver_bicrsafe
+        procedure :: solve => solve_type_solver_bicrsafe
+        procedure :: destroy => destroy_type_solver_bicrsafe
+    end type type_solver_bicrsafe
+
+    interface
+        module subroutine initialize_type_solver_bicrsafe(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_bicrsafe), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_bicrsafe
+
+        module subroutine solve_type_solver_bicrsafe(self, A, b, x)
+            implicit none
+            class(type_solver_bicrsafe), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_bicrsafe
+
+        module subroutine destroy_type_solver_bicrsafe(self)
+            implicit none
+            class(type_solver_bicrsafe), intent(inout) :: self
+        end subroutine destroy_type_solver_bicrsafe
+    end interface
+
+    ! ---- IDR(s) ----
+    type, extends(abst_solver) :: type_solver_idr_s
+        integer(int32) :: s_param = 4
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: v
+        type(type_vector_dp) :: t
+        type(type_vector_dp) :: z
+        type(type_vector_dp), allocatable :: P(:)
+        type(type_vector_dp), allocatable :: G(:)
+        type(type_vector_dp), allocatable :: U(:)
+        real(real64), allocatable :: M_idr(:, :)
+        real(real64), allocatable :: f(:)
+        real(real64), allocatable :: c(:)
+    contains
+        procedure :: initialize => initialize_type_solver_idr_s
+        procedure :: solve => solve_type_solver_idr_s
+        procedure :: destroy => destroy_type_solver_idr_s
+    end type type_solver_idr_s
+
+    interface
+        module subroutine initialize_type_solver_idr_s(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_idr_s), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_idr_s
+
+        module subroutine solve_type_solver_idr_s(self, A, b, x)
+            implicit none
+            class(type_solver_idr_s), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_idr_s
+
+        module subroutine destroy_type_solver_idr_s(self)
+            implicit none
+            class(type_solver_idr_s), intent(inout) :: self
+        end subroutine destroy_type_solver_idr_s
+    end interface
+
+    ! ---- IDR(1) ----
+    type, extends(abst_solver) :: type_solver_idr1
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: r0
+        type(type_vector_dp) :: v
+        type(type_vector_dp) :: t
+        type(type_vector_dp) :: dv
+        type(type_vector_dp) :: dr
+        type(type_vector_dp) :: z
+    contains
+        procedure :: initialize => initialize_type_solver_idr1
+        procedure :: solve => solve_type_solver_idr1
+        procedure :: destroy => destroy_type_solver_idr1
+    end type type_solver_idr1
+
+    interface
+        module subroutine initialize_type_solver_idr1(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_idr1), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_idr1
+
+        module subroutine solve_type_solver_idr1(self, A, b, x)
+            implicit none
+            class(type_solver_idr1), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_idr1
+
+        module subroutine destroy_type_solver_idr1(self)
+            implicit none
+            class(type_solver_idr1), intent(inout) :: self
+        end subroutine destroy_type_solver_idr1
+    end interface
+
+    ! ---- MINRES ----
+    type, extends(abst_solver) :: type_solver_minres
+        type(type_vector_dp) :: v
+        type(type_vector_dp) :: v_old
+        type(type_vector_dp) :: v_new
+        type(type_vector_dp) :: w
+        type(type_vector_dp) :: w_old
+        type(type_vector_dp) :: w_new
+    contains
+        procedure :: initialize => initialize_type_solver_minres
+        procedure :: solve => solve_type_solver_minres
+        procedure :: destroy => destroy_type_solver_minres
+    end type type_solver_minres
+
+    interface
+        module subroutine initialize_type_solver_minres(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_minres), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_minres
+
+        module subroutine solve_type_solver_minres(self, A, b, x)
+            implicit none
+            class(type_solver_minres), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_minres
+
+        module subroutine destroy_type_solver_minres(self)
+            implicit none
+            class(type_solver_minres), intent(inout) :: self
+        end subroutine destroy_type_solver_minres
+    end interface
+
+    ! ---- COCG ----
+    type, extends(abst_solver) :: type_solver_cocg
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: z
+        type(type_vector_dp) :: p
+        type(type_vector_dp) :: q
+    contains
+        procedure :: initialize => initialize_type_solver_cocg
+        procedure :: solve => solve_type_solver_cocg
+        procedure :: destroy => destroy_type_solver_cocg
+    end type type_solver_cocg
+
+    interface
+        module subroutine initialize_type_solver_cocg(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_cocg), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_cocg
+
+        module subroutine solve_type_solver_cocg(self, A, b, x)
+            implicit none
+            class(type_solver_cocg), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_cocg
+
+        module subroutine destroy_type_solver_cocg(self)
+            implicit none
+            class(type_solver_cocg), intent(inout) :: self
+        end subroutine destroy_type_solver_cocg
+    end interface
+
+    ! ---- COCR ----
+    type, extends(abst_solver) :: type_solver_cocr
+        type(type_vector_dp) :: r
+        type(type_vector_dp) :: p
+        type(type_vector_dp) :: Ar
+        type(type_vector_dp) :: Ap
+    contains
+        procedure :: initialize => initialize_type_solver_cocr
+        procedure :: solve => solve_type_solver_cocr
+        procedure :: destroy => destroy_type_solver_cocr
+    end type type_solver_cocr
+
+    interface
+        module subroutine initialize_type_solver_cocr(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_cocr), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_cocr
+
+        module subroutine solve_type_solver_cocr(self, A, b, x)
+            implicit none
+            class(type_solver_cocr), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_cocr
+
+        module subroutine destroy_type_solver_cocr(self)
+            implicit none
+            class(type_solver_cocr), intent(inout) :: self
+        end subroutine destroy_type_solver_cocr
+    end interface
+
 contains
     subroutine set_solver_settings(self, id, num_nodes, tolerance, max_iterations, m_restart)
         implicit none
@@ -237,13 +1068,15 @@ contains
         self%max_iterations = max_iterations
 
         select case (self%ID)
-        case (LINEAR_SOLVER_TYPES%GMRES_M%ID)
+        case (LINEAR_SOLVER_TYPES%GMRES_M%ID, LINEAR_SOLVER_TYPES%FGMRES_M%ID, &
+              LINEAR_SOLVER_TYPES%ORTHOMIN_M%ID)
             if (present(m_restart)) then
                 self%m_restart = m_restart
             else
                 self%m_restart = 100
             end if
         case default
+            self%m_restart = 0
         end select
     end subroutine set_solver_settings
 
@@ -336,61 +1169,105 @@ contains
 
         select case (solver_settings%ID)
         case (LINEAR_SOLVER_TYPES%CG%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_cg :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%BICG%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_bicg :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%CGS%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_cgs :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%BICGSTAB%ID)
             allocate (type_solver_bicgstab :: solver)
             call solver%initialize(solver_settings, preconditioner_settings)
             ierr = solver%status
         case (LINEAR_SOLVER_TYPES%BICGSTAB_L%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_bicgstab_l :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%GPBICG%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_gpbicg :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%TFQMR%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_tfqmr :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%ORTHOMIN_M%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_orthomin :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%GMRES_M%ID)
             allocate (type_solver_gmres :: solver)
             call solver%initialize(solver_settings, preconditioner_settings)
             ierr = solver%status
         case (LINEAR_SOLVER_TYPES%JACOBI%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_jacobi_iter :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%GAUSS_SEIDEL%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_gs :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%SOR%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_sor :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%BICGSAFE%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_bicgsafe :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%CR%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_cr :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%BICR%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_bicr :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%CRS%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_crs :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%BICRSTAB%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_bicrstab :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%GPBICR%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_gpbicr :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%BICRSAFE%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_bicrsafe :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%FGMRES_M%ID)
             allocate (type_solver_fgmres :: solver)
             call solver%initialize(solver_settings, preconditioner_settings)
             ierr = solver%status
         case (LINEAR_SOLVER_TYPES%IDR_S%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_idr_s :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%IDR1%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_idr1 :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%MINRES%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_minres :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%COCG%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_cocg :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%COCR%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_cocr :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case default
             ierr = SOLVER_STATUS%ILL_OPTIONS%ID
         end select
@@ -398,4 +1275,3 @@ contains
     end subroutine create_solver
 
 end module numerical_solver_interface
-

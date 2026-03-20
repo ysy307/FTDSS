@@ -15,6 +15,28 @@ target_sources(SOLVER_SOLVE PRIVATE
     iterative/solve_bicgstab.F90
     iterative/solve_gmres.F90
     iterative/solve_fgmres.F90
+    iterative/solve_cg.F90
+    iterative/solve_bicg.F90
+    iterative/solve_cgs.F90
+    iterative/solve_bicgstab_l.F90
+    iterative/solve_gpbicg.F90
+    iterative/solve_tfqmr.F90
+    iterative/solve_orthomin.F90
+    iterative/solve_jacobi_iter.F90
+    iterative/solve_gs.F90
+    iterative/solve_sor.F90
+    iterative/solve_bicgsafe.F90
+    iterative/solve_cr.F90
+    iterative/solve_bicr.F90
+    iterative/solve_crs.F90
+    iterative/solve_bicrstab.F90
+    iterative/solve_gpbicr.F90
+    iterative/solve_bicrsafe.F90
+    iterative/solve_idr_s.F90
+    iterative/solve_idr1.F90
+    iterative/solve_minres.F90
+    iterative/solve_cocg.F90
+    iterative/solve_cocr.F90
 
     # --- Preconditioners ---
     preconditioner/preconditioner_none.F90
