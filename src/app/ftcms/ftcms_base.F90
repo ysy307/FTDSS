@@ -143,8 +143,17 @@ contains
                                  solver_settings%tolerance, &
                                  solver_settings%max_iterations, &
                                  solver_settings%m_restarts)
-            if (solver_settings%preconditioner_type == PRECONDITIONER_TYPES%ILU%ID .or. &
-                solver_settings%preconditioner_type == PRECONDITIONER_TYPES%JACOBI%ID) then
+            if (any(solver_settings%preconditioner_type == [ &
+                PRECONDITIONER_TYPES%ILU%ID, &
+                PRECONDITIONER_TYPES%JACOBI%ID, &
+                PRECONDITIONER_TYPES%SSOR%ID, &
+                PRECONDITIONER_TYPES%ILUT%ID, &
+                PRECONDITIONER_TYPES%SAAMG%ID, &
+                PRECONDITIONER_TYPES%ILUC%ID, &
+                PRECONDITIONER_TYPES%IS%ID, &
+                PRECONDITIONER_TYPES%SAINV%ID, &
+                PRECONDITIONER_TYPES%HYBRID%ID, &
+                PRECONDITIONER_TYPES%ADDS%ID])) then
                 call pc_info%set(solver_settings%preconditioner_type, num_nodes, self%K%get_num_dofs_per_node())
             else
                 call pc_info%set(solver_settings%preconditioner_type, num_total_dofs)
@@ -624,6 +633,7 @@ contains
                         end if
                     else
                         relaxation_factor = 1.0d0
+                        current(:) = current(:) + du(:)
                     end if
                     call self%temperature%set_delta(relaxation_factor * du(:))
                 else
@@ -668,6 +678,7 @@ contains
                         end if
                     else
                         relaxation_factor = 1.0d0
+                        current(:) = current(:) + du(:)
                     end if
                     call self%pressure%set_delta(relaxation_factor * du(:))
                 else

@@ -14,11 +14,20 @@ target_sources(SOLVER_SOLVE PRIVATE
     # --- Iterative solvers ---
     iterative/solve_bicgstab.F90
     iterative/solve_gmres.F90
+    iterative/solve_fgmres.F90
 
     # --- Preconditioners ---
     preconditioner/preconditioner_none.F90
     preconditioner/preconditioner_jacobi.F90
     preconditioner/preconditioner_iluk.F90
+    preconditioner/preconditioner_ssor.F90
+    preconditioner/preconditioner_ilut.F90
+    preconditioner/preconditioner_saamg.F90
+    preconditioner/preconditioner_iluc.F90
+    preconditioner/preconditioner_is.F90
+    preconditioner/preconditioner_sainv.F90
+    preconditioner/preconditioner_hybrid.F90
+    preconditioner/preconditioner_adds.F90
 
     # --- Factory / Entry ---
     solver.F90

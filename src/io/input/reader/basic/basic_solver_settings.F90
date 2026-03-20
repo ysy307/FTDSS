@@ -205,7 +205,7 @@ contains
                             is_required=.true., default_value=4, valid_range=[1, 20])
         buffer(3) = preconditioner_type
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%preconditioner_type, &
-                            is_required=.true., default_value=1, valid_range=[0, 10])
+                            is_required=.true., default_value=1, valid_range=[0, 11])
         buffer(3) = max_iterations
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%max_iterations, &
                             is_required=.true., default_value=10000, valid_range=[1, huge(1)])
@@ -224,7 +224,7 @@ contains
         legacy_buffer(2) = preconditioner_type
         call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%preconditioner_type, &
                     is_required=.false., default_value=self%solver_settings%linear_solver%preconditioner_type, &
-                    valid_range=[0, 10])
+                    valid_range=[0, 11])
 
         legacy_buffer(2) = max_iterations
         call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%max_iterations, &

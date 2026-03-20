@@ -11,6 +11,7 @@ module numerical_solver_interface
     public :: abst_solver
     public :: type_solver_bicgstab
     public :: type_solver_gmres
+    public :: type_solver_fgmres
 
     public :: type_solver_settings
     public :: create_solver
@@ -177,6 +178,49 @@ module numerical_solver_interface
         end subroutine destroy_type_solver_gmres
     end interface
 
+    !> Flexible GMRES(m) solver.
+    !> Stores preconditioned vectors z(1:m) per Arnoldi step, allowing variable preconditioners.
+    type, extends(abst_solver) :: type_solver_fgmres
+        integer(int32) :: m_restart = 30
+
+        type(type_vector_dp), allocatable :: v(:)   ! Krylov basis V(m+1)
+        type(type_vector_dp), allocatable :: zv(:)  ! Preconditioned vectors Z(m)
+        type(type_vector_dp) :: r                    ! Residual
+        type(type_vector_dp) :: w                    ! Work vector
+
+        real(real64), allocatable :: h(:, :)         ! Hessenberg matrix (m+1, m)
+        real(real64), allocatable :: g(:)            ! RHS (m+1)
+        real(real64), allocatable :: cs(:)           ! Givens cos (m)
+        real(real64), allocatable :: sn(:)           ! Givens sin (m)
+        real(real64), allocatable :: y(:)            ! LS solution (m)
+    contains
+        procedure :: initialize => initialize_type_solver_fgmres
+        procedure :: solve => solve_type_solver_fgmres
+        procedure :: destroy => destroy_type_solver_fgmres
+    end type type_solver_fgmres
+
+    interface
+        module subroutine initialize_type_solver_fgmres(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_fgmres), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_fgmres
+
+        module subroutine solve_type_solver_fgmres(self, A, b, x)
+            implicit none
+            class(type_solver_fgmres), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_fgmres
+
+        module subroutine destroy_type_solver_fgmres(self)
+            implicit none
+            class(type_solver_fgmres), intent(inout) :: self
+        end subroutine destroy_type_solver_fgmres
+    end interface
+
 contains
     subroutine set_solver_settings(self, id, num_nodes, tolerance, max_iterations, m_restart)
         implicit none
@@ -334,7 +378,9 @@ contains
         case (LINEAR_SOLVER_TYPES%BICRSAFE%ID)
             ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
         case (LINEAR_SOLVER_TYPES%FGMRES_M%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_solver_fgmres :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case (LINEAR_SOLVER_TYPES%IDR_S%ID)
             ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
         case (LINEAR_SOLVER_TYPES%IDR1%ID)
