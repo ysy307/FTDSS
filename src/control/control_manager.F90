@@ -89,6 +89,7 @@ module control_control_manager
         procedure, public, pass(self) :: get_update_frequency => get_update_frequency_control
         procedure, public, pass(self) :: get_current_norm => get_current_norm_control
         procedure, public, pass(self) :: get_tolerances => get_tolerances_control
+        procedure, public, pass(self) :: update_convergence_reference_values => update_convergence_reference_values_control
         ! - time
         procedure, public, pass(self) :: get_time => get_time_control
         ! - acceleration
@@ -740,5 +741,13 @@ contains
 
         call self%acceleration%get_previous_relaxation(physics_type, relaxation)
     end subroutine get_previous_relaxation_control
+
+    subroutine update_convergence_reference_values_control(self, reference_values)
+        implicit none
+        class(type_control), intent(inout) :: self
+        real(real64), intent(in) :: reference_values(:)
+
+        call self%iteration%update_reference_values(reference_values)
+    end subroutine update_convergence_reference_values_control
 
 end module control_control_manager

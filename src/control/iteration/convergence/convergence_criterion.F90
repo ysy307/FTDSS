@@ -140,4 +140,20 @@ contains
         end if
 
     end subroutine get_tolerances_convergence_criterion
+
+    !> Update the reference value for relative error normalization.
+    !> Typically called per time step with a characteristic scale of the physical variable.
+    module subroutine update_reference_value_type_convergence_criterion(self, reference_value)
+        implicit none
+        class(type_convergence_criterion), intent(inout) :: self
+        real(real64), intent(in) :: reference_value
+
+        if (abs(reference_value) < 1.0d-6) then
+            self%reference_value = 1.0d0
+        else
+            self%reference_value = abs(reference_value)
+        end if
+
+    end subroutine update_reference_value_type_convergence_criterion
+
 end submodule convergence_criterion

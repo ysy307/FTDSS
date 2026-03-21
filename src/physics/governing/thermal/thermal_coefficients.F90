@@ -338,8 +338,9 @@ contains
             end if
         end if
 
-        ! Clip negative heat capacity as it is physically invalid
-        C_TT = max(C_TT, 0.0d0)
+        ! Floor heat capacity to ensure positive-definite mass matrix.
+        ! Minimum: ice volumetric heat capacity rho_i*c_i*phi_min ~ 917*2100*0.01 ~ 1.9e4
+        C_TT = max(C_TT, 1.0d4)
 
     end subroutine compute_mass_term_thermal
 

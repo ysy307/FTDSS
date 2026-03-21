@@ -577,18 +577,21 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: bdf_coeffs
         integer(int32) :: bdf_order
         real(real64), pointer, contiguous, dimension(:) :: current
-        real(real64), allocatable :: du(:)
+        real(real64), allocatable :: dv(:)
+        real(real64), allocatable :: du_phys(:)
 
         real(real64) :: relaxation_factor
+        real(real64) :: new_scale
         logical :: is_none
         logical :: is_newton
+        logical :: has_col_scale
 
-        ! Line search parameters for Newton mode
-        real(real64) :: max_du, alpha
-        real(real64), parameter :: MAX_DT_STEP = 2.0d0
-        real(real64), parameter :: MAX_DP_STEP = 1.0d3
-        real(real64), parameter :: ALPHA_MIN = 0.1d0
-        integer(int32) :: i
+        ! Picard fixed relaxation factor
+        real(real64), parameter :: PICARD_OMEGA = 0.5d0
+        ! Safety clamp in dimensionless space
+        real(real64), parameter :: MAX_SCALED_DU = 2.0d0
+        integer(int32) :: i, num_nodes, num_dofs_per_node, num_total_dofs
+        integer(int32) :: thermal_dof_idx, hydraulic_dof_idx
 
         call self%control%profiler_start(PROFILER_TYPES%SETUP)
 
@@ -596,46 +599,83 @@ contains
         nullify (bdf_coeffs)
 
         call self%control%get_nonlinear_iter(iter)
-
         call self%control%get_bdf_coeffs(bdf_order, bdf_coeffs)
 
         is_none = self%control%is_none()
         is_newton = self%control%is_compute_newton()
+        has_col_scale = allocated(self%col_scale)
+
+        call self%domain%get_num_nodes(num_nodes)
+        call self%domain%get_num_dof_per_node(num_dofs_per_node)
+        thermal_dof_idx = self%thermal_start_dof
+        hydraulic_dof_idx = self%hydraulic_start_dof
 
         if (self%is_active_thermal()) then
-            call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
+            ! dv is dimensionless increment (S^{-1} du) from column-scaled solve
+            call self%get_variable_increment(PHYSICS_TYPES%THERMAL, dv)
             call self%temperature%get_current(current)
             if (associated(current)) then
-                if (allocated(du) .and. size(du) > 0) then
+                if (allocated(dv) .and. size(dv) > 0) then
+                    ! Unscale to physical: du = S * dv
+                    allocate (du_phys(size(dv)))
+                    if (has_col_scale .and. thermal_dof_idx > 0) then
+                        do i = 1, size(dv)
+                            du_phys(i) = dv(i) * self%col_scale((i - 1) * num_dofs_per_node + thermal_dof_idx)
+                        end do
+                    else
+                        du_phys(:) = dv(:)
+                    end if
+
                     if (.not. is_none) then
-                        if (is_newton) then
-                            ! Per-node clamping: limit each node's dT independently
-                            max_du = maxval(abs(du))
-                            do i = 1, size(du)
-                                if (abs(du(i)) > MAX_DT_STEP) then
-                                    du(i) = sign(MAX_DT_STEP, du(i))
-                                end if
-                            end do
-                            relaxation_factor = 1.0d0
-                            write (*, '("   [Newton] Iter:", I3, " max|dT|:", ES10.3, " (clamped to", F6.2, ")")') &
-                                iter, max_du, MAX_DT_STEP
-                            current(:) = current(:) + du(:)
+                        if (iter == 1) then
+                            ! iter=1: full step (BC adjustment)
+                            current(:) = current(:) + du_phys(:)
+                            call self%temperature%set_delta(du_phys(:))
+
+                            ! Dynamic scale update: set s_T from iter=1 increment
+                            if (has_col_scale .and. thermal_dof_idx > 0) then
+                                new_scale = max(maxval(abs(du_phys)), 1.0d0)
+                                call self%domain%get_num_nodes(num_nodes)
+                                call self%domain%get_num_dof_per_node(num_dofs_per_node)
+                                do i = 1, num_nodes
+                                    self%col_scale((i - 1) * num_dofs_per_node + thermal_dof_idx) = new_scale
+                                end do
+                                call self%domain%get_total_dofs(num_total_dofs)
+                                self%col_scale_inv(:) = 1.0d0 / self%col_scale(:)
+                                write (*, '("   [SCALE-UPDATE] s_T=", ES10.3)') new_scale
+                            end if
                         else
-                            ! Per-node clamping before Aitken relaxation
-                            do i = 1, size(du)
-                                if (abs(du(i)) > MAX_DT_STEP) then
-                                    du(i) = sign(MAX_DT_STEP, du(i))
-                                end if
+                            ! Fixed under-relaxation with clamping in dimensionless space
+                            if (is_newton) then
+                                relaxation_factor = 1.0d0
+                            else
+                                relaxation_factor = PICARD_OMEGA
+                            end if
+
+                            do i = 1, size(dv)
+                                dv(i) = sign(min(abs(dv(i)), MAX_SCALED_DU), dv(i))
                             end do
-                            call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, du, current)
-                            call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
-                            write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+
+                            write (*, '("   [Picard-T] Iter:", I3, " Omega:", F6.4, " max|dv|:", ES10.3)') &
+                                iter, relaxation_factor, maxval(abs(dv))
+
+                            ! Unscale clamped dv for physical update
+                            if (has_col_scale .and. thermal_dof_idx > 0) then
+                                do i = 1, size(dv)
+                                    du_phys(i) = dv(i) * self%col_scale((i - 1) * num_dofs_per_node + thermal_dof_idx)
+                                end do
+                            else
+                                du_phys(:) = dv(:)
+                            end if
+                            current(:) = current(:) + relaxation_factor * du_phys(:)
+                            call self%temperature%set_delta(relaxation_factor * du_phys(:))
                         end if
                     else
-                        relaxation_factor = 1.0d0
-                        current(:) = current(:) + du(:)
+                        ! NONE (linear): full step
+                        current(:) = current(:) + du_phys(:)
+                        call self%temperature%set_delta(du_phys(:))
                     end if
-                    call self%temperature%set_delta(relaxation_factor * du(:))
+                    deallocate (du_phys)
                 else
                     call self%temperature%set_delta(0.0d0 * current)
                 end if
@@ -644,43 +684,60 @@ contains
             call self%calc_gradient_temperature()
             call self%temperature%compute_time_derivative(bdf_coeffs, bdf_order)
 
-            call deallocate_array(du)
+            call deallocate_array(dv)
         end if
 
         if (self%is_active_hydraulic()) then
-            call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, du)
+            call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, dv)
             call self%pressure%get_current(current)
             if (associated(current)) then
-                if (allocated(du) .and. size(du) > 0) then
+                if (allocated(dv) .and. size(dv) > 0) then
+                    ! Unscale to physical: du = S * dv
+                    allocate (du_phys(size(dv)))
+                    if (has_col_scale .and. hydraulic_dof_idx > 0) then
+                        do i = 1, size(dv)
+                            du_phys(i) = dv(i) * self%col_scale((i - 1) * num_dofs_per_node + hydraulic_dof_idx)
+                        end do
+                    else
+                        du_phys(:) = dv(:)
+                    end if
+
                     if (.not. is_none) then
-                        if (is_newton) then
-                            ! Per-node clamping: limit each node's dP independently
-                            max_du = maxval(abs(du))
-                            do i = 1, size(du)
-                                if (abs(du(i)) > MAX_DP_STEP) then
-                                    du(i) = sign(MAX_DP_STEP, du(i))
-                                end if
-                            end do
-                            relaxation_factor = 1.0d0
-                            write (*, '("   [Newton] Iter:", I3, " max|dP|:", ES10.3, " (clamped to", ES10.3, ")")') &
-                                iter, max_du, MAX_DP_STEP
-                            current(:) = current(:) + du(:)
+                        if (iter == 1) then
+                            ! iter=1: full step
+                            current(:) = current(:) + du_phys(:)
+                            call self%pressure%set_delta(du_phys(:))
                         else
-                            ! Per-node clamping before Aitken relaxation
-                            do i = 1, size(du)
-                                if (abs(du(i)) > MAX_DP_STEP) then
-                                    du(i) = sign(MAX_DP_STEP, du(i))
-                                end if
+                            ! Fixed under-relaxation with clamping
+                            if (is_newton) then
+                                relaxation_factor = 1.0d0
+                            else
+                                relaxation_factor = PICARD_OMEGA
+                            end if
+
+                            do i = 1, size(dv)
+                                dv(i) = sign(min(abs(dv(i)), MAX_SCALED_DU), dv(i))
                             end do
-                            call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, du, current)
-                            call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
-                            write (*, '("   [Aitken] Iter:", I3, " Omega:", F6.4)') iter, relaxation_factor
+
+                            write (*, '("   [Picard-H] Iter:", I3, " Omega:", F6.4, " max|dv|:", ES10.3)') &
+                                iter, relaxation_factor, maxval(abs(dv))
+
+                            ! Unscale clamped dv for physical update
+                            if (has_col_scale .and. hydraulic_dof_idx > 0) then
+                                do i = 1, size(dv)
+                                    du_phys(i) = dv(i) * self%col_scale((i - 1) * num_dofs_per_node + hydraulic_dof_idx)
+                                end do
+                            else
+                                du_phys(:) = dv(:)
+                            end if
+                            current(:) = current(:) + relaxation_factor * du_phys(:)
+                            call self%pressure%set_delta(relaxation_factor * du_phys(:))
                         end if
                     else
-                        relaxation_factor = 1.0d0
-                        current(:) = current(:) + du(:)
+                        ! NONE (linear): full step
+                        current(:) = current(:) + du_phys(:)
+                        call self%pressure%set_delta(du_phys(:))
                     end if
-                    call self%pressure%set_delta(relaxation_factor * du(:))
                 else
                     call self%pressure%set_delta(0.0d0 * current)
                 end if
@@ -689,7 +746,7 @@ contains
             call self%calc_gradient_pressure()
             call self%pressure%compute_time_derivative(bdf_coeffs, bdf_order)
 
-            call deallocate_array(du)
+            call deallocate_array(dv)
         end if
 
         call self%control%profiler_stop(PROFILER_TYPES%SETUP)

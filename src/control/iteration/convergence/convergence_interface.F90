@@ -42,6 +42,7 @@ module control_iteration_convergence
         procedure, public, pass(self) :: destroy => destroy_type_convergence_criterion
         ! ---- Mutator ----
         procedure, public, pass(self) :: reset => reset_criterion
+        procedure, public, pass(self) :: update_reference_value => update_reference_value_type_convergence_criterion
         ! ---- Algorithm / Operation ----
         procedure, public, pass(self) :: check_convergence => check_convergence_criterion
         ! ---- Inquiry ----
@@ -101,6 +102,13 @@ module control_iteration_convergence
 
         end subroutine get_tolerances_convergence_criterion
 
+        module subroutine update_reference_value_type_convergence_criterion(self, reference_value)
+            implicit none
+            class(type_convergence_criterion), intent(inout) :: self
+            real(real64), intent(in) :: reference_value
+
+        end subroutine update_reference_value_type_convergence_criterion
+
     end interface
 
     !>
@@ -127,6 +135,7 @@ module control_iteration_convergence
         procedure, public, pass(self) :: initialize => initialize_convergence_control
         ! ---- Mutator ----
         procedure, public, pass(self) :: reset => reset_convergence_control
+        procedure, public, pass(self) :: update_reference_values => update_reference_values_convergence_control
         ! ---- Algorithm / Operation ----
         procedure, public, pass(self) :: check_convergence => check_convergence_control
         ! ---- Inquiry ----
@@ -231,6 +240,13 @@ module control_iteration_convergence
             real(real64), intent(inout), optional :: relative_tolerance
 
         end subroutine get_tolerances_convergence_control
+
+        module subroutine update_reference_values_convergence_control(self, reference_values)
+            implicit none
+            class(type_convergence_control), intent(inout) :: self
+            real(real64), intent(in) :: reference_values(:)
+
+        end subroutine update_reference_values_convergence_control
 
     end interface
 

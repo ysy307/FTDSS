@@ -167,7 +167,9 @@ contains
         real(real64), pointer :: du_data(:) => null()
         real(real64) :: rhs_norm
         type(type_vector_dp) :: diag_vec
+        type(type_vector_dp) :: col_scale_vec
         real(real64), pointer :: diag_data(:) => null()
+        real(real64), pointer :: col_data(:) => null()
         integer(int32) :: num_total_dofs
         integer(int32) :: ierr
         real(real64) :: diag_min, diag_max, diag_ratio
@@ -200,10 +202,23 @@ contains
         end if
 
         ! ------------------------------------------------------------------
-        ! Symmetric diagonal scaling: D^{-1/2} K D^{-1/2} * (D^{1/2} du) = D^{-1/2} F
-        ! This normalizes the diagonal to +-1, dramatically improving condition number
+        ! Column scaling: K' = K * S where S = diag(s_T, s_P, s_T, s_P, ...)
+        ! Transforms K du = F into K' dv = F where dv = S^{-1} du (dimensionless)
         ! ------------------------------------------------------------------
         call self%domain%get_total_dofs(num_total_dofs)
+        if (allocated(self%col_scale)) then
+            call col_scale_vec%initialize(num_total_dofs)
+            col_data => col_scale_vec%get_data()
+            if (associated(col_data)) then
+                col_data(:) = self%col_scale(:)
+                call K_ptr%scale(MATRIX_OPS%SCALE_COL, col_scale_vec)
+            end if
+        end if
+
+        ! ------------------------------------------------------------------
+        ! Symmetric diagonal scaling: D^{-1/2} K' D^{-1/2} * (D^{1/2} dv) = D^{-1/2} F
+        ! This normalizes the diagonal to +-1, dramatically improving condition number
+        ! ------------------------------------------------------------------
         call diag_vec%initialize(num_total_dofs)
         call diag_vec%zero()
         ierr = 0
@@ -230,6 +245,9 @@ contains
             write (*, '(A,ES10.3,A,ES10.3,A,ES10.3)') &
                 '   [SCALE] diag_min=', diag_min, &
                 ' diag_max=', diag_max, ' ratio=', diag_ratio
+            if (diag_ratio > 1.0d12) then
+                write (*, '(A,ES10.3)') '   [WARN] ill-conditioned: ratio=', diag_ratio
+            end if
 
             ! Compute scaling vector: d(i) = 1/sqrt(|diag(i)|)
             ! Guard against near-zero diagonals
@@ -268,6 +286,8 @@ contains
         write (*, '(A,L1)') &
             '   [LINEAR] converged=', self%solver%is_success()
 
+        nullify (col_data)
+        call col_scale_vec%destroy()
         nullify (diag_data)
         call diag_vec%destroy()
 

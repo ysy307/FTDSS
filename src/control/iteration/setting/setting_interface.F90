@@ -30,6 +30,7 @@ module control_iteration_setting
         procedure, public, pass(self) :: get_update_frequency => get_update_frequency_iteration_setting
         procedure, public, pass(self) :: get_current_norm => get_current_norm_iteration_setting
         procedure, public, pass(self) :: get_tolerances => get_tolerances_iteration_setting
+        procedure, public, pass(self) :: update_reference_values => update_reference_values_iteration_setting
         ! ---- Meta / Utility ----
     end type type_iteration_setting
 
@@ -106,5 +107,13 @@ contains
 
         call self%convergence_control%get_tolerances(physics_type, absolute_tolerance, relative_tolerance)
     end subroutine get_tolerances_iteration_setting
+
+    subroutine update_reference_values_iteration_setting(self, reference_values)
+        implicit none
+        class(type_iteration_setting), intent(inout) :: self
+        real(real64), intent(in) :: reference_values(:)
+
+        call self%convergence_control%update_reference_values(reference_values)
+    end subroutine update_reference_values_iteration_setting
 
 end module control_iteration_setting

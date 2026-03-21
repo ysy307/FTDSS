@@ -118,7 +118,7 @@
             "convergence": {
                 "use_criteria": "both",
                 "norm_type": "linf",
-                "logic_between_criteria": "or",
+                "logic_between_criteria": "and",
                 "residual": {
                     "criteria": "relative",
                     "logic": "or",
@@ -126,10 +126,10 @@
                     "relative_tolerance": 1e-03
                 },
                 "update": {
-                    "criteria": "absolute",
+                    "criteria": "relative",
                     "logic": "or",
-                    "absolute_tolerance": 1e2,
-                    "relative_tolerance": 1e-02
+                    "absolute_tolerance": 1e-02,
+                    "relative_tolerance": 1e-03
                 }
             }
         }

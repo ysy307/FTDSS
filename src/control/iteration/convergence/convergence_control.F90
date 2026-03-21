@@ -199,4 +199,21 @@ contains
         call self%residual(physics_type%ID)%get_tolerances(absolute_tolerance, relative_tolerance)
 
     end subroutine get_tolerances_convergence_control
+
+    !> Update per-physics reference values for relative convergence normalization.
+    module subroutine update_reference_values_convergence_control(self, reference_values)
+        implicit none
+        class(type_convergence_control), intent(inout) :: self
+        real(real64), intent(in) :: reference_values(:)
+
+        integer(int32) :: i, n
+
+        n = min(size(reference_values), PHYSICS_TYPES%NUM_ID)
+        do i = 1, n
+            call self%residual(i)%update_reference_value(reference_values(i))
+            call self%update(i)%update_reference_value(reference_values(i))
+        end do
+
+    end subroutine update_reference_values_convergence_control
+
 end submodule convergence_control

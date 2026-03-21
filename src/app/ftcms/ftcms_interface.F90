@@ -47,6 +47,10 @@ module app_ftcms
         integer(int32) :: thermal_start_dof = 0
         integer(int32) :: hydraulic_start_dof = 0
 
+        ! DOF column scaling factors for variable non-dimensionalization
+        real(real64), allocatable :: col_scale(:)
+        real(real64), allocatable :: col_scale_inv(:)
+
         type(type_control) :: control
         type(type_output_manager) :: output
 

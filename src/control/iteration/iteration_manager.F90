@@ -64,6 +64,7 @@ module control_iteration_manager
         procedure, public, pass(self) :: get_update_frequency => get_update_frequency_iteration
         procedure, public, pass(self) :: get_current_norm => get_current_norm_iteration
         procedure, public, pass(self) :: get_tolerances => get_tolerances_iteration
+        procedure, public, pass(self) :: update_reference_values => update_reference_values_iteration
         ! ---- Meta / Utility ----
     end type type_iteration
 
@@ -332,5 +333,13 @@ contains
 
         call self%settings%get_tolerances(physics_type, absolute_tolerance, relative_tolerance)
     end subroutine get_tolerances_iteration
+
+    subroutine update_reference_values_iteration(self, reference_values)
+        implicit none
+        class(type_iteration), intent(inout) :: self
+        real(real64), intent(in) :: reference_values(:)
+
+        call self%settings%update_reference_values(reference_values)
+    end subroutine update_reference_values_iteration
 
 end module control_iteration_manager

@@ -421,6 +421,28 @@ contains
             !$omp end parallel do
             self%status = MATRIX_STATUS%SUCCESS
 
+            !-------------------------------------------
+            ! Column Scaling: A(:,j) <- A(:,j) * alpha(j)
+            !-------------------------------------------
+        else if (op == MATRIX_OPS%SCALE_COL) then
+
+            !$omp parallel do default(shared) private(i,j,cb,col,row_start,row_end,col_dof)
+            do i = 1, self%num_ptrs - 1
+                row_start = self%ptr(i)
+                row_end = self%ptr(i + 1) - 1
+
+                do j = row_start, row_end
+                    col = self%ind(j)
+
+                    do cb = 1, bnc
+                        col_dof = (col - 1) * bnr + cb
+                        self%val(:, cb, j) = self%val(:, cb, j) * alpha_data(col_dof)
+                    end do
+                end do
+            end do
+            !$omp end parallel do
+            self%status = MATRIX_STATUS%SUCCESS
+
         else
             self%status = MATRIX_STATUS%ILL_OPERATIONS
         end if

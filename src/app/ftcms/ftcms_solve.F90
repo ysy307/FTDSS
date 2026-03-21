@@ -7,6 +7,10 @@ contains
         class(type_ftcms), intent(inout) :: self
 
         real(real64), pointer, contiguous, dimension(:) :: u
+        real(real64), pointer, contiguous, dimension(:) :: P_cur => null()
+        real(real64) :: s_T, s_P
+        integer(int32) :: num_nodes, num_dofs_per_node, num_total_dofs
+        integer(int32) :: thermal_dof, hydraulic_dof, i
 
         nullify (u)
 
@@ -21,6 +25,42 @@ contains
 
         call self%control%increment_total()
         call self%control%reset_acceleration()
+
+        ! Compute DOF column scaling factors
+        call self%domain%get_num_nodes(num_nodes)
+        call self%domain%get_num_dof_per_node(num_dofs_per_node)
+        call self%domain%get_total_dofs(num_total_dofs)
+
+        if (.not. allocated(self%col_scale)) then
+            allocate (self%col_scale(num_total_dofs))
+            allocate (self%col_scale_inv(num_total_dofs))
+        end if
+
+        s_T = 1.0d0
+        s_P = 1.0d3
+        if (self%is_active_hydraulic()) then
+            call self%pressure%get_current(P_cur)
+            if (associated(P_cur)) then
+                s_P = max(maxval(abs(P_cur)), 1.0d3)
+                nullify (P_cur)
+            end if
+        end if
+
+        thermal_dof = self%thermal_start_dof
+        hydraulic_dof = self%hydraulic_start_dof
+
+        self%col_scale(:) = 1.0d0
+        do i = 1, num_nodes
+            if (thermal_dof > 0) then
+                self%col_scale((i - 1) * num_dofs_per_node + thermal_dof) = s_T
+            end if
+            if (hydraulic_dof > 0) then
+                self%col_scale((i - 1) * num_dofs_per_node + hydraulic_dof) = s_P
+            end if
+        end do
+        self%col_scale_inv(:) = 1.0d0 / self%col_scale(:)
+
+        write (*, '("   [SCALE] s_T=", ES10.3, " s_P=", ES10.3)') s_T, s_P
 
         ! Save previous step values (Previous <- Current)
         call self%porosity%get_previous(u)
@@ -85,6 +125,9 @@ contains
 
         logical :: is_compute_newton, is_compute_picard, is_config_none
 
+        real(real64) :: ref_values(PHYSICS_TYPES%NUM_ID)
+        real(real64), pointer, contiguous, dimension(:) :: T_cur => null(), P_cur => null()
+
         nullify (current_value)
 
         ! Explicit initialization (avoid implicit SAVE from initializer expression)
@@ -96,6 +139,19 @@ contains
         is_compute_picard = self%control%is_compute_picard()
         ! Check whether config (static) solver is NONE
         is_config_none = self%control%is_none()
+
+        ! Update per-physics reference values for convergence normalization
+        ref_values(:) = 1.0d0
+        if (self%is_active_thermal()) then
+            call self%temperature%get_current(T_cur)
+            if (associated(T_cur)) ref_values(PHYSICS_TYPES%THERMAL%ID) = maxval(abs(T_cur)) + 1.0d0
+        end if
+        if (self%is_active_hydraulic()) then
+            call self%pressure%get_current(P_cur)
+            if (associated(P_cur)) ref_values(PHYSICS_TYPES%HYDRAULIC%ID) = maxval(abs(P_cur)) + 1.0d0
+        end if
+        call self%control%update_convergence_reference_values(ref_values)
+        call self%control%get_nonlinear_iter(iter)
 
         ! ----------------------------------------------------------------------
         ! Thermal Convergence Check
@@ -112,11 +168,10 @@ contains
                 write (*, *) "Error: NaN detected in thermal variables during convergence check."
                 call self%control%set_diverged(PHYSICS_TYPES%THERMAL, diverged)
             else
-                ! When config is NONE, the iteration module returns converged immediately
                 call self%control%check_convergence(PHYSICS_TYPES%THERMAL, residual, increment)
+                write (*, '("   [NL-T] Iter:",I3," res:",ES10.3," du:",ES10.3," ref:",ES10.3)') &
+                    iter, maxval(abs(residual)), maxval(abs(increment)), ref_values(PHYSICS_TYPES%THERMAL%ID)
             end if
-
-            ! Aitken relaxation check
 
         end if
 
@@ -136,6 +191,8 @@ contains
                 call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, diverged)
             else
                 call self%control%check_convergence(PHYSICS_TYPES%HYDRAULIC, residual, increment)
+                write (*, '("   [NL-H] Iter:",I3," res:",ES10.3," du:",ES10.3," ref:",ES10.3)') &
+                    iter, maxval(abs(residual)), maxval(abs(increment)), ref_values(PHYSICS_TYPES%HYDRAULIC%ID)
             end if
         end if
 
@@ -143,7 +200,6 @@ contains
         ! 2. Hybrid method switch decision
         !    Skip when config is NONE (linear)
         ! ----------------------------------------------------------------------
-        call self%control%get_nonlinear_iter(iter)
 
         if (iter > 1 .and. .not. self%control%is_diverged()) then
             if (is_compute_picard .and. .not. is_config_none) then
