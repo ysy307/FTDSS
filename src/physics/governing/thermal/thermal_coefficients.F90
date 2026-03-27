@@ -338,9 +338,12 @@ contains
             end if
         end if
 
-        ! Floor heat capacity to ensure positive-definite mass matrix.
-        ! Minimum: ice volumetric heat capacity rho_i*c_i*phi_min ~ 917*2100*0.01 ~ 1.9e4
-        C_TT = max(C_TT, 1.0d4)
+        ! L-scheme stabilization for phase-change nonlinearity:
+        ! Use L >= Lip(U)/2 as floor. For freezing soil, the apparent heat
+        ! capacity C_TT can spike to O(1e6) at the phase-change front. Using
+        ! L ~ max(C_TT) makes the Picard iteration contractive everywhere,
+        ! at the cost of more iterations (rate ~ 1 - C_min/L).
+        C_TT = max(C_TT, 1.0d6)
 
     end subroutine compute_mass_term_thermal
 

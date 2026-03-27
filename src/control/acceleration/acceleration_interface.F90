@@ -7,6 +7,7 @@ module control_acceleration
 
     public :: abst_acceleration
     public :: type_acceleration_aitken
+    public :: type_acceleration_anderson
 
     !> Abstract base type for acceleration methods
     type, abstract :: abst_acceleration
@@ -251,6 +252,90 @@ module control_acceleration
         procedure, public, pass(self) :: get_current_relaxation => get_current_relaxation_aitken
         procedure, public, pass(self) :: get_previous_relaxation => get_previous_relaxation_aitken
     end type type_acceleration_aitken
+
+    !> Anderson acceleration AA(1) for nonlinear iterations
+    type, extends(abst_acceleration) :: type_acceleration_anderson
+        !> Maximum relaxation factor (beta)
+        real(real64) :: max_relaxation = 1.0d0
+        !> Minimum relaxation factor
+        real(real64) :: min_relaxation = 0.05d0
+        !> Current relaxation factor
+        real(real64), private :: relaxation_factor(PHYSICS_TYPES%NUM_ID) = 1.0d0
+        !> Previous relaxation factor
+        real(real64), private :: previous_relaxation_factor(PHYSICS_TYPES%NUM_ID) = 1.0d0
+        !> Stored increment vectors from the previous iteration
+        real(real64), allocatable, private :: du_prev(:, :)
+        !> Stored Picard iterates from the previous iteration
+        real(real64), allocatable, private :: g_prev(:, :)
+    contains
+        procedure, public, pass(self) :: initialize => initialize_acceleration_anderson
+        procedure, public, pass(self) :: destroy => destroy_acceleration_anderson
+        procedure, public, pass(self) :: compute_relaxation => compute_relaxation_acceleration_anderson
+        procedure, public, pass(self) :: reset => reset_acceleration_anderson
+        procedure, public, pass(self) :: reach_minimum_relaxation => reach_minimum_relaxation_anderson
+        procedure, public, pass(self) :: reach_maximum_relaxation => reach_maximum_relaxation_anderson
+        procedure, public, pass(self) :: get_current_relaxation => get_current_relaxation_anderson
+        procedure, public, pass(self) :: get_previous_relaxation => get_previous_relaxation_anderson
+    end type type_acceleration_anderson
+
+    interface
+        !> Initialize Anderson acceleration
+        module subroutine initialize_acceleration_anderson(self, config)
+            implicit none
+            class(type_acceleration_anderson), intent(inout) :: self
+            type(type_config_acceleration), intent(in) :: config
+        end subroutine initialize_acceleration_anderson
+
+        !> Destroy Anderson acceleration
+        module subroutine destroy_acceleration_anderson(self)
+            implicit none
+            class(type_acceleration_anderson), intent(inout) :: self
+        end subroutine destroy_acceleration_anderson
+
+        !> Compute Anderson acceleration
+        module subroutine compute_relaxation_acceleration_anderson(self, physics_type, iter, du, vec)
+            implicit none
+            class(type_acceleration_anderson), intent(inout) :: self
+            type(type_constant_id), intent(in) :: physics_type
+            integer(int32), intent(in) :: iter
+            real(real64), intent(in) :: du(:)
+            real(real64), intent(inout) :: vec(:)
+        end subroutine compute_relaxation_acceleration_anderson
+
+        !> Reset Anderson acceleration
+        module subroutine reset_acceleration_anderson(self)
+            implicit none
+            class(type_acceleration_anderson), intent(inout) :: self
+        end subroutine reset_acceleration_anderson
+
+        module pure function reach_minimum_relaxation_anderson(self, physics_type) result(reached)
+            implicit none
+            class(type_acceleration_anderson), intent(in) :: self
+            type(type_constant_id), intent(in) :: physics_type
+            logical :: reached
+        end function reach_minimum_relaxation_anderson
+
+        module pure function reach_maximum_relaxation_anderson(self, physics_type) result(reached)
+            implicit none
+            class(type_acceleration_anderson), intent(in) :: self
+            type(type_constant_id), intent(in) :: physics_type
+            logical :: reached
+        end function reach_maximum_relaxation_anderson
+
+        module subroutine get_current_relaxation_anderson(self, physics_type, relaxation)
+            implicit none
+            class(type_acceleration_anderson), intent(in) :: self
+            type(type_constant_id), intent(in) :: physics_type
+            real(real64), intent(inout) :: relaxation
+        end subroutine get_current_relaxation_anderson
+
+        module subroutine get_previous_relaxation_anderson(self, physics_type, relaxation)
+            implicit none
+            class(type_acceleration_anderson), intent(in) :: self
+            type(type_constant_id), intent(in) :: physics_type
+            real(real64), intent(inout) :: relaxation
+        end subroutine get_previous_relaxation_anderson
+    end interface
 
     interface
         !> Initialize Aitken acceleration

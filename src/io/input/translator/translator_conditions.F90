@@ -132,7 +132,7 @@ contains
         type(type_config_acceleration), intent(inout) :: config
 
         config%num_dofs = input%geometry%vtk%num_points
-        config%method = ACCELERATION_METHODS%AITKEN
+        config%method = ACCELERATION_METHODS%NONE
         config%min_relaxation = 0.1d0
         config%max_relaxation = 1.0d0
 
@@ -172,6 +172,7 @@ contains
 
             if (config%active) then
                 call config%reset()
+                config%active = .true.
                 config%iter_min = time_control%adaptive_stepping%iter_min
                 config%iter_max = time_control%adaptive_stepping%iter_max
                 config%scale_up = time_control%adaptive_stepping%scale_up

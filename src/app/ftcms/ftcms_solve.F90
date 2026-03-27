@@ -382,7 +382,13 @@ contains
 
         ! Loop until end time
         time_loop: do while (.not. self%control%is_end_time())
+            block
+                real(real64) :: cur_time
+                call self%control%get_time(cur_time)
+                write (*, '("   [TIME] t=", ES12.5)') cur_time
+            end block
             call self%solve_time_step(is_step_converged)
+            write (*, '("   [STEP] converged=", L1)') is_step_converged
 
             ! Update time and adaptive time stepping
             call self%control%update(is_step_converged)

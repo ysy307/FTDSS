@@ -173,7 +173,8 @@ contains
         integer(int32) :: num_total_dofs
         integer(int32) :: ierr
         real(real64) :: diag_min, diag_max, diag_ratio
-        integer(int32) :: i, n_neg
+        integer(int32) :: i, n_neg, n_neg_T, n_neg_H
+        integer(int32) :: num_nodes, num_dofs_per_node, idx_T, idx_H
 
         call self%control%profiler_start(PROFILER_TYPES%SOLVE)
 
@@ -202,10 +203,44 @@ contains
         end if
 
         ! ------------------------------------------------------------------
+        ! Pre-scaling diagnostic + fix negative thermal diagonals
+        ! ------------------------------------------------------------------
+        call self%domain%get_total_dofs(num_total_dofs)
+        call self%domain%get_num_nodes(num_nodes)
+        call self%domain%get_num_dof_per_node(num_dofs_per_node)
+        call diag_vec%initialize(num_total_dofs)
+        call diag_vec%zero()
+        call K_ptr%get_diagonal(diag_vec)
+        diag_data => diag_vec%get_data()
+        if (associated(diag_data)) then
+            n_neg = 0
+            n_neg_T = 0
+            do i = 1, size(diag_data)
+                if (diag_data(i) < -tiny(1.0d0)) n_neg = n_neg + 1
+            end do
+            ! Fix negative thermal diagonals: flip sign + add stabilization
+            if (self%thermal_start_dof > 0) then
+                do i = 1, num_nodes
+                    idx_T = (i - 1) * num_dofs_per_node + self%thermal_start_dof
+                    if (diag_data(idx_T) < -tiny(1.0d0)) then
+                        n_neg_T = n_neg_T + 1
+                        ! Replace with 2*|diag| to stabilize freezing-front nodes
+                        call K_ptr%set(MATRIX_OPS%INS, i, i, &
+                            self%thermal_start_dof, self%thermal_start_dof, &
+                            2.0d0 * abs(diag_data(idx_T)))
+                    end if
+                end do
+            end if
+            write (*, '(A,I0,A,I0)') &
+                '   [PRE-SCALE] n_neg=', n_neg, ' n_neg_T_fixed=', n_neg_T
+            nullify (diag_data)
+        end if
+        call diag_vec%destroy()
+
+        ! ------------------------------------------------------------------
         ! Column scaling: K' = K * S where S = diag(s_T, s_P, s_T, s_P, ...)
         ! Transforms K du = F into K' dv = F where dv = S^{-1} du (dimensionless)
         ! ------------------------------------------------------------------
-        call self%domain%get_total_dofs(num_total_dofs)
         if (allocated(self%col_scale)) then
             call col_scale_vec%initialize(num_total_dofs)
             col_data => col_scale_vec%get_data()
@@ -238,10 +273,24 @@ contains
                 if (diag_data(i) < -tiny(1.0d0)) n_neg = n_neg + 1
             end do
             diag_ratio = diag_max / max(diag_min, tiny(1.0d0))
-            write (*, '(A,I0,A,I0,A,I0)') &
+            ! Per-physics negative diagonal count
+            n_neg_T = 0; n_neg_H = 0
+            call self%domain%get_num_nodes(num_nodes)
+            call self%domain%get_num_dof_per_node(num_dofs_per_node)
+            do i = 1, num_nodes
+                if (self%thermal_start_dof > 0) then
+                    idx_T = (i - 1) * num_dofs_per_node + self%thermal_start_dof
+                    if (diag_data(idx_T) < -tiny(1.0d0)) n_neg_T = n_neg_T + 1
+                end if
+                if (self%hydraulic_start_dof > 0) then
+                    idx_H = (i - 1) * num_dofs_per_node + self%hydraulic_start_dof
+                    if (diag_data(idx_H) < -tiny(1.0d0)) n_neg_H = n_neg_H + 1
+                end if
+            end do
+            write (*, '(A,I0,A,I0,A,I0,A,I0,A,I0)') &
                 '   [SCALE] ndof=', size(diag_data), &
                 ' n_zero=', count(abs(diag_data) < tiny(1.0d0)), &
-                ' n_neg=', n_neg
+                ' n_neg=', n_neg, ' n_neg_T=', n_neg_T, ' n_neg_H=', n_neg_H
             write (*, '(A,ES10.3,A,ES10.3,A,ES10.3)') &
                 '   [SCALE] diag_min=', diag_min, &
                 ' diag_max=', diag_max, ' ratio=', diag_ratio

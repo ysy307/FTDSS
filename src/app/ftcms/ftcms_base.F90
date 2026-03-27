@@ -579,17 +579,10 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: current
         real(real64), allocatable :: dv(:)
         real(real64), allocatable :: du_phys(:)
-
-        real(real64) :: relaxation_factor
         real(real64) :: new_scale
         logical :: is_none
-        logical :: is_newton
         logical :: has_col_scale
 
-        ! Picard fixed relaxation factor
-        real(real64), parameter :: PICARD_OMEGA = 0.5d0
-        ! Safety clamp in dimensionless space
-        real(real64), parameter :: MAX_SCALED_DU = 2.0d0
         integer(int32) :: i, num_nodes, num_dofs_per_node, num_total_dofs
         integer(int32) :: thermal_dof_idx, hydraulic_dof_idx
 
@@ -602,7 +595,6 @@ contains
         call self%control%get_bdf_coeffs(bdf_order, bdf_coeffs)
 
         is_none = self%control%is_none()
-        is_newton = self%control%is_compute_newton()
         has_col_scale = allocated(self%col_scale)
 
         call self%domain%get_num_nodes(num_nodes)
@@ -627,48 +619,24 @@ contains
                     end if
 
                     if (.not. is_none) then
-                        if (iter == 1) then
-                            ! iter=1: full step (BC adjustment)
-                            current(:) = current(:) + du_phys(:)
-                            call self%temperature%set_delta(du_phys(:))
+                        ! Picard under-relaxation (omega=0.3)
+                        du_phys(:) = 0.3d0 * du_phys(:)
+                        write (*, '("   [T-UPD] Iter:", I3, " max|du|:", ES10.3)') &
+                            iter, maxval(abs(du_phys))
+                        current(:) = current(:) + du_phys(:)
+                        call self%temperature%set_delta(du_phys(:))
 
-                            ! Dynamic scale update: set s_T from iter=1 increment
-                            if (has_col_scale .and. thermal_dof_idx > 0) then
-                                new_scale = max(maxval(abs(du_phys)), 1.0d0)
-                                call self%domain%get_num_nodes(num_nodes)
-                                call self%domain%get_num_dof_per_node(num_dofs_per_node)
-                                do i = 1, num_nodes
-                                    self%col_scale((i - 1) * num_dofs_per_node + thermal_dof_idx) = new_scale
-                                end do
-                                call self%domain%get_total_dofs(num_total_dofs)
-                                self%col_scale_inv(:) = 1.0d0 / self%col_scale(:)
-                                write (*, '("   [SCALE-UPDATE] s_T=", ES10.3)') new_scale
-                            end if
-                        else
-                            ! Fixed under-relaxation with clamping in dimensionless space
-                            if (is_newton) then
-                                relaxation_factor = 1.0d0
-                            else
-                                relaxation_factor = PICARD_OMEGA
-                            end if
-
-                            do i = 1, size(dv)
-                                dv(i) = sign(min(abs(dv(i)), MAX_SCALED_DU), dv(i))
+                        ! Dynamic scale update on iter=1
+                        if (iter == 1 .and. has_col_scale .and. thermal_dof_idx > 0) then
+                            new_scale = max(maxval(abs(du_phys)), 1.0d0)
+                            call self%domain%get_num_nodes(num_nodes)
+                            call self%domain%get_num_dof_per_node(num_dofs_per_node)
+                            do i = 1, num_nodes
+                                self%col_scale((i - 1) * num_dofs_per_node + thermal_dof_idx) = new_scale
                             end do
-
-                            write (*, '("   [Picard-T] Iter:", I3, " Omega:", F6.4, " max|dv|:", ES10.3)') &
-                                iter, relaxation_factor, maxval(abs(dv))
-
-                            ! Unscale clamped dv for physical update
-                            if (has_col_scale .and. thermal_dof_idx > 0) then
-                                do i = 1, size(dv)
-                                    du_phys(i) = dv(i) * self%col_scale((i - 1) * num_dofs_per_node + thermal_dof_idx)
-                                end do
-                            else
-                                du_phys(:) = dv(:)
-                            end if
-                            current(:) = current(:) + relaxation_factor * du_phys(:)
-                            call self%temperature%set_delta(relaxation_factor * du_phys(:))
+                            call self%domain%get_total_dofs(num_total_dofs)
+                            self%col_scale_inv(:) = 1.0d0 / self%col_scale(:)
+                            write (*, '("   [SCALE-UPDATE] s_T=", ES10.3)') new_scale
                         end if
                     else
                         ! NONE (linear): full step
@@ -703,36 +671,12 @@ contains
                     end if
 
                     if (.not. is_none) then
-                        if (iter == 1) then
-                            ! iter=1: full step
-                            current(:) = current(:) + du_phys(:)
-                            call self%pressure%set_delta(du_phys(:))
-                        else
-                            ! Fixed under-relaxation with clamping
-                            if (is_newton) then
-                                relaxation_factor = 1.0d0
-                            else
-                                relaxation_factor = PICARD_OMEGA
-                            end if
-
-                            do i = 1, size(dv)
-                                dv(i) = sign(min(abs(dv(i)), MAX_SCALED_DU), dv(i))
-                            end do
-
-                            write (*, '("   [Picard-H] Iter:", I3, " Omega:", F6.4, " max|dv|:", ES10.3)') &
-                                iter, relaxation_factor, maxval(abs(dv))
-
-                            ! Unscale clamped dv for physical update
-                            if (has_col_scale .and. hydraulic_dof_idx > 0) then
-                                do i = 1, size(dv)
-                                    du_phys(i) = dv(i) * self%col_scale((i - 1) * num_dofs_per_node + hydraulic_dof_idx)
-                                end do
-                            else
-                                du_phys(:) = dv(:)
-                            end if
-                            current(:) = current(:) + relaxation_factor * du_phys(:)
-                            call self%pressure%set_delta(relaxation_factor * du_phys(:))
-                        end if
+                        ! Picard under-relaxation (omega=0.3)
+                        du_phys(:) = 0.3d0 * du_phys(:)
+                        write (*, '("   [H-UPD] Iter:", I3, " max|du|:", ES10.3)') &
+                            iter, maxval(abs(du_phys))
+                        current(:) = current(:) + du_phys(:)
+                        call self%pressure%set_delta(du_phys(:))
                     else
                         ! NONE (linear): full step
                         current(:) = current(:) + du_phys(:)

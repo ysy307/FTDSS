@@ -10,6 +10,7 @@ add_library(SOLVER_CONTROL STATIC)
 target_sources(SOLVER_CONTROL PRIVATE
     acceleration/acceleration_interface.F90
     acceleration/aitken.F90
+    acceleration/anderson.F90
 
     time/ats.F90
     time/time.F90

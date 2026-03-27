@@ -4,7 +4,7 @@ module control_control_manager
     use :: stdlib_optval, only:optval
     use :: module_core
     use :: module_linalg
-    use :: control_acceleration, only:abst_acceleration, type_acceleration_aitken
+    use :: control_acceleration, only:abst_acceleration, type_acceleration_aitken, type_acceleration_anderson
     use :: control_time, only:type_time
     use :: control_time_profiler, only:type_time_profiler
     use :: control_iteration, only:type_iteration
@@ -142,14 +142,17 @@ contains
         ! Acceleration method initialization
         if (present(config_acceleration)) then
             select case (config_acceleration%method%ID)
+            case (ACCELERATION_METHODS%NONE%ID)
+                ! No acceleration - skip allocation
             case (ACCELERATION_METHODS%AITKEN%ID)
                 allocate (type_acceleration_aitken :: self%acceleration)
+                call self%acceleration%initialize(config_acceleration)
             case (ACCELERATION_METHODS%ANDERSON%ID)
-                error stop "Anderson acceleration is not implemented yet."
+                allocate (type_acceleration_anderson :: self%acceleration)
+                call self%acceleration%initialize(config_acceleration)
             case default
                 error stop "Unknown acceleration method: "//trim(config_acceleration%method%name)
             end select
-            call self%acceleration%initialize(config_acceleration)
         end if
 
         ! Output managers initialization with the current time
@@ -407,7 +410,11 @@ contains
         end if
 
         ! 4. Execute update (dt is limited to not exceed t_target)
+        write (*, '("   [ATS] success=", L1, " iter=", I3, " dt_before=", ES10.3)') &
+            success, iter_count, dt_s
         call self%time%update(success, iter_count, t_target)
+        call self%time%get_dt(dt_s)
+        write (*, '("   [ATS] dt_after=", ES10.3)') dt_s
 
     end subroutine update_controls
 
@@ -702,7 +709,12 @@ contains
         !> Overwritten by updated vector \(u_{k+1}\) on exit
         real(real64), intent(inout) :: vec(:)
 
-        call self%acceleration%compute_relaxation(physics_type, iter, du, vec)
+        if (allocated(self%acceleration)) then
+            call self%acceleration%compute_relaxation(physics_type, iter, du, vec)
+        else
+            ! No acceleration: full step (relaxation handled by caller if needed)
+            vec(:) = vec(:) + du(:)
+        end if
 
     end subroutine compute_relaxation_control
 
@@ -730,7 +742,11 @@ contains
         type(type_constant_id), intent(in) :: physics_type
         real(real64), intent(inout) :: relaxation
 
-        call self%acceleration%get_current_relaxation(physics_type, relaxation)
+        if (allocated(self%acceleration)) then
+            call self%acceleration%get_current_relaxation(physics_type, relaxation)
+        else
+            relaxation = 1.0d0
+        end if
     end subroutine get_current_relaxation_control
 
     subroutine get_previous_relaxation_control(self, physics_type, relaxation)
