@@ -231,6 +231,17 @@ contains
                     end if
                 end do
             end if
+            ! Fix negative hydraulic diagonals (same stabilization as thermal)
+            if (self%hydraulic_start_dof > 0) then
+                do i = 1, num_nodes
+                    idx_H = (i - 1) * num_dofs_per_node + self%hydraulic_start_dof
+                    if (diag_data(idx_H) < -tiny(1.0d0)) then
+                        call K_ptr%set(MATRIX_OPS%INS, i, i, &
+                            self%hydraulic_start_dof, self%hydraulic_start_dof, &
+                            2.0d0 * abs(diag_data(idx_H)))
+                    end if
+                end do
+            end if
             write (*, '(A,I0,A,I0)') &
                 '   [PRE-SCALE] n_neg=', n_neg, ' n_neg_T_fixed=', n_neg_T
             nullify (diag_data)

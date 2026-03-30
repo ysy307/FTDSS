@@ -133,28 +133,54 @@ contains
             end if
         end if
 
-        ! 4. Physical projection to avoid negative/oversaturated phase fractions
-        if (ice_content < 0.0d0) then
-            ice_content = 0.0d0
-            dQi_dP = 0.0d0
-            dQi_dT = 0.0d0
-        end if
-        if (ice_content > porosity) then
-            ice_content = porosity
-            dQi_dP = 0.0d0
-            dQi_dT = 0.0d0
-        end if
+        ! 4. Physical projection to avoid negative/oversaturated phase fractions.
+        ! Values are hard-clamped for physical consistency; derivatives are smoothly
+        ! tapered near boundaries (C1 cubic Hermite) to avoid Newton-step divergence.
+        block
+            real(real64), parameter :: delta_frac = 0.01d0
+            real(real64) :: delta, w
 
-        if (water_content < 0.0d0) then
-            water_content = 0.0d0
-            dQw_dP = 0.0d0
-            dQw_dT = 0.0d0
-        end if
-        if (water_content > porosity - ice_content) then
-            water_content = max(0.0d0, porosity - ice_content)
-            dQw_dP = -1.0d0 * dQi_dP
-            dQw_dT = -1.0d0 * dQi_dT
-        end if
+            delta = delta_frac * max(porosity, 1.0d-6)
+
+            if (ice_content < 0.0d0) then
+                ice_content = 0.0d0
+                dQi_dP = 0.0d0
+                dQi_dT = 0.0d0
+            else
+                ! Smooth taper as ice_content approaches 0 from above
+                w = smooth_weight(delta - ice_content, delta)
+                dQi_dP = w * dQi_dP
+                dQi_dT = w * dQi_dT
+            end if
+
+            if (ice_content > porosity) then
+                ice_content = porosity
+                dQi_dP = 0.0d0
+                dQi_dT = 0.0d0
+            else
+                ! Smooth taper as ice_content approaches porosity from below
+                w = smooth_weight(ice_content - (porosity - delta), delta)
+                dQi_dP = w * dQi_dP
+                dQi_dT = w * dQi_dT
+            end if
+
+            if (water_content < 0.0d0) then
+                water_content = 0.0d0
+                dQw_dP = 0.0d0
+                dQw_dT = 0.0d0
+            else
+                ! Smooth taper as water_content approaches 0 from above
+                w = smooth_weight(delta - water_content, delta)
+                dQw_dP = w * dQw_dP
+                dQw_dT = w * dQw_dT
+            end if
+
+            if (water_content > porosity - ice_content) then
+                water_content = max(0.0d0, porosity - ice_content)
+                dQw_dP = -1.0d0 * dQi_dP
+                dQw_dT = -1.0d0 * dQi_dT
+            end if
+        end block
 
         air_content = porosity - water_content - ice_content
         if (air_content < 0.0d0) then
@@ -272,5 +298,21 @@ contains
         call self%fusion%deriv_pressure_ice_water(state, deriv)
 
     end subroutine deriv_pressure_ice_water
+
+    !> C1 cubic Hermite weight: 1 when x<=0, smoothly decays to 0 at x=delta.
+    pure function smooth_weight(x, delta) result(w)
+        implicit none
+        real(real64), intent(in) :: x, delta
+        real(real64) :: w, t
+
+        if (x <= 0.0d0) then
+            w = 1.0d0
+        else if (x >= delta) then
+            w = 0.0d0
+        else
+            t = x / delta
+            w = 1.0d0 - t * t * (3.0d0 - 2.0d0 * t)
+        end if
+    end function smooth_weight
 
 end module models_phase_change_manager

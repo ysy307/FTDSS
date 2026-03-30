@@ -391,6 +391,7 @@ contains
     end subroutine get_variable_residual_ftcms
 
     module subroutine set_state_ftcms(self, node_id, element_id, state, calc_physics)
+        use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
         implicit none
         class(type_ftcms), intent(inout) :: self
         integer(int32), intent(in) :: node_id
@@ -431,7 +432,10 @@ contains
         start_dof_hydraulic = self%hydraulic_start_dof
         if (start_dof_hydraulic > 0) then
             call self%pressure%get_current(node_id, pressure)
-            pressure = min(max(pressure, -1.0d7), 1.0d7)
+            if (.not. ieee_is_finite(pressure)) then
+                write (*, '(A, I0, A, ES13.5)') '[ERROR] Non-finite pressure at node=', node_id, ' P=', pressure
+                error stop 'set_state_ftcms: non-finite pressure'
+            end if
             call self%pressure%get_current_gradient(node_id, grad_P)
             call self%pressure%get_history(node_id, pressure_history)
             call state%set(pressure=pressure, &
@@ -677,6 +681,19 @@ contains
                             iter, maxval(abs(du_phys))
                         current(:) = current(:) + du_phys(:)
                         call self%pressure%set_delta(du_phys(:))
+
+                        ! Dynamic scale update on iter=1
+                        if (iter == 1 .and. has_col_scale .and. hydraulic_dof_idx > 0) then
+                            new_scale = max(maxval(abs(du_phys)), 1.0d3)
+                            call self%domain%get_num_nodes(num_nodes)
+                            call self%domain%get_num_dof_per_node(num_dofs_per_node)
+                            do i = 1, num_nodes
+                                self%col_scale((i - 1) * num_dofs_per_node + hydraulic_dof_idx) = new_scale
+                            end do
+                            call self%domain%get_total_dofs(num_total_dofs)
+                            self%col_scale_inv(:) = 1.0d0 / self%col_scale(:)
+                            write (*, '("   [SCALE-UPDATE] s_P=", ES10.3)') new_scale
+                        end if
                     else
                         ! NONE (linear): full step
                         current(:) = current(:) + du_phys(:)

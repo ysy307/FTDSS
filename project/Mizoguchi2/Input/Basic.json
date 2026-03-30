@@ -112,7 +112,7 @@
     "solver_settings": {
         "bdf_order": 1,
         "nonlinear_solver": {
-            "method": "picard",
+            "method": "none",
             "update_frequency": 1,
             "max_iterations": 100,
             "convergence": {
@@ -135,11 +135,11 @@
         }
     },
     "linear_solver": {
-        "type": 20,
+        "type": 9,
         "preconditioner_type": 2,
-        "max_iterations": 10000,
+        "max_iterations": 100000,
         "tolerance": 1e-8,
-        "restart_size": 200
+        "restart_size": 20000
 
     },
     "parallel_settings": {

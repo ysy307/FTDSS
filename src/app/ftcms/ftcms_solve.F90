@@ -11,17 +11,26 @@ contains
         real(real64) :: s_T, s_P
         integer(int32) :: num_nodes, num_dofs_per_node, num_total_dofs
         integer(int32) :: thermal_dof, hydraulic_dof, i
+        logical :: preserve_newton
 
         nullify (u)
+
+        ! Preserve NEWTON state across coupling iterations (warm start within timestep).
+        ! If NEWTON was already active (from a previous coupling iter or timestep),
+        ! restore it after reset so convergence mode is not lost.
+        preserve_newton = self%control%is_compute_newton()
 
         ! Reset iteration control
         ! reset() may set the compute solver to NONE when config is NONE.
         call self%control%reset_iteration()
 
         ! [Important] Compute solver must always be PICARD or NEWTON.
-        ! Even for NONE (linear) config, Picard discretization is used,
-        ! so explicitly set PICARD here to override the reset state.
-        call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
+        ! Even for NONE (linear) config, Picard discretization is used.
+        if (preserve_newton) then
+            call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%NEWTON)
+        else
+            call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
+        end if
 
         call self%control%increment_total()
         call self%control%reset_acceleration()
