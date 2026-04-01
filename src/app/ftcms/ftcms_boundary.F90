@@ -225,7 +225,10 @@ contains
         integer(int32) :: i, glob_node_id
         integer(int32) :: entity_id, bc_idx
         integer(int32) :: num_matched_patches, num_dirichlet_nodes
-        integer(int32) :: anchor_node_id
+        integer(int32) :: bdf_order
+        integer(int32) :: num_nodes, node_id
+        real(real64), parameter :: NULLSPACE_REG_EPS = 1.0d-8
+        logical, save :: printed_no_dirichlet_hydraulic_notice = .false.
         type(type_bc_result) :: bc_result
         type(type_boundary_patch), pointer :: bc_patch
 
@@ -234,7 +237,6 @@ contains
         call self%domain%get_num_bc_patches(num_patches)
         num_matched_patches = 0
         num_dirichlet_nodes = 0
-        anchor_node_id = -1
 
         do i_patch = 1, num_patches
             call self%domain%get_bc_patch(i_patch, bc_patch)
@@ -245,14 +247,6 @@ contains
             num_matched_patches = num_matched_patches + 1
 
             call self%bc(physics_type%ID)%evaluate(bc_idx, current_time, 0.0d0, bc_result)
-
-            if (anchor_node_id < 0) then
-                if (allocated(bc_patch%connectivity%col_ind)) then
-                    if (size(bc_patch%connectivity%col_ind) > 0) then
-                        anchor_node_id = bc_patch%connectivity%col_ind(1)
-                    end if
-                end if
-            end if
 
             if (.not. bc_result%is_dirichlet) then
                 cycle
@@ -279,18 +273,29 @@ contains
             error stop 'Boundary condition ID mismatch between mesh entity IDs and Conditions.json IDs.'
         end if
 
-        if (num_dirichlet_nodes == 0) then
-            if (anchor_node_id > 0) then
-                write (*, '(A,1X,A,1X,A,I0)') 'Warning: No Dirichlet BC for physics:', trim(physics_type%name), &
-                    '-> applying gauge anchor at node', anchor_node_id
-                call self%K%zero(anchor_node_id, dof_offset)
-                call self%K%set(dof_offset, dof_offset, anchor_node_id, anchor_node_id, 1.0d0)
-                call self%F%set(dof_offset, anchor_node_id, 0.0d0)
-            else
-                write (*, '(A,1X,A)') 'Error: No Dirichlet nodes were constrained for physics:', trim(physics_type%name)
-                error stop 'No essential BC applied. The linear system may be singular.'
-            end if
+        if (physics_type%ID == PHYSICS_TYPES%HYDRAULIC%ID) then
+            self%hydraulic_has_dirichlet_bc = (num_dirichlet_nodes > 0)
         end if
+
+        if (num_dirichlet_nodes == 0) then
+            bdf_order = 0
+            call self%control%get_bdf_coeffs(bdf_order=bdf_order)
+            if (bdf_order <= 0) then
+                write (*, '(A,1X,A)') 'Error: No Dirichlet BC for physics in non-transient mode:', trim(physics_type%name)
+                error stop 'All-Neumann problem without transient storage is singular. Provide Dirichlet BC or transient terms.'
+            end if
+
+            if (physics_type%ID == PHYSICS_TYPES%HYDRAULIC%ID .and. .not. printed_no_dirichlet_hydraulic_notice) then
+                write (*, '(A,1X,A)') 'Notice: Hydraulic Dirichlet BC not found; using transient storage + global mean projection.'
+                printed_no_dirichlet_hydraulic_notice = .true.
+            end if
+
+            call self%domain%get_num_nodes(num_nodes)
+            do node_id = 1, num_nodes
+                call self%K%add(dof_offset, dof_offset, node_id, node_id, NULLSPACE_REG_EPS)
+            end do
+        end if
+
     end subroutine apply_essential_bc_generic
 
 end submodule ftcms_boundary

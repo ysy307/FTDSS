@@ -10,6 +10,7 @@ module physics_governing_thermal
     private
 
     public :: type_thermal
+    public :: SCHEME_TANGENT
 
     integer, parameter :: SCHEME_TANGENT = 0 ! Exact derivative (for Newton-Raphson)
     integer, parameter :: SCHEME_SECANT = 1 ! Finite difference (for Picard / phase-change stabilization)
@@ -35,18 +36,20 @@ module physics_governing_thermal
         procedure, pass(self), private :: assemble_local_newton => assemble_local_newton_thermal
         procedure, pass(self), private :: assemble_local_picard => assemble_local_picard_thermal
 
-        procedure, pass(self), private :: compute_mass_term => compute_mass_term_thermal
-        procedure, pass(self), private :: compute_diffusion_term => compute_diffusion_term_thermal
+        procedure, pass(self), public :: compute_mass_term => compute_mass_term_thermal
+        procedure, pass(self), public :: compute_diffusion_term => compute_diffusion_term_thermal
         procedure, pass(self), private :: compute_advective_term => compute_advective_term_thermal
         procedure, pass(self), private :: compute_latent_term => compute_latent_term_thermal
         procedure, pass(self), private :: compute_transient_term => compute_transient_term_thermal
         procedure, pass(self), private :: compute_history_term => compute_history_term_thermal
-        procedure, pass(self), private :: compute_coupling_mass_term => compute_coupling_mass_term_thermal
+        procedure, pass(self), public :: compute_coupling_mass_term => compute_coupling_mass_term_thermal
 
         procedure, pass(self), public :: calc_enthalpy_density => calc_enthalpy_density_thermal
         procedure, pass(self), public :: calc_density_water => calc_density_water_thermal
         procedure, pass(self), public :: calc_density_ice => calc_density_ice_thermal
         procedure, pass(self), public :: calc_density_vapor_saturation => calc_density_vapor_saturation_thermal
+        procedure, pass(self), public :: calc_specific_heat_water => calc_specific_heat_water_thermal
+        procedure, pass(self), public :: calc_specific_heat_vapor => calc_specific_heat_vapor_thermal
         procedure, pass(self), public :: update_water_phases => update_water_phases_thermal
         procedure, pass(self), public :: cache_enthalpy_history => cache_enthalpy_history_thermal
         procedure, pass(self), public :: invalidate_enthalpy_cache => invalidate_enthalpy_cache_thermal
@@ -84,6 +87,20 @@ module physics_governing_thermal
             real(real64), intent(inout) :: rho_vapor_sat
 
         end subroutine calc_density_vapor_saturation_thermal
+
+        module subroutine calc_specific_heat_water_thermal(self, state, c_w)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: c_w
+        end subroutine calc_specific_heat_water_thermal
+
+        module subroutine calc_specific_heat_vapor_thermal(self, state, c_v)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: c_v
+        end subroutine calc_specific_heat_vapor_thermal
 
         module subroutine update_water_phases_thermal(self, material_id, state)
             implicit none

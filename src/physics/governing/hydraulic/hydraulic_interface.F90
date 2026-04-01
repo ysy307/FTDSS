@@ -28,13 +28,13 @@ module physics_governing_hydraulic
 
         ! --- Coefficient Computation Procedures ---
         procedure, pass(self), private :: compute_mass_term => compute_mass_term_hydraulic
-        procedure, pass(self), private :: compute_diffusion_term => compute_diffusion_term_hydraulic
+        procedure, pass(self), public :: compute_diffusion_term => compute_diffusion_term_hydraulic
         procedure, pass(self), private :: compute_advective_term => compute_advective_term_hydraulic
         procedure, pass(self), private :: compute_transient_term => compute_transient_term_hydraulic
 
         ! --- Coupling Coefficient Procedures ---
         procedure, pass(self), private :: compute_coupling_mass_term => compute_coupling_mass_term_hydraulic
-        procedure, pass(self), private :: compute_coupling_diffusion_term => compute_coupling_diffusion_term_hydraulic
+        procedure, pass(self), public :: compute_coupling_diffusion_term => compute_coupling_diffusion_term_hydraulic
 
         ! --- Helper Procedures ---
         procedure, pass(self), public :: calc_K_wT => calc_K_wT_hydraulic

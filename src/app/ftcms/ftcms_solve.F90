@@ -7,69 +7,20 @@ contains
         class(type_ftcms), intent(inout) :: self
 
         real(real64), pointer, contiguous, dimension(:) :: u
-        real(real64), pointer, contiguous, dimension(:) :: P_cur => null()
-        real(real64) :: s_T, s_P
-        integer(int32) :: num_nodes, num_dofs_per_node, num_total_dofs
-        integer(int32) :: thermal_dof, hydraulic_dof, i
-        logical :: preserve_newton
 
         nullify (u)
-
-        ! Preserve NEWTON state across coupling iterations (warm start within timestep).
-        ! If NEWTON was already active (from a previous coupling iter or timestep),
-        ! restore it after reset so convergence mode is not lost.
-        preserve_newton = self%control%is_compute_newton()
 
         ! Reset iteration control
         ! reset() may set the compute solver to NONE when config is NONE.
         call self%control%reset_iteration()
 
         ! [Important] Compute solver must always be PICARD or NEWTON.
-        ! Even for NONE (linear) config, Picard discretization is used.
-        if (preserve_newton) then
-            call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%NEWTON)
-        else
-            call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
-        end if
+        ! Even for NONE (linear) config, Picard discretization is used,
+        ! so explicitly set PICARD here to override the reset state.
+        call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
 
         call self%control%increment_total()
         call self%control%reset_acceleration()
-
-        ! Compute DOF column scaling factors
-        call self%domain%get_num_nodes(num_nodes)
-        call self%domain%get_num_dof_per_node(num_dofs_per_node)
-        call self%domain%get_total_dofs(num_total_dofs)
-
-        if (.not. allocated(self%col_scale)) then
-            allocate (self%col_scale(num_total_dofs))
-            allocate (self%col_scale_inv(num_total_dofs))
-        end if
-
-        s_T = 1.0d0
-        s_P = 1.0d3
-        if (self%is_active_hydraulic()) then
-            call self%pressure%get_current(P_cur)
-            if (associated(P_cur)) then
-                s_P = max(maxval(abs(P_cur)), 1.0d3)
-                nullify (P_cur)
-            end if
-        end if
-
-        thermal_dof = self%thermal_start_dof
-        hydraulic_dof = self%hydraulic_start_dof
-
-        self%col_scale(:) = 1.0d0
-        do i = 1, num_nodes
-            if (thermal_dof > 0) then
-                self%col_scale((i - 1) * num_dofs_per_node + thermal_dof) = s_T
-            end if
-            if (hydraulic_dof > 0) then
-                self%col_scale((i - 1) * num_dofs_per_node + hydraulic_dof) = s_P
-            end if
-        end do
-        self%col_scale_inv(:) = 1.0d0 / self%col_scale(:)
-
-        write (*, '("   [SCALE] s_T=", ES10.3, " s_P=", ES10.3)') s_T, s_P
 
         ! Save previous step values (Previous <- Current)
         call self%porosity%get_previous(u)
@@ -128,14 +79,12 @@ contains
         real(real64), allocatable :: residual(:)
         real(real64), allocatable :: increment(:)
         real(real64) :: current_norm
+        real(real64) :: relaxation_factor
         real(real64) :: switch_norm(PHYSICS_TYPES%NUM_ID)
         logical :: should_switch
         logical, parameter :: diverged = .true.
 
         logical :: is_compute_newton, is_compute_picard, is_config_none
-
-        real(real64) :: ref_values(PHYSICS_TYPES%NUM_ID)
-        real(real64), pointer, contiguous, dimension(:) :: T_cur => null(), P_cur => null()
 
         nullify (current_value)
 
@@ -148,19 +97,6 @@ contains
         is_compute_picard = self%control%is_compute_picard()
         ! Check whether config (static) solver is NONE
         is_config_none = self%control%is_none()
-
-        ! Update per-physics reference values for convergence normalization
-        ref_values(:) = 1.0d0
-        if (self%is_active_thermal()) then
-            call self%temperature%get_current(T_cur)
-            if (associated(T_cur)) ref_values(PHYSICS_TYPES%THERMAL%ID) = maxval(abs(T_cur)) + 1.0d0
-        end if
-        if (self%is_active_hydraulic()) then
-            call self%pressure%get_current(P_cur)
-            if (associated(P_cur)) ref_values(PHYSICS_TYPES%HYDRAULIC%ID) = maxval(abs(P_cur)) + 1.0d0
-        end if
-        call self%control%update_convergence_reference_values(ref_values)
-        call self%control%get_nonlinear_iter(iter)
 
         ! ----------------------------------------------------------------------
         ! Thermal Convergence Check
@@ -177,10 +113,15 @@ contains
                 write (*, *) "Error: NaN detected in thermal variables during convergence check."
                 call self%control%set_diverged(PHYSICS_TYPES%THERMAL, diverged)
             else
+                ! When config is NONE, the iteration module returns converged immediately
+                if (is_compute_picard .and. .not. is_config_none) then
+                    call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
+                    increment(:) = relaxation_factor * increment(:)
+                end if
                 call self%control%check_convergence(PHYSICS_TYPES%THERMAL, residual, increment)
-                write (*, '("   [NL-T] Iter:",I3," res:",ES10.3," du:",ES10.3," ref:",ES10.3)') &
-                    iter, maxval(abs(residual)), maxval(abs(increment)), ref_values(PHYSICS_TYPES%THERMAL%ID)
             end if
+
+            ! Aitken relaxation check
 
         end if
 
@@ -199,9 +140,11 @@ contains
                 write (*, *) "Error: NaN detected in hydraulic variables during convergence check."
                 call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, diverged)
             else
+                if (is_compute_picard .and. .not. is_config_none) then
+                    call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
+                    increment(:) = relaxation_factor * increment(:)
+                end if
                 call self%control%check_convergence(PHYSICS_TYPES%HYDRAULIC, residual, increment)
-                write (*, '("   [NL-H] Iter:",I3," res:",ES10.3," du:",ES10.3," ref:",ES10.3)') &
-                    iter, maxval(abs(residual)), maxval(abs(increment)), ref_values(PHYSICS_TYPES%HYDRAULIC%ID)
             end if
         end if
 
@@ -209,6 +152,7 @@ contains
         ! 2. Hybrid method switch decision
         !    Skip when config is NONE (linear)
         ! ----------------------------------------------------------------------
+        call self%control%get_nonlinear_iter(iter)
 
         if (iter > 1 .and. .not. self%control%is_diverged()) then
             if (is_compute_picard .and. .not. is_config_none) then
@@ -252,6 +196,8 @@ contains
         class(type_ftcms), intent(inout) :: self
         logical, intent(inout) :: is_step_converged
         logical :: prescribe_bc
+        integer(int32) :: iter_nl
+        real(real64) :: t_res, t_inc, h_res, h_inc
 
         ! Staggered coupling variables
         logical :: do_staggered
@@ -263,8 +209,11 @@ contains
         real(real64), allocatable :: P_old(:)
         real(real64), pointer, contiguous :: T_cur(:) => null()
         real(real64), pointer, contiguous :: P_cur(:) => null()
+        integer(int32) :: bdf_order
+        real(real64) :: mean_pressure
         real(real64) :: T_scale, P_scale
         integer(int32) :: num_nodes
+        logical :: linear_failed
 
         is_step_converged = .false.
 
@@ -276,8 +225,12 @@ contains
             allocate (T_old(num_nodes), P_old(num_nodes))
         end if
 
+        ! Initialize per-time-step state only once.
+        call self%solve_time_step_initial_setup()
+
         ! Outer coupling iteration loop
         coupling_loop: do coupling_iter = 1, merge(MAX_COUPLING_ITER, 1, do_staggered)
+            linear_failed = .false.
 
             ! Save solution before inner nonlinear solve for coupling check
             if (do_staggered .and. coupling_iter > 1) then
@@ -289,8 +242,13 @@ contains
                 nullify (P_cur)
             end if
 
-            ! Initial setup (compute solver is always set to PICARD here)
-            call self%solve_time_step_initial_setup()
+            ! For coupling iterations > 1, reset nonlinear controls only.
+            if (coupling_iter > 1) then
+                call self%control%reset_iteration()
+                call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
+                call self%control%increment_total()
+                call self%control%reset_acceleration()
+            end if
 
             ! Nonlinear iteration loop
             nonlinear: do while (self%control%should_continue())
@@ -309,6 +267,7 @@ contains
 
                 ! If linear solver failed, mark as diverged and exit
                 if (.not. self%solver%is_success()) then
+                    linear_failed = .true.
                     if (self%is_active_thermal()) then
                         call self%control%set_converged( &
                             PHYSICS_TYPES%THERMAL, .false.)
@@ -330,12 +289,57 @@ contains
                 ! Update solution with relaxation (Aitken for Picard, damped for Newton)
                 call self%reflect_variables()
 
+                ! Enforce global pressure gauge each nonlinear iteration for all-Neumann hydraulic systems.
+                if (self%is_active_hydraulic()) then
+                    bdf_order = 0
+                    call self%control%get_bdf_coeffs(bdf_order=bdf_order)
+                    if (.not. self%hydraulic_has_dirichlet_bc .and. bdf_order >= 1) then
+                        call self%pressure%get_current(P_cur)
+                        if (associated(P_cur)) then
+                            mean_pressure = sum(P_cur(:)) / real(size(P_cur), real64)
+                            P_cur(:) = P_cur(:) - mean_pressure
+                        end if
+                        nullify (P_cur)
+                    end if
+                end if
+
                 ! Force exit after one iteration when config is NONE (linear solve)
                 if (self%control%is_none()) exit nonlinear
 
             end do nonlinear
 
             is_step_converged = self%control%is_converged()
+
+            if (.not. is_step_converged) then
+                call self%control%get_nonlinear_iter(iter_nl)
+                t_res = 0.0d0
+                t_inc = 0.0d0
+                h_res = 0.0d0
+                h_inc = 0.0d0
+                if (self%is_active_thermal()) then
+                    if (.not. linear_failed) then
+                        call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, NONLINEAR_NORM_CRITERIA%RESIDUAL, &
+                                                           NORM_TYPES%LINF, t_res)
+                        call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, NONLINEAR_NORM_CRITERIA%UPDATE, &
+                                                           NORM_TYPES%LINF, t_inc)
+                    end if
+                end if
+                if (self%is_active_hydraulic()) then
+                    if (.not. linear_failed) then
+                        call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, NONLINEAR_NORM_CRITERIA%RESIDUAL, &
+                                                           NORM_TYPES%LINF, h_res)
+                        call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, NONLINEAR_NORM_CRITERIA%UPDATE, &
+                                                           NORM_TYPES%LINF, h_inc)
+                    end if
+                end if
+                if (linear_failed) then
+                    write (*, '(A,I0,A,L1,A)') '   [NONLINEAR] failed: iter=', iter_nl, ', diverged=', &
+                        self%control%is_diverged(), ', linear solver failure before nonlinear norm update.'
+                else
+                    write (*, '(A,I0,A,L1,A,4(ES11.3,1X))') '   [NONLINEAR] failed: iter=', iter_nl, ', diverged=', &
+                        self%control%is_diverged(), ', T_res/T_inc/H_res/H_inc=', t_res, t_inc, h_res, h_inc
+                end if
+            end if
 
             ! If inner solve failed, skip coupling check
             if (.not. is_step_converged) exit coupling_loop
@@ -385,26 +389,30 @@ contains
 
         logical :: is_step_converged
         integer(int32) :: consecutive_failures
+        integer(int32) :: step_counter
+        integer(int32) :: nl_iter
+        real(real64) :: time_s, dt_s
         integer(int32), parameter :: MAX_CONSECUTIVE_FAILURES = 50
 
         consecutive_failures = 0
+        step_counter = 0
 
         ! Loop until end time
         time_loop: do while (.not. self%control%is_end_time())
-            block
-                real(real64) :: cur_time
-                call self%control%get_time(cur_time)
-                write (*, '("   [TIME] t=", ES12.5)') cur_time
-            end block
             call self%solve_time_step(is_step_converged)
-            write (*, '("   [STEP] converged=", L1)') is_step_converged
 
             ! Update time and adaptive time stepping
             call self%control%update(is_step_converged)
 
             if (is_step_converged) then
                 consecutive_failures = 0
-
+                step_counter = step_counter + 1
+                call self%control%get_nonlinear_iter(nl_iter)
+                call self%control%get_time(time_s)
+                if (step_counter == 1 .or. mod(step_counter, 20) == 0 .or. nl_iter > 8) then
+                    write (*, '(A,I0,A,ES13.5,A,I0)') '   [STEP] converged: n=', step_counter, &
+                        ', t[s]=', time_s, ', nonlinear_iter=', nl_iter
+                end if
                 ! Shift variable history on convergence
                 call self%shift()
 
@@ -414,6 +422,13 @@ contains
             else
                 ! Retry with smaller dt
                 consecutive_failures = consecutive_failures + 1
+
+                if (self%control%is_min_dt()) then
+                    call self%control%get_dt(dt_s)
+                    write (*, '(A,ES13.5,A)') '   [ERROR] Step failed at minimum dt=', dt_s, '. Stopping retry loop.'
+                    exit time_loop
+                end if
+
                 write (*, '("   [WARNING] Step Failed (",I0,"/",I0,"). Retrying with smaller dt...")') &
                     consecutive_failures, MAX_CONSECUTIVE_FAILURES
                 if (consecutive_failures >= MAX_CONSECUTIVE_FAILURES) then

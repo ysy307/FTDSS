@@ -2,6 +2,10 @@ module models_phase_change_fusion
     use, intrinsic :: iso_fortran_env
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state
+    use :: constitutive_constants, only: &
+        lf => latent_heat_fusion_water_0c, &
+        T_to_K => celsius_to_kelvin, &
+        Tf0 => water_freezing_point_at_standard_atmospheric_pressure
     use :: physics_constitutive_base, only:abst_constitutive
     use :: models_wrf, only:abst_wrf
     use :: models_phase_change_gcc, only:abst_gcc
@@ -9,6 +13,12 @@ module models_phase_change_fusion
     private
 
     public :: type_fusion
+
+    ! Smooth blending scale [Pa] for effective suction max(psi_cap, psi_cryo).
+    ! A small positive epsilon avoids non-differentiable switching at psi_cap=psi_cryo.
+    real(real64), parameter :: SUCTION_BLEND_EPS = 1.0d4
+    real(real64), parameter :: FREEZING_SMOOTH_BAND = 0.25d0
+    real(real64), parameter :: DPW_DT_LIMIT = 1.0d8
 
     !>
     !> @brief Model for fusion (melting/freezing) physics.
@@ -28,6 +38,57 @@ module models_phase_change_fusion
     end type type_fusion
 
 contains
+
+    pure subroutine compute_effective_suction(psi_cap, psi_cryo, psi_eff, dpsi_eff_dpsi_cap, dpsi_eff_dpsi_cryo)
+        implicit none
+        real(real64), intent(in) :: psi_cap, psi_cryo
+        real(real64), intent(inout) :: psi_eff
+        real(real64), intent(inout), optional :: dpsi_eff_dpsi_cap, dpsi_eff_dpsi_cryo
+
+        real(real64) :: delta_psi, blend_denom
+
+        delta_psi = psi_cap - psi_cryo
+        blend_denom = sqrt(delta_psi*delta_psi + SUCTION_BLEND_EPS*SUCTION_BLEND_EPS)
+
+        psi_eff = 0.5d0*(psi_cap + psi_cryo + blend_denom)
+
+        if (present(dpsi_eff_dpsi_cap)) then
+            dpsi_eff_dpsi_cap = 0.5d0*(1.0d0 + delta_psi/blend_denom)
+        end if
+        if (present(dpsi_eff_dpsi_cryo)) then
+            dpsi_eff_dpsi_cryo = 0.5d0*(1.0d0 - delta_psi/blend_denom)
+        end if
+    end subroutine compute_effective_suction
+
+    pure subroutine compute_freezing_activation(temperature, activation, dactivation_dT)
+        implicit none
+        real(real64), intent(in) :: temperature
+        real(real64), intent(inout) :: activation
+        real(real64), intent(inout), optional :: dactivation_dT
+
+        real(real64) :: arg, sech2
+
+        arg = (temperature - Tf0) / FREEZING_SMOOTH_BAND
+        activation = 0.5d0*(1.0d0 - tanh(arg))
+
+        if (present(dactivation_dT)) then
+            sech2 = 1.0d0 - tanh(arg)*tanh(arg)
+            dactivation_dT = -0.5d0*sech2/FREEZING_SMOOTH_BAND
+        end if
+    end subroutine compute_freezing_activation
+
+    pure subroutine bound_symmetric(value_in, bound, value_out)
+        implicit none
+        real(real64), intent(in) :: value_in, bound
+        real(real64), intent(inout) :: value_out
+
+        if (bound <= 0.0d0) then
+            value_out = value_in
+            return
+        end if
+
+        value_out = value_in / (1.0d0 + abs(value_in)/bound)
+    end subroutine bound_symmetric
 
     !>
     !> @brief Initialize fusion model.
@@ -59,21 +120,20 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: ice_content
 
-        real(real64) :: pressure
+        real(real64) :: pressure, temperature
         real(real64) :: psi_cap, psi_cryo, psi_eff
-        real(real64) :: theta_target_unfrozen, theta_liquid
+        real(real64) :: d_theta_liquid_dPress
+        real(real64) :: freezing_activation
         real(real64) :: rho_water, rho_ice, density_ratio
 
-        ! Compute suction as positive magnitude for comparison
         call state%pressure%get(pressure)
+        call state%temperature%get(temperature)
 
         psi_cap = max(0.0d0, -pressure)
         call self%gcc%calc(state, psi_cryo)
-        psi_eff = max(psi_cap, psi_cryo)
+        call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
 
-        ! WRF input requires negative pressure head, so negate psi
-        call self%wrf%calc(-psi_cap, theta_target_unfrozen)
-        call self%wrf%calc(-psi_eff, theta_liquid)
+        call self%wrf%deriv(-psi_eff, d_theta_liquid_dPress)
 
         call self%calc_rho_water(state, rho_water)
         call self%calc_rho_ice(state, rho_ice)
@@ -84,7 +144,13 @@ contains
             density_ratio = 1.0d0
         end if
 
-        ice_content = max(0.0d0, (theta_target_unfrozen - theta_liquid) * density_ratio)
+        call compute_freezing_activation(temperature, freezing_activation)
+
+        if (psi_cryo > 0.0d0) then
+            ice_content = max(0.0d0, freezing_activation * density_ratio * d_theta_liquid_dPress * psi_cryo)
+        else
+            ice_content = 0.0d0
+        end if
 
     end subroutine calc_ice_content
 
@@ -98,16 +164,17 @@ contains
         real(real64), intent(inout) :: dice_dP
         real(real64), intent(inout) :: dice_dT
 
-        real(real64) :: pressure
-        real(real64) :: psi_cap, psi_cryo
-        real(real64) :: d_psi_cap_dP
+        real(real64) :: pressure, temperature, temperature_K
+        real(real64) :: psi_cap, psi_cryo, psi_eff
         real(real64) :: d_psi_cryo_dP, d_psi_cryo_dT
-        real(real64) :: d_psi_eff_dP, d_psi_eff_dT
-        real(real64) :: d_theta_target_dPress, d_theta_liquid_dPress ! renamed from dPsi to dPress
+        real(real64) :: d_theta_liquid_dPress
+        real(real64) :: dPi_dT
+        real(real64) :: dPw_dP, dPw_dT, dPw_dT_bounded
+        real(real64) :: freezing_activation, d_freezing_activation_dT
         real(real64) :: rho_w, rho_i, density_ratio
-        real(real64) :: theta_target, theta_liquid
 
         call state%pressure%get(pressure)
+        call state%temperature%get(temperature)
         call self%calc_rho_water(state, rho_w)
         call self%calc_rho_ice(state, rho_i)
 
@@ -117,53 +184,33 @@ contains
             density_ratio = 1.0d0
         end if
 
-        if (pressure < 0.0d0) then
-            psi_cap = -pressure
-            d_psi_cap_dP = -1.0d0
-        else
-            psi_cap = 0.0d0
-            d_psi_cap_dP = 0.0d0
-        end if
+        psi_cap = max(0.0d0, -pressure)
 
         call self%gcc%calc(state, psi_cryo)
         call self%gcc%deriv_temperature(state, d_psi_cryo_dT)
         call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
 
-        if (psi_cap >= psi_cryo) then
-            d_psi_eff_dP = d_psi_cap_dP
-            d_psi_eff_dT = 0.0d0
-        else
-            d_psi_eff_dP = d_psi_cryo_dP
-            d_psi_eff_dT = d_psi_cryo_dT
-        end if
+        call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
+        call self%wrf%deriv(-psi_eff, d_theta_liquid_dPress)
 
-        ! WRF evaluation
-        ! Derivative computation: input is negative pressure (-psi).
-        ! Return value d_theta_..._dPress is d(theta)/d(Pressure) (typically positive)
-        call self%wrf%calc(-psi_cap, theta_target)
-        call self%wrf%calc(-max(psi_cap, psi_cryo), theta_liquid)
-        call self%wrf%deriv(-psi_cap, d_theta_target_dPress)
-        call self%wrf%deriv(-max(psi_cap, psi_cryo), d_theta_liquid_dPress)
+        temperature_K = max(1.0d0, temperature + T_to_K)
 
-        ! Chain rule application
-        ! Input variable P_in = -psi
-        ! d(P_in)/dX = - d(psi)/dX
-        ! d(theta)/dX = d(theta)/d(P_in) * d(P_in)/dX
-        !             = d_theta_..._dPress * (- d_psi_..._dX)
+        ! Pressure state variable is water pressure itself.
+        dPw_dP = 1.0d0
 
-        if (theta_target > theta_liquid) then
-            ! d(Ice)/dP = ratio * [ d(Theta_target)/dP - d(Theta_liquid)/dP ]
-            !           = ratio * [ (dThetaT/dP_in * -dPsiCap/dP) - (dThetaL/dP_in * -dPsiEff/dP) ]
-            !           = ratio * [ - dThetaT * dPsiCap + dThetaL * dPsiEff ]
+        ! GCC identity in this codebase: psi_cryo = P_w - P_i.
+        dPi_dT = -d_psi_cryo_dT
 
-            dice_dP = density_ratio * ( &
-                      d_theta_target_dPress * (-d_psi_cap_dP) - &
-                      d_theta_liquid_dPress * (-d_psi_eff_dP) &
-                      )
+        ! Chain-rule mapping for the capacity formulation.
+        dPw_dT = density_ratio * dPi_dT + rho_w*lf/temperature_K
+        call bound_symmetric(dPw_dT, DPW_DT_LIMIT, dPw_dT_bounded)
 
-            dice_dT = density_ratio * ( &
-                      -d_theta_liquid_dPress * (-d_psi_eff_dT) &
-                      )
+        call compute_freezing_activation(temperature, freezing_activation, d_freezing_activation_dT)
+
+        if (psi_cryo > 0.0d0) then
+            dice_dP = freezing_activation * (-density_ratio * d_theta_liquid_dPress * dPw_dP)
+            dice_dT = freezing_activation * (-density_ratio * d_theta_liquid_dPress * dPw_dT_bounded) + &
+                      d_freezing_activation_dT * (density_ratio * d_theta_liquid_dPress * psi_cryo)
         else
             dice_dP = 0.0d0
             dice_dT = 0.0d0
@@ -196,7 +243,7 @@ contains
         end if
 
         call self%gcc%calc(state, psi_cryo)
-        psi_eff = max(psi_cap, psi_cryo)
+        call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
 
         ! Pass negative pressure to WRF
         call self%wrf%calc(-psi_eff, water_content)
@@ -217,7 +264,9 @@ contains
         real(real64) :: psi_cap, psi_cryo
         real(real64) :: d_psi_cap_dP
         real(real64) :: d_psi_cryo_dP, d_psi_cryo_dT
+        real(real64) :: psi_eff
         real(real64) :: d_psi_eff_dP, d_psi_eff_dT
+        real(real64) :: d_psi_eff_dpsi_cap, d_psi_eff_dpsi_cryo
         real(real64) :: d_theta_liquid_dPress ! renamed variable
 
         call state%pressure%get(pressure)
@@ -234,20 +283,17 @@ contains
         ! Cryogenic suction
         call self%gcc%calc(state, psi_cryo)
 
-        ! Select effective suction and determine derivatives
-        if (psi_cap >= psi_cryo) then
-            d_psi_eff_dP = d_psi_cap_dP
-            d_psi_eff_dT = 0.0d0
-        else
-            call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
-            call self%gcc%deriv_temperature(state, d_psi_cryo_dT)
-            d_psi_eff_dP = d_psi_cryo_dP
-            d_psi_eff_dT = d_psi_cryo_dT
-        end if
+        call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
+        call self%gcc%deriv_temperature(state, d_psi_cryo_dT)
+
+        ! Select effective suction and determine derivatives with smooth blending.
+        call compute_effective_suction(psi_cap, psi_cryo, psi_eff, d_psi_eff_dpsi_cap, d_psi_eff_dpsi_cryo)
+        d_psi_eff_dP = d_psi_eff_dpsi_cap*d_psi_cap_dP + d_psi_eff_dpsi_cryo*d_psi_cryo_dP
+        d_psi_eff_dT = d_psi_eff_dpsi_cryo*d_psi_cryo_dT
 
         ! 3. Compute moisture capacity (dTheta/dPress)
         ! Pass negative pressure to WRF
-        call self%wrf%deriv(-max(psi_cap, psi_cryo), d_theta_liquid_dPress)
+        call self%wrf%deriv(-psi_eff, d_theta_liquid_dPress)
 
         ! 4. Assemble liquid water content derivatives (chain rule)
         ! Input is -psi_eff, so chain rule multiplies by -d(psi)/dX

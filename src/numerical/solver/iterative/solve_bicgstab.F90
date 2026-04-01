@@ -82,7 +82,7 @@ contains
         call self%residual_history%zero()
 
         ! ==========================================================
-        ! 2: Set an initial value x0 (use user's initial guess)
+        ! 2: Set an initial value x0 (use user initial guess)
         ! ==========================================================
         call self%x%copy(x)
         x_internal_ptr => self%x%get_data()

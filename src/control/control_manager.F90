@@ -4,7 +4,7 @@ module control_control_manager
     use :: stdlib_optval, only:optval
     use :: module_core
     use :: module_linalg
-    use :: control_acceleration, only:abst_acceleration, type_acceleration_aitken, type_acceleration_anderson
+    use :: control_acceleration, only:abst_acceleration, type_acceleration_aitken
     use :: control_time, only:type_time
     use :: control_time_profiler, only:type_time_profiler
     use :: control_iteration, only:type_iteration
@@ -89,9 +89,10 @@ module control_control_manager
         procedure, public, pass(self) :: get_update_frequency => get_update_frequency_control
         procedure, public, pass(self) :: get_current_norm => get_current_norm_control
         procedure, public, pass(self) :: get_tolerances => get_tolerances_control
-        procedure, public, pass(self) :: update_convergence_reference_values => update_convergence_reference_values_control
         ! - time
         procedure, public, pass(self) :: get_time => get_time_control
+        procedure, public, pass(self) :: get_dt => get_dt_control
+        procedure, public, pass(self) :: is_min_dt => is_min_dt_control
         ! - acceleration
         procedure, public, pass(self) :: get_current_relaxation => get_current_relaxation_control
         procedure, public, pass(self) :: get_previous_relaxation => get_previous_relaxation_control
@@ -142,17 +143,18 @@ contains
         ! Acceleration method initialization
         if (present(config_acceleration)) then
             select case (config_acceleration%method%ID)
-            case (ACCELERATION_METHODS%NONE%ID)
-                ! No acceleration - skip allocation
             case (ACCELERATION_METHODS%AITKEN%ID)
                 allocate (type_acceleration_aitken :: self%acceleration)
-                call self%acceleration%initialize(config_acceleration)
+            case (ACCELERATION_METHODS%NONE%ID)
+                ! No acceleration object is needed for NONE mode.
             case (ACCELERATION_METHODS%ANDERSON%ID)
-                allocate (type_acceleration_anderson :: self%acceleration)
-                call self%acceleration%initialize(config_acceleration)
+                error stop "Anderson acceleration is not implemented yet."
             case default
                 error stop "Unknown acceleration method: "//trim(config_acceleration%method%name)
             end select
+            if (allocated(self%acceleration)) then
+                call self%acceleration%initialize(config_acceleration)
+            end if
         end if
 
         ! Output managers initialization with the current time
@@ -410,11 +412,7 @@ contains
         end if
 
         ! 4. Execute update (dt is limited to not exceed t_target)
-        write (*, '("   [ATS] success=", L1, " iter=", I3, " dt_before=", ES10.3)') &
-            success, iter_count, dt_s
         call self%time%update(success, iter_count, t_target)
-        call self%time%get_dt(dt_s)
-        write (*, '("   [ATS] dt_after=", ES10.3)') dt_s
 
     end subroutine update_controls
 
@@ -525,6 +523,23 @@ contains
         call self%time%get_time(time)
 
     end subroutine get_time_control
+
+    subroutine get_dt_control(self, dt)
+        implicit none
+        class(type_control), intent(in) :: self
+        real(real64), intent(inout) :: dt
+
+        call self%time%get_dt(dt)
+
+    end subroutine get_dt_control
+
+    pure function is_min_dt_control(self) result(is_min_dt)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: is_min_dt
+
+        is_min_dt = self%time%is_min_dt()
+    end function is_min_dt_control
 
     subroutine display_profiler_control(self, unit_in)
         implicit none
@@ -711,9 +726,6 @@ contains
 
         if (allocated(self%acceleration)) then
             call self%acceleration%compute_relaxation(physics_type, iter, du, vec)
-        else
-            ! No acceleration: full step (relaxation handled by caller if needed)
-            vec(:) = vec(:) + du(:)
         end if
 
     end subroutine compute_relaxation_control
@@ -724,7 +736,11 @@ contains
         type(type_constant_id), intent(in) :: physics_type
         logical :: reached
 
-        reached = self%acceleration%reach_minimum_relaxation(physics_type)
+        if (allocated(self%acceleration)) then
+            reached = self%acceleration%reach_minimum_relaxation(physics_type)
+        else
+            reached = .false.
+        end if
     end function reach_minimum_relaxation_control
 
     pure function reach_maximum_relaxation_control(self, physics_type) result(reached)
@@ -733,7 +749,11 @@ contains
         type(type_constant_id), intent(in) :: physics_type
         logical :: reached
 
-        reached = self%acceleration%reach_maximum_relaxation(physics_type)
+        if (allocated(self%acceleration)) then
+            reached = self%acceleration%reach_maximum_relaxation(physics_type)
+        else
+            reached = .false.
+        end if
     end function reach_maximum_relaxation_control
 
     subroutine get_current_relaxation_control(self, physics_type, relaxation)
@@ -755,15 +775,11 @@ contains
         type(type_constant_id), intent(in) :: physics_type
         real(real64), intent(inout) :: relaxation
 
-        call self%acceleration%get_previous_relaxation(physics_type, relaxation)
+        if (allocated(self%acceleration)) then
+            call self%acceleration%get_previous_relaxation(physics_type, relaxation)
+        else
+            relaxation = 1.0d0
+        end if
     end subroutine get_previous_relaxation_control
-
-    subroutine update_convergence_reference_values_control(self, reference_values)
-        implicit none
-        class(type_control), intent(inout) :: self
-        real(real64), intent(in) :: reference_values(:)
-
-        call self%iteration%update_reference_values(reference_values)
-    end subroutine update_convergence_reference_values_control
 
 end module control_control_manager

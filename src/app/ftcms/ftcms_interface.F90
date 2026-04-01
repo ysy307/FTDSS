@@ -46,6 +46,7 @@ module app_ftcms
 
         integer(int32) :: thermal_start_dof = 0
         integer(int32) :: hydraulic_start_dof = 0
+        logical :: hydraulic_has_dirichlet_bc = .false.
 
         ! DOF column scaling factors for variable non-dimensionalization
         real(real64), allocatable :: col_scale(:)
@@ -221,9 +222,10 @@ module app_ftcms
 
         end subroutine update_variables_ftcms
 
-        module subroutine reflect_variables_ftcms(self)
+        module subroutine reflect_variables_ftcms(self, step_scale)
             implicit none
             class(type_ftcms), intent(inout) :: self
+            real(real64), intent(in), optional :: step_scale
 
         end subroutine reflect_variables_ftcms
 

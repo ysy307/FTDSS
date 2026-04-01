@@ -620,4 +620,20 @@ contains
 
     end subroutine invalidate_enthalpy_cache_thermal
 
+    module subroutine calc_specific_heat_water_thermal(self, state, c_w)
+        implicit none
+        class(type_thermal), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: c_w
+        call self%physics%calc_specific_heat_water(state, c_w)
+    end subroutine calc_specific_heat_water_thermal
+
+    module subroutine calc_specific_heat_vapor_thermal(self, state, c_v)
+        implicit none
+        class(type_thermal), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: c_v
+        call self%physics%calc_specific_heat_vapor(state, c_v)
+    end subroutine calc_specific_heat_vapor_thermal
+
 end submodule thermal_coefficients

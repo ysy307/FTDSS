@@ -117,7 +117,7 @@ contains
         type(type_matrix_dense), intent(inout), optional :: K_HT
         type(type_vector_dp), intent(inout), optional :: F_H
 
-        integer(int32) :: i, j, n_nodes, n_gauss, n_dim, ierr
+        integer(int32) :: i, j, d, n_nodes, n_gauss, n_dim, ierr
         real(real64) :: bdf0
         real(real64), allocatable :: local_vec_res(:)
 
@@ -151,6 +151,11 @@ contains
         do i = 1, n_gauss
             call self%compute_mass_term(workspace%material_id, workspace%state_gp(i), workspace%work_C(i))
             call self%compute_diffusion_term(workspace%material_id, workspace%state_gp(i), workspace%work_D(:, :, i))
+            ! Min cutoffs: prevent near-zero diagonals in near-frozen/dry state
+            workspace%work_C(i) = max(workspace%work_C(i), 1.0d-20)
+            do d = 1, n_dim
+                workspace%work_D(d, d, i) = max(workspace%work_D(d, d, i), 1.0d-20)
+            end do
             call self%compute_advective_term(workspace%material_id, workspace%state_gp(i), workspace%work_V(:, i))
             call self%compute_transient_term(workspace%material_id, workspace%state_gp(i), &
                                              workspace%bdf_coeffs(1:workspace%bdf_order + 1), &
