@@ -21,7 +21,7 @@ contains
         dQv_dP = 0.0d0
         drho_w_dP = 0.0d0
         drho_ice_dP = 0.0d0
-        dP_ice_dP_water = 0.0d0
+        dP_ice_dP_water = 1.0d0
 
         call state%water_content%get(Qw)
         call state%ice_content%get(Qi)
@@ -33,13 +33,15 @@ contains
 
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_density_ice(state, rho_i)
+         call self%physics%calc_density_water_derivatives(material_id, state, dden_dP=drho_w_dP)
+         call self%physics%calc_density_ice_derivatives(material_id, state, dden_dP=drho_ice_dP)
+         call self%physics%calc_pressure_ice_water_derivative(material_id, state, dP_ice_dP_water)
 
-        ! C_HH = d(rho_eff)/dP >= 0 (thermodynamic constraint)
+         ! C_HH = d(rho_eff)/dP
         ! rho_eff = rho_w*Qw + rho_i*Qi + rho_w*Qv
-        ! Clamp: near freezing front rho_i*dQi_dP can exceed rho_w*dQw_dP numerically.
-        C_HH = max(0.0d0, rho_w * dQw_dP + Qw * drho_w_dP &
+         C_HH = rho_w * dQw_dP + Qw * drho_w_dP &
                + rho_i * dQi_dP + Qi * drho_ice_dP * dP_ice_dP_water &
-               + rho_w * dQv_dP + Qv * drho_w_dP)
+             + rho_w * dQv_dP + Qv * drho_w_dP
 
     end subroutine compute_mass_term_hydraulic
 
@@ -107,9 +109,8 @@ contains
         case (COMP_TYPES%XYZ_3D%ID)
             V_H(3) = -grav_flux_mag ! z-direction
         case (COMP_TYPES%XY_2D%ID)
-            ! Usually gravity is perpendicular to XY plane or handled differently
-            ! Assuming XY implies horizontal plane, gravity term might be zero or handled externally
-            V_H(:) = 0.0d0
+            ! No gravity contribution in XY_2D.
+            ! Keep the thermo-osmotic term accumulated above.
         end select
 
     end subroutine compute_advective_term_hydraulic

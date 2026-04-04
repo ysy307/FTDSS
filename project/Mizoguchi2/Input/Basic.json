@@ -7,7 +7,7 @@
         "calculate_thermal": true,
         "calculate_hydraulic": true,
         "calculate_mechanical": false,
-        "coupling_mode": "strong",
+        "coupling_mode": "staggered",
         "partitioning": true
     },
     "geometry_settings": {
@@ -136,10 +136,10 @@
     },
     "linear_solver": {
         "type": 4,
-        "preconditioner_type": 2,
-        "max_iterations": 100000,
-        "tolerance": 1e-10,
-        "restart_size": 50
+        "preconditioner_type": 1,
+        "max_iterations": 200000,
+        "tolerance": 1e-06,
+        "restart_size": 1000
 
     },
     "parallel_settings": {

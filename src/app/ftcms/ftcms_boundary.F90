@@ -65,6 +65,57 @@ contains
     end subroutine apply_bc_ftcms
 
     !>
+    !> Freezes all DOFs of a given physics in the linear system.
+    !> Sets K[i,i]=1, K row=0, F[i]=0 for every node.
+    !> After this, the linear solve yields du=0 for those DOFs,
+    !> so reflect_variables leaves that variable unchanged.
+    !> Called after apply_bc in the staggered nonlinear loop.
+    module subroutine freeze_physics_dofs_ftcms(self, physics_type)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        type(type_constant_id), intent(in) :: physics_type
+
+        integer(int32) :: i_node, num_nodes, dof_index, k, row_start, row_end
+        integer(int32), pointer :: ptr(:) => null(), ind(:) => null()
+        real(real64), pointer :: val(:, :, :) => null()
+        class(abst_matrix), pointer :: matrix_ptr => null()
+
+        call self%domain%get_num_nodes(num_nodes)
+        call self%domain%get_start_dof_index(physics_type, dof_index)
+
+        ! Eliminate couplings to the frozen variable in all equations.
+        matrix_ptr => self%K%get_matrix()
+        select type (matrix_ptr)
+        type is (type_matrix_bsr)
+            ptr => matrix_ptr%get_ptr()
+            ind => matrix_ptr%get_ind()
+            val => matrix_ptr%get_val()
+            if (associated(ptr) .and. associated(ind) .and. associated(val)) then
+                do i_node = 1, num_nodes
+                    row_start = ptr(i_node)
+                    row_end = ptr(i_node + 1) - 1
+                    do k = row_start, row_end
+                        val(:, dof_index, k) = 0.0d0
+                    end do
+                end do
+            end if
+            nullify (ptr)
+            nullify (ind)
+            nullify (val)
+        class default
+            continue
+        end select
+        nullify (matrix_ptr)
+
+        do i_node = 1, num_nodes
+            call self%K%zero(i_node, dof_index)
+            call self%K%set(dof_index, dof_index, i_node, i_node, 1.0d0)
+            call self%F%set(dof_index, i_node, 0.0d0)
+        end do
+
+    end subroutine freeze_physics_dofs_ftcms
+
+    !>
     !> Enforces Dirichlet values directly into the solution vector.
     !>
     module subroutine prescribe_essential_bc_generic(self, physics_type, current_time, variable)
@@ -229,6 +280,8 @@ contains
         integer(int32) :: num_nodes, node_id
         real(real64), parameter :: NULLSPACE_REG_EPS = 1.0d-8
         logical, save :: printed_no_dirichlet_hydraulic_notice = .false.
+        logical, save :: printed_hydraulic_gauge_notice = .false.
+        logical, save :: printed_thermal_gauge_notice = .false.
         type(type_bc_result) :: bc_result
         type(type_boundary_patch), pointer :: bc_patch
 
@@ -275,6 +328,8 @@ contains
 
         if (physics_type%ID == PHYSICS_TYPES%HYDRAULIC%ID) then
             self%hydraulic_has_dirichlet_bc = (num_dirichlet_nodes > 0)
+        else if (physics_type%ID == PHYSICS_TYPES%THERMAL%ID) then
+            self%thermal_has_dirichlet_bc = (num_dirichlet_nodes > 0)
         end if
 
         if (num_dirichlet_nodes == 0) then
@@ -290,10 +345,32 @@ contains
                 printed_no_dirichlet_hydraulic_notice = .true.
             end if
 
-            call self%domain%get_num_nodes(num_nodes)
-            do node_id = 1, num_nodes
-                call self%K%add(dof_offset, dof_offset, node_id, node_id, NULLSPACE_REG_EPS)
-            end do
+            if (physics_type%ID == PHYSICS_TYPES%HYDRAULIC%ID .or. physics_type%ID == PHYSICS_TYPES%THERMAL%ID) then
+                ! Enforce a scalar gauge for all-Neumann systems.
+                ! This removes the constant nullspace robustly without changing solver type.
+                node_id = 1
+                call self%K%zero(node_id, dof_offset)
+                call self%K%set(dof_offset, dof_offset, node_id, node_id, 1.0d0)
+                call self%F%set(dof_offset, node_id, 0.0d0)
+                if (physics_type%ID == PHYSICS_TYPES%HYDRAULIC%ID) then
+                    self%hydraulic_has_dirichlet_bc = .true.
+                    if (.not. printed_hydraulic_gauge_notice) then
+                        write (*, '(A)') 'Notice: Applied hydraulic gauge constraint at node 1 (all-Neumann case).'
+                        printed_hydraulic_gauge_notice = .true.
+                    end if
+                else
+                    self%thermal_has_dirichlet_bc = .true.
+                    if (.not. printed_thermal_gauge_notice) then
+                        write (*, '(A)') 'Notice: Applied thermal gauge constraint at node 1 (all-Neumann case).'
+                        printed_thermal_gauge_notice = .true.
+                    end if
+                end if
+            else
+                call self%domain%get_num_nodes(num_nodes)
+                do node_id = 1, num_nodes
+                    call self%K%add(dof_offset, dof_offset, node_id, node_id, NULLSPACE_REG_EPS)
+                end do
+            end if
         end if
 
     end subroutine apply_essential_bc_generic

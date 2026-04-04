@@ -8,7 +8,7 @@ submodule(io_input_basic) input_basic_analysis_controls
     character(*), parameter :: calculate_hydraulic = "calculate_hydraulic"
     character(*), parameter :: calculate_mechanical = "calculate_mechanical"
     character(*), parameter :: coupling_mode = "coupling_mode"
-    character(*), parameter :: coupling_modes_strings(2) = [character(len=16) :: "weak", "strong"]
+    character(*), parameter :: coupling_modes_strings(2) = [character(len=16) :: "staggered", "monolithic"]
     character(*), parameter :: partitioning = "partitioning"
     !!------------------------------------------------------------------------------------------------------------------------------
 contains
@@ -37,7 +37,7 @@ contains
 
         buffer(2) = coupling_mode
         call get_json_value(json, join(buffer), self%analysis_controls%coupling_mode, &
-                            is_required=.true., default_value="weak", valid_list=coupling_modes_strings)
+                            is_required=.true., default_value="monolithic", valid_list=coupling_modes_strings)
 
         buffer(2) = partitioning
         call get_json_value(json, join(buffer), self%analysis_controls%partitioning, &

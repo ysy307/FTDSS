@@ -254,6 +254,7 @@ contains
             end if
 
             write (output_settings%io_unit, output_settings%fmt_line) time, output_values(1:self%num_observations)
+            flush (output_settings%io_unit)
         end associate
     end subroutine write_observation_line
 

@@ -6,6 +6,7 @@
 !> - L2 projection (lumped mass) for nodal gradient calculations
 !> - Evaluation of water and vapor fluxes based on the Darcy law
 submodule(app_ftcms) ftcms_compute
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
 contains
 
@@ -155,10 +156,11 @@ contains
     !>
     !> Failure behavior:
     !> - Halts execution if solver fails
-    module subroutine solve_ftcms(self)
+    module subroutine solve_ftcms(self, frozen_physics)
         implicit none
         !> Main application object
         class(type_ftcms), intent(inout) :: self
+        type(type_constant_id), intent(in), optional :: frozen_physics
 
         class(abst_matrix), pointer :: K_ptr => null()
         type(type_vector_dp), pointer :: F_ptr => null()
@@ -167,25 +169,42 @@ contains
         real(real64), pointer :: du_data(:) => null()
         type(type_vector_dp) :: scale_vec
         real(real64), pointer :: scale_data(:) => null()
+        real(real64), pointer :: k_values(:, :, :) => null()
         real(real64) :: tt_diag_sum, hh_diag_sum
+        real(real64) :: tt_diag_min, hh_diag_min
         real(real64) :: tt_rhs_sum, hh_rhs_sum
+        real(real64) :: max_abs_k, max_abs_f
         real(real64) :: hydraulic_scale
         real(real64) :: rhs_mean_h
         real(real64) :: retry_diag
-        real(real64) :: retry_scale, hh_diag_max
+        real(real64) :: pre_retry_diag
+        real(real64) :: retry_scale, hh_diag_max, tt_diag_max
         integer(int32) :: num_total_dofs, num_dofs_per_node
         integer(int32) :: thermal_dof, hydraulic_dof
         integer(int32) :: i, local_dof, h_count, num_nodes, retry_iter
         real(real64), parameter :: diag_eps = 1.0d-30
-        real(real64), parameter :: scale_cap = 1.0d6
+        real(real64), parameter :: scale_cap = 1.0d3
         real(real64), parameter :: retry_diag_factor = 1.0d-1
         real(real64), parameter :: retry_diag_min = 1.0d-2
+        real(real64), parameter :: retry_diag_cap = 1.0d4
+        real(real64), parameter :: base_diag_factor = 1.0d-4
         integer(int32), parameter :: max_retry_iters = 3
         logical :: do_hydraulic
+        logical :: enable_block_scaling
+        logical :: is_thermal_frozen
+        logical :: is_hydraulic_frozen
+        character(len=16) :: frozen_label
         logical :: apply_global_scaling
+        real(real64) :: diag_ratio
+        real(real64) :: rhs_ratio
         logical :: retried_with_damping
         logical, save :: printed_scale_warning = .false.
         logical, save :: first_scale_report = .true.
+        logical, save :: printed_scaling_enabled_notice = .false.
+        real(real64), save :: hydraulic_frozen_diag_hint = 0.0d0
+        logical, parameter :: enable_phase_trace = .false.
+        integer(int32) :: n_nonfinite_k, n_nonfinite_f
+        character(len=16) :: solve_phase
 
         call self%control%profiler_start(PROFILER_TYPES%SOLVE)
 
@@ -211,9 +230,22 @@ contains
         num_dofs_per_node = self%K%get_num_dofs_per_node()
         call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, thermal_dof)
         call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, hydraulic_dof)
-        do_hydraulic = self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)
+
+        is_thermal_frozen = .false.
+        is_hydraulic_frozen = .false.
+        if (present(frozen_physics)) then
+            is_thermal_frozen = (frozen_physics%ID == PHYSICS_TYPES%THERMAL%ID)
+            is_hydraulic_frozen = (frozen_physics%ID == PHYSICS_TYPES%HYDRAULIC%ID)
+        end if
+
+        do_hydraulic = self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC) .and. (.not. is_hydraulic_frozen)
+        solve_phase = 'none'
+        if (present(frozen_physics)) solve_phase = trim(frozen_physics%name)
+        enable_block_scaling = self%control%is_physics_active(PHYSICS_TYPES%THERMAL) .and. &
+                               self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)
         apply_global_scaling = .false.
         retried_with_damping = .false.
+        pre_retry_diag = 0.0d0
 
         if (do_hydraulic .and. (.not. self%hydraulic_has_dirichlet_bc) .and. associated(f_data)) then
             rhs_mean_h = 0.0d0
@@ -242,6 +274,9 @@ contains
 
         tt_diag_sum = 0.0d0
         hh_diag_sum = 0.0d0
+        tt_diag_min = huge(1.0d0)
+        hh_diag_min = huge(1.0d0)
+        tt_diag_max = 0.0d0
         hh_diag_max = 0.0d0
         tt_rhs_sum = 0.0d0
         hh_rhs_sum = 0.0d0
@@ -250,8 +285,11 @@ contains
                 local_dof = mod(i - 1, num_dofs_per_node) + 1
                 if (local_dof == thermal_dof) then
                     tt_diag_sum = tt_diag_sum + abs(scale_data(i))
+                    tt_diag_min = min(tt_diag_min, abs(scale_data(i)))
+                    tt_diag_max = max(tt_diag_max, abs(scale_data(i)))
                 else if (local_dof == hydraulic_dof) then
                     hh_diag_sum = hh_diag_sum + abs(scale_data(i))
+                    hh_diag_min = min(hh_diag_min, abs(scale_data(i)))
                     hh_diag_max = max(hh_diag_max, abs(scale_data(i)))
                 end if
 
@@ -265,12 +303,23 @@ contains
             end do
 
             hydraulic_scale = 1.0d0
-            if (do_hydraulic .and. hh_diag_sum > diag_eps .and. tt_diag_sum > diag_eps) then
+            if (enable_block_scaling .and. hh_diag_sum > diag_eps .and. tt_diag_sum > diag_eps) then
                 hydraulic_scale = sqrt(tt_diag_sum / hh_diag_sum)
                 hydraulic_scale = min(max(hydraulic_scale, 1.0d0/scale_cap), scale_cap)
-            else if (do_hydraulic .and. hh_rhs_sum > diag_eps .and. tt_rhs_sum > diag_eps) then
-                hydraulic_scale = sqrt(tt_rhs_sum / hh_rhs_sum)
-                hydraulic_scale = min(max(hydraulic_scale, 1.0d0/scale_cap), scale_cap)
+            end if
+
+            diag_ratio = 1.0d0
+            rhs_ratio = 1.0d0
+            if (enable_block_scaling .and. hh_diag_sum > diag_eps .and. tt_diag_sum > diag_eps) then
+                diag_ratio = max(tt_diag_sum/hh_diag_sum, hh_diag_sum/tt_diag_sum)
+            end if
+            if (enable_block_scaling .and. hh_rhs_sum > diag_eps .and. tt_rhs_sum > diag_eps) then
+                rhs_ratio = max(tt_rhs_sum/hh_rhs_sum, hh_rhs_sum/tt_rhs_sum)
+            end if
+
+            ! Activate global block scaling when thermal-hydraulic imbalance is significant.
+            if (enable_block_scaling) then
+                apply_global_scaling = (diag_ratio > 1.0d1) .or. (rhs_ratio > 1.0d1)
             end if
 
             if (first_scale_report) then
@@ -282,12 +331,57 @@ contains
                 first_scale_report = .false.
             end if
 
-            if (do_hydraulic .and. (.not. printed_scale_warning)) then
+            if (present(frozen_physics)) then
+                frozen_label = trim(frozen_physics%name)
+                if (tt_diag_min == huge(1.0d0)) tt_diag_min = 0.0d0
+                if (hh_diag_min == huge(1.0d0)) hh_diag_min = 0.0d0
+                n_nonfinite_k = 0
+                max_abs_k = 0.0d0
+                select type (K_ptr)
+                type is (type_matrix_bsr)
+                    k_values => K_ptr%get_val()
+                    if (associated(k_values)) then
+                        n_nonfinite_k = count(.not. ieee_is_finite(k_values))
+                        if (size(k_values) > 0) then
+                            max_abs_k = maxval(abs(k_values), mask=ieee_is_finite(k_values))
+                        end if
+                    end if
+                    nullify (k_values)
+                class default
+                    continue
+                end select
+
+                n_nonfinite_f = 0
+                max_abs_f = 0.0d0
+                if (associated(f_data)) then
+                    n_nonfinite_f = count(.not. ieee_is_finite(f_data))
+                    if (size(f_data) > 0) then
+                        max_abs_f = maxval(abs(f_data), mask=ieee_is_finite(f_data))
+                    end if
+                end if
+
+                if (enable_phase_trace .or. n_nonfinite_k > 0 .or. n_nonfinite_f > 0) then
+                    write (*, '(A,A,A,ES13.5,A,ES13.5,A,ES13.5,A,ES13.5,A,I0,A,ES13.5,A,I0,A,ES13.5)') &
+                        '   [SCALE-PHASE] frozen=', trim(frozen_label), &
+                        ', TT_diag_min=', tt_diag_min, ', HH_diag_min=', hh_diag_min, &
+                        ', TT_rhs=', tt_rhs_sum, ', HH_rhs=', hh_rhs_sum, &
+                        ', K_nonfinite=', n_nonfinite_k, ', K_absmax=', max_abs_k, &
+                        ', F_nonfinite=', n_nonfinite_f, ', F_absmax=', max_abs_f
+                end if
+            end if
+
+            if (enable_block_scaling .and. (.not. printed_scale_warning)) then
                 if (hydraulic_scale > 1.0d2 .or. hydraulic_scale < 1.0d-2) then
                     write (*, '(A,ES13.5,A)') '   [SCALE] Notice: strong T/H scale disparity detected (H_scale=', &
                         hydraulic_scale, '). Consider revisiting input-unit scaling.'
                     printed_scale_warning = .true.
                 end if
+            end if
+
+            if (apply_global_scaling .and. (.not. printed_scaling_enabled_notice)) then
+                write (*, '(A,2(ES13.5,A),L1)') '   [SCALE] Enabling global block scaling: diag_ratio=', diag_ratio, &
+                    ', rhs_ratio=', rhs_ratio, ', active=', apply_global_scaling
+                printed_scaling_enabled_notice = .true.
             end if
 
             if (apply_global_scaling) then
@@ -305,11 +399,37 @@ contains
                 call K_ptr%scale(MATRIX_OPS%SCALE_SYMM_DIAG, scale_vec)
                 call F_ptr%scale(VECTOR_OPS%SCALE_SYMM_DIAG, scale_vec)
             end if
+
+            if (do_hydraulic .and. hydraulic_dof > 0 .and. hh_diag_max > diag_eps) then
+                call self%domain%get_num_nodes(num_nodes)
+                retry_diag = max(retry_diag_min, base_diag_factor*hh_diag_max)
+                do i = 1, num_nodes
+                    call self%K%add(hydraulic_dof, hydraulic_dof, i, i, retry_diag)
+                end do
+            end if
+
+            if (is_hydraulic_frozen .and. thermal_dof > 0 .and. tt_diag_max > diag_eps) then
+                call self%domain%get_num_nodes(num_nodes)
+                pre_retry_diag = max(retry_diag_min, retry_diag_factor*max(diag_eps, tt_diag_max))
+                pre_retry_diag = max(pre_retry_diag, hydraulic_frozen_diag_hint)
+                pre_retry_diag = min(pre_retry_diag, retry_diag_cap)
+                do i = 1, num_nodes
+                    call self%K%add(thermal_dof, thermal_dof, i, i, pre_retry_diag)
+                end do
+            end if
         end if
 
         call du_ptr%zero()
+        if (enable_phase_trace) write (*, '(A,A)') '   [LINEAR-PHASE] start frozen=', trim(solve_phase)
         call self%solver%solve(K_ptr, F_ptr, du_ptr)
         call self%solver%check()
+        if (enable_phase_trace .or. (.not. self%solver%is_success())) then
+            write (*, '(A,A,A,L1)') '   [LINEAR-PHASE] done frozen=', trim(solve_phase), ', success=', self%solver%is_success()
+        end if
+
+        if (self%solver%is_success() .and. is_hydraulic_frozen) then
+            hydraulic_frozen_diag_hint = max(retry_diag_min, pre_retry_diag)
+        end if
 
         if ((.not. self%solver%is_success()) .and. do_hydraulic .and. (.not. self%hydraulic_has_dirichlet_bc)) then
             call self%domain%get_num_nodes(num_nodes)
@@ -318,6 +438,23 @@ contains
                 retry_diag = max(retry_diag_min, retry_diag_factor*retry_scale*max(diag_eps, hh_diag_max))
                 do i = 1, num_nodes
                     call self%K%add(hydraulic_dof, hydraulic_dof, i, i, retry_diag)
+                end do
+
+                call du_ptr%zero()
+                call self%solver%solve(K_ptr, F_ptr, du_ptr)
+                call self%solver%check()
+                retried_with_damping = .true.
+                if (self%solver%is_success()) exit
+                retry_scale = retry_scale*10.0d0
+            end do
+        else if ((.not. self%solver%is_success()) .and. is_hydraulic_frozen .and. tt_diag_max > diag_eps) then
+            call self%domain%get_num_nodes(num_nodes)
+            retry_scale = 1.0d0
+            do retry_iter = 1, max_retry_iters
+                retry_diag = max(retry_diag_min, retry_diag_factor*retry_scale*max(diag_eps, tt_diag_max))
+                retry_diag = min(retry_diag, retry_diag_cap)
+                do i = 1, num_nodes
+                    call self%K%add(thermal_dof, thermal_dof, i, i, retry_diag)
                 end do
 
                 call du_ptr%zero()
@@ -337,7 +474,11 @@ contains
         end if
 
         if (retried_with_damping .and. self%solver%is_success()) then
-            write (*, '(A,ES13.5)') '   [SOLVE] all-Neumann hydraulic retry succeeded with global diagonal damping=', retry_diag
+            write (*, '(A,A,A,ES13.5)') '   [SOLVE] retry succeeded (frozen=', trim(solve_phase), &
+                ') with global diagonal damping=', retry_diag
+            if (is_hydraulic_frozen) then
+                hydraulic_frozen_diag_hint = max(retry_diag_min, retry_diag)
+            end if
         end if
 
         nullify (scale_data)

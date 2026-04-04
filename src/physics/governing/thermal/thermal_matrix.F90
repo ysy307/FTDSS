@@ -208,7 +208,6 @@ contains
         if (present(K_TH)) K_TH_val => K_TH%get_val()
         if (present(F_T)) F_T_val => F_T%get_data()
 
-        ! Coupling workspace
         if (present(K_TH)) then
             allocate (work_C_TH(workspace%num_fe_gauss))
             work_C_TH(:) = 0.0d0
@@ -260,7 +259,6 @@ contains
             call matvec(workspace%work_matrix, workspace%T_node, local_vec_adv_flux, ierr)
         end if
 
-        ! Coupling: K_TH assembly (pressure coupling)
         if (associated(K_TH_val)) then
             call workspace%compute_K1(work_C_TH, workspace%work_matrix)
             K_TH_val(1:n_nodes, 1:n_nodes) = &

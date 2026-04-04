@@ -723,9 +723,11 @@ contains
         !> State vector \(u_k\) on entry
         !> Overwritten by updated vector \(u_{k+1}\) on exit
         real(real64), intent(inout) :: vec(:)
-
         if (allocated(self%acceleration)) then
             call self%acceleration%compute_relaxation(physics_type, iter, du, vec)
+        else
+            ! Fallback Picard update when no acceleration method is configured.
+            vec(:) = vec(:) + du(:)
         end if
 
     end subroutine compute_relaxation_control

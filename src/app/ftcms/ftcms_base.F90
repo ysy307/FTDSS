@@ -59,8 +59,8 @@ contains
         call input_translator%execute(input, config_iteration)
         call input_translator%execute(input, config_time)
         call input_translator%execute(input, config_time_ats)
-        call input_translator%execute(input, config_output_field)
-        call input_translator%execute(input, config_output_history)
+        call input_translator%execute(input, OUTPUT_TYPES%FIELD, config_output_field)
+        call input_translator%execute(input, OUTPUT_TYPES%HISTORY, config_output_history)
         call input_translator%execute(input, config_acceleration)
         call input_translator%execute(input, config_parallel_openmp)
 
@@ -599,6 +599,7 @@ contains
         real(real64) :: relaxation_factor
         logical :: is_none
         logical :: is_newton
+        logical :: is_picard
 
         ! Line search parameters for Newton mode
         real(real64) :: max_du, alpha
@@ -619,8 +620,9 @@ contains
 
         call self%control%get_bdf_coeffs(bdf_order, bdf_coeffs)
 
-        is_none = self%control%is_none()
         is_newton = self%control%is_compute_newton()
+        is_picard = self%control%is_compute_picard()
+        is_none = (.not. is_newton) .and. (.not. is_picard)
 
         if (self%is_active_thermal()) then
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
@@ -645,7 +647,13 @@ contains
                             ! Apply damped Newton update directly
                             current(:) = current(:) + relaxation_factor * du(:)
                         else
-                            call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, du, current)
+                            max_du = maxval(abs(du))
+                            if (max_du > MAX_DT_STEP) then
+                                alpha = MAX_DT_STEP / max_du
+                            else
+                                alpha = 1.0d0
+                            end if
+                            call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, alpha*du, current)
                             call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
                         end if
                     else
@@ -688,7 +696,13 @@ contains
                             if (present(step_scale)) relaxation_factor = max(min(step_scale, 1.0d0), 0.0d0)
                             current(:) = current(:) + relaxation_factor * du(:)
                         else
-                            call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, du, current)
+                            max_du = maxval(abs(du))
+                            if (max_du > MAX_DP_STEP) then
+                                alpha = MAX_DP_STEP / max_du
+                            else
+                                alpha = 1.0d0
+                            end if
+                            call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, alpha*du, current)
                             call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
                         end if
                     else

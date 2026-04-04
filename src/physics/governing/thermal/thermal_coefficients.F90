@@ -338,11 +338,8 @@ contains
             end if
         end if
 
-        ! L-scheme stabilization for phase-change nonlinearity:
-        ! Use L >= Lip(U)/2 as floor. For freezing soil, the apparent heat
-        ! capacity C_TT can spike to O(1e6) at the phase-change front. Using
-        ! L ~ max(C_TT) makes the Picard iteration contractive everywhere,
-        ! at the cost of more iterations (rate ~ 1 - C_min/L).
+        ! L-scheme-like floor for robust Picard/staggered thermal assembly.
+        ! This avoids near-singular thermal mass around phase-transition fronts.
         C_TT = max(C_TT, 1.0d6)
 
     end subroutine compute_mass_term_thermal

@@ -47,6 +47,7 @@ module app_ftcms
         integer(int32) :: thermal_start_dof = 0
         integer(int32) :: hydraulic_start_dof = 0
         logical :: hydraulic_has_dirichlet_bc = .false.
+        logical :: thermal_has_dirichlet_bc = .false.
 
         ! DOF column scaling factors for variable non-dimensionalization
         real(real64), allocatable :: col_scale(:)
@@ -90,6 +91,7 @@ module app_ftcms
 
         ! --- Boundary Condition Procedures ---
         procedure, public, pass(self) :: apply_bc => apply_bc_ftcms
+        procedure, private, pass(self) :: freeze_physics_dofs => freeze_physics_dofs_ftcms
         procedure, private, pass(self) :: prescribe_essential_bc_generic
         procedure, private, pass(self) :: apply_natural_bc_generic
         procedure, private, pass(self) :: apply_essential_bc_generic
@@ -116,6 +118,7 @@ module app_ftcms
 
         !> Solve a single time step including the nonlinear iteration loop
         procedure, public, pass(self) :: solve_time_step => solve_time_step_ftcms
+        procedure, private, pass(self) :: solve_time_step_staggered => solve_time_step_staggered_ftcms
         procedure, private, pass(self) :: solve_time_step_initial_setup => solve_time_step_initial_setup_ftcms
         procedure, private, pass(self) :: solve_time_step_setup => solve_time_step_setup_ftcms
         procedure, private, pass(self) :: solve_time_step_check_convergence => solve_time_step_check_convergence_ftcms
@@ -172,9 +175,16 @@ module app_ftcms
 
         end subroutine apply_bc_ftcms
 
-        module subroutine solve_ftcms(self)
+        module subroutine freeze_physics_dofs_ftcms(self, physics_type)
             implicit none
             class(type_ftcms), intent(inout) :: self
+            type(type_constant_id), intent(in) :: physics_type
+        end subroutine freeze_physics_dofs_ftcms
+
+        module subroutine solve_ftcms(self, frozen_physics)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            type(type_constant_id), intent(in), optional :: frozen_physics
 
         end subroutine solve_ftcms
 
@@ -343,9 +353,10 @@ module app_ftcms
 
         end subroutine solve_time_step_setup_ftcms
 
-        module subroutine solve_time_step_check_convergence_ftcms(self)
+        module subroutine solve_time_step_check_convergence_ftcms(self, target_physics)
             implicit none
             class(type_ftcms), intent(inout), target :: self
+            type(type_constant_id), intent(in), optional :: target_physics
 
         end subroutine solve_time_step_check_convergence_ftcms
 
@@ -355,6 +366,12 @@ module app_ftcms
             logical, intent(inout) :: is_step_converged
 
         end subroutine solve_time_step_ftcms
+
+        module subroutine solve_time_step_staggered_ftcms(self, is_step_converged)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            logical, intent(inout) :: is_step_converged
+        end subroutine solve_time_step_staggered_ftcms
 
         module subroutine output_fields_ftcms(self)
             implicit none

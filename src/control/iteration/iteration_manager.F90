@@ -167,7 +167,7 @@ contains
             call raise_error(ERROR_CODES%INVALID_TYPE, opt=strip(physics_type%name))
         end if
 
-        if (self%is_none()) then
+        if (self%is_compute_none()) then
             call self%set_converged(physics_type, .true.)
             call self%set_diverged(physics_type, .false.)
             return

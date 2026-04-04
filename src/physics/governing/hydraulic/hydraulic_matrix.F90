@@ -119,6 +119,8 @@ contains
 
         integer(int32) :: i, j, d, n_nodes, n_gauss, n_dim, ierr
         real(real64) :: bdf0
+        real(real64), parameter :: picard_capacity_min = 1.0d-12
+        real(real64), parameter :: picard_diffusion_min = 1.0d-12
         real(real64), allocatable :: local_vec_res(:)
 
         real(real64), allocatable :: work_C_HT(:)
@@ -152,9 +154,9 @@ contains
             call self%compute_mass_term(workspace%material_id, workspace%state_gp(i), workspace%work_C(i))
             call self%compute_diffusion_term(workspace%material_id, workspace%state_gp(i), workspace%work_D(:, :, i))
             ! Min cutoffs: prevent near-zero diagonals in near-frozen/dry state
-            workspace%work_C(i) = max(workspace%work_C(i), 1.0d-20)
+            workspace%work_C(i) = max(workspace%work_C(i), picard_capacity_min)
             do d = 1, n_dim
-                workspace%work_D(d, d, i) = max(workspace%work_D(d, d, i), 1.0d-20)
+                workspace%work_D(d, d, i) = max(workspace%work_D(d, d, i), picard_diffusion_min)
             end do
             call self%compute_advective_term(workspace%material_id, workspace%state_gp(i), workspace%work_V(:, i))
             call self%compute_transient_term(workspace%material_id, workspace%state_gp(i), &
@@ -234,7 +236,7 @@ contains
             ! Add Gravity Term
             workspace%work_vec(:) = 0.0d0
             call workspace%compute_R2(workspace%work_V, workspace%work_vec)
-            local_vec_res(:) = local_vec_res(:) + workspace%work_vec(:)
+            local_vec_res(:) = local_vec_res(:) - workspace%work_vec(:)
 
             ! F = - Residual
             do i = 1, n_nodes
@@ -261,8 +263,10 @@ contains
         integer(int32) :: gp, i, j, d
         integer(int32) :: n_nodes, n_gauss, n_dim
         real(real64) :: bdf0, wJ, detJ, Ceq, dTheta_dt
-        real(real64), parameter :: K_min = 1.0d-20
-        real(real64), parameter :: Ceq_min = 1.0d-20
+        real(real64), parameter :: K_min = 1.0d-12
+        real(real64), parameter :: Ceq_min = 1.0d-12
+        real(real64), parameter :: coupling_cap = 1.0d3
+        real(real64), parameter :: row_scale_min = 1.0d-14
 
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gauss_pts
         real(real64), pointer, contiguous, dimension(:) :: weights
@@ -326,6 +330,8 @@ contains
             Ceq = max(Ceq, Ceq_min)
             do d = 1, n_dim
                 D_HH(d, d) = max(D_HH(d, d), K_min)
+                ! Bound thermal-hydraulic coupling diffusion to avoid residual blow-up.
+                D_HT(d, d) = sign(min(abs(D_HT(d, d)), coupling_cap*D_HH(d, d)), D_HT(d, d))
             end do
 
             grad_P = matmul(workspace%work_dpsi_dx, workspace%P_node)
@@ -345,7 +351,7 @@ contains
         end do
 
         ! Row equilibration: scale each row by its max absolute value
-        row_max = max(maxval(abs(J_elem), dim=2), tiny(1.0d0))
+        row_max = max(maxval(abs(J_elem), dim=2), row_scale_min)
         J_elem = J_elem / spread(row_max, 2, n_nodes)
         R_elem = R_elem / row_max
 
