@@ -130,6 +130,7 @@ contains
 
         call self%Qw%initialize(num_nodes, max_bdf_order)
         call self%Qi%initialize(num_nodes, max_bdf_order)
+        call self%Qi_seg%initialize(num_nodes, max_bdf_order)
         call self%Qa%initialize(num_nodes, max_bdf_order)
         call self%Qv%initialize(num_nodes, max_bdf_order)
 
@@ -221,6 +222,7 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: pressure
         real(real64), pointer, contiguous, dimension(:) :: water_content
         real(real64), pointer, contiguous, dimension(:) :: ice_content
+        real(real64), pointer, contiguous, dimension(:) :: ice_content_seg
         real(real64), pointer, contiguous, dimension(:) :: vapor_content
 
         call self%control%profiler_start(PROFILER_TYPES%IO)
@@ -228,6 +230,7 @@ contains
         nullify (temperature)
         nullify (pressure)
         nullify (ice_content)
+        nullify (ice_content_seg)
         nullify (vapor_content)
         nullify (water_content)
 
@@ -243,19 +246,22 @@ contains
             end if
             call self%Qw%get_previous(water_content)
             call self%Qi%get_previous(ice_content)
+            call self%Qi_seg%get_previous(ice_content_seg)
             call self%Qv%get_previous(vapor_content)
             call self%output%output_fields(file_counts=iter, &
                                            temperature=temperature, &
                                            water_content=water_content, &
                                            ice_content=ice_content, &
                                            vapor_content=vapor_content, &
-                                           pressure=pressure)
+                                           pressure=pressure, &
+                                           ice_content_seg=ice_content_seg)
 
             call self%control%update_output(OUTPUT_TYPES%FIELD, current_time)
 
             nullify (temperature)
             nullify (pressure)
             nullify (ice_content)
+            nullify (ice_content_seg)
             nullify (water_content)
             nullify (vapor_content)
         end if
@@ -460,6 +466,12 @@ contains
         call state%set(porosity=porosity, &
                        porosity_history=porosity_history(1:bdf_order + 1))
 
+        block
+            real(real64) :: qi_seg_val
+            call self%Qi_seg%get_current(node_id, qi_seg_val)
+            call state%ice_content_seg%set(qi_seg_val)
+        end block
+
         call state%temperature%get(temperature, temperature_set)
         call state%pressure%get(pressure, pressure_set)
         if (.not. temperature_set .or. .not. pressure_set) then
@@ -578,6 +590,7 @@ contains
         call self%porosity%advance()
         call self%Qw%advance()
         call self%Qi%advance()
+        call self%Qi_seg%advance()
         call self%Qa%advance()
         call self%Qv%advance()
 
@@ -605,6 +618,8 @@ contains
         real(real64) :: max_du, alpha
         real(real64), parameter :: MAX_DT_STEP = 5.0d0
         real(real64), parameter :: MAX_DP_STEP = 1.0d5
+        real(real64), parameter :: PICARD_MAX_DT_STEP = 2.0d1
+        real(real64), parameter :: PICARD_MAX_DP_STEP = 2.0d5
         real(real64), parameter :: ALPHA_MIN = 0.1d0
         real(real64), parameter :: TEMP_MIN_C = -80.0d0
         real(real64), parameter :: TEMP_MAX_C = 80.0d0
@@ -647,9 +662,12 @@ contains
                             ! Apply damped Newton update directly
                             current(:) = current(:) + relaxation_factor * du(:)
                         else
+                            ! Picard update also needs a moderate cap to avoid unstable overshoots.
                             max_du = maxval(abs(du))
-                            if (max_du > MAX_DT_STEP) then
-                                alpha = MAX_DT_STEP / max_du
+                            if (max_du > PICARD_MAX_DT_STEP) then
+                                alpha = PICARD_MAX_DT_STEP / max_du
+                                write (*, '(A,2(ES13.5,A))') '   [REFLECT] thermal Picard cap active: max|du|=', &
+                                    max_du, ', alpha=', alpha, ''
                             else
                                 alpha = 1.0d0
                             end if
@@ -697,8 +715,10 @@ contains
                             current(:) = current(:) + relaxation_factor * du(:)
                         else
                             max_du = maxval(abs(du))
-                            if (max_du > MAX_DP_STEP) then
-                                alpha = MAX_DP_STEP / max_du
+                            if (max_du > PICARD_MAX_DP_STEP) then
+                                alpha = PICARD_MAX_DP_STEP / max_du
+                                write (*, '(A,2(ES13.5,A))') '   [REFLECT] hydraulic Picard cap active: max|du|=', &
+                                    max_du, ', alpha=', alpha, ''
                             else
                                 alpha = 1.0d0
                             end if

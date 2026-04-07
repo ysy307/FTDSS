@@ -80,7 +80,7 @@ contains
     end subroutine initialize_type_output_manager
 
     subroutine output_fields_output_manager(self, file_counts, temperature, water_content, ice_content, &
-                                            vapor_content, pressure, water_flux)
+                                            vapor_content, pressure, water_flux, ice_content_seg)
         implicit none
         class(type_output_manager), intent(inout) :: self
         integer(int32), intent(in) :: file_counts
@@ -90,6 +90,7 @@ contains
         real(real64), intent(in), optional :: vapor_content(:)
         real(real64), intent(in), optional :: pressure(:)
         type(type_coordinate_array_dp), intent(in), optional :: water_flux
+        real(real64), intent(in), optional :: ice_content_seg(:)
 
         if (.not. allocated(self%overall)) return
 
@@ -99,7 +100,8 @@ contains
                                        ice_content=ice_content, &
                                        vapor_content=vapor_content, &
                                        pressure=pressure, &
-                                       water_flux=water_flux)
+                                       water_flux=water_flux, &
+                                       ice_content_seg=ice_content_seg)
     end subroutine output_fields_output_manager
 
     subroutine output_history_output_manager(self, time, temperature, water_content, ice_content, &

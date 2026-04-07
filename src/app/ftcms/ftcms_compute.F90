@@ -41,12 +41,12 @@ contains
         type(type_state), allocatable :: states(:)
 
         ! Temporary storage for elemental values
-        real(real64) :: elem_qw, elem_qi, elem_qa, elem_qv
+        real(real64) :: elem_qw, elem_qi, elem_qi_seg, elem_qa, elem_qv
         real(real64) :: elem_vol
 
         ! Accumulators for volume-weighted sum
         real(real64) :: sum_vol
-        real(real64) :: sum_qw_vol, sum_qi_vol, sum_qa_vol, sum_qv_vol
+        real(real64) :: sum_qw_vol, sum_qi_vol, sum_qi_seg_vol, sum_qa_vol, sum_qv_vol
 
         ! OpenMP variables
         integer(int32) :: num_threads, tid
@@ -65,8 +65,8 @@ contains
         !$OMP PARALLEL DEFAULT(NONE) &
         !$OMP SHARED(self, num_nodes, states) &
         !$OMP PRIVATE(i_node, element_list, num_neighbors, j, i_elem, &
-        !$OMP         elem_vol, material_id, elem_qw, elem_qi, elem_qa, elem_qv, &
-        !$OMP         sum_vol, sum_qw_vol, sum_qi_vol, sum_qa_vol, sum_qv_vol, &
+        !$OMP         elem_vol, material_id, elem_qw, elem_qi, elem_qi_seg, elem_qa, elem_qv, &
+        !$OMP         sum_vol, sum_qw_vol, sum_qi_vol, sum_qi_seg_vol, sum_qa_vol, sum_qv_vol, &
         !$OMP         tid)
 
         ! Get thread ID (1-based)
@@ -85,6 +85,7 @@ contains
             sum_vol = 0.0d0
             sum_qw_vol = 0.0d0
             sum_qi_vol = 0.0d0
+            sum_qi_seg_vol = 0.0d0
             sum_qa_vol = 0.0d0
             sum_qv_vol = 0.0d0
 
@@ -104,12 +105,14 @@ contains
 
                     ! Retrieve volumetric contents for each phase from the state
                     call states(tid)%get(water_content=elem_qw, ice_content=elem_qi, &
-                                         air_content=elem_qa, vapor_content=elem_qv)
+                                         air_content=elem_qa, vapor_content=elem_qv, &
+                                         ice_content_seg=elem_qi_seg)
 
                     ! Weighted addition
                     sum_vol = sum_vol + elem_vol
                     sum_qw_vol = sum_qw_vol + (elem_qw * elem_vol)
                     sum_qi_vol = sum_qi_vol + (elem_qi * elem_vol)
+                    sum_qi_seg_vol = sum_qi_seg_vol + (elem_qi_seg * elem_vol)
                     sum_qa_vol = sum_qa_vol + (elem_qa * elem_vol)
                     sum_qv_vol = sum_qv_vol + (elem_qv * elem_vol)
                 end do
@@ -119,12 +122,14 @@ contains
             if (abs(sum_vol) > epsilon(1.0d0)) then
                 call self%Qw%set_current(i_node, sum_qw_vol / sum_vol)
                 call self%Qi%set_current(i_node, sum_qi_vol / sum_vol)
+                call self%Qi_seg%set_current(i_node, sum_qi_seg_vol / sum_vol)
                 call self%Qa%set_current(i_node, sum_qa_vol / sum_vol)
                 call self%Qv%set_current(i_node, sum_qv_vol / sum_vol)
             else
                 ! Handle isolated nodes
                 call self%Qw%set_current(i_node, 0.0d0)
                 call self%Qi%set_current(i_node, 0.0d0)
+                call self%Qi_seg%set_current(i_node, 0.0d0)
                 call self%Qa%set_current(i_node, 0.0d0)
                 call self%Qv%set_current(i_node, 0.0d0)
             end if
@@ -165,6 +170,7 @@ contains
         class(abst_matrix), pointer :: K_ptr => null()
         type(type_vector_dp), pointer :: F_ptr => null()
         type(type_vector_dp), pointer :: du_ptr => null()
+        type(type_vector_dp) :: lin_res_vec
         real(real64), pointer :: f_data(:) => null()
         real(real64), pointer :: du_data(:) => null()
         type(type_vector_dp) :: scale_vec
@@ -179,6 +185,7 @@ contains
         real(real64) :: retry_diag
         real(real64) :: pre_retry_diag
         real(real64) :: retry_scale, hh_diag_max, tt_diag_max
+        real(real64) :: lin_res_norm, rhs_norm, lin_res_ratio
         integer(int32) :: num_total_dofs, num_dofs_per_node
         integer(int32) :: thermal_dof, hydraulic_dof
         integer(int32) :: i, local_dof, h_count, num_nodes, retry_iter
@@ -202,8 +209,11 @@ contains
         logical, save :: first_scale_report = .true.
         logical, save :: printed_scaling_enabled_notice = .false.
         real(real64), save :: hydraulic_frozen_diag_hint = 0.0d0
+        logical, save :: printed_linear_audit_header = .false.
+        integer(int32), save :: linear_audit_count = 0
         logical, parameter :: enable_phase_trace = .false.
         integer(int32) :: n_nonfinite_k, n_nonfinite_f
+        integer(int32) :: ierr
         character(len=16) :: solve_phase
 
         call self%control%profiler_start(PROFILER_TYPES%SOLVE)
@@ -464,6 +474,26 @@ contains
                 if (self%solver%is_success()) exit
                 retry_scale = retry_scale*10.0d0
             end do
+        end if
+
+        if (self%solver%is_success()) then
+            call lin_res_vec%initialize(num_total_dofs)
+            call lin_res_vec%zero()
+            call matvec(K_ptr, du_ptr, lin_res_vec, ierr)
+            call vector_axpy(-1.0d0, F_ptr, lin_res_vec)
+            lin_res_norm = vector_norm2(lin_res_vec)
+            rhs_norm = vector_norm2(F_ptr)
+            lin_res_ratio = lin_res_norm/max(rhs_norm, diag_eps)
+            if (.not. printed_linear_audit_header) then
+                write (*, '(A)') '   [LINEAR-AUDIT] ratio = ||K*du-F||2 / ||F||2'
+                printed_linear_audit_header = .true.
+            end if
+            linear_audit_count = linear_audit_count + 1
+            if (linear_audit_count <= 40 .or. lin_res_ratio > 1.0d-2 .or. enable_phase_trace) then
+                write (*, '(A,I0,A,A,A,3(ES13.5,A))') '   [LINEAR-AUDIT] n=', linear_audit_count, ', phase=', &
+                    trim(solve_phase), ', ratio=', lin_res_ratio, ', ||Kdu-F||=', lin_res_norm, ', ||F||=', rhs_norm, ''
+            end if
+            call lin_res_vec%destroy()
         end if
 
         ! Recover original unknown scale: du = D * du_scaled
@@ -846,5 +876,69 @@ contains
         end select
 
     end subroutine calc_vapor_flux_ftcms
+
+    !> Update segregated ice content after convergence via forward Euler.
+    !>
+    !> Mathematical definition:
+    !> \[ \theta_{i,\mathrm{seg}}^{n+1} = \theta_{i,\mathrm{seg}}^n + S_\mathrm{seg} \Delta t \]
+    !> where \( S_\mathrm{seg} = \mathrm{SP}_0 \, |\nabla T| \, f_\mathrm{fringe}(T) \).
+    !>
+    !> Assumptions:
+    !> - Called once per converged time step (explicit integration)
+    !> - Nodal gradients are up-to-date
+    !>
+    !> Numerical guarantee:
+    !> - \(\theta_{i,\mathrm{seg}} \geq 0\)
+    !> - Extraction limited by available liquid water
+    !>
+    !> Computational complexity:
+    !> - \(O(N_\mathrm{nodes})\)
+    !>
+    !> Failure behavior:
+    !> - No-op if segregation is inactive for all materials
+    module subroutine update_segregation_ice_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        integer(int32) :: i_node, num_nodes, material_id
+        integer(int32), pointer, contiguous :: element_list(:)
+        real(real64) :: qi_seg_old, qi_seg_new, qw_avail, S_seg, dt_s
+        type(type_state) :: local_state
+
+        call self%control%get_dt(dt_s)
+        if (dt_s <= 0.0d0) return
+
+        call self%domain%get_num_nodes(num_nodes)
+
+        do i_node = 1, num_nodes
+            ! Get first adjacent element for material_id
+            nullify (element_list)
+            call self%domain%element_adjacency%get_list(i_node, element_list)
+            if (.not. associated(element_list)) cycle
+            if (size(element_list) < 1) cycle
+
+            call self%domain%get_material_id(element_list(1), material_id)
+
+            ! Build nodal state (includes grad_T, ice/water content)
+            call self%set_state(i_node, element_list(1), local_state)
+
+            ! Compute segregation sink
+            S_seg = 0.0d0
+            call self%hydraulic%calc_segregation_sink(material_id, local_state, S_seg)
+            if (abs(S_seg) <= 0.0d0) cycle
+
+            ! Forward Euler update with stability guard
+            call self%Qi_seg%get_current(i_node, qi_seg_old)
+            qi_seg_new = qi_seg_old + S_seg * dt_s
+            qi_seg_new = max(qi_seg_new, 0.0d0)
+
+            ! Do not extract more water than available
+            call self%Qw%get_current(i_node, qw_avail)
+            qi_seg_new = min(qi_seg_new, qi_seg_old + max(qw_avail, 0.0d0))
+
+            call self%Qi_seg%set_current(i_node, qi_seg_new)
+        end do
+
+    end subroutine update_segregation_ice_ftcms
 
 end submodule ftcms_compute

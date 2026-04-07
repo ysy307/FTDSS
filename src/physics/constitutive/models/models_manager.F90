@@ -8,6 +8,7 @@ module constitutive_models_manager
     use :: models_phase_change_fusion
     use :: models_phase_change_vaporization
     use :: models_phase_change_manager
+    use :: models_segregation_potential, only: type_segregation_potential
     implicit none
     private
 
@@ -19,6 +20,7 @@ module constitutive_models_manager
         type(holder_hcfs) :: hcf
         type(holder_gccs) :: gcc
         type(type_phase_manager) :: phase_manager
+        type(type_segregation_potential) :: segregation
     contains
         procedure, public :: initialize
         procedure, public :: update_water_phases
@@ -30,6 +32,8 @@ module constitutive_models_manager
         procedure, public :: calc_latent_heat_vaporization
         procedure, public :: calc_pressure_ice_water_derivative
         procedure, public :: calc_cryo_suction_deriv_T
+        procedure, public :: calc_segregation_sink
+        procedure, public :: is_segregation_active
     end type type_models_manager
 
 contains
@@ -52,6 +56,9 @@ contains
         end if
         if (present(config_gcc) .and. present(water) .and. present(ice)) then
             call self%gcc%initialize(material_id, config_gcc, water, ice)
+            if (config_gcc%segregation_potential > 0.0d0) then
+                call self%segregation%initialize(config_gcc%segregation_potential)
+            end if
         end if
 
         if (allocated(self%wrf%p) .and. allocated(self%gcc%p)) then
@@ -140,5 +147,23 @@ contains
 
         call self%gcc%deriv_temperature(state, deriv)
     end subroutine calc_cryo_suction_deriv_T
+
+    subroutine calc_segregation_sink(self, state, grad_T_magnitude, S_seg)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(in) :: grad_T_magnitude
+        real(real64), intent(inout) :: S_seg
+
+        call self%segregation%calc_sink(state, grad_T_magnitude, S_seg)
+    end subroutine calc_segregation_sink
+
+    pure function is_segregation_active(self) result(active)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        logical :: active
+
+        active = self%segregation%is_active()
+    end function is_segregation_active
 
 end module constitutive_models_manager

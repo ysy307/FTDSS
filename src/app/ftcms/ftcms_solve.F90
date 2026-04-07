@@ -416,7 +416,7 @@ contains
 
         logical :: prescribe_bc
         integer(int32) :: iter_nl, coupling_iter, num_nodes, bdf_order
-        integer(int32), parameter :: MAX_COUPLING_ITER = 2
+        integer(int32), parameter :: MAX_COUPLING_ITER = 1
         integer(int32), parameter :: MAX_PHASE_NL_ITER = 20
         real(real64), parameter :: COUPLING_TOL = 1.0d-3
         real(real64), parameter :: THERMAL_INCREMENT_GUARD = 1.0d6
@@ -689,6 +689,9 @@ contains
                     write (*, '(A,I0,A,ES13.5,A,I0)') '   [STEP] converged: n=', step_counter, &
                         ', t[s]=', time_s, ', nonlinear_iter=', nl_iter
                 end if
+                ! Update segregated ice content (explicit forward Euler)
+                call self%update_segregation_ice()
+
                 ! Shift variable history on convergence
                 call self%shift()
 

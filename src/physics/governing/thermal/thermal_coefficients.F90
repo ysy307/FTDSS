@@ -57,13 +57,18 @@ contains
         end if
 
         ! Ice phase (Include Latent Heat of Fusion)
-        if (Qi > 0.0d0) then
-            call self%physics%calc_density_ice(state, rho_i)
-            call self%physics%calc_specific_heat_ice(state, c_i)
-            call self%physics%calc_latent_heat_fusion(material_id, state, Lf)
-            ! Reference state logic implies Lf is removed at T < 0
-            U = U + rho_i * c_i * Qi * temperature - Lf * rho_i * Qi
-        end if
+        ! Use total ice = pore ice + segregated ice for energy balance
+        block
+            real(real64) :: Qi_seg, Qi_total
+            call state%ice_content_seg%get(Qi_seg)
+            Qi_total = Qi + Qi_seg
+            if (Qi_total > 0.0d0) then
+                call self%physics%calc_density_ice(state, rho_i)
+                call self%physics%calc_specific_heat_ice(state, c_i)
+                call self%physics%calc_latent_heat_fusion(material_id, state, Lf)
+                U = U + rho_i * c_i * Qi_total * temperature - Lf * rho_i * Qi_total
+            end if
+        end block
 
         ! Vapor phase (Include Latent Heat of Vaporization)
         if (Qv > 0.0d0) then
@@ -182,16 +187,23 @@ contains
         if (.not. associated(pressure_history)) return
         if (.not. associated(porosity_history)) return
         n_hist = min(size(bdf_coeffs), size(temperature_history), size(pressure_history), size(porosity_history))
-        do j = 1, n_hist
-            ! Reconstruct state from history data and recalculate enthalpy
-            call local_state%temperature%set(temperature_history(j))
-            call local_state%pressure%set(pressure_history(j))
-            call local_state%porosity%set(porosity_history(j))
-            call self%update_water_phases(material_id, local_state)
-            call self%calc_enthalpy_density(material_id, local_state, Uj)
 
-            dU_dt = dU_dt + bdf_coeffs(j) * Uj
-        end do
+        block
+            real(real64) :: Qi_seg_current
+            call state%ice_content_seg%get(Qi_seg_current)
+
+            do j = 1, n_hist
+                ! Reconstruct state from history data and recalculate enthalpy
+                call local_state%temperature%set(temperature_history(j))
+                call local_state%pressure%set(pressure_history(j))
+                call local_state%porosity%set(porosity_history(j))
+                call local_state%ice_content_seg%set(Qi_seg_current)
+                call self%update_water_phases(material_id, local_state)
+                call self%calc_enthalpy_density(material_id, local_state, Uj)
+
+                dU_dt = dU_dt + bdf_coeffs(j) * Uj
+            end do
+        end block
 
     end subroutine compute_transient_term_thermal
 
@@ -284,6 +296,7 @@ contains
             call self%calc_enthalpy_density(material_id, state, C_TT_current)
 
             ! Old U (from previous time step)
+            call temp_state%copy(state)
             call temp_state%temperature%set(temperature_history(2))
             call temp_state%pressure%set(pressure_history(2))
             call temp_state%porosity%set(porosity_history(2))
@@ -317,13 +330,23 @@ contains
             end if
 
             ! Ice (including latent heat derivative)
-            if (Qi > 0.0d0) then
-                call self%physics%calc_density_ice(state, rho_i)
-                call self%physics%calc_specific_heat_ice(state, c_i)
-                call self%physics%calc_latent_heat_fusion(material_id, state, Lf)
-                call state%dQi_dT%get(dQi_dT)
-                C_TT = C_TT + rho_i * c_i * Qi - Lf * rho_i * dQi_dT
-            end if
+            ! Qi_seg is lagged: dQi_seg/dT = 0, but sensible heat uses Qi_total
+            block
+                real(real64) :: Qi_seg_t, Qi_total_t
+                call state%ice_content_seg%get(Qi_seg_t)
+                Qi_total_t = Qi + Qi_seg_t
+                if (Qi_total_t > 0.0d0) then
+                    call self%physics%calc_density_ice(state, rho_i)
+                    call self%physics%calc_specific_heat_ice(state, c_i)
+                    C_TT = C_TT + rho_i * c_i * Qi_total_t
+                    ! Latent term uses pore-ice derivative only (dQi_seg/dT = 0)
+                    if (Qi > 0.0d0) then
+                        call self%physics%calc_latent_heat_fusion(material_id, state, Lf)
+                        call state%dQi_dT%get(dQi_dT)
+                        C_TT = C_TT - Lf * rho_i * dQi_dT
+                    end if
+                end if
+            end block
 
             ! Vapor (including latent heat derivative)
             if (Qv > 0.0d0) then

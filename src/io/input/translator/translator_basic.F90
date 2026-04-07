@@ -232,7 +232,8 @@ contains
         ! GCC model processing
         !==================================================
 
-        associate (material => input%basic%materials(material_id)%phase_change%equilibrium_model)
+        associate (material => input%basic%materials(material_id)%phase_change%equilibrium_model, &
+                   phase => input%basic%materials(material_id)%phase_change)
 
             call config%reset()
 
@@ -242,6 +243,8 @@ contains
             else
                 config%gcc_model = GCC_TYPES%NON_SEGREGATION
             end if
+
+            config%segregation_potential = phase%segregation_potential
 
         end associate
 

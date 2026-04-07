@@ -54,6 +54,8 @@ module physics_constitutive_manager
         procedure, public :: calc_Kvh
         procedure, public :: calc_KvT
         procedure, public :: calc_cryo_suction_deriv_T
+        procedure, public :: calc_segregation_sink
+        procedure, public :: is_segregation_active
 
     end type type_constitutive_manager
 
@@ -455,5 +457,25 @@ contains
 
         call self%models(self%materials_id_map(material_id))%calc_cryo_suction_deriv_T(state, deriv)
     end subroutine calc_cryo_suction_deriv_T
+
+    subroutine calc_segregation_sink(self, material_id, state, grad_T_magnitude, S_seg)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(in) :: grad_T_magnitude
+        real(real64), intent(inout) :: S_seg
+
+        call self%models(self%materials_id_map(material_id))%calc_segregation_sink(state, grad_T_magnitude, S_seg)
+    end subroutine calc_segregation_sink
+
+    function is_segregation_active(self, material_id) result(active)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        logical :: active
+
+        active = self%models(self%materials_id_map(material_id))%is_segregation_active()
+    end function is_segregation_active
 
 end module physics_constitutive_manager

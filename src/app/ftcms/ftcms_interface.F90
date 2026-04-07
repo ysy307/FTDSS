@@ -30,6 +30,7 @@ module app_ftcms
 
         type(type_variable) :: Qw
         type(type_variable) :: Qi
+        type(type_variable) :: Qi_seg
         type(type_variable) :: Qa
         type(type_variable) :: Qv
 
@@ -106,6 +107,7 @@ module app_ftcms
         procedure, public, pass(self) :: reflect_variables => reflect_variables_ftcms
 
         procedure, public, pass(self) :: update_variables => update_variables_ftcms
+        procedure, public, pass(self) :: update_segregation_ice => update_segregation_ice_ftcms
         procedure, public, pass(self) :: assemble_local => assemble_local_ftcms
         procedure, public, pass(self) :: assemble => assemble_ftcms
         procedure, private, pass(self) :: assemble_initialize => assemble_initialize_ftcms
@@ -231,6 +233,11 @@ module app_ftcms
             class(type_ftcms), intent(inout) :: self
 
         end subroutine update_variables_ftcms
+
+        module subroutine update_segregation_ice_ftcms(self)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+        end subroutine update_segregation_ice_ftcms
 
         module subroutine reflect_variables_ftcms(self, step_scale)
             implicit none

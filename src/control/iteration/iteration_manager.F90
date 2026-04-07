@@ -84,10 +84,6 @@ contains
         self%nonlinear_solver_type = config%nonlinear_solver_type
         self%compute_nonlinear_solver_type = self%nonlinear_solver_type
 
-        if (self%nonlinear_solver_type == NONLINEAR_SOLVER%NONE) then
-            return
-        end if
-
         call self%settings%initialize(config%nonlinear, reference_values)
 
     end subroutine initialize_type_iteration

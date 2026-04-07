@@ -378,4 +378,27 @@ contains
 
     end subroutine compute_transient_term_mixed_hydraulic
 
+    !> @brief Compute segregation sink from temperature gradient magnitude.
+    module subroutine calc_segregation_sink_hydraulic(self, material_id, state, S_seg)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: S_seg
+
+        type(type_coordinate_dp), pointer :: grad_T
+        real(real64) :: grad_T_mag
+
+        S_seg = 0.0d0
+        nullify (grad_T)
+        call state%grad_T%get(grad_T)
+        if (.not. associated(grad_T)) return
+
+        grad_T_mag = sqrt(grad_T%x**2 + grad_T%y**2 + grad_T%z**2)
+        if (grad_T_mag <= 0.0d0) return
+
+        call self%physics%calc_segregation_sink(material_id, state, grad_T_mag, S_seg)
+
+    end subroutine calc_segregation_sink_hydraulic
+
 end submodule hydraulic_coefficients

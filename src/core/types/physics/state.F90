@@ -56,6 +56,7 @@ module core_types_physics_state
         type(type_field_dp) :: pressure ! Pressure [m]
         type(type_field_dp) :: water_content ! Water content [-]
         type(type_field_dp) :: ice_content ! Ice content [-]
+        type(type_field_dp) :: ice_content_seg ! Segregated ice content [-]
         type(type_field_dp) :: vapor_content ! Vapor content [-]
         type(type_field_dp) :: air_content ! Air content [-]
         type(type_field_dp) :: porosity ! Porosity [-]
@@ -246,7 +247,8 @@ contains
                              !  dot_T, dot_P, &
                              grad_T, grad_P, &
                              relative_humidity, mass_fraction_clay, &
-                             water_flux, vapor_flux)
+                             water_flux, vapor_flux, &
+                             ice_content_seg)
         implicit none
         class(type_state), intent(inout) :: self
 
@@ -263,6 +265,7 @@ contains
         type(type_coordinate_dp), intent(in), optional :: grad_T, grad_P
         real(real64), intent(in), optional :: relative_humidity, mass_fraction_clay
         type(type_coordinate_dp), intent(in), optional :: water_flux, vapor_flux
+        real(real64), intent(in), optional :: ice_content_seg
 
         if (present(temperature)) then
             call self%temperature%set(temperature)
@@ -349,6 +352,9 @@ contains
         if (present(vapor_flux)) then
             call self%vapor_flux%set(vapor_flux)
         end if
+        if (present(ice_content_seg)) then
+            call self%ice_content_seg%set(ice_content_seg)
+        end if
 
     end subroutine set_all_state
 
@@ -360,7 +366,8 @@ contains
                              ! dot_T, dot_P, &
                              grad_T, grad_P, &
                              relative_humidity, mass_fraction_clay, &
-                             water_flux, vapor_flux)
+                             water_flux, vapor_flux, &
+                             ice_content_seg)
         implicit none
         class(type_state), intent(in) :: self
         real(real64), intent(inout), optional :: temperature, pressure
@@ -376,6 +383,7 @@ contains
         type(type_coordinate_dp), intent(inout), pointer, optional :: grad_T, grad_P
         real(real64), intent(inout), optional :: relative_humidity, mass_fraction_clay
         type(type_coordinate_dp), intent(inout), pointer, optional :: water_flux, vapor_flux
+        real(real64), intent(inout), optional :: ice_content_seg
 
         if (present(temperature)) then
             call self%temperature%get(temperature)
@@ -456,6 +464,9 @@ contains
         if (present(vapor_flux)) then
             call self%vapor_flux%get(vapor_flux)
         end if
+        if (present(ice_content_seg)) then
+            call self%ice_content_seg%get(ice_content_seg)
+        end if
     end subroutine get_all_state
 
     subroutine reset_all_state(self)
@@ -466,6 +477,7 @@ contains
         call self%pressure%reset()
         call self%water_content%reset()
         call self%ice_content%reset()
+        call self%ice_content_seg%reset()
         call self%vapor_content%reset()
         call self%air_content%reset()
         call self%porosity%reset()
@@ -499,6 +511,7 @@ contains
         call self%pressure%set(source%pressure%value)
         call self%water_content%set(source%water_content%value)
         call self%ice_content%set(source%ice_content%value)
+        call self%ice_content_seg%set(source%ice_content_seg%value)
         call self%vapor_content%set(source%vapor_content%value)
         call self%air_content%set(source%air_content%value)
         call self%porosity%set(source%porosity%value)

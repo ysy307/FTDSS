@@ -1,5 +1,4 @@
 submodule(app_ftcms) ftcms_assemble
-    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
 
 contains
@@ -15,19 +14,12 @@ contains
         real(real64), allocatable :: elem_coords(:, :)
 
         integer(int32) :: i_color, i_elem, elem_id
-        integer(int32) :: i_local
         integer(int32), pointer, contiguous, dimension(:) :: p_connectivity
         integer(int32) :: thermal_dof, hydraulic_dof
         integer(int32) :: num_nodes_local
 
         integer(int32) :: num_colors, num_elements_in_color
         integer(int32), pointer, contiguous, dimension(:) :: elements_list
-        real(real64), pointer :: local_matrix_vals(:, :)
-        real(real64), pointer :: local_vector_vals(:)
-        real(real64) :: local_diag_sum, local_tt_diag_sum, local_hh_diag_sum, local_h_scale
-        real(real64), parameter :: local_diag_eps = 1.0d-20
-        real(real64), parameter :: hydraulic_scale_eps = 1.0d-30
-        real(real64), parameter :: hydraulic_scale_max = 1.0d6
 
         logical :: use_scatter, do_hydraulic
 
@@ -35,8 +27,6 @@ contains
 
         nullify (p_connectivity)
         nullify (elements_list)
-        nullify (local_matrix_vals)
-        nullify (local_vector_vals)
 
         call self%K%zero()
         call self%F%zero()
@@ -56,8 +46,7 @@ contains
         !$OMP        thermal_dof, hydraulic_dof, use_scatter, do_hydraulic) &
         !$OMP PRIVATE(i_color, i_elem, elem_id, p_connectivity, workspace, &
         !$OMP         local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
-        !$OMP         local_F_T, local_F_H, elem_coords, num_nodes_local, local_matrix_vals, local_vector_vals, &
-        !$OMP         local_diag_sum, local_tt_diag_sum, local_hh_diag_sum, local_h_scale, i_local)
+        !$OMP         local_F_T, local_F_H, elem_coords, num_nodes_local)
 
         do i_color = 1, num_colors
 
@@ -79,52 +68,6 @@ contains
 
                     call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
                                              local_F_T, local_F_H)
-
-                    local_diag_sum = 0.0d0
-                    local_matrix_vals => local_K_TT%get_val()
-                    if (associated(local_matrix_vals)) then
-                        do i_local = 1, workspace%num_fe_nodes
-                            local_diag_sum = local_diag_sum + abs(local_matrix_vals(i_local, i_local))
-                        end do
-                    end if
-                    local_tt_diag_sum = local_diag_sum
-
-                    if (do_hydraulic) then
-                        local_diag_sum = 0.0d0
-                        local_matrix_vals => local_K_HH%get_val()
-                        if (associated(local_matrix_vals)) then
-                            do i_local = 1, workspace%num_fe_nodes
-                                local_diag_sum = local_diag_sum + abs(local_matrix_vals(i_local, i_local))
-                            end do
-                        end if
-
-                        local_matrix_vals => local_K_HT%get_val()
-                        if (associated(local_matrix_vals)) then
-                            do i_local = 1, workspace%num_fe_nodes
-                                local_diag_sum = local_diag_sum + abs(local_matrix_vals(i_local, i_local))
-                            end do
-                        end if
-                        local_hh_diag_sum = local_diag_sum
-
-                        local_h_scale = 1.0d0
-                        if (local_hh_diag_sum > hydraulic_scale_eps .and. local_tt_diag_sum > local_diag_eps) then
-                            local_h_scale = sqrt(local_tt_diag_sum / local_hh_diag_sum)
-                        end if
-
-                        if (.not. ieee_is_finite(local_h_scale) .or. local_h_scale < 1.0d0) local_h_scale = 1.0d0
-                        if (local_h_scale > hydraulic_scale_max) local_h_scale = hydraulic_scale_max
-
-                        if (local_h_scale > 1.0d0 + 1.0d-12) then
-                            local_matrix_vals => local_K_HH%get_val()
-                            if (associated(local_matrix_vals)) local_matrix_vals(:, :) = local_h_scale * local_matrix_vals(:, :)
-                            local_matrix_vals => local_K_HT%get_val()
-                            if (associated(local_matrix_vals)) local_matrix_vals(:, :) = local_h_scale * local_matrix_vals(:, :)
-                            local_vector_vals => local_F_H%get_data()
-                            if (associated(local_vector_vals)) local_vector_vals(:) = local_h_scale * local_vector_vals(:)
-                            nullify (local_vector_vals)
-                        end if
-                    end if
-                    nullify (local_matrix_vals)
 
                     num_nodes_local = workspace%num_fe_nodes
 

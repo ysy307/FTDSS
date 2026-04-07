@@ -100,6 +100,7 @@ module io_input_basic
 
     type :: type_phase_change
         type(type_equilibrium_model) :: equilibrium_model
+        real(real64) :: segregation_potential = 0.0d0
     end type type_phase_change
 
     type :: type_hydraulic_conductivity_model

@@ -127,10 +127,13 @@ contains
         real(real64), allocatable :: work_D_HT(:, :, :)
         real(real64), allocatable :: work_matrix_coupling(:, :)
 
+        real(real64), allocatable :: work_sink(:)
+
         n_nodes = workspace%num_fe_nodes
         n_gauss = workspace%num_fe_gauss
         n_dim = workspace%num_fe_dimension
         allocate (local_vec_res(n_nodes))
+        allocate (work_sink(n_gauss))
         bdf0 = workspace%bdf_coeffs(1)
 
         workspace%work_C(:) = 0.0d0
@@ -138,6 +141,7 @@ contains
         workspace%work_V(:, :) = 0.0d0
         workspace%work_d_dt(:) = 0.0d0
         local_vec_res(:) = 0.0d0
+        work_sink(:) = 0.0d0
 
         ! Coupling workspace
         if (present(K_HT)) then
@@ -167,6 +171,8 @@ contains
                 call self%compute_coupling_mass_term(workspace%material_id, workspace%state_gp(i), work_C_HT(i))
                 call self%compute_coupling_diffusion_term(workspace%material_id, workspace%state_gp(i), work_D_HT(:, :, i))
             end if
+
+            call self%calc_segregation_sink(workspace%material_id, workspace%state_gp(i), work_sink(i))
         end do
 
         ! 2. Mass Matrix (LHS)
@@ -238,6 +244,11 @@ contains
             call workspace%compute_R2(workspace%work_V, workspace%work_vec)
             local_vec_res(:) = local_vec_res(:) - workspace%work_vec(:)
 
+            ! Add Segregation Sink Term
+            workspace%work_vec(:) = 0.0d0
+            call workspace%compute_R1(work_sink, workspace%work_vec)
+            local_vec_res(:) = local_vec_res(:) + workspace%work_vec(:)
+
             ! F = - Residual
             do i = 1, n_nodes
                 call F_H%set(VECTOR_OPS%ADD, i, -local_vec_res(i))
@@ -245,6 +256,7 @@ contains
         end if
 
         if (allocated(local_vec_res)) deallocate (local_vec_res)
+        if (allocated(work_sink)) deallocate (work_sink)
         if (allocated(work_C_HT)) deallocate (work_C_HT)
         if (allocated(work_D_HT)) deallocate (work_D_HT)
         if (allocated(work_matrix_coupling)) deallocate (work_matrix_coupling)
@@ -348,6 +360,18 @@ contains
                                                matmul(D_HH, workspace%work_dpsi_dx(:, j)))
                 end do
             end do
+
+            ! Segregation sink: removes water mass at freezing fringe
+            block
+                real(real64) :: S_seg
+                S_seg = 0.0d0
+                call self%calc_segregation_sink(material_id, workspace%state_gp(gp), S_seg)
+                if (abs(S_seg) > 0.0d0) then
+                    do i = 1, n_nodes
+                        R_elem(i) = R_elem(i) + wJ * workspace%work_psi(i) * S_seg
+                    end do
+                end if
+            end block
         end do
 
         ! Row equilibration: scale each row by its max absolute value

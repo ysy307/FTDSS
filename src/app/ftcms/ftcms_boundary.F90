@@ -278,10 +278,16 @@ contains
         integer(int32) :: num_matched_patches, num_dirichlet_nodes
         integer(int32) :: bdf_order
         integer(int32) :: num_nodes, node_id
+        integer(int32) :: n_dim
+        integer(int32) :: first_dirichlet_node
         real(real64), parameter :: NULLSPACE_REG_EPS = 1.0d-8
+        real(real64) :: first_dirichlet_coord(3)
+        real(real64), allocatable :: node_coord(:)
         logical, save :: printed_no_dirichlet_hydraulic_notice = .false.
         logical, save :: printed_hydraulic_gauge_notice = .false.
         logical, save :: printed_thermal_gauge_notice = .false.
+        logical, save :: printed_thermal_dirichlet_location = .false.
+        logical, save :: printed_hydraulic_dirichlet_location = .false.
         type(type_bc_result) :: bc_result
         type(type_boundary_patch), pointer :: bc_patch
 
@@ -290,6 +296,14 @@ contains
         call self%domain%get_num_bc_patches(num_patches)
         num_matched_patches = 0
         num_dirichlet_nodes = 0
+        first_dirichlet_node = 0
+        first_dirichlet_coord(:) = 0.0d0
+        n_dim = 0
+        call self%domain%nodes%get_dimension(n_dim)
+        if (n_dim > 0) then
+            allocate (node_coord(n_dim))
+            node_coord(:) = 0.0d0
+        end if
 
         do i_patch = 1, num_patches
             call self%domain%get_bc_patch(i_patch, bc_patch)
@@ -317,9 +331,34 @@ contains
                     ! 2. Set Residual/Force vector
                     call self%F%set(dof_offset, glob_node_id, 0.0d0)
                     num_dirichlet_nodes = num_dirichlet_nodes + 1
+
+                    if (first_dirichlet_node == 0) then
+                        first_dirichlet_node = glob_node_id
+                        if (allocated(node_coord)) then
+                            call self%domain%nodes%get_coordinate(glob_node_id, node_coord)
+                            first_dirichlet_coord(:) = 0.0d0
+                            first_dirichlet_coord(1:min(3, n_dim)) = node_coord(1:min(3, n_dim))
+                        end if
+                    end if
                 end do
             end if
         end do
+
+        if (num_dirichlet_nodes > 0) then
+            if (physics_type%ID == PHYSICS_TYPES%THERMAL%ID .and. .not. printed_thermal_dirichlet_location) then
+                write (*, '(A,I0,A,I0,A,I0,A,3(ES13.5,A))') '   [BC] thermal Dirichlet nodes=', num_dirichlet_nodes, &
+                    ', matched_patches=', num_matched_patches, ', sample_node=', first_dirichlet_node, &
+                    ', sample_coord(x,y,z)=', first_dirichlet_coord(1), ',', first_dirichlet_coord(2), ',', &
+                    first_dirichlet_coord(3), ''
+                printed_thermal_dirichlet_location = .true.
+            else if (physics_type%ID == PHYSICS_TYPES%HYDRAULIC%ID .and. .not. printed_hydraulic_dirichlet_location) then
+                write (*, '(A,I0,A,I0,A,I0,A,3(ES13.5,A))') '   [BC] hydraulic Dirichlet nodes=', num_dirichlet_nodes, &
+                    ', matched_patches=', num_matched_patches, ', sample_node=', first_dirichlet_node, &
+                    ', sample_coord(x,y,z)=', first_dirichlet_coord(1), ',', first_dirichlet_coord(2), ',', &
+                    first_dirichlet_coord(3), ''
+                printed_hydraulic_dirichlet_location = .true.
+            end if
+        end if
 
         if (num_matched_patches == 0) then
             write (*, '(A,1X,A)') 'Error: No boundary patch matched boundary_conditions IDs for physics:', trim(physics_type%name)
@@ -372,6 +411,8 @@ contains
                 end do
             end if
         end if
+
+        if (allocated(node_coord)) deallocate (node_coord)
 
     end subroutine apply_essential_bc_generic
 
