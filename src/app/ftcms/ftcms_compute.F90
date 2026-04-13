@@ -418,15 +418,9 @@ contains
                 end do
             end if
 
-            if (is_hydraulic_frozen .and. thermal_dof > 0 .and. tt_diag_max > diag_eps) then
-                call self%domain%get_num_nodes(num_nodes)
-                pre_retry_diag = max(retry_diag_min, retry_diag_factor*max(diag_eps, tt_diag_max))
-                pre_retry_diag = max(pre_retry_diag, hydraulic_frozen_diag_hint)
-                pre_retry_diag = min(pre_retry_diag, retry_diag_cap)
-                do i = 1, num_nodes
-                    call self%K%add(thermal_dof, thermal_dof, i, i, pre_retry_diag)
-                end do
-            end if
+            ! Thermal diagonal damping disabled: it over-damps interior nodes
+            ! and prevents heat diffusion from propagating through the domain.
+            pre_retry_diag = 0.0d0
         end if
 
         call du_ptr%zero()

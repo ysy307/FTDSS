@@ -15,7 +15,8 @@ contains
 
         if (control%is_compute_newton()) then
             call self%assemble_local_newton(control, workspace, K_HH, K_HT, F_H)
-        else if (control%is_compute_picard()) then
+        else
+            ! Picard assembly is also used for NONE (single-shot linear solve).
             call self%assemble_local_picard(control, workspace, K_HH, K_HT, F_H)
         end if
 
@@ -278,14 +279,11 @@ contains
         real(real64), parameter :: K_min = 1.0d-12
         real(real64), parameter :: Ceq_min = 1.0d-12
         real(real64), parameter :: coupling_cap = 1.0d3
-        real(real64), parameter :: row_scale_min = 1.0d-14
-
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gauss_pts
         real(real64), pointer, contiguous, dimension(:) :: weights
 
         real(real64), allocatable :: D_HH(:, :), D_HT(:, :), V_H(:)
         real(real64), allocatable :: grad_P(:), grad_T(:), flux(:)
-        real(real64), allocatable :: row_max(:)
 
         nullify (gauss_pts)
         nullify (weights)
@@ -300,7 +298,6 @@ contains
 
         allocate (D_HH(n_dim, n_dim), D_HT(n_dim, n_dim), V_H(n_dim))
         allocate (grad_P(n_dim), grad_T(n_dim), flux(n_dim))
-        allocate (row_max(n_nodes))
 
         call workspace%fe%get_gauss(gauss_pts)
         call workspace%fe%get_weight(weights)
@@ -374,14 +371,9 @@ contains
             end block
         end do
 
-        ! Row equilibration: scale each row by its max absolute value
-        row_max = max(maxval(abs(J_elem), dim=2), row_scale_min)
-        J_elem = J_elem / spread(row_max, 2, n_nodes)
-        R_elem = R_elem / row_max
-
         nullify (gauss_pts)
         nullify (weights)
-        deallocate (D_HH, D_HT, V_H, grad_P, grad_T, flux, row_max)
+        deallocate (D_HH, D_HT, V_H, grad_P, grad_T, flux)
 
     end subroutine assemble_element_hydraulic
 

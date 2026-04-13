@@ -282,11 +282,18 @@ contains
                 ! Setup (update iteration counter)
                 call self%solve_time_step_setup(prescribe_bc)
 
+                ! Prescribe Dirichlet values before assembly so gradients reflect BCs
+                if (prescribe_bc) then
+                    call self%prescribe_dirichlet()
+                    call self%calc_gradient_temperature()
+                    call self%calc_gradient_pressure()
+                end if
+
                 ! Assemble matrices and residual
                 call self%assemble()
 
-                ! Apply boundary conditions
-                call self%apply_bc(prescribe_bc)
+                ! Apply boundary conditions (natural + essential) to the linear system
+                call self%apply_bc(prescribed=.false.)
 
                 ! Linear solve (K * du = F)
                 call self%solve()
@@ -463,8 +470,13 @@ contains
 
             hydraulic_nl: do while (self%control%should_continue())
                 call self%solve_time_step_setup(prescribe_bc)
+                if (prescribe_bc) then
+                    call self%prescribe_dirichlet()
+                    call self%calc_gradient_temperature()
+                    call self%calc_gradient_pressure()
+                end if
                 call self%assemble()
-                call self%apply_bc(prescribe_bc)
+                call self%apply_bc(prescribed=.false.)
                 call self%freeze_physics_dofs(PHYSICS_TYPES%THERMAL)
                 call self%solve(frozen_physics=PHYSICS_TYPES%THERMAL)
 
@@ -543,8 +555,13 @@ contains
 
             thermal_nl: do while (self%control%should_continue())
                 call self%solve_time_step_setup(prescribe_bc)
+                if (prescribe_bc) then
+                    call self%prescribe_dirichlet()
+                    call self%calc_gradient_temperature()
+                    call self%calc_gradient_pressure()
+                end if
                 call self%assemble()
-                call self%apply_bc(prescribe_bc)
+                call self%apply_bc(prescribed=.false.)
                 call self%freeze_physics_dofs(PHYSICS_TYPES%HYDRAULIC)
                 call self%solve(frozen_physics=PHYSICS_TYPES%HYDRAULIC)
 

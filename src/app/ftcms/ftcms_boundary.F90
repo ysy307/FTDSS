@@ -2,6 +2,22 @@ submodule(app_ftcms) ftcms_boundary
     implicit none
 contains
 
+    module subroutine prescribe_dirichlet_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        real(real64) :: current_time
+
+        call self%control%get_time(current_time)
+
+        if (self%is_active_thermal()) then
+            call self%prescribe_essential_bc_generic(PHYSICS_TYPES%THERMAL, current_time, self%temperature)
+        end if
+
+        if (self%is_active_hydraulic()) then
+            call self%prescribe_essential_bc_generic(PHYSICS_TYPES%HYDRAULIC, current_time, self%pressure)
+        end if
+    end subroutine prescribe_dirichlet_ftcms
+
     !>
     !> Applies all boundary conditions for active physics.
     !> Order: Prescribe (Step 0) -> Natural (Step 1) -> Essential (Step 2)

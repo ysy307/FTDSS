@@ -38,6 +38,7 @@ add_subdirectory(src/app/ftcms)
 # ====================================================================
 # プロジェクト直下の app ディレクトリにあるエントリーポイント
 add_executable(FTCMS app/ftcms.f90)
+set_target_properties(FTCMS PROPERTIES LINKER_LANGUAGE Fortran)
 
 # 実行ファイルに必要な最上位ライブラリターゲットをリンクする（名称は仮）
 # 必要なフラグ（インクルードパスやOpenMP等）もターゲット経由で自動伝搬する

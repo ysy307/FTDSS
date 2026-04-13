@@ -14,7 +14,8 @@ contains
 
         if (control%is_compute_newton()) then
             call self%assemble_local_newton(control, workspace, K_TT, K_TH, F_T)
-        else if (control%is_compute_picard()) then
+        else
+            ! Picard assembly is also used for NONE (single-shot linear solve).
             call self%assemble_local_picard(control, workspace, K_TT, K_TH, F_T)
         end if
 
@@ -36,6 +37,9 @@ contains
         real(real64), pointer :: K_TH_val(:, :)
         real(real64), pointer :: F_T_val(:)
         real(real64), allocatable :: work_C_TH(:)
+        real(real64), allocatable :: work_Q_seg(:)
+        real(real64) :: S_seg, Lf, rho_w, grad_T_mag
+        type(type_coordinate_dp), pointer :: grad_T_ptr
         logical :: has_advection
 
         n_nodes = workspace%num_fe_nodes
@@ -43,6 +47,7 @@ contains
         nullify (K_TT_val)
         nullify (K_TH_val)
         nullify (F_T_val)
+        nullify (grad_T_ptr)
 
         if (present(K_TT)) K_TT_val => K_TT%get_val()
         if (present(K_TH)) K_TH_val => K_TH%get_val()
@@ -60,6 +65,9 @@ contains
             allocate (work_C_TH(workspace%num_fe_gauss))
             work_C_TH(:) = 0.0d0
         end if
+
+        allocate (work_Q_seg(workspace%num_fe_gauss))
+        work_Q_seg(:) = 0.0d0
 
         do i = 1, workspace%num_fe_gauss
             call self%compute_mass_term(workspace%material_id, workspace%state_gp(i), &
@@ -101,6 +109,26 @@ contains
                 write (*, '(A,I0,A,I0)') 'Error: Thermal advection term exploded. mat=', workspace%material_id, ', gp=', i
                 error stop 'Thermal advection overflow in local assembly.'
             end if
+
+            ! Segregation latent heat source
+            nullify (grad_T_ptr)
+            call workspace%state_gp(i)%grad_T%get(grad_T_ptr)
+            if (associated(grad_T_ptr)) then
+                grad_T_mag = sqrt(grad_T_ptr%x**2 + grad_T_ptr%y**2 + grad_T_ptr%z**2)
+                if (grad_T_mag > 0.0d0) then
+                    S_seg = 0.0d0
+                    call self%physics%calc_segregation_sink( &
+                        workspace%material_id, workspace%state_gp(i), grad_T_mag, S_seg)
+                    if (S_seg > 0.0d0) then
+                        Lf = 0.0d0
+                        rho_w = 0.0d0
+                        call self%physics%calc_latent_heat_fusion( &
+                            workspace%material_id, workspace%state_gp(i), Lf)
+                        call self%calc_density_water(workspace%state_gp(i), rho_w)
+                        work_Q_seg(i) = Lf * rho_w * S_seg
+                    end if
+                end if
+            end if
         end do
 
         ! Mass term -> K_TT
@@ -116,6 +144,11 @@ contains
             workspace%work_vec(:) = 0.0d0
             call workspace%compute_R1(workspace%work_d_dt, workspace%work_vec)
             F_T_val(1:n_nodes) = F_T_val(1:n_nodes) - workspace%work_vec(1:n_nodes)
+
+            ! Segregation latent heat source
+            workspace%work_vec(:) = 0.0d0
+            call workspace%compute_R1(work_Q_seg, workspace%work_vec)
+            F_T_val(1:n_nodes) = F_T_val(1:n_nodes) + workspace%work_vec(1:n_nodes)
         end if
 
         ! Diffusion term -> K_TT + F_T
@@ -157,6 +190,7 @@ contains
         end if
 
         if (allocated(work_C_TH)) deallocate (work_C_TH)
+        if (allocated(work_Q_seg)) deallocate (work_Q_seg)
 
     end subroutine assemble_local_newton_thermal
 
@@ -180,6 +214,9 @@ contains
         real(real64), allocatable :: local_vec_diff_flux(:)
         real(real64), allocatable :: local_vec_adv_flux(:)
         real(real64), allocatable :: work_C_TH(:)
+        real(real64), allocatable :: work_Q_seg(:)
+        real(real64) :: S_seg, Lf, rho_w, grad_T_mag
+        type(type_coordinate_dp), pointer :: grad_T_ptr
         integer(int32) :: n_nodes
         logical :: has_advection
 
@@ -203,6 +240,7 @@ contains
         nullify (K_TT_val)
         nullify (K_TH_val)
         nullify (F_T_val)
+        nullify (grad_T_ptr)
 
         if (present(K_TT)) K_TT_val => K_TT%get_val()
         if (present(K_TH)) K_TH_val => K_TH%get_val()
@@ -212,6 +250,9 @@ contains
             allocate (work_C_TH(workspace%num_fe_gauss))
             work_C_TH(:) = 0.0d0
         end if
+
+        allocate (work_Q_seg(workspace%num_fe_gauss))
+        work_Q_seg(:) = 0.0d0
 
         do i = 1, workspace%num_fe_gauss
             call self%compute_mass_term(workspace%material_id, workspace%state_gp(i), workspace%work_C(i))
@@ -228,6 +269,26 @@ contains
 
             if (present(K_TH)) then
                 call self%compute_coupling_mass_term(workspace%material_id, workspace%state_gp(i), work_C_TH(i))
+            end if
+
+            ! Segregation latent heat source
+            nullify (grad_T_ptr)
+            call workspace%state_gp(i)%grad_T%get(grad_T_ptr)
+            if (associated(grad_T_ptr)) then
+                grad_T_mag = sqrt(grad_T_ptr%x**2 + grad_T_ptr%y**2 + grad_T_ptr%z**2)
+                if (grad_T_mag > 0.0d0) then
+                    S_seg = 0.0d0
+                    call self%physics%calc_segregation_sink( &
+                        workspace%material_id, workspace%state_gp(i), grad_T_mag, S_seg)
+                    if (S_seg > 0.0d0) then
+                        Lf = 0.0d0
+                        rho_w = 0.0d0
+                        call self%physics%calc_latent_heat_fusion( &
+                            workspace%material_id, workspace%state_gp(i), Lf)
+                        call self%calc_density_water(workspace%state_gp(i), rho_w)
+                        work_Q_seg(i) = Lf * rho_w * S_seg
+                    end if
+                end if
             end if
         end do
 
@@ -270,8 +331,13 @@ contains
         if (associated(F_T_val)) then
             call workspace%compute_R1(workspace%work_d_dt, local_vec_transient)
 
+            ! Segregation latent heat source
+            workspace%work_vec(:) = 0.0d0
+            call workspace%compute_R1(work_Q_seg, workspace%work_vec)
+
             do i = 1, n_nodes
-                val_T = -local_vec_transient(i) - local_vec_diff_flux(i) - local_vec_adv_flux(i)
+                val_T = -local_vec_transient(i) - local_vec_diff_flux(i) - local_vec_adv_flux(i) &
+                    + workspace%work_vec(i)
                 F_T_val(i) = F_T_val(i) + val_T
             end do
         end if
@@ -280,6 +346,7 @@ contains
         if (allocated(local_vec_diff_flux)) deallocate (local_vec_diff_flux)
         if (allocated(local_vec_adv_flux)) deallocate (local_vec_adv_flux)
         if (allocated(work_C_TH)) deallocate (work_C_TH)
+        if (allocated(work_Q_seg)) deallocate (work_Q_seg)
 
     end subroutine assemble_local_picard_thermal
 
