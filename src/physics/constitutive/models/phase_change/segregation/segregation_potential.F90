@@ -38,12 +38,13 @@ contains
 
     end subroutine initialize_segregation_potential
 
-    !> Compute segregation sink term at a point.
+    !> Compute volumetric segregation sink term at a point.
     !>
-    !> Mathematical definition:
-    !> \( S_{seg} = SP_0 \, |\nabla T| \, f_{fringe}(T) \)
-    !> where \( f_{fringe} \) is a smooth indicator for the freezing fringe.
-    !> The sink is positive (water removal from pore space).
+    !> Using Mizoguchi-style SP with units [m/(s·K)], the liquid water intake
+    !> rate per unit pore volume within the freezing fringe is
+    !> \[ S_{seg} = SP_0 \, |\nabla T| \, f_{fringe}(T) \quad [1/s] \]
+    !> where \( f_{fringe} \) is a smooth top-hat indicator on \([T_{low}, T_{high}]\).
+    !> The sink is positive (liquid water removed from pore space).
     subroutine calc_segregation_sink(self, state, grad_T_magnitude, S_seg)
         implicit none
         class(type_segregation_potential), intent(in) :: self
@@ -51,38 +52,48 @@ contains
         real(real64), intent(in) :: grad_T_magnitude
         real(real64), intent(inout) :: S_seg
 
-        real(real64) :: temperature, Qi, Qw
+        real(real64) :: temperature, Qw, Qi, Qi_seg, porosity_val, gas_space
         real(real64) :: f_fringe
-        real(real64) :: T_mid, T_half_width, arg_low, arg_high
+        real(real64) :: T_half_width, dT_fringe, arg_low, arg_high
+        real(real64) :: gas_frac, gas_gate, gas_eps_abs
         real(real64), parameter :: sharpness = 4.0d0
+        real(real64), parameter :: gas_eps_rel = 0.005d0
 
         S_seg = 0.0d0
         if (self%SP0 <= 0.0d0) return
+        if (grad_T_magnitude <= 0.0d0) return
 
         call state%temperature%get(temperature)
-        call state%ice_content%get(Qi)
         call state%water_content%get(Qw)
 
-        ! Fringe requires both ice and liquid water present
-        if (Qi <= 0.0d0 .or. Qw <= 0.0d0) return
+        if (Qw <= 0.0d0) return
 
-        ! Smooth fringe indicator using product of two tanh sigmoids
-        T_mid = 0.5d0 * (self%T_fringe_low + self%T_fringe_high)
-        T_half_width = 0.5d0 * (self%T_fringe_high - self%T_fringe_low)
-        if (T_half_width <= 0.0d0) return
+        ! Gas-phase saturation gate: C1-smooth ramp on available pore space.
+        ! The hard cutoff (gas_space <= 0 => S_seg = 0) is retained as the lower
+        ! end of a cubic smoothstep to preserve Jacobian-Residual consistency.
+        call state%ice_content%get(Qi)
+        call state%ice_content_seg%get(Qi_seg)
+        call state%porosity%get(porosity_val)
+        gas_space = porosity_val - Qi - Qi_seg - Qw
+        gas_eps_abs = gas_eps_rel * max(porosity_val, 1.0d-6)
+        if (gas_eps_abs <= 0.0d0) return
+        gas_frac = max(0.0d0, min(1.0d0, gas_space / gas_eps_abs))
+        gas_gate = gas_frac * gas_frac * (3.0d0 - 2.0d0 * gas_frac)
+        if (gas_gate <= 0.0d0) return
 
-        ! Lower bound activation: rises from 0 to 1 as T increases above T_fringe_low
+        dT_fringe = self%T_fringe_high - self%T_fringe_low
+        if (dT_fringe <= 0.0d0) return
+        T_half_width = 0.5d0 * dT_fringe
+
+        ! Smooth top-hat indicator on [T_fringe_low, T_fringe_high]
         arg_low = sharpness * (temperature - self%T_fringe_low) / T_half_width
-        ! Upper bound activation: drops from 1 to 0 as T increases above T_fringe_high
         arg_high = sharpness * (self%T_fringe_high - temperature) / T_half_width
-
-        ! Clamp arguments to avoid overflow in tanh
         arg_low = max(min(arg_low, 20.0d0), -20.0d0)
         arg_high = max(min(arg_high, 20.0d0), -20.0d0)
-
         f_fringe = 0.5d0 * (1.0d0 + tanh(arg_low)) * 0.5d0 * (1.0d0 + tanh(arg_high))
 
-        S_seg = self%SP0 * grad_T_magnitude * f_fringe
+        ! Volumetric sink rate [1/s]: SP0 * |grad T| * f_fringe * gas_gate
+        S_seg = self%SP0 * grad_T_magnitude * f_fringe * gas_gate
 
     end subroutine calc_segregation_sink
 

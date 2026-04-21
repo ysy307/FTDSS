@@ -3,8 +3,6 @@ module models_phase_change_fusion
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state
     use :: constitutive_constants, only: &
-        lf => latent_heat_fusion_water_0c, &
-        T_to_K => celsius_to_kelvin, &
         Tf0 => water_freezing_point_at_standard_atmospheric_pressure
     use :: physics_constitutive_base, only:abst_constitutive
     use :: models_wrf, only:abst_wrf
@@ -18,7 +16,13 @@ module models_phase_change_fusion
     ! A small positive epsilon avoids non-differentiable switching at psi_cap=psi_cryo.
     real(real64), parameter :: SUCTION_BLEND_EPS = 1.0d4
     real(real64), parameter :: FREEZING_SMOOTH_BAND = 0.25d0
-    real(real64), parameter :: DPW_DT_LIMIT = 1.0d8
+    !> Pore-space cap: Qi <= (porosity - theta_l_eff - PORE_MARGIN).
+    !> A small margin keeps phase_systems's hard cap out of the picture.
+    real(real64), parameter :: PORE_MARGIN = 1.0d-4
+    !> Smoothing scale for pore cap, relative to porosity. A wider scale keeps
+    !> the Jacobian contribution from Qi_unbounded alive deeper into the capped
+    !> regime, which is critical for deep-subfreezing thermal convergence.
+    real(real64), parameter :: PORE_CAP_SMOOTH_REL = 2.0d-2
 
     !>
     !> @brief Model for fusion (melting/freezing) physics.
@@ -77,19 +81,6 @@ contains
         end if
     end subroutine compute_freezing_activation
 
-    pure subroutine bound_symmetric(value_in, bound, value_out)
-        implicit none
-        real(real64), intent(in) :: value_in, bound
-        real(real64), intent(inout) :: value_out
-
-        if (bound <= 0.0d0) then
-            value_out = value_in
-            return
-        end if
-
-        value_out = value_in / (1.0d0 + abs(value_in)/bound)
-    end subroutine bound_symmetric
-
     !>
     !> @brief Initialize fusion model.
     !>
@@ -114,6 +105,18 @@ contains
     !>
     !> @brief Calculate ice content based on thermodynamic state.
     !>
+    !> In-situ (local equilibrium) equivalent-saturation formulation with pore-space cap:
+    !> \[ Q_{i,unb} = f_{freeze}(T) \cdot (\rho_w/\rho_i) \cdot \max(0, \theta_l(-\psi_{cap}) - \theta_l(-\psi_{eff})) \]
+    !> \[ Q_{i,cap} = \max(0, \phi - \theta_l(-\psi_{eff}) - \epsilon) \]
+    !> \[ Q_i = \tfrac{1}{2}\left(Q_{i,unb} + Q_{i,cap}
+    !>         - \sqrt{(Q_{i,unb} - Q_{i,cap})^2 + s^2}\right) \]
+    !> The first WRF evaluation gives the unfrozen-reference liquid content (capillary
+    !> only); the second gives the current liquid content with cryogenic suction
+    !> included. Mass conservation between the two is scaled by the ice expansion
+    !> ratio \(\rho_w/\rho_i\); a C1-smooth minimum with the available pore space
+    !> enforces geometric feasibility (Qi + theta_l <= phi) without discontinuous
+    !> Jacobian drops. Excess mass that cannot fit as ice is physically carried out
+    !> by Darcy flow in the hydraulic PDE.
     subroutine calc_ice_content(self, state, ice_content)
         implicit none
         class(type_fusion), intent(in) :: self
@@ -122,9 +125,11 @@ contains
 
         real(real64) :: pressure, temperature
         real(real64) :: psi_cap, psi_cryo, psi_eff
-        real(real64) :: d_theta_liquid_dPress
+        real(real64) :: theta_l_cap, theta_l_eff, delta_theta
         real(real64) :: freezing_activation
         real(real64) :: rho_water, rho_ice, density_ratio
+        real(real64) :: porosity_val, Qi_seg, Qi_unbounded, Qi_cap
+        real(real64) :: smooth_scale, diff
 
         call state%pressure%get(pressure)
         call state%temperature%get(temperature)
@@ -133,7 +138,8 @@ contains
         call self%gcc%calc(state, psi_cryo)
         call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
 
-        call self%wrf%deriv(-psi_eff, d_theta_liquid_dPress)
+        call self%wrf%calc(-psi_cap, theta_l_cap)
+        call self%wrf%calc(-psi_eff, theta_l_eff)
 
         call self%calc_rho_water(state, rho_water)
         call self%calc_rho_ice(state, rho_ice)
@@ -146,17 +152,29 @@ contains
 
         call compute_freezing_activation(temperature, freezing_activation)
 
-        if (psi_cryo > 0.0d0) then
-            ice_content = max(0.0d0, freezing_activation * density_ratio * d_theta_liquid_dPress * psi_cryo)
-        else
-            ice_content = 0.0d0
-        end if
+        delta_theta = max(0.0d0, theta_l_cap - theta_l_eff)
+        Qi_unbounded = freezing_activation * density_ratio * delta_theta
+
+        call state%porosity%get(porosity_val)
+        call state%ice_content_seg%get(Qi_seg)
+        Qi_cap = max(0.0d0, porosity_val - theta_l_eff - max(Qi_seg, 0.0d0) - PORE_MARGIN)
+
+        smooth_scale = PORE_CAP_SMOOTH_REL * max(porosity_val, 1.0d-6)
+        diff = Qi_unbounded - Qi_cap
+        ice_content = 0.5d0 * (Qi_unbounded + Qi_cap - sqrt(diff*diff + smooth_scale*smooth_scale))
+        ice_content = max(0.0d0, ice_content)
 
     end subroutine calc_ice_content
 
     !>
     !> @brief Calculate derivatives of ice content w.r.t pressure and temperature.
     !>
+    !> Chain rule through the pore-cap smooth minimum:
+    !> \[ \partial Q_i/\partial x = w_{unb}\,\partial Q_{i,unb}/\partial x
+    !>    + w_{cap}\,\partial Q_{i,cap}/\partial x \]
+    !> with weights \(w_{unb} = \tfrac{1}{2}(1-(Q_{unb}-Q_{cap})/r)\),
+    !> \(w_{cap} = \tfrac{1}{2}(1+(Q_{unb}-Q_{cap})/r)\),
+    !> \(r = \sqrt{(Q_{unb}-Q_{cap})^2 + s^2}\).
     subroutine calc_ice_content_derivatives(self, state, dice_dP, dice_dT)
         implicit none
         class(type_fusion), intent(in) :: self
@@ -164,14 +182,20 @@ contains
         real(real64), intent(inout) :: dice_dP
         real(real64), intent(inout) :: dice_dT
 
-        real(real64) :: pressure, temperature, temperature_K
+        real(real64) :: pressure, temperature
         real(real64) :: psi_cap, psi_cryo, psi_eff
+        real(real64) :: d_psi_cap_dP
         real(real64) :: d_psi_cryo_dP, d_psi_cryo_dT
-        real(real64) :: d_theta_liquid_dPress
-        real(real64) :: dPi_dT
-        real(real64) :: dPw_dP, dPw_dT, dPw_dT_bounded
+        real(real64) :: d_psi_eff_dpsi_cap, d_psi_eff_dpsi_cryo
+        real(real64) :: d_psi_eff_dP, d_psi_eff_dT
+        real(real64) :: theta_l_cap, theta_l_eff, delta_theta
+        real(real64) :: dtheta_dPin_cap, dtheta_dPin_eff
+        real(real64) :: d_theta_cap_dP, d_theta_eff_dP, d_theta_eff_dT
         real(real64) :: freezing_activation, d_freezing_activation_dT
         real(real64) :: rho_w, rho_i, density_ratio
+        real(real64) :: porosity_val, Qi_unbounded, Qi_cap
+        real(real64) :: dQi_unb_dP, dQi_unb_dT, dQi_cap_dP, dQi_cap_dT
+        real(real64) :: smooth_scale, diff, denom, w_unb, w_cap
 
         call state%pressure%get(pressure)
         call state%temperature%get(temperature)
@@ -184,37 +208,75 @@ contains
             density_ratio = 1.0d0
         end if
 
-        psi_cap = max(0.0d0, -pressure)
+        if (pressure < 0.0d0) then
+            psi_cap = -pressure
+            d_psi_cap_dP = -1.0d0
+        else
+            psi_cap = 0.0d0
+            d_psi_cap_dP = 0.0d0
+        end if
 
         call self%gcc%calc(state, psi_cryo)
-        call self%gcc%deriv_temperature(state, d_psi_cryo_dT)
         call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
+        call self%gcc%deriv_temperature(state, d_psi_cryo_dT)
 
-        call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
-        call self%wrf%deriv(-psi_eff, d_theta_liquid_dPress)
+        call compute_effective_suction(psi_cap, psi_cryo, psi_eff, d_psi_eff_dpsi_cap, d_psi_eff_dpsi_cryo)
+        d_psi_eff_dP = d_psi_eff_dpsi_cap * d_psi_cap_dP + d_psi_eff_dpsi_cryo * d_psi_cryo_dP
+        d_psi_eff_dT = d_psi_eff_dpsi_cryo * d_psi_cryo_dT
 
-        temperature_K = max(1.0d0, temperature + T_to_K)
-
-        ! Pressure state variable is water pressure itself.
-        dPw_dP = 1.0d0
-
-        ! GCC identity in this codebase: psi_cryo = P_w - P_i.
-        dPi_dT = -d_psi_cryo_dT
-
-        ! Chain-rule mapping for the capacity formulation.
-        dPw_dT = density_ratio * dPi_dT + rho_w*lf/temperature_K
-        call bound_symmetric(dPw_dT, DPW_DT_LIMIT, dPw_dT_bounded)
+        call self%wrf%calc(-psi_cap, theta_l_cap)
+        call self%wrf%calc(-psi_eff, theta_l_eff)
+        call self%wrf%deriv(-psi_cap, dtheta_dPin_cap)
+        call self%wrf%deriv(-psi_eff, dtheta_dPin_eff)
 
         call compute_freezing_activation(temperature, freezing_activation, d_freezing_activation_dT)
 
-        if (psi_cryo > 0.0d0) then
-            dice_dP = freezing_activation * (-density_ratio * d_theta_liquid_dPress * dPw_dP)
-            dice_dT = freezing_activation * (-density_ratio * d_theta_liquid_dPress * dPw_dT_bounded) + &
-                      d_freezing_activation_dT * (density_ratio * d_theta_liquid_dPress * psi_cryo)
+        ! Liquid-content derivatives (chain rule: WRF input is -psi).
+        d_theta_cap_dP = dtheta_dPin_cap * (-d_psi_cap_dP)
+        d_theta_eff_dP = dtheta_dPin_eff * (-d_psi_eff_dP)
+        d_theta_eff_dT = dtheta_dPin_eff * (-d_psi_eff_dT)
+
+        ! Unbounded ice content and its derivatives.
+        delta_theta = theta_l_cap - theta_l_eff
+        if (delta_theta > 0.0d0) then
+            Qi_unbounded = freezing_activation * density_ratio * delta_theta
+            dQi_unb_dP = freezing_activation * density_ratio * (d_theta_cap_dP - d_theta_eff_dP)
+            dQi_unb_dT = freezing_activation * density_ratio * (-d_theta_eff_dT) + &
+                         d_freezing_activation_dT * density_ratio * delta_theta
         else
-            dice_dP = 0.0d0
-            dice_dT = 0.0d0
+            Qi_unbounded = 0.0d0
+            dQi_unb_dP = 0.0d0
+            dQi_unb_dT = 0.0d0
         end if
+
+        ! Pore-space cap: Qi_cap = max(0, porosity - theta_l_eff - Qi_seg - PORE_MARGIN).
+        ! Qi_seg is treated as an explicit (frozen-in-Newton) state here, so it
+        ! contributes no Jacobian terms.
+        call state%porosity%get(porosity_val)
+        block
+            real(real64) :: qi_seg_val
+            call state%ice_content_seg%get(qi_seg_val)
+            qi_seg_val = max(qi_seg_val, 0.0d0)
+            if (porosity_val - theta_l_eff - qi_seg_val - PORE_MARGIN > 0.0d0) then
+                Qi_cap = porosity_val - theta_l_eff - qi_seg_val - PORE_MARGIN
+                dQi_cap_dP = -d_theta_eff_dP
+                dQi_cap_dT = -d_theta_eff_dT
+            else
+                Qi_cap = 0.0d0
+                dQi_cap_dP = 0.0d0
+                dQi_cap_dT = 0.0d0
+            end if
+        end block
+
+        ! C1-smooth minimum of Qi_unbounded and Qi_cap.
+        smooth_scale = PORE_CAP_SMOOTH_REL * max(porosity_val, 1.0d-6)
+        diff = Qi_unbounded - Qi_cap
+        denom = sqrt(diff*diff + smooth_scale*smooth_scale)
+        w_unb = 0.5d0 * (1.0d0 - diff / denom)
+        w_cap = 0.5d0 * (1.0d0 + diff / denom)
+
+        dice_dP = w_unb * dQi_unb_dP + w_cap * dQi_cap_dP
+        dice_dT = w_unb * dQi_unb_dT + w_cap * dQi_cap_dT
 
     end subroutine calc_ice_content_derivatives
 

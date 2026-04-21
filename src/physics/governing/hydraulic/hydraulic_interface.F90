@@ -103,11 +103,12 @@ module physics_governing_hydraulic
         !> \[ J^e_{ii} = \int N_i\,\alpha_0 C_{eq}\,d\Omega
         !>            + \int \nabla N_i \cdot D_{HH}\nabla N_i\,d\Omega \]
         !> \[ J^e_{ij} = \int \nabla N_i \cdot D_{HH}\nabla N_j\,d\Omega \quad (i \neq j) \]
-        module subroutine assemble_element_hydraulic(self, material_id, bdf_coeffs, workspace, J_elem, R_elem)
+        module subroutine assemble_element_hydraulic(self, material_id, bdf_coeffs, dt, workspace, J_elem, R_elem)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: material_id
             real(real64), intent(in) :: bdf_coeffs(:)
+            real(real64), intent(in) :: dt
             type(type_assemble_workspace), intent(inout) :: workspace
             real(real64), intent(inout) :: J_elem(:, :)
             real(real64), intent(inout) :: R_elem(:)
@@ -237,11 +238,12 @@ module physics_governing_hydraulic
             real(real64), intent(inout) :: dTheta_dt
         end subroutine compute_transient_term_mixed_hydraulic
 
-        module subroutine calc_segregation_sink_hydraulic(self, material_id, state, S_seg)
+        module subroutine calc_segregation_sink_hydraulic(self, material_id, state, dt, S_seg)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: material_id
             type(type_state), intent(in) :: state
+            real(real64), intent(in) :: dt
             real(real64), intent(inout) :: S_seg
         end subroutine calc_segregation_sink_hydraulic
 

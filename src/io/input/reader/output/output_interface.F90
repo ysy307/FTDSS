@@ -19,10 +19,10 @@ module io_input_output_conditions
     character(*), parameter :: valid_time_units(5) = [character(len=16) :: "second", "minute", "hour", "day", "year"]
     character(*), parameter :: variables = "variables"
     character(*), parameter :: valid_variables_lists(9) = [character(32) :: &
-                                                           ! Keep this list in sync with OUTPUT_VARIABLE_TYPES in include/constants.fypp
-                                                           'water_content', 'ice_content', 'vapor_content', &
-                                                           'temperature', 'thermal_conductivity', 'volumetric_heat_capacity', &
-                                                           'pressure', 'water_flux', 'hydraulic_conductivity']
+                                                            ! Keep this list in sync with OUTPUT_VARIABLE_TYPES in include/constants.fypp
+                                                            'water_content', 'ice_content', 'vapor_content', &
+                                                            'temperature', 'thermal_conductivity', 'volumetric_heat_capacity', &
+                                                            'pressure', 'water_flux', 'hydraulic_conductivity']
 
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_field_output

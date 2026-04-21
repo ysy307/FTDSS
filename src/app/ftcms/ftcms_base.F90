@@ -175,6 +175,18 @@ contains
             call create_solver(self%solver, solver_info, pc_info, ierr)
         end associate
 
+        ! Capture initial mean pressure to anchor the all-Neumann null-mode
+        ! without shifting the absolute level (WRF depends on absolute P).
+        if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc)) then
+            nullify (phase_values)
+            call self%pressure%get_current(phase_values)
+            if (associated(phase_values) .and. size(phase_values) > 0) then
+                self%hydraulic_ref_mean = sum(phase_values) / real(size(phase_values), real64)
+                self%hydraulic_ref_mean_set = .true.
+            end if
+            nullify (phase_values)
+        end if
+
         ! Populate initial phase variables from initial T/P/porosity before first output.
         call self%update_variables()
         nullify (phase_values)
@@ -221,16 +233,17 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: temperature
         real(real64), pointer, contiguous, dimension(:) :: pressure
         real(real64), pointer, contiguous, dimension(:) :: water_content
-        real(real64), pointer, contiguous, dimension(:) :: ice_content
-        real(real64), pointer, contiguous, dimension(:) :: ice_content_seg
+        real(real64), pointer, contiguous, dimension(:) :: ice_pore
+        real(real64), pointer, contiguous, dimension(:) :: ice_seg
+        real(real64), allocatable, target :: ice_content(:)
         real(real64), pointer, contiguous, dimension(:) :: vapor_content
 
         call self%control%profiler_start(PROFILER_TYPES%IO)
 
         nullify (temperature)
         nullify (pressure)
-        nullify (ice_content)
-        nullify (ice_content_seg)
+        nullify (ice_pore)
+        nullify (ice_seg)
         nullify (vapor_content)
         nullify (water_content)
 
@@ -245,23 +258,25 @@ contains
                 call self%pressure%get_previous(pressure)
             end if
             call self%Qw%get_previous(water_content)
-            call self%Qi%get_previous(ice_content)
-            call self%Qi_seg%get_previous(ice_content_seg)
+            call self%Qi%get_previous(ice_pore)
+            call self%Qi_seg%get_previous(ice_seg)
             call self%Qv%get_previous(vapor_content)
+            allocate (ice_content(size(ice_pore)))
+            ice_content(:) = ice_pore(:) + ice_seg(:)
             call self%output%output_fields(file_counts=iter, &
                                            temperature=temperature, &
                                            water_content=water_content, &
                                            ice_content=ice_content, &
                                            vapor_content=vapor_content, &
-                                           pressure=pressure, &
-                                           ice_content_seg=ice_content_seg)
+                                           pressure=pressure)
 
             call self%control%update_output(OUTPUT_TYPES%FIELD, current_time)
 
+            deallocate (ice_content)
             nullify (temperature)
             nullify (pressure)
-            nullify (ice_content)
-            nullify (ice_content_seg)
+            nullify (ice_pore)
+            nullify (ice_seg)
             nullify (water_content)
             nullify (vapor_content)
         end if
@@ -277,15 +292,18 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: temperature
         real(real64), pointer, contiguous, dimension(:) :: pressure
         real(real64), pointer, contiguous, dimension(:) :: water_content
-        real(real64), pointer, contiguous, dimension(:) :: ice_content
+        real(real64), pointer, contiguous, dimension(:) :: ice_pore
         real(real64), pointer, contiguous, dimension(:) :: vapor_content
+        real(real64), pointer, contiguous, dimension(:) :: ice_seg
+        real(real64), allocatable, target :: ice_content(:)
         call self%control%profiler_start(PROFILER_TYPES%IO)
 
         nullify (temperature)
         nullify (pressure)
         nullify (water_content)
-        nullify (ice_content)
+        nullify (ice_pore)
         nullify (vapor_content)
+        nullify (ice_seg)
 
         call self%control%get_time(current_time)
 
@@ -297,8 +315,11 @@ contains
                 call self%pressure%get_previous(pressure)
             end if
             call self%Qw%get_previous(water_content)
-            call self%Qi%get_previous(ice_content)
+            call self%Qi%get_previous(ice_pore)
             call self%Qv%get_previous(vapor_content)
+            call self%Qi_seg%get_previous(ice_seg)
+            allocate (ice_content(size(ice_pore)))
+            ice_content(:) = ice_pore(:) + ice_seg(:)
             call self%control%get_output_time(OUTPUT_TYPES%HISTORY, current_time, current_time_converted)
             call self%output%output_history(time=current_time_converted, &
                                             temperature=temperature, &
@@ -308,9 +329,11 @@ contains
                                             pressure=pressure)
             call self%control%update_output(OUTPUT_TYPES%HISTORY, current_time)
 
+            deallocate (ice_content)
             nullify (water_content)
-            nullify (ice_content)
+            nullify (ice_pore)
             nullify (vapor_content)
+            nullify (ice_seg)
             nullify (temperature)
             nullify (pressure)
         end if
@@ -614,7 +637,7 @@ contains
         logical :: is_newton
         logical :: is_picard
 
-        ! Line search parameters for Newton mode
+        ! Line search parameters for Newton modep
         real(real64) :: max_du, alpha
         real(real64), parameter :: MAX_DT_STEP = 5.0d0
         real(real64), parameter :: MAX_DP_STEP = 1.0d5

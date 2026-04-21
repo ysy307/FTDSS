@@ -460,11 +460,22 @@ contains
             end if
 
             if (present(valid_list)) then
-                do i = 1, size(target_var)
-                    if (.not. any(valid_list == strip(target_var(i)))) then
-                        call raise_error(ERROR_CODES%PARAM_RANGE, opt=strip(key))
-                    end if
-                end do
+                block
+                    integer :: j
+                    logical :: found
+                    do i = 1, size(target_var)
+                        found = .false.
+                        do j = 1, size(valid_list)
+                            if (strip(valid_list(j)) == strip(target_var(i))) then
+                                found = .true.
+                                exit
+                            end if
+                        end do
+                        if (.not. found) then
+                            call raise_error(ERROR_CODES%PARAM_RANGE, opt=strip(key))
+                        end if
+                    end do
+                end block
             end if
         end if
 

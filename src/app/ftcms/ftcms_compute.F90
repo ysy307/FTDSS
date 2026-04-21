@@ -896,8 +896,11 @@ contains
 
         integer(int32) :: i_node, num_nodes, material_id
         integer(int32), pointer, contiguous :: element_list(:)
-        real(real64) :: qi_seg_old, qi_seg_new, qw_avail, S_seg, dt_s
+        real(real64) :: qi_seg_old, qi_seg_new, S_seg, dt_s
         type(type_state) :: local_state
+        real(real64), parameter :: rho_water = 999.8d0  !< [kg/m^3]
+        real(real64), parameter :: rho_ice = 917.0d0    !< [kg/m^3]
+        real(real64), parameter :: density_ratio = rho_water / rho_ice  !< ~1.0903
 
         call self%control%get_dt(dt_s)
         if (dt_s <= 0.0d0) return
@@ -916,19 +919,17 @@ contains
             ! Build nodal state (includes grad_T, ice/water content)
             call self%set_state(i_node, element_list(1), local_state)
 
-            ! Compute segregation sink
+            ! Compute the effective (already clamped) segregation sink.
+            ! The hydraulic wrapper applies the same forward-Euler pore/water
+            ! clamps used below, so the PDE residual and Qi_seg integrator
+            ! see identical rates -- total water mass is conserved.
             S_seg = 0.0d0
-            call self%hydraulic%calc_segregation_sink(material_id, local_state, S_seg)
+            call self%hydraulic%calc_segregation_sink(material_id, local_state, dt_s, S_seg)
             if (abs(S_seg) <= 0.0d0) cycle
 
-            ! Forward Euler update with stability guard
             call self%Qi_seg%get_current(i_node, qi_seg_old)
-            qi_seg_new = qi_seg_old + S_seg * dt_s
+            qi_seg_new = qi_seg_old + density_ratio * S_seg * dt_s
             qi_seg_new = max(qi_seg_new, 0.0d0)
-
-            ! Do not extract more water than available
-            call self%Qw%get_current(i_node, qw_avail)
-            qi_seg_new = min(qi_seg_new, qi_seg_old + max(qw_avail, 0.0d0))
 
             call self%Qi_seg%set_current(i_node, qi_seg_new)
         end do

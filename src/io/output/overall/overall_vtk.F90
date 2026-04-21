@@ -29,7 +29,7 @@ contains
     end subroutine initialize_type_output_overall_vtk
 
     module subroutine write_fields_vtk(self, file_counts, temperature, water_content, ice_content, &
-                                       vapor_content, pressure, water_flux, ice_content_seg)
+                                       vapor_content, pressure, water_flux)
         implicit none
         class(type_output_overall_vtk), intent(inout) :: self
         integer(int32), intent(in) :: file_counts
@@ -39,7 +39,6 @@ contains
         real(real64), intent(in), optional :: vapor_content(:)
         real(real64), intent(in), optional :: pressure(:)
         type(type_coordinate_array_dp), intent(in), optional :: water_flux
-        real(real64), intent(in), optional :: ice_content_seg(:)
 
         integer(int32) :: iostat
         integer(int32) :: unit
@@ -97,8 +96,6 @@ contains
                 if (present(water_flux)) call self%output_field(unit, "waterFlux", water_flux%x, water_flux%y, water_flux%z)
             case (OUTPUT_VARIABLE_TYPES%HYDRAULIC_CONDUCTIVITY%ID)
                 print *, "Warning: 'hydraulic_conductivity' is not implemented in VTK output."
-            case (OUTPUT_VARIABLE_TYPES%ICE_CONTENT_SEG%ID)
-                if (present(ice_content_seg)) call self%output_field(unit, "IceContentSeg", ice_content_seg)
             end select
         end do
 

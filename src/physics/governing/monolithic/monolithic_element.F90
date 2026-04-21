@@ -294,11 +294,13 @@ contains
                          dot_product(workspace%work_dpsi_dx(:, i), &
                                      matmul(D_HH, grad_P) + matmul(D_HT, grad_T)))
 
-                ! Segregation sink contribution to pressure residual
+                ! Segregation sink contribution to pressure residual.
+                ! Pass the current time step so the clamped S_seg matches
+                ! the Qi_seg forward-Euler update (total-water conservation).
                 block
                     real(real64) :: S_seg_mono
                     S_seg_mono = 0.0d0
-                    call hydraulic%calc_segregation_sink(material_id, workspace%state_gp(gp), S_seg_mono)
+                    call hydraulic%calc_segregation_sink(material_id, workspace%state_gp(gp), time_step, S_seg_mono)
                     R_P(i) = R_P(i) + wJ * workspace%work_psi(i) * S_seg_mono
                 end block
 

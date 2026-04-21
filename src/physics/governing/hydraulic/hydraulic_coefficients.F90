@@ -379,15 +379,27 @@ contains
     end subroutine compute_transient_term_mixed_hydraulic
 
     !> @brief Compute segregation sink from temperature gradient magnitude.
-    module subroutine calc_segregation_sink_hydraulic(self, material_id, state, S_seg)
+    !>
+    !> Returns an **effective** S_seg (volumetric liquid-water removal rate
+    !> [1/s]) that is consistent with the forward-Euler Qi_seg update clamps.
+    !> The PDE sink and the Qi_seg accumulator must see the same rate to
+    !> preserve total water mass; any clamping of ice growth (available
+    !> water, remaining pore space) is folded back into S_seg here.
+    module subroutine calc_segregation_sink_hydraulic(self, material_id, state, dt, S_seg)
         implicit none
         class(type_hydraulic), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
+        real(real64), intent(in) :: dt
         real(real64), intent(inout) :: S_seg
 
         type(type_coordinate_dp), pointer :: grad_T
-        real(real64) :: grad_T_mag
+        real(real64) :: grad_T_mag, S_seg_raw
+        real(real64) :: Qw, Qi_pore, Qi_seg, porosity_val
+        real(real64) :: delta_seg_raw, delta_seg_clamped, pore_space_left
+        real(real64), parameter :: rho_water = 999.8d0
+        real(real64), parameter :: rho_ice = 917.0d0
+        real(real64), parameter :: density_ratio = rho_water / rho_ice
 
         S_seg = 0.0d0
         nullify (grad_T)
@@ -397,7 +409,25 @@ contains
         grad_T_mag = sqrt(grad_T%x**2 + grad_T%y**2 + grad_T%z**2)
         if (grad_T_mag <= 0.0d0) return
 
-        call self%physics%calc_segregation_sink(material_id, state, grad_T_mag, S_seg)
+        S_seg_raw = 0.0d0
+        call self%physics%calc_segregation_sink(material_id, state, grad_T_mag, S_seg_raw)
+        if (S_seg_raw <= 0.0d0 .or. dt <= 0.0d0) return
+
+        call state%water_content%get(Qw)
+        call state%ice_content%get(Qi_pore)
+        call state%ice_content_seg%get(Qi_seg)
+        call state%porosity%get(porosity_val)
+
+        ! Apply the same forward-Euler clamps used by update_segregation_ice:
+        !   (a) cannot consume more liquid water than is locally available
+        !   (b) cannot push Qi_pore + Qi_seg + Qw beyond porosity
+        delta_seg_raw = density_ratio * S_seg_raw * dt
+        delta_seg_clamped = min(delta_seg_raw, density_ratio * max(Qw, 0.0d0))
+        pore_space_left = max(porosity_val - Qi_pore - Qi_seg - max(Qw, 0.0d0), 0.0d0)
+        delta_seg_clamped = min(delta_seg_clamped, pore_space_left)
+        delta_seg_clamped = max(delta_seg_clamped, 0.0d0)
+
+        S_seg = delta_seg_clamped / (density_ratio * dt)
 
     end subroutine calc_segregation_sink_hydraulic
 

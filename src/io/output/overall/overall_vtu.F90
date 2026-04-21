@@ -55,8 +55,7 @@ contains
     end subroutine initialize_type_output_overall_vtu
 
     module subroutine write_fields_vtu(self, file_counts, temperature, water_content, &
-                                       ice_content, vapor_content, pressure, water_flux, &
-                                       ice_content_seg)
+                                       ice_content, vapor_content, pressure, water_flux)
         implicit none
         class(type_output_overall_vtu), intent(inout) :: self
         integer(int32), intent(in) :: file_counts
@@ -66,7 +65,6 @@ contains
         real(real64), intent(in), optional :: vapor_content(:)
         real(real64), intent(in), optional :: pressure(:)
         type(type_coordinate_array_dp), intent(in), optional :: water_flux
-        real(real64), intent(in), optional :: ice_content_seg(:)
 
         type(type_vtu_writer) :: writer
         real(c_double), allocatable :: water_flux_vec(:, :)
@@ -136,12 +134,6 @@ contains
                 end if
             case (OUTPUT_VARIABLE_TYPES%HYDRAULIC_CONDUCTIVITY%ID)
                 print *, "Warning: 'hydraulic_conductivity' is not implemented in VTK output."
-            case (OUTPUT_VARIABLE_TYPES%ICE_CONTENT_SEG%ID)
-                if (present(ice_content_seg)) then
-                    call assert_finite_real64_array(ice_content_seg, 'IceContentSeg')
-                    call writer%write_scalar_point_data( &
-                        'IceContentSeg', int(self%num_points, kind=c_int), ice_content_seg)
-                end if
             end select
         end do
 

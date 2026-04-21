@@ -22,6 +22,9 @@ contains
         self%num_nodes = solver_settings%num_nodes
         self%tolerance = solver_settings%tolerance
         self%max_iterations = solver_settings%max_iterations
+        self%projection_enabled = solver_settings%projection_enabled
+        self%projection_offset = solver_settings%projection_offset
+        self%projection_stride = solver_settings%projection_stride
 
         call self%p%initialize(self%num_nodes)
         call self%phat%initialize(self%num_nodes)
@@ -129,6 +132,10 @@ contains
             ! Fallback: if RHS data is unavailable, treat b as zero vector.
             r_ptr = -r_ptr
         end if
+
+        ! Null-space projection: remove the constant mode from the initial residual
+        ! so that Krylov iterations stay on the range of A.
+        call project_component_mean_zero(self%r, self%projection_enabled, self%projection_offset, self%projection_stride)
 
         ! ==========================================================
         ! 4: Create preconditioned matrix
@@ -278,8 +285,10 @@ contains
             end if
             ! 15: phat = M^-1 * p
             call self%pc%apply(self%p, self%phat)
+            call project_component_mean_zero(self%phat, self%projection_enabled, self%projection_offset, self%projection_stride)
             ! 16: v = A * phat
             call matvec(A, self%phat, self%v, ierr)
+            call project_component_mean_zero(self%v, self%projection_enabled, self%projection_offset, self%projection_stride)
             norm_v = vector_norm2(self%v)
             if ((.not. ieee_is_finite(norm_v)) .or. norm_v > NORM_GUARD_CAP) then
                 norm_r = vector_norm2(self%r)
@@ -365,8 +374,10 @@ contains
 
             ! 19: shat = M^-1 * s
             call self%pc%apply(self%s, self%shat)
+            call project_component_mean_zero(self%shat, self%projection_enabled, self%projection_offset, self%projection_stride)
             ! 20: t = A * shat
             call matvec(A, self%shat, self%t, ierr)
+            call project_component_mean_zero(self%t, self%projection_enabled, self%projection_offset, self%projection_stride)
             norm_t = vector_norm2(self%t)
             if ((.not. ieee_is_finite(norm_t)) .or. norm_t > NORM_GUARD_CAP) then
                 norm_s = vector_norm2(self%s)
@@ -441,6 +452,8 @@ contains
             call vector_axpy(alpha, self%phat, self%x)
             call vector_axpy(omega, self%shat, self%x)
             call vector_axpyz(-omega, self%t, self%s, self%r)
+            call project_component_mean_zero(self%x, self%projection_enabled, self%projection_offset, self%projection_stride)
+            call project_component_mean_zero(self%r, self%projection_enabled, self%projection_offset, self%projection_stride)
 
             ! 25: ||r_k+1||_2
             resid = vector_norm2(self%r)

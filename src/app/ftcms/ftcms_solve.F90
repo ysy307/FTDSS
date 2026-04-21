@@ -229,8 +229,7 @@ contains
         real(real64), pointer, contiguous :: T_cur(:) => null()
         real(real64), pointer, contiguous :: P_cur(:) => null()
         integer(int32) :: bdf_order
-        real(real64) :: mean_pressure
-        real(real64) :: T_scale, P_scale
+        real(real64) :: T_scale, P_scale, mean_pressure
         integer(int32) :: num_nodes
         logical :: linear_failed
 
@@ -322,18 +321,16 @@ contains
                 ! Update solution with relaxation (Aitken for Picard, damped for Newton)
                 call self%reflect_variables()
 
-                ! Enforce global pressure gauge each nonlinear iteration for all-Neumann hydraulic systems.
-                if (self%is_active_hydraulic()) then
-                    bdf_order = 0
-                    call self%control%get_bdf_coeffs(bdf_order=bdf_order)
-                    if (.not. self%hydraulic_has_dirichlet_bc .and. bdf_order >= 1) then
-                        call self%pressure%get_current(P_cur)
-                        if (associated(P_cur)) then
-                            mean_pressure = sum(P_cur(:)) / real(size(P_cur), real64)
-                            P_cur(:) = P_cur(:) - mean_pressure
-                        end if
-                        nullify (P_cur)
+                ! Anchor the all-Neumann null-mode to the initial mean pressure
+                ! (preserves absolute level required by the WRF).
+                if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc) &
+                    .and. self%hydraulic_ref_mean_set) then
+                    call self%pressure%get_current(P_cur)
+                    if (associated(P_cur) .and. size(P_cur) > 0) then
+                        mean_pressure = sum(P_cur) / real(size(P_cur), real64)
+                        P_cur(:) = P_cur(:) - (mean_pressure - self%hydraulic_ref_mean)
                     end if
+                    nullify (P_cur)
                 end if
 
                 ! Force exit after one iteration when config is NONE (linear solve)
@@ -429,7 +426,8 @@ contains
         real(real64), parameter :: THERMAL_INCREMENT_GUARD = 1.0d6
         real(real64), parameter :: HYDRAULIC_INCREMENT_GUARD = 1.0d8
         real(real64) :: t_res, t_inc, h_res, h_inc
-        real(real64) :: coupling_change_T, coupling_change_P, T_scale, P_scale, mean_pressure
+        real(real64) :: coupling_change_T, coupling_change_P, T_scale, P_scale
+        real(real64) :: mean_pressure
         real(real64) :: phase_inc_max
         real(real64), allocatable :: T_old(:), P_old(:)
         real(real64), allocatable :: phase_increment(:)
@@ -514,6 +512,16 @@ contains
                     call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
                     call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
                     exit hydraulic_nl
+                end if
+
+                ! Anchor the all-Neumann null-mode to the initial mean pressure.
+                if ((.not. self%hydraulic_has_dirichlet_bc) .and. self%hydraulic_ref_mean_set) then
+                    call self%pressure%get_current(P_cur)
+                    if (associated(P_cur) .and. size(P_cur) > 0) then
+                        mean_pressure = sum(P_cur) / real(size(P_cur), real64)
+                        P_cur(:) = P_cur(:) - (mean_pressure - self%hydraulic_ref_mean)
+                    end if
+                    nullify (P_cur)
                 end if
 
                 if (self%control%is_none()) exit hydraulic_nl
@@ -601,17 +609,15 @@ contains
                     exit thermal_nl
                 end if
 
-                if (self%is_active_hydraulic()) then
-                    bdf_order = 0
-                    call self%control%get_bdf_coeffs(bdf_order=bdf_order)
-                    if (.not. self%hydraulic_has_dirichlet_bc .and. bdf_order >= 1) then
-                        call self%pressure%get_current(P_cur)
-                        if (associated(P_cur)) then
-                            mean_pressure = sum(P_cur(:)) / real(size(P_cur), real64)
-                            P_cur(:) = P_cur(:) - mean_pressure
-                        end if
-                        nullify (P_cur)
+                ! Anchor the all-Neumann null-mode to the initial mean pressure.
+                if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc) &
+                    .and. self%hydraulic_ref_mean_set) then
+                    call self%pressure%get_current(P_cur)
+                    if (associated(P_cur) .and. size(P_cur) > 0) then
+                        mean_pressure = sum(P_cur) / real(size(P_cur), real64)
+                        P_cur(:) = P_cur(:) - (mean_pressure - self%hydraulic_ref_mean)
                     end if
+                    nullify (P_cur)
                 end if
 
                 if (self%control%is_none()) exit thermal_nl

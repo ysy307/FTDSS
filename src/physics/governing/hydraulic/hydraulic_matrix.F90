@@ -34,7 +34,7 @@ contains
 
         integer(int32) :: i, j
         integer(int32) :: n_nodes, n_gauss, n_dim
-        real(real64) :: bdf0
+        real(real64) :: bdf0, dt_local
 
         real(real64), allocatable :: J_local(:, :)
         real(real64), allocatable :: R_local(:)
@@ -47,12 +47,14 @@ contains
         n_gauss = workspace%num_fe_gauss
         n_dim = workspace%num_fe_dimension
         bdf0 = workspace%bdf_coeffs(1)
+        dt_local = 0.0d0
+        call control%get_dt(dt_local)
 
         ! 1. J_HH + R_H: assemble_element (explicit Gauss loop, min cutoff, row equilibration)
         allocate (J_local(n_nodes, n_nodes), R_local(n_nodes))
         call self%assemble_element(workspace%material_id, &
                                    workspace%bdf_coeffs(1:workspace%bdf_order + 1), &
-                                   workspace, J_local, R_local)
+                                   dt_local, workspace, J_local, R_local)
 
         if (present(K_HH)) then
             do j = 1, n_nodes
@@ -119,7 +121,7 @@ contains
         type(type_vector_dp), intent(inout), optional :: F_H
 
         integer(int32) :: i, j, d, n_nodes, n_gauss, n_dim, ierr
-        real(real64) :: bdf0
+        real(real64) :: bdf0, dt_local
         real(real64), parameter :: picard_capacity_min = 1.0d-12
         real(real64), parameter :: picard_diffusion_min = 1.0d-12
         real(real64), allocatable :: local_vec_res(:)
@@ -136,6 +138,8 @@ contains
         allocate (local_vec_res(n_nodes))
         allocate (work_sink(n_gauss))
         bdf0 = workspace%bdf_coeffs(1)
+        dt_local = 0.0d0
+        call control%get_dt(dt_local)
 
         workspace%work_C(:) = 0.0d0
         workspace%work_D(:, :, :) = 0.0d0
@@ -173,7 +177,7 @@ contains
                 call self%compute_coupling_diffusion_term(workspace%material_id, workspace%state_gp(i), work_D_HT(:, :, i))
             end if
 
-            call self%calc_segregation_sink(workspace%material_id, workspace%state_gp(i), work_sink(i))
+            call self%calc_segregation_sink(workspace%material_id, workspace%state_gp(i), dt_local, work_sink(i))
         end do
 
         ! 2. Mass Matrix (LHS)
@@ -264,11 +268,12 @@ contains
 
     end subroutine assemble_local_picard_hydraulic
 
-    module subroutine assemble_element_hydraulic(self, material_id, bdf_coeffs, workspace, J_elem, R_elem)
+    module subroutine assemble_element_hydraulic(self, material_id, bdf_coeffs, dt, workspace, J_elem, R_elem)
         implicit none
         class(type_hydraulic), intent(in) :: self
         integer(int32), intent(in) :: material_id
         real(real64), intent(in) :: bdf_coeffs(:)
+        real(real64), intent(in) :: dt
         type(type_assemble_workspace), intent(inout) :: workspace
         real(real64), intent(inout) :: J_elem(:, :)
         real(real64), intent(inout) :: R_elem(:)
@@ -278,7 +283,6 @@ contains
         real(real64) :: bdf0, wJ, detJ, Ceq, dTheta_dt
         real(real64), parameter :: K_min = 1.0d-12
         real(real64), parameter :: Ceq_min = 1.0d-12
-        real(real64), parameter :: coupling_cap = 1.0d3
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gauss_pts
         real(real64), pointer, contiguous, dimension(:) :: weights
 
@@ -339,8 +343,6 @@ contains
             Ceq = max(Ceq, Ceq_min)
             do d = 1, n_dim
                 D_HH(d, d) = max(D_HH(d, d), K_min)
-                ! Bound thermal-hydraulic coupling diffusion to avoid residual blow-up.
-                D_HT(d, d) = sign(min(abs(D_HT(d, d)), coupling_cap*D_HH(d, d)), D_HT(d, d))
             end do
 
             grad_P = matmul(workspace%work_dpsi_dx, workspace%P_node)
@@ -358,11 +360,14 @@ contains
                 end do
             end do
 
-            ! Segregation sink: removes water mass at freezing fringe
+            ! Segregation sink: removes water mass at freezing fringe.
+            ! The effective S_seg is clamped to match the forward-Euler
+            ! Qi_seg update so the PDE sink equals the ice accumulation
+            ! rate (water-equivalent) — preserving total-water conservation.
             block
                 real(real64) :: S_seg
                 S_seg = 0.0d0
-                call self%calc_segregation_sink(material_id, workspace%state_gp(gp), S_seg)
+                call self%calc_segregation_sink(material_id, workspace%state_gp(gp), dt, S_seg)
                 if (abs(S_seg) > 0.0d0) then
                     do i = 1, n_nodes
                         R_elem(i) = R_elem(i) + wJ * workspace%work_psi(i) * S_seg

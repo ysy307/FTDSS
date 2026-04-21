@@ -245,6 +245,8 @@ contains
             end if
 
             config%segregation_potential = phase%segregation_potential
+            config%T_fringe_low = phase%T_fringe_low
+            config%T_fringe_high = phase%T_fringe_high
 
         end associate
 

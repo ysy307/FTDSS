@@ -316,41 +316,6 @@ contains
 
     end subroutine solve_type_solver_gmres
 
-    subroutine project_component_mean_zero(vec, enabled, offset, stride)
-        implicit none
-        type(type_vector_dp), intent(inout) :: vec
-        logical, intent(in) :: enabled
-        integer(int32), intent(in) :: offset, stride
-
-        real(real64), pointer :: data(:)
-        real(real64) :: mean_val
-        integer(int32) :: i, count, first_idx
-
-        if (.not. enabled) return
-        if (stride <= 0 .or. offset <= 0) return
-
-        data => vec%get_data()
-        if (.not. associated(data)) return
-
-        first_idx = offset
-        if (first_idx > size(data)) return
-
-        mean_val = 0.0d0
-        count = 0
-        do i = first_idx, size(data), stride
-            mean_val = mean_val + data(i)
-            count = count + 1
-        end do
-        if (count <= 0) return
-
-        mean_val = mean_val / real(count, real64)
-        do i = first_idx, size(data), stride
-            data(i) = data(i) - mean_val
-        end do
-
-        nullify (data)
-    end subroutine project_component_mean_zero
-
     !> Finalize the GMRES solver instance and release memory.
     module subroutine destroy_type_solver_gmres(self)
         implicit none

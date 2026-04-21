@@ -77,8 +77,7 @@ module io_output_overall
         end subroutine abst_initialize
 
         subroutine abst_write_fields(self, file_counts, temperature, &
-                water_content, ice_content, vapor_content, pressure, water_flux, &
-                ice_content_seg)
+                water_content, ice_content, vapor_content, pressure, water_flux)
             import :: abst_output_overall, type_coordinate_array_dp, real64, int32
             implicit none
             class(abst_output_overall), intent(inout) :: self
@@ -89,7 +88,6 @@ module io_output_overall
             real(real64), intent(in), optional :: vapor_content(:)
             real(real64), intent(in), optional :: pressure(:)
             type(type_coordinate_array_dp), intent(in), optional :: water_flux
-            real(real64), intent(in), optional :: ice_content_seg(:)
         end subroutine abst_write_fields
 
         subroutine abst_write_cell(self, file_name, variable_name, variable)
@@ -112,7 +110,7 @@ module io_output_overall
         end subroutine initialize_type_output_overall_vtk
 
         module subroutine write_fields_vtk(self, file_counts, temperature, water_content, ice_content, &
-                                           vapor_content, pressure, water_flux, ice_content_seg)
+                                           vapor_content, pressure, water_flux)
             implicit none
             class(type_output_overall_vtk), intent(inout) :: self
             integer(int32), intent(in) :: file_counts
@@ -122,7 +120,6 @@ module io_output_overall
             real(real64), intent(in), optional :: vapor_content(:)
             real(real64), intent(in), optional :: pressure(:)
             type(type_coordinate_array_dp), intent(in), optional :: water_flux
-            real(real64), intent(in), optional :: ice_content_seg(:)
         end subroutine write_fields_vtk
 
         module subroutine write_cell_vtk(self, file_name, variable_name, variable)
@@ -196,7 +193,7 @@ module io_output_overall
         end subroutine initialize_type_output_overall_vtu
 
         module subroutine write_fields_vtu(self, file_counts, temperature, water_content, ice_content, &
-                                           vapor_content, pressure, water_flux, ice_content_seg)
+                                           vapor_content, pressure, water_flux)
             implicit none
             class(type_output_overall_vtu), intent(inout) :: self
             integer(int32), intent(in) :: file_counts
@@ -206,7 +203,6 @@ module io_output_overall
             real(real64), intent(in), optional :: vapor_content(:)
             real(real64), intent(in), optional :: pressure(:)
             type(type_coordinate_array_dp), intent(in), optional :: water_flux
-            real(real64), intent(in), optional :: ice_content_seg(:)
         end subroutine write_fields_vtu
 
         module subroutine write_cell_vtu(self, file_name, variable_name, variable)

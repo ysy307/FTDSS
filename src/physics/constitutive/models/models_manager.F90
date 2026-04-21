@@ -57,7 +57,9 @@ contains
         if (present(config_gcc) .and. present(water) .and. present(ice)) then
             call self%gcc%initialize(material_id, config_gcc, water, ice)
             if (config_gcc%segregation_potential > 0.0d0) then
-                call self%segregation%initialize(config_gcc%segregation_potential)
+                call self%segregation%initialize(config_gcc%segregation_potential, &
+                                                 T_fringe_low=config_gcc%T_fringe_low, &
+                                                 T_fringe_high=config_gcc%T_fringe_high)
             end if
         end if
 

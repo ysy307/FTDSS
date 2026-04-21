@@ -87,8 +87,11 @@
             },
             "phase_change": {
                 "equilibrium_model": {
-                    "segregation": true
-                }
+                    "segregation": false
+                },
+                "segregation_potential": 5.0e-7,
+                "T_fringe_low": -1.0,
+                "T_fringe_high": 0.0
             },
             "water_characteristic_curve": {
                 "model": "VG",
@@ -145,7 +148,7 @@
     "parallel_settings": {
         "threads": {
             "is_parallel": true,
-            "num_threads": 1,
+            "num_threads": 4,
             "schedule": "static",
             "max_active_levels": 1
         }

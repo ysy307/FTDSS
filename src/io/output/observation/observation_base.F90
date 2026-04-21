@@ -326,8 +326,6 @@ contains
             end if
         end if
 
-
-
         deallocate (obs_values)
     end subroutine output_history_output_observation
 

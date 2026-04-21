@@ -296,6 +296,47 @@ contains
 
     end subroutine display_residual_history_solver
 
+    !> Project the constant-vector null-mode out of `vec` on a strided DOF component.
+    !>
+    !> For an all-Neumann physics block the matrix is singular with a constant
+    !> null-space; registering that as the null-space and orthogonalising every
+    !> residual/matvec to it keeps Krylov iterations stable. `offset`/`stride`
+    !> address a single physics field inside a coupled DOF layout.
+    subroutine project_component_mean_zero(vec, enabled, offset, stride)
+        implicit none
+        type(type_vector_dp), intent(inout) :: vec
+        logical, intent(in) :: enabled
+        integer(int32), intent(in) :: offset, stride
+
+        real(real64), pointer :: data(:)
+        real(real64) :: mean_val
+        integer(int32) :: i, count, first_idx
+
+        if (.not. enabled) return
+        if (stride <= 0 .or. offset <= 0) return
+
+        data => vec%get_data()
+        if (.not. associated(data)) return
+
+        first_idx = offset
+        if (first_idx > size(data)) return
+
+        mean_val = 0.0d0
+        count = 0
+        do i = first_idx, size(data), stride
+            mean_val = mean_val + data(i)
+            count = count + 1
+        end do
+        if (count <= 0) return
+
+        mean_val = mean_val / real(count, real64)
+        do i = first_idx, size(data), stride
+            data(i) = data(i) - mean_val
+        end do
+
+        nullify (data)
+    end subroutine project_component_mean_zero
+
     subroutine create_solver(solver, solver_settings, preconditioner_settings, ierr)
         implicit none
         class(abst_solver), allocatable, intent(inout) :: solver

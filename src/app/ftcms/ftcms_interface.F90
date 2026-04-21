@@ -50,6 +50,12 @@ module app_ftcms
         logical :: hydraulic_has_dirichlet_bc = .false.
         logical :: thermal_has_dirichlet_bc = .false.
 
+        ! Reference mean pressure captured from the initial condition.
+        ! Used to pin the null-mode of all-Neumann hydraulic systems without
+        ! distorting the absolute pressure level (WRF relies on absolute P).
+        logical :: hydraulic_ref_mean_set = .false.
+        real(real64) :: hydraulic_ref_mean = 0.0d0
+
         ! DOF column scaling factors for variable non-dimensionalization
         real(real64), allocatable :: col_scale(:)
         real(real64), allocatable :: col_scale_inv(:)
