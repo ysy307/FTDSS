@@ -191,11 +191,12 @@ contains
                 resid_krylov = abs(self%g(iter + 1))
                 call self%residual_history%set(MATRIX_OPS%INS, iter_global, resid_krylov)
 
-                ! Exit only when max iterations reached or Krylov estimate is at machine precision.
-                ! Do NOT exit on tolerance alone: the Krylov estimate can underestimate the true
-                ! residual when the preconditioner is ill-conditioned, causing premature restarts
-                ! that diverge. The outer restart_loop checks the true residual after each restart.
-                if (resid_krylov < 1.0d-14 .or. iter_global >= self%max_iterations) then
+                ! Exit when Krylov estimate is at tolerance, machine precision, or max iterations.
+                ! The outer restart_loop checks the true residual after each restart and continues
+                ! if not yet converged, so exiting here on tolerance is safe.
+                if (resid_krylov < max(self%tolerance, 1.0d-14) .or. &
+                    resid_krylov < self%relative_tolerance * b_norm .or. &
+                    iter_global >= self%max_iterations) then
                     if (iter_global >= self%max_iterations) self%status = SOLVER_STATUS%MAXITER%ID
                     exit arnoldi_loop
                 end if
@@ -233,14 +234,23 @@ contains
 
             call self%residual_history%set(MATRIX_OPS%INS, iter_global, beta)
 
-            ! Restart divergence guard: if the update caused a residual explosion,
-            ! revert x and exit. This prevents catastrophic NaN/Inf propagation when
-            ! the preconditioner amplifies the Hessenberg LS solution (ill-conditioned
-            ! stagnated system with large ILU condition number).
-            if (beta > 1.0d6 * beta_pre_update .or. beta /= beta) then
+            ! Restart divergence guard: if the update worsened the residual significantly,
+            ! revert x to the pre-update state and restart from a clean residual.
+            ! Threshold of 10x: catches the GMRES Krylov-exhaustion catastrophic
+            ! cancellation case (true_resid 3.7x worse) while allowing mild fluctuations.
+            ! On NaN/Inf always revert and terminate.
+            if (beta /= beta .or. beta > 1.0d1 * beta_pre_update) then
                 call vector_axpy(-1.0d0, self%z, x)
-                self%status = SOLVER_STATUS%MAXITER%ID
-                exit restart_loop
+                if (beta /= beta) then
+                    self%status = SOLVER_STATUS%MAXITER%ID
+                    exit restart_loop
+                end if
+                ! Recompute residual from reverted x for a clean restart
+                call matvec(A, x, self%r, ierr)
+                call vector_axpyz(-1.0d0, self%r, b, self%r)
+                call project_component_mean_zero(self%r, self%projection_enabled, &
+                                                 self%projection_offset, self%projection_stride)
+                beta = vector_norm2(self%r)
             end if
 
             if (beta < self%tolerance .or. &

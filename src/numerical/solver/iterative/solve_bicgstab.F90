@@ -78,9 +78,9 @@ contains
         real(real64), parameter :: SHADOW_PERTURB_EPS = 1.0d-12
         real(real64), parameter :: NORM_GUARD_CAP = 1.0d120
         real(real64), parameter :: STAGNATION_RATIO = 0.9999d0
-        integer(int32), parameter :: STAGNATION_PATIENCE = 400
+        integer(int32), parameter :: STAGNATION_PATIENCE = 5000
         real(real64), parameter :: PROGRESS_GAIN = 1.0d-3
-        integer(int32), parameter :: NO_PROGRESS_PATIENCE = 400
+        integer(int32), parameter :: NO_PROGRESS_PATIENCE = 5000
         logical :: alpha_recovered
         integer(int32) :: stagnant_count
         integer(int32) :: no_progress_count
