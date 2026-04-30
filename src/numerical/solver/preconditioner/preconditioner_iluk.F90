@@ -218,21 +218,6 @@ contains
             end if
         end do
 
-        ! Modified ILU(0): replace negative in-block diagonals with absolute values
-        ! in the PRECONDITIONER copy only. This makes the preconditioner approximate
-        ! a positive-definite matrix, which is more robust for indefinite systems
-        ! arising from phase-change (latent heat) contributions.
-        do i = 1, self%num_rows
-            do kb = 1, bs
-                diag_val = self%val_blocks(kb, kb, self%diag_ptr(i))
-                if (diag_val < 0.0d0) then
-                    self%val_blocks(kb, kb, self%diag_ptr(i)) = abs(diag_val)
-                else if (abs(diag_val) < PIVOT_TOL) then
-                    self%val_blocks(kb, kb, self%diag_ptr(i)) = PIVOT_TOL
-                end if
-            end do
-        end do
-
         do i = 1, self%num_rows
             do k = self%ptr(i), self%ptr(i + 1) - 1
                 work_pos(self%ind(k)) = k
@@ -256,16 +241,18 @@ contains
                 end do
             end do
 
-            ! Ensure diagonal block has no near-zero or negative pivots after
-            ! Schur complement elimination. ILU(0) drop-policy can introduce
-            ! spurious negative diagonals that make M^-1*K indefinite and cause
-            ! GMRES to diverge catastrophically.
+            ! Ensure diagonal block remains non-singular.
+            ! Note: Do NOT clamp negative pivots to positive; this corrupts the factorization.
+            ! If indefiniteness appears, the issue is in the system itself (e.g., phase-change latent heat).
             do kb = 1, bs
                 diag_val = self%val_blocks(kb, kb, self%diag_ptr(i))
-                if (diag_val < 0.0d0) then
-                    self%val_blocks(kb, kb, self%diag_ptr(i)) = max(abs(diag_val), PIVOT_TOL)
-                else if (diag_val < PIVOT_TOL) then
-                    self%val_blocks(kb, kb, self%diag_ptr(i)) = PIVOT_TOL
+                if (abs(diag_val) < PIVOT_TOL) then
+                    ! Only clamp near-zero to tolerance; preserve sign
+                    if (diag_val >= 0.0d0) then
+                        self%val_blocks(kb, kb, self%diag_ptr(i)) = PIVOT_TOL
+                    else
+                        self%val_blocks(kb, kb, self%diag_ptr(i)) = -PIVOT_TOL
+                    end if
                 end if
             end do
 

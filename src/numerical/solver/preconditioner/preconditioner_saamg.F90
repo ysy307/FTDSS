@@ -23,12 +23,13 @@ contains
         type(type_vector_dp), intent(in) :: r
         type(type_vector_dp), intent(inout) :: z
 
-        real(real64), dimension(:), pointer :: xz
+        real(real64), dimension(:), pointer :: xz, xr
         integer(int32) :: i, k, col, bs, idx_i, idx_c, ierr, nc_dofs
 
         bs = self%block_size
         nc_dofs = self%num_coarse * bs
 
+        xr => r%get_data()
         call z%copy(r)
         xz => z%get_data()
 
@@ -37,15 +38,10 @@ contains
             return
         end if
 
-        ! Pre-smoothing: Jacobi sweep (D^-1 r) on fine grid
-        do i = 1, self%num_rows
-            idx_i = (i - 1)*bs + 1
-            call dgemv('N', bs, bs, 1.0d0, self%diag_inv(:, :, i), bs, &
-                       xz(idx_i), 1, 0.0d0, self%work_fine(idx_i), 1)
-        end do
-        xz = self%work_fine
+        ! Initialize correction vector to zero
+        self%work_fine = 0.0d0
 
-        ! Restrict to coarse grid: r_c = P^T * r
+        ! Restrict residual to coarse grid: r_c = P^T * r
         self%work_coarse = 0.0d0
         do i = 1, self%num_rows
             idx_i = (i - 1)*bs + 1
@@ -53,29 +49,32 @@ contains
                 col = self%P_ind(k)
                 idx_c = (col - 1)*bs + 1
                 call dgemv('T', bs, bs, 1.0d0, self%P_val(:, :, k), bs, &
-                           xz(idx_i), 1, 1.0d0, self%work_coarse(idx_c), 1)
+                           xr(idx_i), 1, 1.0d0, self%work_coarse(idx_c), 1)
             end do
         end do
 
-        ! Coarse-grid direct solve via LU
+        ! Coarse-grid direct solve via LU: x_c = A_c^{-1} * r_c
         self%work_coarse_block(1:nc_dofs, 1) = self%work_coarse(1:nc_dofs)
         call dgetrs('N', nc_dofs, 1, self%coarse_lu, nc_dofs, self%coarse_pivots, &
                     self%work_coarse_block(1, 1), nc_dofs, ierr)
         if (ierr /= 0) then
-            self%status = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            self%status = SOLVER_STATUS%DECOMPOSITION_FAILURE%ID
             return
         end if
 
-        ! Prolongate coarse correction: x = x + P * x_c
+        ! Prolongate coarse correction: x = P * x_c
         do i = 1, self%num_rows
             idx_i = (i - 1)*bs + 1
             do k = self%P_ptr(i), self%P_ptr(i + 1) - 1
                 col = self%P_ind(k)
                 idx_c = (col - 1)*bs + 1
                 call dgemv('N', bs, bs, 1.0d0, self%P_val(:, :, k), bs, &
-                           self%work_coarse_block(idx_c, 1), 1, 1.0d0, xz(idx_i), 1)
+                           self%work_coarse_block(idx_c, 1), 1, 1.0d0, self%work_fine(idx_i), 1)
             end do
         end do
+
+        ! Return correction: z = x
+        xz = self%work_fine
 
     end subroutine apply_preconditioner_saamg
 
