@@ -7,9 +7,9 @@
         },
         "time_stepping": {
             "unit": "second",
-            "initial_step": 3.0e2,
-            "min_step": 1.0e-6,
-            "max_step": 3.0e6
+            "initial_step": 60.0,
+            "min_step": 1.0,
+            "max_step": 300.0
         },
         "adaptive_stepping": {
             "is_active": true,
@@ -74,10 +74,10 @@
                 ]
             },
             "hydraulic": {
-                "type": "flux",
+                "type": "dirichlet",
                 "value_type": "constant",
                 "values": [
-                    0.0
+                    -54065.7412
                 ]
             }
         },
@@ -87,9 +87,10 @@
             "calculate_hydraulic": true,
             "calculate_mechanical": false,
             "thermal": {
-                "type": "dirichlet",
+                "type": "robin",
                 "value_type": "constant",
                 "values": [
+                    28.0,
                     -6.0
                 ]
             },
@@ -110,7 +111,7 @@
         },
         "hydraulic": {
             "type": "uniform",
-            "value": -41989.80629285056,
+            "value": -54065.7412,
             "field_name": "Pressure"
         },
         "porosity": {

@@ -44,6 +44,7 @@ module app_ftcms
         type(type_bc_manager) :: bc(PHYSICS_TYPES%NUM_ID)
 
         class(abst_solver), allocatable :: solver
+        class(abst_solver), allocatable :: solver_thermal
 
         integer(int32) :: thermal_start_dof = 0
         integer(int32) :: hydraulic_start_dof = 0
@@ -100,6 +101,7 @@ module app_ftcms
         procedure, public, pass(self) :: apply_bc => apply_bc_ftcms
         procedure, public, pass(self) :: prescribe_dirichlet => prescribe_dirichlet_ftcms
         procedure, private, pass(self) :: freeze_physics_dofs => freeze_physics_dofs_ftcms
+        procedure, private, pass(self) :: zero_frozen_increment => zero_frozen_increment_ftcms
         procedure, private, pass(self) :: prescribe_essential_bc_generic
         procedure, private, pass(self) :: apply_natural_bc_generic
         procedure, private, pass(self) :: apply_essential_bc_generic
@@ -195,6 +197,12 @@ module app_ftcms
             class(type_ftcms), intent(inout) :: self
             type(type_constant_id), intent(in) :: physics_type
         end subroutine freeze_physics_dofs_ftcms
+
+        module subroutine zero_frozen_increment_ftcms(self, frozen_physics)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            type(type_constant_id), intent(in) :: frozen_physics
+        end subroutine zero_frozen_increment_ftcms
 
         module subroutine solve_ftcms(self, frozen_physics)
             implicit none

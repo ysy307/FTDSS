@@ -144,10 +144,10 @@ contains
         call self%apply_bc()
 
         ! Initialize solver strictly from input settings.
-        associate (solver_settings => input%basic%solver_settings%linear_solver)
-            solver_type_selected = solver_settings%solver_type
-            preconditioner_type_selected = solver_settings%preconditioner_type
-            m_restart_selected = solver_settings%m_restarts
+        associate (linear_solver_settings => input%basic%solver_settings%linear_solver)
+            solver_type_selected = linear_solver_settings%solver_type
+            preconditioner_type_selected = linear_solver_settings%preconditioner_type
+            m_restart_selected = linear_solver_settings%m_restarts
             projection_enabled_selected = .false.
             projection_offset_selected = 0
             projection_stride_selected = 0
@@ -161,18 +161,37 @@ contains
 
             call solver_info%set(solver_type_selected, &
                                  num_total_dofs, &
-                                 solver_settings%tolerance, &
-                                 solver_settings%max_iterations, &
+                                 linear_solver_settings%tolerance, &
+                                 linear_solver_settings%max_iterations, &
                                  m_restart_selected, &
                                  projection_enabled=projection_enabled_selected, &
                                  projection_offset=projection_offset_selected, &
                                  projection_stride=projection_stride_selected)
-            if (preconditioner_type_selected == PRECONDITIONER_TYPES%ILU%ID) then
-                call pc_info%set(preconditioner_type_selected, num_nodes, self%K%get_num_dofs_per_node())
+            if (preconditioner_type_selected == PRECONDITIONER_TYPES%ILU%ID .or. &
+                preconditioner_type_selected == PRECONDITIONER_TYPES%ILUT%ID .or. &
+                preconditioner_type_selected == PRECONDITIONER_TYPES%SAAMG%ID) then
+                call pc_info%set(preconditioner_type_selected, num_nodes, self%K%get_num_dofs_per_node(), &
+                                 amg_strength_threshold=linear_solver_settings%amg_strength_threshold, &
+                                 amg_smoother_sweeps=linear_solver_settings%amg_smoother_sweeps, &
+                                 amg_max_agg_size=linear_solver_settings%amg_max_agg_size, &
+                                 amg_drop_tolerance=linear_solver_settings%amg_drop_tolerance, &
+                                 amg_drop_strategy=linear_solver_settings%amg_drop_strategy, &
+                                 amg_smoother_type=linear_solver_settings%amg_smoother_type, &
+                                 amg_rebuild_frequency=linear_solver_settings%amg_rebuild_frequency, &
+                                 amg_rebuild_threshold=linear_solver_settings%amg_rebuild_threshold)
             else
                 call pc_info%set(preconditioner_type_selected, num_total_dofs)
             end if
             call create_solver(self%solver, solver_info, pc_info, ierr)
+
+            ! Thermal phase solver uses Jacobi: ILU on the full BSR matrix degrades
+            ! when the hydraulic DOF rows are frozen to identity in the staggered scheme,
+            ! causing catastrophic GMRES divergence. Jacobi is stable but weaker;
+            ! the staggered coupling iterations absorb the residual.
+            if (self%is_active_thermal()) then
+                call pc_info%set(PRECONDITIONER_TYPES%JACOBI%ID, num_total_dofs)
+                call create_solver(self%solver_thermal, solver_info, pc_info, ierr)
+            end if
         end associate
 
         ! Capture initial mean pressure to anchor the all-Neumann null-mode

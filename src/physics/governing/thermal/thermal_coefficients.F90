@@ -342,10 +342,6 @@ contains
             end if
         end if
 
-        ! L-scheme-like floor for robust Picard/staggered thermal assembly.
-        ! This avoids near-singular thermal mass around phase-transition fronts.
-        C_TT = max(C_TT, 1.0d6)
-
     end subroutine compute_mass_term_thermal
 
     !> @brief Calculate Coupling Mass Term C_TH = dU/dP
@@ -503,6 +499,12 @@ contains
         real(real64), intent(inout) :: L_TT
 
         real(real64) :: rho_w, L_v, K_vT
+
+        if (.not. self%enable_vapor_transport) then
+            L_TT = 0.0d0
+            return
+        end if
+
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_latent_heat_vaporization(material_id, state, L_v)
         call self%physics%calc_KvT(material_id, state, K_vT)

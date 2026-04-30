@@ -94,7 +94,7 @@ contains
                 case (OUTPUT_VARIABLE_TYPES%PRESSURE%ID)
                     self%settings(variable%ID)%do_output = .true.
                     self%settings(variable%ID)%variable_type = variable
-                    self%settings(variable%ID)%variable_unit = "m"
+                    self%settings(variable%ID)%variable_unit = "Pa"
                     self%settings(variable%ID)%file_name = strip(dir_output)//"obsf_P."//strip(file_format%NAME)
                     self%settings(variable%ID)%io_unit = open (strip(self%settings(variable%ID)%file_name), "wt", iostat=iostat)
                     if (iostat /= 0) call raise_error(ERROR_CODES%OPEN_FILE_FAILED, self%settings(variable%ID)%file_name)
@@ -224,7 +224,7 @@ contains
             header_line = "Time"
             select case (output_settings%variable_type%ID)
             case (OUTPUT_VARIABLE_TYPES%WATER_FLUX%ID)
-                do i = 1, self%num_observations / 3
+                do i = 1, self%num_observations
                     header_line = trim(header_line)//output_settings%delimiter//"Obs"//to_string(i)//"_x" &
                                   //output_settings%delimiter//"Obs"//to_string(i)//"_y" &
                                   //output_settings%delimiter//"Obs"//to_string(i)//"_z"
@@ -253,13 +253,13 @@ contains
                 call raise_error(ERROR_CODES%WRITE_FILE_FAILED, output_settings%file_name)
             end if
 
-            write (output_settings%io_unit, output_settings%fmt_line) time, output_values(1:self%num_observations)
+            write (output_settings%io_unit, output_settings%fmt_line) time, output_values(1:size(output_values))
             flush (output_settings%io_unit)
         end associate
     end subroutine write_observation_line
 
     module subroutine output_history_output_observation(self, time, temperature, water_content, ice_content, &
-                                                        vapor_content, pressure)
+                                                        vapor_content, pressure, water_flux)
         implicit none
         class(type_output_observation), intent(inout) :: self
         real(real64), intent(in) :: time
@@ -268,8 +268,10 @@ contains
         real(real64), intent(in), optional :: ice_content(:)
         real(real64), intent(in), optional :: vapor_content(:)
         real(real64), intent(in), optional :: pressure(:)
+        type(type_coordinate_array_dp), intent(in), optional :: water_flux
 
         real(real64), allocatable :: obs_values(:)
+        real(real64), allocatable :: obs_values_flux(:)
         integer(int32) :: i
 
         if (self%num_observations <= 0) return
@@ -323,6 +325,20 @@ contains
                     call self%observation_points(i)%extract_value(vapor_content, obs_values(i))
                 end do
                 call self%write_line(OUTPUT_VARIABLE_TYPES%VAPOR_CONTENT, time, obs_values)
+            end if
+        end if
+
+        ! Process water flux vector
+        if (present(water_flux)) then
+            if (self%settings(OUTPUT_VARIABLE_TYPES%WATER_FLUX%ID)%do_output) then
+                allocate (obs_values_flux(3 * self%num_observations))
+                do i = 1, self%num_observations
+                    call self%observation_points(i)%extract_value(water_flux%x, obs_values_flux(3 * i - 2))
+                    call self%observation_points(i)%extract_value(water_flux%y, obs_values_flux(3 * i - 1))
+                    call self%observation_points(i)%extract_value(water_flux%z, obs_values_flux(3 * i))
+                end do
+                call self%write_line(OUTPUT_VARIABLE_TYPES%WATER_FLUX, time, obs_values_flux)
+                deallocate (obs_values_flux)
             end if
         end if
 

@@ -19,6 +19,7 @@ module physics_governing_thermal
         private
         integer(int32) :: computation_type
         integer(int32) :: computation_dimension
+        logical :: enable_vapor_transport = .true.
         type(type_constitutive_manager) :: physics
 
         ! Enthalpy cache for BDF history terms

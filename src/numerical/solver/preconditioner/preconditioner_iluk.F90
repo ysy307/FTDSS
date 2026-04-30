@@ -256,10 +256,15 @@ contains
                 end do
             end do
 
-            ! Ensure diagonal block has no near-zero pivots after elimination
+            ! Ensure diagonal block has no near-zero or negative pivots after
+            ! Schur complement elimination. ILU(0) drop-policy can introduce
+            ! spurious negative diagonals that make M^-1*K indefinite and cause
+            ! GMRES to diverge catastrophically.
             do kb = 1, bs
                 diag_val = self%val_blocks(kb, kb, self%diag_ptr(i))
-                if (abs(diag_val) < PIVOT_TOL) then
+                if (diag_val < 0.0d0) then
+                    self%val_blocks(kb, kb, self%diag_ptr(i)) = max(abs(diag_val), PIVOT_TOL)
+                else if (diag_val < PIVOT_TOL) then
                     self%val_blocks(kb, kb, self%diag_ptr(i)) = PIVOT_TOL
                 end if
             end do

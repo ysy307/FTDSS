@@ -196,6 +196,7 @@ contains
         type(json_file), intent(inout) :: json
         character(256) :: buffer(3)
         character(256) :: legacy_buffer(2)
+        character(:), allocatable :: temp_string
 
         buffer(1) = solver_settings
         buffer(2) = linear_solver
@@ -212,6 +213,44 @@ contains
         buffer(3) = tolerance
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%tolerance, &
                             is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
+        buffer(3) = restart_size
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%m_restarts, &
+                    is_required=.false., default_value=30, valid_range=[1, huge(1)])
+
+        ! Optional SA-AMG parameters. These defaults are used when the keys are omitted.
+        buffer(3) = "amg_strength_threshold"
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_strength_threshold, &
+                    is_required=.false., default_value=0.25d0, valid_range=[0.0d0, huge(0.0d0)])
+
+        buffer(3) = "amg_smoother_sweeps"
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_smoother_sweeps, &
+                    is_required=.false., default_value=2, valid_range=[1, huge(1)])
+
+        buffer(3) = "amg_max_agg_size"
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_max_agg_size, &
+                    is_required=.false., default_value=8, valid_range=[1, huge(1)])
+
+        buffer(3) = "amg_drop_tolerance"
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_drop_tolerance, &
+                    is_required=.false., default_value=1.0d-4, valid_range=[0.0d0, huge(0.0d0)])
+
+        buffer(3) = "amg_drop_strategy"
+        call get_json_value(json, join(buffer(1:3)), temp_string, &
+                is_required=.false., default_value="RELATIVE")
+        self%solver_settings%linear_solver%amg_drop_strategy = temp_string
+
+        buffer(3) = "amg_smoother_type"
+        call get_json_value(json, join(buffer(1:3)), temp_string, &
+                is_required=.false., default_value="HYBRID")
+        self%solver_settings%linear_solver%amg_smoother_type = temp_string
+
+        buffer(3) = "amg_rebuild_frequency"
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_rebuild_frequency, &
+                    is_required=.false., default_value=5, valid_range=[1, huge(1)])
+
+        buffer(3) = "amg_rebuild_threshold"
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_rebuild_threshold, &
+                    is_required=.false., default_value=1.0d-2, valid_range=[0.0d0, huge(0.0d0)])
 
         ! Backward compatibility: also accept legacy top-level "linear_solver".
         legacy_buffer(1) = linear_solver
@@ -235,6 +274,13 @@ contains
         call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%tolerance, &
                     is_required=.false., default_value=self%solver_settings%linear_solver%tolerance, &
                     valid_range=[0.0d0, huge(0.0d0)])
+
+        legacy_buffer(2) = restart_size
+        call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%m_restarts, &
+                    is_required=.false., default_value=self%solver_settings%linear_solver%m_restarts, &
+                    valid_range=[1, huge(1)])
+
+        if (allocated(temp_string)) deallocate (temp_string)
 
     end subroutine read_solver_settings_linear
 

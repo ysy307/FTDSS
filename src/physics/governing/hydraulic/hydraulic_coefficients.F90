@@ -65,7 +65,7 @@ contains
         ! K_flh: Liquid Hydraulic Conductivity [m/s]
         ! K_vP: Vapor Hydraulic Conductivity (equivalent) [m/s]
         call self%physics%calc_Kflh(material_id, state, K_flh)
-        call self%physics%calc_Kvh(material_id, state, K_vP)
+        call self%calc_K_vP(material_id, state, K_vP)
 
         ! D_HH = (K_liquid + K_vapor) / g
         ! Unit: [m/s] / [m/s^2] = [s]
@@ -222,7 +222,11 @@ contains
         integer(int32), intent(in) :: target_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: K_vT
-        call self%physics%calc_KvT(target_id, state, K_vT)
+        if (self%enable_vapor_transport) then
+            call self%physics%calc_KvT(target_id, state, K_vT)
+        else
+            K_vT = 0.0d0
+        end if
     end subroutine calc_K_vT_hydraulic
 
     module subroutine calc_K_vP_hydraulic(self, target_id, state, K_vP)
@@ -231,7 +235,11 @@ contains
         integer(int32), intent(in) :: target_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: K_vP
-        call self%physics%calc_Kvh(target_id, state, K_vP)
+        if (self%enable_vapor_transport) then
+            call self%physics%calc_Kvh(target_id, state, K_vP)
+        else
+            K_vP = 0.0d0
+        end if
     end subroutine calc_K_vP_hydraulic
 
     module subroutine update_water_phases_hydraulic(self, material_id, state)

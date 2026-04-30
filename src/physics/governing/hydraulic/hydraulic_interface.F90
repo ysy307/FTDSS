@@ -15,6 +15,7 @@ module physics_governing_hydraulic
         private
         integer(int32) :: computation_type
         integer(int32) :: computation_dimension
+        logical :: enable_vapor_transport = .true.
         type(type_constitutive_manager) :: physics
     contains
         procedure, pass(self), public :: initialize => initialize_type_hydraulic
@@ -41,6 +42,7 @@ module physics_governing_hydraulic
         procedure, pass(self), public :: calc_K_wP => calc_K_wP_hydraulic
         procedure, pass(self), public :: calc_K_vT => calc_K_vT_hydraulic
         procedure, pass(self), public :: calc_K_vP => calc_K_vP_hydraulic
+        procedure, pass(self), public :: is_vapor_transport_enabled => is_vapor_transport_enabled_hydraulic
 
         procedure, pass(self), public :: update_water_phases => update_water_phases_hydraulic
         procedure, pass(self), public :: calc_effective_density => calc_effective_density_hydraulic
@@ -197,6 +199,12 @@ module physics_governing_hydraulic
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: K_vP
         end subroutine calc_K_vP_hydraulic
+
+        module pure function is_vapor_transport_enabled_hydraulic(self) result(enabled)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            logical :: enabled
+        end function is_vapor_transport_enabled_hydraulic
 
         module subroutine update_water_phases_hydraulic(self, material_id, state)
             implicit none

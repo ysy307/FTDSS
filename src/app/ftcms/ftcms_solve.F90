@@ -477,6 +477,7 @@ contains
                 call self%apply_bc(prescribed=.false.)
                 call self%freeze_physics_dofs(PHYSICS_TYPES%THERMAL)
                 call self%solve(frozen_physics=PHYSICS_TYPES%THERMAL)
+                call self%zero_frozen_increment(PHYSICS_TYPES%THERMAL)
 
                 if (.not. self%solver%is_success()) then
                     linear_failed = .true.
@@ -572,8 +573,16 @@ contains
                 call self%apply_bc(prescribed=.false.)
                 call self%freeze_physics_dofs(PHYSICS_TYPES%HYDRAULIC)
                 call self%solve(frozen_physics=PHYSICS_TYPES%HYDRAULIC)
+                call self%zero_frozen_increment(PHYSICS_TYPES%HYDRAULIC)
 
-                if (.not. self%solver%is_success()) then
+                if (allocated(self%solver_thermal)) then
+                    if (.not. self%solver_thermal%is_success()) then
+                        linear_failed = .true.
+                        call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
+                        call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
+                        exit thermal_nl
+                    end if
+                else if (.not. self%solver%is_success()) then
                     linear_failed = .true.
                     call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
                     call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)

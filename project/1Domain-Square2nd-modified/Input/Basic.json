@@ -134,11 +134,19 @@
         }
     },
     "linear_solver": {
-        "type": 4,
+        "type": 9,
         "preconditioner_type": 1,
         "max_iterations": 50000,
         "tolerance": 1e-6,
-        "restart_size": 1000
+        "restart_size": 1000,
+        "amg_strength_threshold": 0.25,
+        "amg_smoother_sweeps": 2,
+        "amg_max_agg_size": 8,
+        "amg_drop_tolerance": 1e-04,
+        "amg_drop_strategy": "RELATIVE",
+        "amg_smoother_type": "JACOBI",
+        "amg_rebuild_frequency": 5,
+        "amg_rebuild_threshold": 1e-02
     },
     "parallel_settings": {
         "threads": {

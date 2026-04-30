@@ -45,6 +45,18 @@ module numerical_solver_preconditioner
         real(real64) :: amg_strength_threshold = 0.25d0
         !> AMG smoother sweeps (default 2)
         integer(int32) :: amg_smoother_sweeps = 2
+        !> AMG maximum aggregate size (default 8)
+        integer(int32) :: amg_max_agg_size = 8
+        !> AMG drop tolerance for coarse matrix (default 1.0e-4)
+        real(real64) :: amg_drop_tolerance = 1.0d-4
+        !> AMG drop strategy: 'NONE' | 'RELATIVE' (default 'RELATIVE')
+        character(len=32) :: amg_drop_strategy = 'RELATIVE'
+        !> AMG smoother type: 'JACOBI' | 'GS_FWD' | 'GS_BWD' | 'HYBRID' (default 'JACOBI')
+        character(len=32) :: amg_smoother_type = 'JACOBI'
+        !> AMG rebuild frequency (number of steps, default 5)
+        integer(int32) :: amg_rebuild_frequency = 5
+        !> AMG rebuild threshold for relative residual increase (default 1.0e-2)
+        real(real64) :: amg_rebuild_threshold = 1.0d-2
     contains
         !> Set configuration parameters.
         procedure :: set => set_preconditioner_settings
@@ -479,26 +491,37 @@ module numerical_solver_preconditioner
         integer(int32) :: num_rows = -1
         integer(int32) :: block_size = 1
         logical :: is_block = .false.
+        integer(int32) :: bs_coarse = 1
         real(real64) :: strength_threshold = 0.25d0
         integer(int32) :: smoother_sweeps = 2
+        integer(int32) :: max_agg_size = 8
         integer(int32) :: num_coarse = -1
-        !> Inverse of diagonal entries for Jacobi smoother
-        real(real64), allocatable :: diag_inv(:)
+        character(len=32) :: smoother_type = 'JACOBI'
+        character(len=32) :: drop_strategy = 'RELATIVE'
+        real(real64) :: drop_tolerance = 1.0d-4
+        integer(int32) :: rebuild_frequency = 5
+        real(real64) :: rebuild_threshold = 1.0d-2
+        integer(int32) :: step_count = 0
+        real(real64) :: last_residual_norm = 0.0d0
+        logical :: is_symmetric_structure = .false.
+        !> Inverse of diagonal blocks (bs x bs x num_nodes)
+        real(real64), allocatable :: diag_inv(:, :, :)
         !> Diagonal block positions in fine-grid matrix
         integer(int32), allocatable :: fine_diag_ptr(:)
-        !> Prolongation P (CSR: n_fine x n_coarse)
+        !> Prolongation P (BSR format: n_fine x n_coarse, block size bs x bs)
         integer(int32), allocatable :: P_ptr(:), P_ind(:)
-        real(real64), allocatable :: P_val(:)
-        !> Restriction R = P^T (CSR: n_coarse x n_fine)
+        real(real64), allocatable :: P_val(:, :, :)
+        !> Restriction R = P^T (BSR format: n_coarse x n_fine, block size bs x bs)
         integer(int32), allocatable :: R_ptr(:), R_ind(:)
-        real(real64), allocatable :: R_val(:)
-        !> Coarse grid matrix (dense, n_coarse x n_coarse)
-        real(real64), allocatable :: coarse_val(:, :)
-        !> LU factorization of coarse matrix
+        real(real64), allocatable :: R_val(:, :, :)
+        !> Coarse grid matrix (BSR format: n_coarse x n_coarse, block size bs x bs)
+        integer(int32), allocatable :: Ac_ptr(:), Ac_ind(:)
+        real(real64), allocatable :: Ac_val(:, :, :)
+        !> LU factorization workspace (fallback to dense if needed)
         real(real64), allocatable :: coarse_lu(:, :)
         integer(int32), allocatable :: coarse_pivots(:)
         !> Workspace
-        real(real64), allocatable :: work_fine(:), work_coarse(:)
+        real(real64), allocatable :: work_fine(:), work_coarse(:), work_coarse_block(:, :)
         !> Pointers to fine-grid BSR arrays
         integer(int32), pointer :: a_ptr(:) => null()
         integer(int32), pointer :: a_ind(:) => null()
@@ -796,7 +819,10 @@ module numerical_solver_preconditioner
 contains
 
     !> Sets the preconditioner configuration settings.
-    subroutine set_preconditioner_settings(self, id, num_nodes, block_size, ilu_fillin_level, ssor_omega)
+    subroutine set_preconditioner_settings(self, id, num_nodes, block_size, ilu_fillin_level, ssor_omega, &
+                                           amg_strength_threshold, amg_smoother_sweeps, amg_max_agg_size, &
+                                           amg_drop_tolerance, amg_drop_strategy, amg_smoother_type, &
+                                           amg_rebuild_frequency, amg_rebuild_threshold)
         implicit none
         !> Settings instance to be configured
         class(type_preconditioner_settings), intent(inout) :: self
@@ -810,6 +836,22 @@ contains
         integer(int32), intent(in), optional :: ilu_fillin_level
         !> SSOR relaxation parameter (optional, default 1.0)
         real(real64), intent(in), optional :: ssor_omega
+        !> Optional AMG strength threshold for SA-AMG.
+        real(real64), intent(in), optional :: amg_strength_threshold
+        !> Optional AMG smoother sweeps for SA-AMG.
+        integer(int32), intent(in), optional :: amg_smoother_sweeps
+        !> Optional AMG maximum aggregate size for SA-AMG.
+        integer(int32), intent(in), optional :: amg_max_agg_size
+        !> Optional AMG coarse-matrix drop tolerance for SA-AMG.
+        real(real64), intent(in), optional :: amg_drop_tolerance
+        !> Optional AMG drop strategy for SA-AMG.
+        character(len=*), intent(in), optional :: amg_drop_strategy
+        !> Optional AMG smoother type for SA-AMG.
+        character(len=*), intent(in), optional :: amg_smoother_type
+        !> Optional AMG rebuild frequency for SA-AMG.
+        integer(int32), intent(in), optional :: amg_rebuild_frequency
+        !> Optional AMG rebuild threshold for SA-AMG.
+        real(real64), intent(in), optional :: amg_rebuild_threshold
 
         self%ID = id
         select case (self%ID)
@@ -870,6 +912,14 @@ contains
             else
                 self%block_size = 1
             end if
+            if (present(amg_strength_threshold)) self%amg_strength_threshold = amg_strength_threshold
+            if (present(amg_smoother_sweeps)) self%amg_smoother_sweeps = amg_smoother_sweeps
+            if (present(amg_max_agg_size)) self%amg_max_agg_size = amg_max_agg_size
+            if (present(amg_drop_tolerance)) self%amg_drop_tolerance = amg_drop_tolerance
+            if (present(amg_drop_strategy)) self%amg_drop_strategy = adjustl(amg_drop_strategy)
+            if (present(amg_smoother_type)) self%amg_smoother_type = adjustl(amg_smoother_type)
+            if (present(amg_rebuild_frequency)) self%amg_rebuild_frequency = amg_rebuild_frequency
+            if (present(amg_rebuild_threshold)) self%amg_rebuild_threshold = amg_rebuild_threshold
         case (PRECONDITIONER_TYPES%ILUC%ID, PRECONDITIONER_TYPES%IS%ID, &
               PRECONDITIONER_TYPES%SAINV%ID, PRECONDITIONER_TYPES%HYBRID%ID, &
               PRECONDITIONER_TYPES%ADDS%ID)

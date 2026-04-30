@@ -167,7 +167,7 @@ module io_output_observation
         end subroutine write_observation_line
 
         module subroutine output_history_output_observation(self, time, temperature, water_content, ice_content, &
-                                                            vapor_content, pressure)
+                                                            vapor_content, pressure, water_flux)
             implicit none
             class(type_output_observation), intent(inout) :: self
             real(real64), intent(in) :: time
@@ -176,6 +176,7 @@ module io_output_observation
             real(real64), intent(in), optional :: ice_content(:)
             real(real64), intent(in), optional :: vapor_content(:)
             real(real64), intent(in), optional :: pressure(:)
+            type(type_coordinate_array_dp), intent(in), optional :: water_flux
         end subroutine output_history_output_observation
     end interface
 

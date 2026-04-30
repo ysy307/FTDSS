@@ -21,7 +21,7 @@ contains
         integer(int32) :: num_colors, num_elements_in_color
         integer(int32), pointer, contiguous, dimension(:) :: elements_list
 
-        logical :: use_scatter, do_hydraulic
+        logical :: use_scatter, do_thermal, do_hydraulic
 
         call self%control%profiler_start(PROFILER_TYPES%ASSEMBLE)
 
@@ -32,7 +32,11 @@ contains
         call self%F%zero()
 
         call self%domain%get_num_colors(num_colors)
-        call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, thermal_dof)
+
+        do_thermal = self%is_active_thermal()
+        if (do_thermal) then
+            call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, thermal_dof)
+        end if
 
         do_hydraulic = self%is_active_hydraulic()
         if (do_hydraulic) then
@@ -43,7 +47,7 @@ contains
 
         !$OMP PARALLEL IF(do_hydraulic) DEFAULT(NONE) &
         !$OMP SHARED(self, num_colors, elements_list, num_elements_in_color, &
-        !$OMP        thermal_dof, hydraulic_dof, use_scatter, do_hydraulic) &
+        !$OMP        thermal_dof, hydraulic_dof, use_scatter, do_thermal, do_hydraulic) &
         !$OMP PRIVATE(i_color, i_elem, elem_id, p_connectivity, workspace, &
         !$OMP         local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
         !$OMP         local_F_T, local_F_H, elem_coords, num_nodes_local)
@@ -72,26 +76,32 @@ contains
                     num_nodes_local = workspace%num_fe_nodes
 
                     ! $OMP CRITICAL(ftcms_global_assembly)
-                    if (use_scatter) then
-                        call self%K%add(thermal_dof, thermal_dof, elem_id, num_nodes_local, local_K_TT)
-                        if (do_hydraulic) then
-                            call self%K%add(thermal_dof, hydraulic_dof, elem_id, num_nodes_local, local_K_TH)
+                    if (do_thermal) then
+                        if (use_scatter) then
+                            call self%K%add(thermal_dof, thermal_dof, elem_id, num_nodes_local, local_K_TT)
+                            if (do_hydraulic) then
+                                call self%K%add(thermal_dof, hydraulic_dof, elem_id, num_nodes_local, local_K_TH)
+                            end if
+                        else
+                            call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_K_TT)
+                            if (do_hydraulic) then
+                                call self%K%add(thermal_dof, hydraulic_dof, p_connectivity, local_K_TH)
+                            end if
                         end if
-                    else
-                        call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_K_TT)
-                        if (do_hydraulic) then
-                            call self%K%add(thermal_dof, hydraulic_dof, p_connectivity, local_K_TH)
-                        end if
+                        call self%F%add(thermal_dof, p_connectivity, local_F_T)
                     end if
-                    call self%F%add(thermal_dof, p_connectivity, local_F_T)
 
                     if (do_hydraulic) then
                         if (use_scatter) then
                             call self%K%add(hydraulic_dof, hydraulic_dof, elem_id, num_nodes_local, local_K_HH)
-                            call self%K%add(hydraulic_dof, thermal_dof, elem_id, num_nodes_local, local_K_HT)
+                            if (do_thermal) then
+                                call self%K%add(hydraulic_dof, thermal_dof, elem_id, num_nodes_local, local_K_HT)
+                            end if
                         else
                             call self%K%add(hydraulic_dof, hydraulic_dof, p_connectivity, local_K_HH)
-                            call self%K%add(hydraulic_dof, thermal_dof, p_connectivity, local_K_HT)
+                            if (do_thermal) then
+                                call self%K%add(hydraulic_dof, thermal_dof, p_connectivity, local_K_HT)
+                            end if
                         end if
                         call self%F%add(hydraulic_dof, p_connectivity, local_F_H)
                     end if

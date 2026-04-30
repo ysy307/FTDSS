@@ -62,7 +62,16 @@ contains
 
         self%computation_type = input%basic%simulation_settings%calculate_type
         self%computation_dimension = input%basic%simulation_settings%calculate_dimension
+        self%enable_vapor_transport = input%basic%analysis_controls%enable_vapor_transport
 
     end subroutine initialize_type_hydraulic
+
+    module pure function is_vapor_transport_enabled_hydraulic(self) result(enabled)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        logical :: enabled
+
+        enabled = self%enable_vapor_transport
+    end function is_vapor_transport_enabled_hydraulic
 
 end submodule hydraulic_base

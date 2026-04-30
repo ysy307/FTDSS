@@ -131,6 +131,31 @@ contains
 
     end subroutine freeze_physics_dofs_ftcms
 
+    !> Zero the increment (du) entries for the frozen physics DOFs.
+    !> Prevents GMRES restart drift from contaminating frozen-phase updates.
+    module subroutine zero_frozen_increment_ftcms(self, frozen_physics)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        type(type_constant_id), intent(in) :: frozen_physics
+
+        integer(int32) :: i_node, num_nodes, dof_index, num_dofs_per_node
+        real(real64), pointer :: du(:) => null()
+
+        call self%domain%get_num_nodes(num_nodes)
+        call self%domain%get_num_dof_per_node(num_dofs_per_node)
+        call self%domain%get_start_dof_index(frozen_physics, dof_index)
+
+        du => self%du%get_data()
+        if (.not. associated(du)) return
+
+        do i_node = 1, num_nodes
+            du(num_dofs_per_node * (i_node - 1) + dof_index) = 0.0d0
+        end do
+
+        nullify (du)
+
+    end subroutine zero_frozen_increment_ftcms
+
     !>
     !> Enforces Dirichlet values directly into the solution vector.
     !>
@@ -294,13 +319,9 @@ contains
         integer(int32) :: num_matched_patches, num_dirichlet_nodes
         integer(int32) :: bdf_order
         integer(int32) :: n_dim
-        integer(int32) :: node_id
         integer(int32) :: first_dirichlet_node
         real(real64) :: first_dirichlet_coord(3)
         real(real64), allocatable :: node_coord(:)
-        logical, save :: printed_no_dirichlet_hydraulic_notice = .false.
-        logical, save :: printed_hydraulic_gauge_notice = .false.
-        logical, save :: printed_thermal_gauge_notice = .false.
         logical, save :: printed_thermal_dirichlet_location = .false.
         logical, save :: printed_hydraulic_dirichlet_location = .false.
         type(type_bc_result) :: bc_result
@@ -394,32 +415,6 @@ contains
                 error stop 'All-Neumann problem without transient storage is singular. Provide Dirichlet BC or transient terms.'
             end if
 
-            if (physics_type%ID == PHYSICS_TYPES%HYDRAULIC%ID .and. .not. printed_no_dirichlet_hydraulic_notice) then
-                write (*, '(A,1X,A)') 'Notice: Hydraulic Dirichlet BC not found; using transient storage + gauge at node 1.'
-                printed_no_dirichlet_hydraulic_notice = .true.
-            end if
-
-            ! Enforce a scalar gauge for all-Neumann systems by row-replacing
-            ! a single reference node. This breaks mass balance at node 1 but
-            ! gives a well-conditioned system; future work: Lagrange-multiplier
-            ! alternative that preserves conservation.
-            node_id = 1
-            call self%K%zero(node_id, dof_offset)
-            call self%K%set(dof_offset, dof_offset, node_id, node_id, 1.0d0)
-            call self%F%set(dof_offset, node_id, 0.0d0)
-            if (physics_type%ID == PHYSICS_TYPES%HYDRAULIC%ID) then
-                self%hydraulic_has_dirichlet_bc = .true.
-                if (.not. printed_hydraulic_gauge_notice) then
-                    write (*, '(A)') 'Notice: Applied hydraulic gauge constraint at node 1 (all-Neumann case).'
-                    printed_hydraulic_gauge_notice = .true.
-                end if
-            else
-                self%thermal_has_dirichlet_bc = .true.
-                if (.not. printed_thermal_gauge_notice) then
-                    write (*, '(A)') 'Notice: Applied thermal gauge constraint at node 1 (all-Neumann case).'
-                    printed_thermal_gauge_notice = .true.
-                end if
-            end if
         end if
 
         if (allocated(node_coord)) deallocate (node_coord)
