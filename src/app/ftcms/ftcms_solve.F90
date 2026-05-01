@@ -73,32 +73,16 @@ contains
         class(type_ftcms), intent(inout), target :: self
         type(type_constant_id), intent(in), optional :: target_physics
 
-        integer(int32) :: iter
-
         real(real64), pointer, contiguous, dimension(:) :: current_value
 
         real(real64), allocatable :: residual(:)
         real(real64), allocatable :: increment(:)
-        real(real64) :: current_norm
         real(real64) :: relaxation_factor
-        real(real64) :: switch_norm(PHYSICS_TYPES%NUM_ID)
-        logical :: should_switch
         logical, parameter :: diverged = .true.
 
-        logical :: is_compute_newton, is_compute_picard, is_config_none
         logical :: check_thermal, check_hydraulic
 
         nullify (current_value)
-
-        ! Explicit initialization (avoid implicit SAVE from initializer expression)
-        switch_norm(:) = [1.0d-2, 1.0d-4, 1.0d-4]
-        should_switch = .true.
-
-        ! Get compute (dynamic) solver state
-        is_compute_newton = self%control%is_compute_newton()
-        is_compute_picard = self%control%is_compute_picard()
-        ! Check whether config (static) solver is NONE
-        is_config_none = self%control%is_none()
 
         check_thermal = self%control%is_physics_active(PHYSICS_TYPES%THERMAL)
         check_hydraulic = self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)
@@ -132,15 +116,10 @@ contains
                 write (*, *) "Error: NaN detected in thermal variables during convergence check."
                 call self%control%set_diverged(PHYSICS_TYPES%THERMAL, diverged)
             else
-                ! When config is NONE, the iteration module returns converged immediately
-                if (is_compute_picard) then
-                    call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
-                    increment(:) = relaxation_factor * increment(:)
-                end if
+                call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
+                increment(:) = relaxation_factor * increment(:)
                 call self%control%check_convergence(PHYSICS_TYPES%THERMAL, residual, increment)
             end if
-
-            ! Aitken relaxation check
 
         end if
 
@@ -159,49 +138,9 @@ contains
                 write (*, *) "Error: NaN detected in hydraulic variables during convergence check."
                 call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, diverged)
             else
-                if (is_compute_picard) then
-                    call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
-                    increment(:) = relaxation_factor * increment(:)
-                end if
+                call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
+                increment(:) = relaxation_factor * increment(:)
                 call self%control%check_convergence(PHYSICS_TYPES%HYDRAULIC, residual, increment)
-            end if
-        end if
-
-        ! ----------------------------------------------------------------------
-        ! 2. Hybrid method switch decision
-        !    Skip when config is NONE (linear)
-        ! ----------------------------------------------------------------------
-        call self%control%get_nonlinear_iter(iter)
-
-        if (iter > 1 .and. .not. self%control%is_diverged()) then
-            if (is_compute_picard .and. .not. is_config_none) then
-                should_switch = .true.
-
-                ! Thermal Residual Check
-                if (check_thermal) then
-                    current_norm = 0.0d0
-                    call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, NONLINEAR_NORM_CRITERIA%RESIDUAL, &
-                                                       NORM_TYPES%LINF, current_norm)
-                    ! [Debug output skipped]
-                    if (current_norm > switch_norm(PHYSICS_TYPES%THERMAL%ID)) then
-                        should_switch = .false.
-                    end if
-                end if
-
-                ! Hydraulic Residual Check
-                if (check_hydraulic) then
-                    current_norm = 0.0d0
-                    call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, NONLINEAR_NORM_CRITERIA%RESIDUAL, &
-                                                       NORM_TYPES%LINF, current_norm)
-                    if (current_norm > switch_norm(PHYSICS_TYPES%HYDRAULIC%ID)) then
-                        should_switch = .false.
-                    end if
-                end if
-
-                if (should_switch) then
-                    write (*, '("   -> Residual small enough. Switching to Newton-Raphson.")')
-                    call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%NEWTON)
-                end if
             end if
         end if
 
@@ -294,11 +233,17 @@ contains
                 ! Apply boundary conditions (natural + essential) to the linear system
                 call self%apply_bc(prescribed=.false.)
 
+                ! Matrix diagnostics on first iteration
+                call self%control%get_nonlinear_iter(iter_nl)
+                if (iter_nl == 1) call debug_matrix_diagnostics(self%K, self%F)
+
                 ! Linear solve (K * du = F)
                 call self%solve()
 
                 ! If linear solver failed, mark as diverged and exit
                 if (.not. self%solver%is_success()) then
+                    write (*, '(A)') '   [GMRES] failed — residual history:'
+                    call self%solver%display_rhistory(unit_display=6)
                     linear_failed = .true.
                     if (self%is_active_thermal()) then
                         call self%control%set_converged( &
@@ -463,6 +408,7 @@ contains
             ! =============================================================
             ! Phase 1: Hydraulic nonlinear loop (T frozen)
             ! =============================================================
+            write (*, '(A)') '   [STAGGERED] entering hydraulic NL phase'; flush (6)
             phase_label = '[HYD_NL]'
             linear_failed = .false.
 
@@ -476,10 +422,14 @@ contains
                 call self%assemble()
                 call self%apply_bc(prescribed=.false.)
                 call self%freeze_physics_dofs(PHYSICS_TYPES%THERMAL)
+                call self%control%get_nonlinear_iter(iter_nl)
+                if (iter_nl == 1) call debug_matrix_diagnostics(self%K, self%F)
                 call self%solve(frozen_physics=PHYSICS_TYPES%THERMAL)
                 call self%zero_frozen_increment(PHYSICS_TYPES%THERMAL)
 
                 if (.not. self%solver%is_success()) then
+                    write (*, '(A)') '   [GMRES/HYD] failed — residual history:'
+                    call self%solver%display_rhistory(unit_display=6)
                     linear_failed = .true.
                     call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
                     call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
@@ -534,9 +484,9 @@ contains
                 h_inc = 0.0d0
                 if (.not. linear_failed) then
                     call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, &
-                        NONLINEAR_NORM_CRITERIA%RESIDUAL, NORM_TYPES%LINF, h_res)
+                                                       NONLINEAR_NORM_CRITERIA%RESIDUAL, NORM_TYPES%LINF, h_res)
                     call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, &
-                        NONLINEAR_NORM_CRITERIA%UPDATE, NORM_TYPES%LINF, h_inc)
+                                                       NONLINEAR_NORM_CRITERIA%UPDATE, NORM_TYPES%LINF, h_inc)
                 end if
                 if (linear_failed) then
                     write (*, '(A,A,A,I0,A,L1,A)') '   ', phase_label, &
@@ -572,17 +522,24 @@ contains
                 call self%assemble()
                 call self%apply_bc(prescribed=.false.)
                 call self%freeze_physics_dofs(PHYSICS_TYPES%HYDRAULIC)
+                call self%control%get_nonlinear_iter(iter_nl)
+                write (*, '(A,I0)') '   [THM] before solve, iter_nl=', iter_nl; flush (6)
+                if (iter_nl == 1) call debug_matrix_diagnostics(self%K, self%F)
                 call self%solve(frozen_physics=PHYSICS_TYPES%HYDRAULIC)
                 call self%zero_frozen_increment(PHYSICS_TYPES%HYDRAULIC)
 
                 if (allocated(self%solver_thermal)) then
                     if (.not. self%solver_thermal%is_success()) then
+                        write (*, '(A)') '   [GMRES/THM] failed — residual history:'
+                        call self%solver_thermal%display_rhistory(unit_display=6)
                         linear_failed = .true.
                         call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
                         call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
                         exit thermal_nl
                     end if
                 else if (.not. self%solver%is_success()) then
+                    write (*, '(A)') '   [GMRES/THM] failed — residual history:'
+                    call self%solver%display_rhistory(unit_display=6)
                     linear_failed = .true.
                     call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
                     call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
@@ -640,9 +597,9 @@ contains
                 t_inc = 0.0d0
                 if (.not. linear_failed) then
                     call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, &
-                        NONLINEAR_NORM_CRITERIA%RESIDUAL, NORM_TYPES%LINF, t_res)
+                                                       NONLINEAR_NORM_CRITERIA%RESIDUAL, NORM_TYPES%LINF, t_res)
                     call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, &
-                        NONLINEAR_NORM_CRITERIA%UPDATE, NORM_TYPES%LINF, t_inc)
+                                                       NONLINEAR_NORM_CRITERIA%UPDATE, NORM_TYPES%LINF, t_inc)
                 end if
                 if (linear_failed) then
                     write (*, '(A,A,A,I0,A,L1,A)') '   ', phase_label, &
@@ -752,4 +709,85 @@ contains
         end do time_loop
 
     end subroutine run_ftcms
+    ! -----------------------------------------------------------------------
+    ! Temporary diagnostic: print matrix/RHS statistics to help pinpoint
+    ! why GMRES is not converging (discretisation vs preconditioner vs solver).
+    ! Call once per time step (iter_nl == 1) before the linear solve.
+    ! -----------------------------------------------------------------------
+    subroutine debug_matrix_diagnostics(K, F)
+        implicit none
+        type(type_jacobian_matrix), intent(inout), target :: K
+        type(type_residual_vector), intent(in) :: F
+
+        class(abst_matrix), pointer :: mat
+        real(real64), pointer :: val(:), rhs(:)
+        integer(int32), pointer :: ia(:), ja(:)
+        integer(int32) :: n, nnz, i, j
+        real(real64) :: diag_min, diag_max, row_norm_max, val_abs
+        logical :: has_nan, has_inf
+        integer(int32) :: dofs_per_node
+        real(real64) :: row_sum
+
+        write (*, '(A)') '   [DIAG] --- matrix diagnostics start ---'
+        flush (6)
+
+        mat => K%get_matrix()
+        rhs => F%get_data()
+
+        has_nan = .false.
+        has_inf = .false.
+
+        select type (mat)
+        type is (type_matrix_csr)
+            val => mat%get_val()
+            ia => mat%get_ptr()
+            ja => mat%get_ind() ! not used but keeps pointer live
+            n = size(ia) - 1
+            nnz = size(val)
+
+            diag_min = huge(1.0d0)
+            diag_max = -huge(1.0d0)
+            row_norm_max = 0.0d0
+
+            do i = 1, n
+                row_sum = 0.0d0
+                do j = ia(i), ia(i + 1) - 1
+                    val_abs = abs(val(j))
+                    row_sum = row_sum + val_abs
+                    if (val(j) /= val(j)) has_nan = .true.
+                    if (val_abs > huge(1.0d0) * 0.5d0) has_inf = .true.
+                    ! diagonal: find entry where ja(j) == i
+                    if (ja(j) == i) then
+                        if (val(j) < diag_min) diag_min = val(j)
+                        if (val(j) > diag_max) diag_max = val(j)
+                    end if
+                end do
+                if (row_sum > row_norm_max) row_norm_max = row_sum
+            end do
+
+            write (*, '(A)') '   [DIAG] Matrix diagnostics:'
+            write (*, '(A,I0,A,I0)') '     n=', n, '  nnz=', nnz
+            write (*, '(A,ES12.4,A,ES12.4)') '     diag min=', diag_min, '  diag max=', diag_max
+            write (*, '(A,ES12.4)') '     row L1-norm max=', row_norm_max
+            write (*, '(A,L1,A,L1)') '     NaN in K=', has_nan, '  Inf in K=', has_inf
+
+        class default
+            write (*, '(A)') '   [DIAG] Matrix type not CSR — skipping diagnostics.'
+        end select
+
+        dofs_per_node = K%get_num_dofs_per_node()
+        write (*, '(A,I0)') '     DOFs per node=', dofs_per_node
+
+        ! RHS diagnostics
+        if (associated(rhs)) then
+            val_abs = maxval(abs(rhs))
+            has_nan = any(rhs /= rhs)
+            write (*, '(A,ES12.4,A,L1)') '     |F|_inf=', val_abs, '  NaN in F=', has_nan
+        end if
+
+        write (*, '(A)') '   [DIAG] --- matrix diagnostics end ---'
+        flush (6)
+
+    end subroutine debug_matrix_diagnostics
+
 end submodule ftcms_solve

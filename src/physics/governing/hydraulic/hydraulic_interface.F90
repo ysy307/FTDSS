@@ -23,7 +23,6 @@ module physics_governing_hydraulic
 
         ! --- Assembly Procedures ---
         procedure, pass(self), public :: assemble_local => assemble_local_hydraulic
-        procedure, pass(self), private :: assemble_local_newton => assemble_local_newton_hydraulic
         procedure, pass(self), private :: assemble_local_picard => assemble_local_picard_hydraulic
         procedure, pass(self), private :: assemble_element => assemble_element_hydraulic
 
@@ -75,16 +74,6 @@ module physics_governing_hydraulic
             type(type_matrix_dense), intent(inout), optional :: K_HT
             type(type_vector_dp), intent(inout), optional :: F_H
         end subroutine assemble_local_hydraulic
-
-        module subroutine assemble_local_newton_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
-            implicit none
-            class(type_hydraulic), intent(in) :: self
-            type(type_control), intent(in) :: control
-            type(type_assemble_workspace), intent(inout) :: workspace
-            type(type_matrix_dense), intent(inout), optional :: K_HH
-            type(type_matrix_dense), intent(inout), optional :: K_HT
-            type(type_vector_dp), intent(inout), optional :: F_H
-        end subroutine assemble_local_newton_hydraulic
 
         module subroutine assemble_local_picard_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
             implicit none

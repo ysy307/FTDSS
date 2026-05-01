@@ -34,7 +34,6 @@ module physics_governing_thermal
         procedure, pass(self), public :: destroy => destroy_type_thermal
 
         procedure, pass(self), public :: assemble_local => assemble_local_thermal
-        procedure, pass(self), private :: assemble_local_newton => assemble_local_newton_thermal
         procedure, pass(self), private :: assemble_local_picard => assemble_local_picard_thermal
 
         procedure, pass(self), public :: compute_mass_term => compute_mass_term_thermal
@@ -221,17 +220,6 @@ module physics_governing_thermal
             type(type_vector_dp), intent(inout), optional :: F_T
 
         end subroutine assemble_local_thermal
-
-        module subroutine assemble_local_newton_thermal(self, control, workspace, K_TT, K_TH, F_T)
-            implicit none
-            class(type_thermal), intent(in) :: self
-            type(type_control), intent(in) :: control
-            type(type_assemble_workspace), intent(inout) :: workspace
-            type(type_matrix_dense), intent(inout), optional :: K_TT
-            type(type_matrix_dense), intent(inout), optional :: K_TH
-            type(type_vector_dp), intent(inout), optional :: F_T
-
-        end subroutine assemble_local_newton_thermal
 
         module subroutine assemble_local_picard_thermal(self, control, workspace, K_TT, K_TH, F_T)
             implicit none

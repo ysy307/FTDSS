@@ -653,16 +653,10 @@ contains
 
         real(real64) :: relaxation_factor
         logical :: is_none
-        logical :: is_newton
-        logical :: is_picard
 
-        ! Line search parameters for Newton modep
         real(real64) :: max_du, alpha
-        real(real64), parameter :: MAX_DT_STEP = 5.0d0
-        real(real64), parameter :: MAX_DP_STEP = 1.0d5
         real(real64), parameter :: PICARD_MAX_DT_STEP = 2.0d1
         real(real64), parameter :: PICARD_MAX_DP_STEP = 2.0d5
-        real(real64), parameter :: ALPHA_MIN = 0.1d0
         real(real64), parameter :: TEMP_MIN_C = -80.0d0
         real(real64), parameter :: TEMP_MAX_C = 80.0d0
         real(real64), parameter :: PRESS_MIN_PA = -1.0d7
@@ -677,9 +671,7 @@ contains
 
         call self%control%get_bdf_coeffs(bdf_order, bdf_coeffs)
 
-        is_newton = self%control%is_compute_newton()
-        is_picard = self%control%is_compute_picard()
-        is_none = (.not. is_newton) .and. (.not. is_picard)
+        is_none = self%control%is_none()
 
         if (self%is_active_thermal()) then
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
@@ -690,32 +682,16 @@ contains
 
                 if (allocated(du) .and. size(du) > 0) then
                     if (.not. is_none) then
-                        if (is_newton) then
-                            ! Damped Newton: clamp step by max allowable change
-                            max_du = maxval(abs(du))
-                            if (max_du > MAX_DT_STEP) then
-                                alpha = MAX_DT_STEP / max_du
-                                alpha = max(alpha, ALPHA_MIN)
-                            else
-                                alpha = 1.0d0
-                            end if
-                            relaxation_factor = alpha
-                            if (present(step_scale)) relaxation_factor = max(min(step_scale, 1.0d0), 0.0d0)
-                            ! Apply damped Newton update directly
-                            current(:) = current(:) + relaxation_factor * du(:)
+                        max_du = maxval(abs(du))
+                        if (max_du > PICARD_MAX_DT_STEP) then
+                            alpha = PICARD_MAX_DT_STEP / max_du
+                            write (*, '(A,2(ES13.5,A))') '   [REFLECT] thermal Picard cap active: max|du|=', &
+                                max_du, ', alpha=', alpha, ''
                         else
-                            ! Picard update also needs a moderate cap to avoid unstable overshoots.
-                            max_du = maxval(abs(du))
-                            if (max_du > PICARD_MAX_DT_STEP) then
-                                alpha = PICARD_MAX_DT_STEP / max_du
-                                write (*, '(A,2(ES13.5,A))') '   [REFLECT] thermal Picard cap active: max|du|=', &
-                                    max_du, ', alpha=', alpha, ''
-                            else
-                                alpha = 1.0d0
-                            end if
-                            call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, alpha*du, current)
-                            call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
+                            alpha = 1.0d0
                         end if
+                        call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, alpha * du, current)
+                        call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
                     else
                         relaxation_factor = 1.0d0
                         current(:) = current(:) + du(:)
@@ -743,30 +719,16 @@ contains
 
                 if (allocated(du) .and. size(du) > 0) then
                     if (.not. is_none) then
-                        if (is_newton) then
-                            ! Damped Newton: clamp step by max allowable pressure change
-                            max_du = maxval(abs(du))
-                            if (max_du > MAX_DP_STEP) then
-                                alpha = MAX_DP_STEP / max_du
-                                alpha = max(alpha, ALPHA_MIN)
-                            else
-                                alpha = 1.0d0
-                            end if
-                            relaxation_factor = alpha
-                            if (present(step_scale)) relaxation_factor = max(min(step_scale, 1.0d0), 0.0d0)
-                            current(:) = current(:) + relaxation_factor * du(:)
+                        max_du = maxval(abs(du))
+                        if (max_du > PICARD_MAX_DP_STEP) then
+                            alpha = PICARD_MAX_DP_STEP / max_du
+                            write (*, '(A,2(ES13.5,A))') '   [REFLECT] hydraulic Picard cap active: max|du|=', &
+                                max_du, ', alpha=', alpha, ''
                         else
-                            max_du = maxval(abs(du))
-                            if (max_du > PICARD_MAX_DP_STEP) then
-                                alpha = PICARD_MAX_DP_STEP / max_du
-                                write (*, '(A,2(ES13.5,A))') '   [REFLECT] hydraulic Picard cap active: max|du|=', &
-                                    max_du, ', alpha=', alpha, ''
-                            else
-                                alpha = 1.0d0
-                            end if
-                            call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, alpha*du, current)
-                            call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
+                            alpha = 1.0d0
                         end if
+                        call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, alpha * du, current)
+                        call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
                     else
                         relaxation_factor = 1.0d0
                         current(:) = current(:) + du(:)

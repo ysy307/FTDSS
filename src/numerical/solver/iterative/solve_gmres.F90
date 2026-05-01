@@ -97,10 +97,22 @@ contains
         real(real64) :: beta, b_norm, w_norm, temp_val, h_norm_before
         real(real64) :: resid_krylov, beta0_initial, beta_pre_update
         integer(int32) :: i, k, ierr, iter_global, iter
+        integer(int32) :: bad_restart_count
 
         iter_global = 0
+        bad_restart_count = 0
         self%current_iteration = 0
         self%status = SOLVER_STATUS%SUCCESS%ID
+
+        block
+            real(real64), pointer :: bptr(:)
+            bptr => b%get_data()
+            write (*, '(A,I0,A,I0,A,I0)') &
+                '   [GMRES-INIT] n=', size(bptr), &
+                ' m_restart=', self%m_restart, ' max_iter=', self%max_iterations
+            flush(6)
+            nullify(bptr)
+        end block
 
         call self%residual_history%zero()
         call self%pc%setup(A)
@@ -117,9 +129,15 @@ contains
         beta = vector_norm2(self%r)
         beta0_initial = beta
 
+        write (*, '(A,ES12.4,A,ES12.4,A,ES12.4)') &
+            '   [GMRES] beta0=', beta, '  tol=', self%tolerance, '  rel_tol*b=', self%relative_tolerance * b_norm
+        flush(6)
+
         call self%residual_history%set(MATRIX_OPS%INS, 1, beta)
 
         if (beta < self%tolerance .or. beta < self%relative_tolerance * b_norm) then
+            write (*, '(A)') '   [GMRES] converged on initial residual check'
+            flush(6)
             return
         end if
 
@@ -191,6 +209,13 @@ contains
                 resid_krylov = abs(self%g(iter + 1))
                 call self%residual_history%set(MATRIX_OPS%INS, iter_global, resid_krylov)
 
+                if (mod(iter_global, 10) == 0) then
+                    write (*, '(A,I0,A,ES12.4,A,ES12.4)', advance='yes') &
+                        '   [GMRES] iter=', iter_global, &
+                        '  resid=', resid_krylov, '  b_norm=', b_norm
+                    flush(6)
+                end if
+
                 ! Exit when Krylov estimate is at tolerance, machine precision, or max iterations.
                 ! The outer restart_loop checks the true residual after each restart and continues
                 ! if not yet converged, so exiting here on tolerance is safe.
@@ -217,6 +242,12 @@ contains
                 call vector_axpy(self%y(i), self%v(i), self%x_update)
             end do
 
+            write (*, '(A,I0,A,ES12.4,A,ES12.4)') &
+                '   [GMRES-UPD] k=', k, &
+                '  |y|_inf=', maxval(abs(self%y(1:k))), &
+                '  |x_update|=', vector_norm2(self%x_update)
+            flush(6)
+
             call self%pc%apply(self%x_update, self%z)
 
             ! Save beta before the update to detect post-update divergence
@@ -239,9 +270,19 @@ contains
             ! Threshold of 10x: catches the GMRES Krylov-exhaustion catastrophic
             ! cancellation case (true_resid 3.7x worse) while allowing mild fluctuations.
             ! On NaN/Inf always revert and terminate.
-            if (beta /= beta .or. beta > 1.0d1 * beta_pre_update) then
+            ! bad_restart_count limits consecutive failed restarts to prevent infinite loops
+            ! when the preconditioner is ill-conditioned and every update diverges.
+            if (beta /= beta .or. beta > 1.0d2 * beta_pre_update) then
+                write (*, '(A,ES12.4,A,ES12.4,A,I0)') &
+                    '   [GMRES-GUARD] beta=', beta, '  pre=', beta_pre_update, '  bad_count=', bad_restart_count
+                flush(6)
                 call vector_axpy(-1.0d0, self%z, x)
                 if (beta /= beta) then
+                    self%status = SOLVER_STATUS%MAXITER%ID
+                    exit restart_loop
+                end if
+                bad_restart_count = bad_restart_count + 1
+                if (bad_restart_count >= 3) then
                     self%status = SOLVER_STATUS%MAXITER%ID
                     exit restart_loop
                 end if
@@ -251,6 +292,8 @@ contains
                 call project_component_mean_zero(self%r, self%projection_enabled, &
                                                  self%projection_offset, self%projection_stride)
                 beta = vector_norm2(self%r)
+            else
+                bad_restart_count = 0
             end if
 
             if (beta < self%tolerance .or. &

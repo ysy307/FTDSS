@@ -3,7 +3,7 @@ submodule(physics_governing_hydraulic) hydraulic_matrix
     implicit none
 contains
 
-    !> @brief Assemble Local Matrix and Vector (Wrapper)
+    !> @brief Assemble local matrix and vector (Picard only)
     module subroutine assemble_local_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
         implicit none
         class(type_hydraulic), intent(in) :: self
@@ -13,104 +13,11 @@ contains
         type(type_matrix_dense), intent(inout), optional :: K_HT
         type(type_vector_dp), intent(inout), optional :: F_H
 
-        if (control%is_compute_newton()) then
-            call self%assemble_local_newton(control, workspace, K_HH, K_HT, F_H)
-        else
-            ! Picard assembly is also used for NONE (single-shot linear solve).
-            call self%assemble_local_picard(control, workspace, K_HH, K_HT, F_H)
-        end if
+        call self%assemble_local_picard(control, workspace, K_HH, K_HT, F_H)
 
     end subroutine assemble_local_hydraulic
 
-    !> @brief Assemble Newton-Raphson Local Components
-    module subroutine assemble_local_newton_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
-        implicit none
-        class(type_hydraulic), intent(in) :: self
-        type(type_control), intent(in) :: control
-        type(type_assemble_workspace), intent(inout) :: workspace
-        type(type_matrix_dense), intent(inout), optional :: K_HH
-        type(type_matrix_dense), intent(inout), optional :: K_HT
-        type(type_vector_dp), intent(inout), optional :: F_H
-
-        integer(int32) :: i, j
-        integer(int32) :: n_nodes, n_gauss, n_dim
-        real(real64) :: bdf0, dt_local
-
-        real(real64), allocatable :: J_local(:, :)
-        real(real64), allocatable :: R_local(:)
-
-        real(real64), allocatable :: work_C_HT(:)
-        real(real64), allocatable :: work_D_HT(:, :, :)
-        real(real64), allocatable :: work_matrix_coupling(:, :)
-
-        n_nodes = workspace%num_fe_nodes
-        n_gauss = workspace%num_fe_gauss
-        n_dim = workspace%num_fe_dimension
-        bdf0 = workspace%bdf_coeffs(1)
-        dt_local = 0.0d0
-        call control%get_dt(dt_local)
-
-        ! 1. J_HH + R_H: assemble_element (explicit Gauss loop, min cutoff, row equilibration)
-        allocate (J_local(n_nodes, n_nodes), R_local(n_nodes))
-        call self%assemble_element(workspace%material_id, &
-                                   workspace%bdf_coeffs(1:workspace%bdf_order + 1), &
-                                   dt_local, workspace, J_local, R_local)
-
-        if (present(K_HH)) then
-            do j = 1, n_nodes
-                do i = 1, n_nodes
-                    call K_HH%set(MATRIX_OPS%ADD, i, j, J_local(i, j))
-                end do
-            end do
-        end if
-
-        if (present(F_H)) then
-            do i = 1, n_nodes
-                call F_H%set(VECTOR_OPS%ADD, i, -R_local(i))
-            end do
-        end if
-
-        deallocate (J_local, R_local)
-
-        ! 2. K_HT: coupling Jacobian (separate Gauss loop, unchanged)
-        if (present(K_HT)) then
-            allocate (work_C_HT(n_gauss))
-            allocate (work_D_HT(n_dim, n_dim, n_gauss))
-            allocate (work_matrix_coupling(n_nodes, n_nodes))
-            work_C_HT(:) = 0.0d0
-            work_D_HT(:, :, :) = 0.0d0
-            work_matrix_coupling(:, :) = 0.0d0
-
-            do i = 1, n_gauss
-                call self%compute_coupling_mass_term(workspace%material_id, workspace%state_gp(i), work_C_HT(i))
-                call self%compute_coupling_diffusion_term(workspace%material_id, workspace%state_gp(i), work_D_HT(:, :, i))
-            end do
-
-            ! C_HT mass coupling -> K_HT
-            call workspace%compute_K1(work_C_HT, work_matrix_coupling)
-            do j = 1, n_nodes
-                do i = 1, n_nodes
-                    call K_HT%set(MATRIX_OPS%ADD, i, j, bdf0 * work_matrix_coupling(i, j))
-                end do
-            end do
-
-            ! D_HT diffusion coupling -> K_HT
-            call workspace%compute_K2(work_D_HT, work_matrix_coupling)
-            do j = 1, n_nodes
-                do i = 1, n_nodes
-                    call K_HT%set(MATRIX_OPS%ADD, i, j, work_matrix_coupling(i, j))
-                end do
-            end do
-
-        end if
-
-        if (allocated(work_C_HT)) deallocate (work_C_HT)
-        if (allocated(work_D_HT)) deallocate (work_D_HT)
-        if (allocated(work_matrix_coupling)) deallocate (work_matrix_coupling)
-
-    end subroutine assemble_local_newton_hydraulic
-
-    !> @brief Assemble Picard Local Components
+    !> @brief Assemble Picard local components
     module subroutine assemble_local_picard_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
         implicit none
         class(type_hydraulic), intent(in) :: self

@@ -612,9 +612,9 @@ contains
         integer(int32), pointer, contiguous :: element_list(:)
         real(real64) :: qi_seg_old, qi_seg_new, S_seg, dt_s
         type(type_state) :: local_state
-        real(real64), parameter :: rho_water = 999.8d0  !< [kg/m^3]
-        real(real64), parameter :: rho_ice = 917.0d0    !< [kg/m^3]
-        real(real64), parameter :: density_ratio = rho_water / rho_ice  !< ~1.0903
+        real(real64), parameter :: rho_water = 999.8d0 !< [kg/m^3]
+        real(real64), parameter :: rho_ice = 917.0d0 !< [kg/m^3]
+        real(real64), parameter :: density_ratio = rho_water / rho_ice !< ~1.0903
 
         call self%control%get_dt(dt_s)
         if (dt_s <= 0.0d0) return

@@ -61,7 +61,6 @@ module app_ftcms
         real(real64), allocatable :: col_scale(:)
         real(real64), allocatable :: col_scale_inv(:)
 
-
         type(type_control) :: control
         type(type_output_manager) :: output
 
