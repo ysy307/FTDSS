@@ -150,13 +150,15 @@ contains
 
         call state%dQw_dT%get(dQw_dT)
         call state%dQi_dT%get(dQi_dT)
-        call state%dQv_dT%get(dQv_dT)
+        if (self%enable_vapor_transport) then
+            call state%dQv_dT%get(dQv_dT)
+        end if
 
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_density_ice(state, rho_i)
 
         ! C_HT = d(rho_eff)/dT
-        ! rho_eff = rho_w*Qw + rho_i*Qi + rho_w*Qv
+        ! rho_eff = rho_w*Qw + rho_i*Qi + rho_w*Qv (vapor term only when enabled)
         C_HT = rho_w * dQw_dT + rho_i * dQi_dT + rho_w * dQv_dT
 
     end subroutine compute_coupling_mass_term_hydraulic

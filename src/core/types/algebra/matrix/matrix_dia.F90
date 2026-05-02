@@ -287,6 +287,17 @@ contains
 
     end subroutine set_all_dia
 
+    module subroutine set_by_index_dia(self, op, index, row_block, col_block, value)
+        implicit none
+        class(type_matrix_dia), intent(inout) :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: index
+        integer(int32), intent(in) :: row_block, col_block
+        real(real64), intent(in) :: value
+
+        self%status = MATRIX_STATUS%NOT_IMPLEMENTED
+    end subroutine set_by_index_dia
+
     !>
     !> Scales the matrix.
     !>

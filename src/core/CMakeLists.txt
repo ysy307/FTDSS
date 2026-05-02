@@ -129,6 +129,7 @@ target_sources(SOLVER_CORE PRIVATE
     # Topology
     types/topology/connectivity.F90
     types/topology/graph.F90
+    types/topology/scatter_map.F90
     # Utils
     types/utils/datetime.F90
     # Core

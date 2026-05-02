@@ -65,10 +65,12 @@ module core_types_algebra_matrix
         procedure(abst_set_value_block), private, pass(self), deferred :: set_value_block !&
         procedure(abst_set_row),         private, pass(self), deferred :: set_row !&
         procedure(abst_set_all),         private, pass(self), deferred :: set_all !&
+        procedure(abst_set_by_index), private, pass(self), deferred :: set_by_index
         generic, public :: set => set_value, & !&
                                   set_value_block, & !&
                                   set_row, & !&
-                                  set_all !&
+                                  set_all, & !&
+                                  set_by_index !&
 
         procedure(abst_scale),           public,  pass(self), deferred :: scale !&
         procedure(abst_zero_all),        public,  pass(self), deferred :: zero_all !&
@@ -187,6 +189,16 @@ module core_types_algebra_matrix
             real(real64), intent(in) :: value
         end subroutine abst_set_all
 
+        subroutine abst_set_by_index(self, op, index, row_block, col_block, value)
+            import :: abst_matrix, type_constant_id, int32, real64
+            implicit none
+            class(abst_matrix), intent(inout) :: self
+            type(type_constant_id), intent(in) :: op
+            integer(int32), intent(in) :: index
+            integer(int32), intent(in) :: row_block, col_block
+            real(real64), intent(in) :: value
+        end subroutine abst_set_by_index
+
         !>
         !> Scales the matrix by a given scalar value.
         subroutine abst_scale(self, op, alpha)
@@ -276,6 +288,7 @@ module core_types_algebra_matrix
         procedure, pass(self) :: set_value_block => set_value_block_dense
         procedure, pass(self) :: set_row => set_row_dense
         procedure, pass(self) :: set_all => set_all_dense
+        procedure, pass(self) :: set_by_index => set_by_index_dense
         procedure, pass(self) :: scale => scale_dense
         procedure, pass(self) :: find => find_dense
         procedure, pass(self) :: zero_all => zero_all_dense
@@ -359,6 +372,14 @@ module core_types_algebra_matrix
             real(real64), intent(in) :: value
         end subroutine set_all_dense
 
+        module subroutine set_by_index_dense(self, op, index, row_block, col_block, value)
+            class(type_matrix_dense), intent(inout) :: self
+            type(type_constant_id), intent(in) :: op
+            integer(int32), intent(in) :: index
+            integer(int32), intent(in) :: row_block, col_block
+            real(real64), intent(in) :: value
+        end subroutine set_by_index_dense
+
         !> Scales all values in the dense matrix by a scalar factor.
         module subroutine scale_dense(self, op, alpha)
             implicit none
@@ -429,6 +450,7 @@ module core_types_algebra_matrix
         procedure, pass(self) :: set_value_block => set_value_block_csr
         procedure, pass(self) :: set_row => set_row_csr
         procedure, pass(self) :: set_all => set_all_csr
+        procedure, pass(self) :: set_by_index => set_by_index_csr
         procedure, pass(self) :: scale => scale_csr
         procedure, pass(self) :: zero_all => zero_all_csr
         procedure, pass(self) :: zero_row => zero_row_csr
@@ -534,6 +556,16 @@ module core_types_algebra_matrix
             real(real64), intent(in) :: value
         end subroutine set_all_csr
 
+        !> Sets a value at a specific index.
+        module subroutine set_by_index_csr(self, op, index, row_block, col_block, value)
+            implicit none
+            class(type_matrix_csr), intent(inout) :: self
+            type(type_constant_id), intent(in) :: op
+            integer(int32), intent(in) :: index
+            integer(int32), intent(in) :: row_block, col_block
+            real(real64), intent(in) :: value
+        end subroutine set_by_index_csr
+
         !> Scales all stored matrix values by a scalar factor.
         module subroutine scale_csr(self, op, alpha)
             implicit none
@@ -596,6 +628,7 @@ module core_types_algebra_matrix
         procedure, pass(self) :: set_value_block => set_value_block_coo
         procedure, pass(self) :: set_row => set_row_coo
         procedure, pass(self) :: set_all => set_all_coo
+        procedure, pass(self) :: set_by_index => set_by_index_coo
         procedure, pass(self) :: scale => scale_coo
         procedure, pass(self) :: zero_all => zero_all_coo
         procedure, pass(self) :: zero_row => zero_row_coo
@@ -701,6 +734,16 @@ module core_types_algebra_matrix
             real(real64), intent(in) :: value
         end subroutine set_all_coo
 
+        !> Sets a value at a specific index.
+        module subroutine set_by_index_coo(self, op, index, row_block, col_block, value)
+            implicit none
+            class(type_matrix_coo), intent(inout) :: self
+            type(type_constant_id), intent(in) :: op
+            integer(int32), intent(in) :: index
+            integer(int32), intent(in) :: row_block, col_block
+            real(real64), intent(in) :: value
+        end subroutine set_by_index_coo
+
         !> Scales all stored matrix values by a scalar factor.
         module subroutine scale_coo(self, op, alpha)
             implicit none
@@ -763,6 +806,7 @@ module core_types_algebra_matrix
         procedure, pass(self) :: set_value_block => set_value_block_bsr
         procedure, pass(self) :: set_row => set_row_bsr
         procedure, pass(self) :: set_all => set_all_bsr
+        procedure, pass(self) :: set_by_index => set_by_index_bsr
         procedure, pass(self) :: scale => scale_bsr
         procedure, pass(self) :: zero_all => zero_all_bsr
         procedure, pass(self) :: zero_row => zero_row_bsr
@@ -865,6 +909,15 @@ module core_types_algebra_matrix
             real(real64), intent(in) :: value
         end subroutine set_all_bsr
 
+        module subroutine set_by_index_bsr(self, op, index, row_block, col_block, value)
+            implicit none
+            class(type_matrix_bsr), intent(inout) :: self
+            type(type_constant_id), intent(in) :: op
+            integer(int32), intent(in) :: index
+            integer(int32), intent(in) :: row_block, col_block
+            real(real64), intent(in) :: value
+        end subroutine set_by_index_bsr
+
         module subroutine scale_bsr(self, op, alpha)
             implicit none
             class(type_matrix_bsr), intent(inout) :: self
@@ -924,6 +977,7 @@ module core_types_algebra_matrix
         procedure, pass(self) :: set_value_block => set_value_block_dia
         procedure, pass(self) :: set_row => set_row_dia
         procedure, pass(self) :: set_all => set_all_dia
+        procedure, pass(self) :: set_by_index => set_by_index_dia
         procedure, pass(self) :: scale => scale_dia
         procedure, pass(self) :: zero_all => zero_all_dia
         procedure, pass(self) :: zero_row => zero_row_dia
@@ -1015,6 +1069,15 @@ module core_types_algebra_matrix
             type(type_constant_id), intent(in) :: op
             real(real64), intent(in) :: value
         end subroutine set_all_dia
+
+        module subroutine set_by_index_dia(self, op, index, row_block, col_block, value)
+            implicit none
+            class(type_matrix_dia), intent(inout) :: self
+            type(type_constant_id), intent(in) :: op
+            integer(int32), intent(in) :: index
+            integer(int32), intent(in) :: row_block, col_block
+            real(real64), intent(in) :: value
+        end subroutine set_by_index_dia
 
         module subroutine scale_dia(self, op, alpha)
             implicit none

@@ -318,6 +318,32 @@ contains
         self%status = MATRIX_STATUS%SUCCESS
     end subroutine set_all_bsr
 
+    module subroutine set_by_index_bsr(self, op, index, row_block, col_block, value)
+        implicit none
+        class(type_matrix_bsr), intent(inout) :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: index
+        integer(int32), intent(in) :: row_block, col_block
+        real(real64), intent(in) :: value
+
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
+
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
+            self%val(row_block, col_block, index) = value
+        case (MATRIX_OPS%ADD%ID)
+            self%val(row_block, col_block, index) = &
+                self%val(row_block, col_block, index) + value
+        case default
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end select
+
+        self%status = MATRIX_STATUS%SUCCESS
+    end subroutine set_by_index_bsr
+
     module subroutine scale_bsr(self, op, alpha)
         implicit none
         class(type_matrix_bsr), intent(inout) :: self

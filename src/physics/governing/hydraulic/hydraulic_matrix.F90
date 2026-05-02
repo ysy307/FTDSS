@@ -29,6 +29,8 @@ contains
 
         integer(int32) :: i, j, d, n_nodes, n_gauss, n_dim, ierr
         real(real64) :: bdf0, dt_local
+        real(real64), parameter :: C_min = 1.0d-12
+        real(real64), parameter :: K_min = 1.0d-12
         real(real64), allocatable :: local_vec_res(:)
 
         real(real64), allocatable :: work_C_HT(:)
@@ -66,7 +68,11 @@ contains
         ! 1. Gauss Loop
         do i = 1, n_gauss
             call self%compute_mass_term(workspace%material_id, workspace%state_gp(i), workspace%work_C(i))
+            workspace%work_C(i) = max(workspace%work_C(i), C_min)
             call self%compute_diffusion_term(workspace%material_id, workspace%state_gp(i), workspace%work_D(:, :, i))
+            do d = 1, workspace%num_fe_dimension
+                workspace%work_D(d, d, i) = max(workspace%work_D(d, d, i), K_min)
+            end do
             call self%compute_advective_term(workspace%material_id, workspace%state_gp(i), workspace%work_V(:, i))
             call self%compute_transient_term(workspace%material_id, workspace%state_gp(i), &
                                              workspace%bdf_coeffs(1:workspace%bdf_order + 1), &
@@ -222,7 +228,7 @@ contains
             Ceq = 0.0d0
             dTheta_dt = 0.0d0
 
-            call self%compute_C_eq(material_id, workspace%state_gp(gp), Ceq)
+            call self%compute_mass_term(material_id, workspace%state_gp(gp), Ceq)
             call self%compute_diffusion_term(material_id, workspace%state_gp(gp), D_HH)
             call self%compute_coupling_diffusion_term(material_id, workspace%state_gp(gp), D_HT)
             call self%compute_advective_term(material_id, workspace%state_gp(gp), V_H)

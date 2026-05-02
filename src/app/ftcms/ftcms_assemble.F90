@@ -45,7 +45,7 @@ contains
 
         use_scatter = .true.
 
-        !$OMP PARALLEL IF(do_hydraulic) DEFAULT(NONE) &
+        !$OMP PARALLEL IF(do_hydraulic .or. do_thermal) DEFAULT(NONE) &
         !$OMP SHARED(self, num_colors, elements_list, num_elements_in_color, &
         !$OMP        thermal_dof, hydraulic_dof, use_scatter, do_thermal, do_hydraulic) &
         !$OMP PRIVATE(i_color, i_elem, elem_id, p_connectivity, workspace, &

@@ -246,6 +246,33 @@ contains
     end subroutine set_row_csr
 
     !>
+    !> Sets all entries in a specific block row to a single scalar value.
+    module subroutine set_by_index_csr(self, op, index, row_block, col_block, value)
+        implicit none
+        class(type_matrix_csr), intent(inout) :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: index
+        integer(int32), intent(in) :: row_block, col_block
+        real(real64), intent(in) :: value
+
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
+
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
+            self%val(index) = value
+        case (MATRIX_OPS%ADD%ID)
+            self%val(index) = self%val(index) + value
+        case default
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end select
+
+        self%status = MATRIX_STATUS%SUCCESS
+    end subroutine set_by_index_csr
+
+    !>
     !> Sets all stored non-zero values in the matrix to a single scalar value.
     !>
     module subroutine set_all_csr(self, op, value)

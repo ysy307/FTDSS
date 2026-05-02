@@ -74,6 +74,8 @@ module core_types
         type_graph
     use :: core_types_topology_connectivity, only: &
         type_csr_index
+    use :: core_types_topology_scatter_map, only: &
+        type_scatter_map
 
     !-----------------------------------------------------------------
     ! Physics
@@ -91,7 +93,7 @@ module core_types
         type_solar_system
 
     !-----------------------------------------------------------------
-    ! Utilites
+    ! Utilities
     !-----------------------------------------------------------------
     use :: core_types_utils_datetime, only: &
         type_datetime

@@ -91,6 +91,7 @@ contains
         class(type_ftcms), intent(inout) :: self
         type(type_constant_id), intent(in) :: physics_type
 
+        real(real64) :: diag_val
         integer(int32) :: i_node, num_nodes, dof_index, k, row_start, row_end
         integer(int32), pointer :: ptr(:) => null(), ind(:) => null()
         real(real64), pointer :: val(:, :, :) => null()
@@ -123,9 +124,17 @@ contains
         end select
         nullify (matrix_ptr)
 
+        
         do i_node = 1, num_nodes
+            ! 元の対角成分を取得
+            call self%K%get(dof_index, dof_index, i_node, i_node, diag_val)
+
             call self%K%zero(i_node, dof_index)
-            call self%K%set(dof_index, dof_index, i_node, i_node, 1.0d0)
+
+            ! ゼロにならないよう安全対策
+            if (abs(diag_val) < 1.0d-12) diag_val = 1.0d0
+
+            call self%K%set(dof_index, dof_index, i_node, i_node, diag_val)
             call self%F%set(dof_index, i_node, 0.0d0)
         end do
 

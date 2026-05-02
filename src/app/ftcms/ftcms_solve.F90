@@ -233,17 +233,13 @@ contains
                 ! Apply boundary conditions (natural + essential) to the linear system
                 call self%apply_bc(prescribed=.false.)
 
-                ! Matrix diagnostics on first iteration
                 call self%control%get_nonlinear_iter(iter_nl)
-                if (iter_nl == 1) call debug_matrix_diagnostics(self%K, self%F)
 
                 ! Linear solve (K * du = F)
                 call self%solve()
 
                 ! If linear solver failed, mark as diverged and exit
                 if (.not. self%solver%is_success()) then
-                    write (*, '(A)') '   [GMRES] failed — residual history:'
-                    call self%solver%display_rhistory(unit_display=6)
                     linear_failed = .true.
                     if (self%is_active_thermal()) then
                         call self%control%set_converged( &
@@ -408,7 +404,6 @@ contains
             ! =============================================================
             ! Phase 1: Hydraulic nonlinear loop (T frozen)
             ! =============================================================
-            write (*, '(A)') '   [STAGGERED] entering hydraulic NL phase'; flush (6)
             phase_label = '[HYD_NL]'
             linear_failed = .false.
 
@@ -423,13 +418,10 @@ contains
                 call self%apply_bc(prescribed=.false.)
                 call self%freeze_physics_dofs(PHYSICS_TYPES%THERMAL)
                 call self%control%get_nonlinear_iter(iter_nl)
-                if (iter_nl == 1) call debug_matrix_diagnostics(self%K, self%F)
                 call self%solve(frozen_physics=PHYSICS_TYPES%THERMAL)
                 call self%zero_frozen_increment(PHYSICS_TYPES%THERMAL)
 
                 if (.not. self%solver%is_success()) then
-                    write (*, '(A)') '   [GMRES/HYD] failed — residual history:'
-                    call self%solver%display_rhistory(unit_display=6)
                     linear_failed = .true.
                     call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
                     call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
@@ -523,23 +515,17 @@ contains
                 call self%apply_bc(prescribed=.false.)
                 call self%freeze_physics_dofs(PHYSICS_TYPES%HYDRAULIC)
                 call self%control%get_nonlinear_iter(iter_nl)
-                write (*, '(A,I0)') '   [THM] before solve, iter_nl=', iter_nl; flush (6)
-                if (iter_nl == 1) call debug_matrix_diagnostics(self%K, self%F)
                 call self%solve(frozen_physics=PHYSICS_TYPES%HYDRAULIC)
                 call self%zero_frozen_increment(PHYSICS_TYPES%HYDRAULIC)
 
                 if (allocated(self%solver_thermal)) then
                     if (.not. self%solver_thermal%is_success()) then
-                        write (*, '(A)') '   [GMRES/THM] failed — residual history:'
-                        call self%solver_thermal%display_rhistory(unit_display=6)
                         linear_failed = .true.
                         call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
                         call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
                         exit thermal_nl
                     end if
                 else if (.not. self%solver%is_success()) then
-                    write (*, '(A)') '   [GMRES/THM] failed — residual history:'
-                    call self%solver%display_rhistory(unit_display=6)
                     linear_failed = .true.
                     call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
                     call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
@@ -709,85 +695,4 @@ contains
         end do time_loop
 
     end subroutine run_ftcms
-    ! -----------------------------------------------------------------------
-    ! Temporary diagnostic: print matrix/RHS statistics to help pinpoint
-    ! why GMRES is not converging (discretisation vs preconditioner vs solver).
-    ! Call once per time step (iter_nl == 1) before the linear solve.
-    ! -----------------------------------------------------------------------
-    subroutine debug_matrix_diagnostics(K, F)
-        implicit none
-        type(type_jacobian_matrix), intent(inout), target :: K
-        type(type_residual_vector), intent(in) :: F
-
-        class(abst_matrix), pointer :: mat
-        real(real64), pointer :: val(:), rhs(:)
-        integer(int32), pointer :: ia(:), ja(:)
-        integer(int32) :: n, nnz, i, j
-        real(real64) :: diag_min, diag_max, row_norm_max, val_abs
-        logical :: has_nan, has_inf
-        integer(int32) :: dofs_per_node
-        real(real64) :: row_sum
-
-        write (*, '(A)') '   [DIAG] --- matrix diagnostics start ---'
-        flush (6)
-
-        mat => K%get_matrix()
-        rhs => F%get_data()
-
-        has_nan = .false.
-        has_inf = .false.
-
-        select type (mat)
-        type is (type_matrix_csr)
-            val => mat%get_val()
-            ia => mat%get_ptr()
-            ja => mat%get_ind() ! not used but keeps pointer live
-            n = size(ia) - 1
-            nnz = size(val)
-
-            diag_min = huge(1.0d0)
-            diag_max = -huge(1.0d0)
-            row_norm_max = 0.0d0
-
-            do i = 1, n
-                row_sum = 0.0d0
-                do j = ia(i), ia(i + 1) - 1
-                    val_abs = abs(val(j))
-                    row_sum = row_sum + val_abs
-                    if (val(j) /= val(j)) has_nan = .true.
-                    if (val_abs > huge(1.0d0) * 0.5d0) has_inf = .true.
-                    ! diagonal: find entry where ja(j) == i
-                    if (ja(j) == i) then
-                        if (val(j) < diag_min) diag_min = val(j)
-                        if (val(j) > diag_max) diag_max = val(j)
-                    end if
-                end do
-                if (row_sum > row_norm_max) row_norm_max = row_sum
-            end do
-
-            write (*, '(A)') '   [DIAG] Matrix diagnostics:'
-            write (*, '(A,I0,A,I0)') '     n=', n, '  nnz=', nnz
-            write (*, '(A,ES12.4,A,ES12.4)') '     diag min=', diag_min, '  diag max=', diag_max
-            write (*, '(A,ES12.4)') '     row L1-norm max=', row_norm_max
-            write (*, '(A,L1,A,L1)') '     NaN in K=', has_nan, '  Inf in K=', has_inf
-
-        class default
-            write (*, '(A)') '   [DIAG] Matrix type not CSR — skipping diagnostics.'
-        end select
-
-        dofs_per_node = K%get_num_dofs_per_node()
-        write (*, '(A,I0)') '     DOFs per node=', dofs_per_node
-
-        ! RHS diagnostics
-        if (associated(rhs)) then
-            val_abs = maxval(abs(rhs))
-            has_nan = any(rhs /= rhs)
-            write (*, '(A,ES12.4,A,L1)') '     |F|_inf=', val_abs, '  NaN in F=', has_nan
-        end if
-
-        write (*, '(A)') '   [DIAG] --- matrix diagnostics end ---'
-        flush (6)
-
-    end subroutine debug_matrix_diagnostics
-
 end submodule ftcms_solve

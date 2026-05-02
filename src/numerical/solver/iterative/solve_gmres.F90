@@ -107,10 +107,10 @@ contains
         block
             real(real64), pointer :: bptr(:)
             bptr => b%get_data()
-            write (*, '(A,I0,A,I0,A,I0)') &
-                '   [GMRES-INIT] n=', size(bptr), &
-                ' m_restart=', self%m_restart, ' max_iter=', self%max_iterations
-            flush(6)
+            ! write (*, '(A,I0,A,I0,A,I0)') &
+            !     '   [GMRES-INIT] n=', size(bptr), &
+            !     ' m_restart=', self%m_restart, ' max_iter=', self%max_iterations
+            ! flush(6)
             nullify(bptr)
         end block
 
@@ -129,15 +129,15 @@ contains
         beta = vector_norm2(self%r)
         beta0_initial = beta
 
-        write (*, '(A,ES12.4,A,ES12.4,A,ES12.4)') &
-            '   [GMRES] beta0=', beta, '  tol=', self%tolerance, '  rel_tol*b=', self%relative_tolerance * b_norm
-        flush(6)
+        ! write (*, '(A,ES12.4,A,ES12.4,A,ES12.4)') &
+        !     '   [GMRES] beta0=', beta, '  tol=', self%tolerance, '  rel_tol*b=', self%relative_tolerance * b_norm
+        ! flush(6)
 
         call self%residual_history%set(MATRIX_OPS%INS, 1, beta)
 
         if (beta < self%tolerance .or. beta < self%relative_tolerance * b_norm) then
-            write (*, '(A)') '   [GMRES] converged on initial residual check'
-            flush(6)
+            ! write (*, '(A)') '   [GMRES] converged on initial residual check'
+            ! flush(6)
             return
         end if
 
@@ -209,12 +209,12 @@ contains
                 resid_krylov = abs(self%g(iter + 1))
                 call self%residual_history%set(MATRIX_OPS%INS, iter_global, resid_krylov)
 
-                if (mod(iter_global, 10) == 0) then
-                    write (*, '(A,I0,A,ES12.4,A,ES12.4)', advance='yes') &
-                        '   [GMRES] iter=', iter_global, &
-                        '  resid=', resid_krylov, '  b_norm=', b_norm
-                    flush(6)
-                end if
+                ! if (mod(iter_global, 10) == 0) then
+                !     write (*, '(A,I0,A,ES12.4,A,ES12.4)', advance='yes') &
+                !         '   [GMRES] iter=', iter_global, &
+                !         '  resid=', resid_krylov, '  b_norm=', b_norm
+                !     flush(6)
+                ! end if
 
                 ! Exit when Krylov estimate is at tolerance, machine precision, or max iterations.
                 ! The outer restart_loop checks the true residual after each restart and continues
@@ -242,11 +242,11 @@ contains
                 call vector_axpy(self%y(i), self%v(i), self%x_update)
             end do
 
-            write (*, '(A,I0,A,ES12.4,A,ES12.4)') &
-                '   [GMRES-UPD] k=', k, &
-                '  |y|_inf=', maxval(abs(self%y(1:k))), &
-                '  |x_update|=', vector_norm2(self%x_update)
-            flush(6)
+            ! write (*, '(A,I0,A,ES12.4,A,ES12.4)') &
+            !     '   [GMRES-UPD] k=', k, &
+            !     '  |y|_inf=', maxval(abs(self%y(1:k))), &
+            !     '  |x_update|=', vector_norm2(self%x_update)
+            ! flush(6)
 
             call self%pc%apply(self%x_update, self%z)
 
@@ -273,8 +273,8 @@ contains
             ! bad_restart_count limits consecutive failed restarts to prevent infinite loops
             ! when the preconditioner is ill-conditioned and every update diverges.
             if (beta /= beta .or. beta > 1.0d2 * beta_pre_update) then
-                write (*, '(A,ES12.4,A,ES12.4,A,I0)') &
-                    '   [GMRES-GUARD] beta=', beta, '  pre=', beta_pre_update, '  bad_count=', bad_restart_count
+                ! write (*, '(A,ES12.4,A,ES12.4,A,I0)') &
+                !     '   [GMRES-GUARD] beta=', beta, '  pre=', beta_pre_update, '  bad_count=', bad_restart_count
                 flush(6)
                 call vector_axpy(-1.0d0, self%z, x)
                 if (beta /= beta) then

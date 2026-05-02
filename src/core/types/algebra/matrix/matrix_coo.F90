@@ -269,7 +269,25 @@ contains
 
     end subroutine set_all_coo
 
-!>
+    module subroutine set_by_index_coo(self, op, index, row_block, col_block, value)
+        implicit none
+        !> The COO matrix object.
+        class(type_matrix_coo), intent(inout) :: self
+        !> The operation to perform
+        type(type_constant_id), intent(in) :: op
+        !> The 1-based index in the `val`/`ind`/`col` arrays.
+        integer(int32), intent(in) :: index
+        !> The block row index.
+        integer(int32), intent(in) :: row_block
+        !> The block column index.
+        integer(int32), intent(in) :: col_block
+        !> The value to set at the specified entry.
+        real(real64), intent(in) :: value
+
+        self%status = MATRIX_STATUS%NOT_IMPLEMENTED
+    end subroutine set_by_index_coo
+
+    !>
     !> Scales all stored values in the matrix by a scalar factor vector.
     module subroutine scale_coo(self, op, alpha)
         implicit none

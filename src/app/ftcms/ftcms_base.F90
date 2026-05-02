@@ -692,6 +692,7 @@ contains
                         end if
                         call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, alpha * du, current)
                         call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
+                        current(:) = current(:) + relaxation_factor * alpha * du(:)
                     else
                         relaxation_factor = 1.0d0
                         current(:) = current(:) + du(:)
@@ -729,6 +730,7 @@ contains
                         end if
                         call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, alpha * du, current)
                         call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
+                        current(:) = current(:) + relaxation_factor * alpha * du(:)
                     else
                         relaxation_factor = 1.0d0
                         current(:) = current(:) + du(:)

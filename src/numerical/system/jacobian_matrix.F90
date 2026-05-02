@@ -11,17 +11,23 @@ module numerical_system_jacobian_matrix
 
     type :: type_jacobian_matrix
         private
-        integer(int32) :: matrix_type = -1
         integer(int32) :: num_nodes = 0
         integer(int32) :: num_dofs_per_node = 0
+        integer(int32) :: num_dofs_of_physics(PHYSICS_TYPES%NUM_ID) = 0
         integer(int32) :: size = 0
 
-        class(abst_matrix), allocatable :: matrix
+        type(type_constant_id) :: coupling_mode
 
-        integer(int32), allocatable :: scatter_data(:)
-        integer(int32), allocatable :: scatter_ptr(:)
-        integer(int32) :: scatter_max_nodes = 0
-        logical :: scatter_ready = .false.
+        type(type_matrix_bsr), allocatable :: matrix(:)
+        type(type_scatter_map) :: scatter_map
+
+        integer(int32) :: num_system = 0
+
+        ! physics i -> system index (0 if inactive)
+        integer(int32) :: physics_to_system(PHYSICS_TYPES%NUM_ID) = 0
+
+        ! per system total dofs
+        integer(int32), allocatable :: system_size(:)
     contains
         procedure, public, pass(self) :: initialize => initialize_jacobian_matrix
         procedure, public, pass(self) :: destroy => destroy_jacobian_matrix
@@ -48,22 +54,70 @@ module numerical_system_jacobian_matrix
 
 contains
 
-    subroutine initialize_jacobian_matrix(self, domain)
+    subroutine initialize_jacobian_matrix(self, domain, coupling_mode)
         implicit none
         class(type_jacobian_matrix), intent(inout) :: self
         class(type_domain), intent(in) :: domain
+        type(type_constant_id), intent(in) :: coupling_mode
+
+        type(type_constant_id) :: physics_type
         integer(int32), allocatable :: row(:), col(:)
+        integer(int32) :: i, j, k
 
         if (allocated(self%matrix)) call self%destroy()
 
+        self%coupling_mode = coupling_mode
+        self%physics_to_system(:) = 0
+        self%num_dofs_of_physics(:) = 0
+
         call domain%get_total_dofs(self%size)
         call domain%get_num_nodes(self%num_nodes)
-        call domain%get_num_dof_per_node(self%num_dofs_per_node)
         call domain%get_node_adjacency(MATRIX_TYPES%CSR, row, col)
 
-        self%matrix_type = MATRIX_TYPES%BSR%ID
+        select case (coupling_mode%ID)
 
-        self%matrix = create_matrix(MATRIX_TYPES%BSR, self%num_nodes, row, col, self%num_dofs_per_node)
+        case (COUPLING_MODES%MONOLITHIC%ID)
+
+            call domain%get_num_dof_per_node(self%num_dofs_per_node)
+            self%num_system = 1
+
+            allocate (self%system_size(1))
+            self%system_size(1) = self%size
+
+        case (COUPLING_MODES%STAGGERED%ID)
+            do i = 1, PHYSICS_TYPES%NUM_ID
+                call domain%get_start_dof_index(PHYSICS_TYPES%to_object(i), self%num_dofs_of_physics(i))
+            end do
+
+            self%num_system = count(self%num_dofs_of_physics > 0)
+
+            allocate (self%system_size(self%num_system))
+
+            ! representative value (avoid invalid state)
+            self%num_dofs_per_node = 0
+
+        end select
+
+        allocate (self%matrix(self%num_system))
+
+        select case (coupling_mode%ID)
+        case (COUPLING_MODES%MONOLITHIC%ID)
+            call self%matrix(1)%initialize(self%num_nodes, row, col, self%num_dofs_per_node)
+        case (COUPLING_MODES%STAGGERED%ID)
+            j = 0
+            do i = 1, PHYSICS_TYPES%NUM_ID
+                if (self%num_dofs_of_physics(i) == 0) cycle
+                j = j + 1
+                self%physics_to_system(i) = j
+                self%system_size(j) = self%num_nodes * self%num_dofs_of_physics(i)
+                call self%matrix(j)%initialize( &
+                    self%num_nodes, row, col, self%num_dofs_of_physics(i) &
+                    )
+            end do
+
+        end select
+
+        call self%build_scatter_map(domain)
 
         deallocate (row, col)
     end subroutine initialize_jacobian_matrix
@@ -73,62 +127,42 @@ contains
         class(type_jacobian_matrix), intent(inout) :: self
         class(type_domain), intent(in) :: domain
 
-        integer(int32) :: num_fe, elem_id, i, j, n_local
-        integer(int32) :: row_node, ptr_start, ptr_end, block_index
-        integer(int32) :: total_entries, offset
-        integer(int32), pointer, contiguous :: connectivity(:)
-        integer(int32), pointer :: bsr_ptr(:), bsr_ind(:)
+        integer(int32) :: num_fe, elem_id
+        integer(int32) :: i, j, n_local
+        integer(int32), allocatable :: shape(:, :)
 
-        if (.not. allocated(self%matrix)) return
+        integer(int32), pointer, contiguous :: connectivity(:)
+        integer(int32), pointer :: ptr(:), ind(:)
 
         call domain%get_num_fe(num_fe)
         if (num_fe == 0) return
 
-        select type (matrix => self%matrix)
-        type is (type_matrix_bsr)
-            bsr_ptr => matrix%get_ptr()
-            bsr_ind => matrix%get_ind()
-        class default
-            return
-        end select
+        allocate (shape(2, num_fe))
 
-        if (allocated(self%scatter_ptr)) deallocate (self%scatter_ptr)
-        allocate (self%scatter_ptr(num_fe + 1))
-
-        total_entries = 0
-        self%scatter_max_nodes = 0
         do elem_id = 1, num_fe
-            nullify (connectivity)
             call domain%get_fe_connectivity(elem_id, connectivity)
-            n_local = size(connectivity)
-            self%scatter_ptr(elem_id) = total_entries + 1
-            total_entries = total_entries + n_local * n_local
-            if (n_local > self%scatter_max_nodes) self%scatter_max_nodes = n_local
+            shape(1, elem_id) = size(connectivity)
+            shape(2, elem_id) = size(connectivity)
         end do
-        self%scatter_ptr(num_fe + 1) = total_entries + 1
 
-        if (allocated(self%scatter_data)) deallocate (self%scatter_data)
-        allocate (self%scatter_data(total_entries))
+        call self%scatter_map%initialize(num_fe, 2, shape)
+
+        ! 構造は1つ目のmatrixで十分
+        ptr => self%matrix(1)%get_ptr()
+        ind => self%matrix(1)%get_ind()
 
         do elem_id = 1, num_fe
-            nullify (connectivity)
             call domain%get_fe_connectivity(elem_id, connectivity)
             n_local = size(connectivity)
-            offset = self%scatter_ptr(elem_id) - 1
 
             do i = 1, n_local
-                row_node = connectivity(i)
-                ptr_start = bsr_ptr(row_node)
-                ptr_end = bsr_ptr(row_node + 1) - 1
-
                 do j = 1, n_local
-                    block_index = binary_find(connectivity(j), bsr_ind, ptr_start, ptr_end)
-                    self%scatter_data(offset + (i - 1) * n_local + j) = block_index
+                    call self%scatter_map%set(elem_id, [i, j], &
+                                              binary_find(connectivity(j), ind, &
+                                                          ptr(connectivity(i)), ptr(connectivity(i) + 1) - 1))
                 end do
             end do
         end do
-
-        self%scatter_ready = .true.
 
     end subroutine build_scatter_map_jacobian
 
@@ -140,8 +174,7 @@ contains
             call self%matrix%destroy()
             deallocate (self%matrix)
         end if
-        if (allocated(self%scatter_data)) deallocate (self%scatter_data)
-        if (allocated(self%scatter_ptr)) deallocate (self%scatter_ptr)
+        call self%scatter_map%destroy()
         self%scatter_ready = .false.
         self%scatter_max_nodes = 0
         self%size = 0
@@ -254,6 +287,7 @@ contains
         end select
     end subroutine add_local_jacobian_matrix
 
+
     subroutine add_local_fast_jacobian_matrix(self, row_dof, col_dof, element_id, n_local, local_data)
         implicit none
         class(type_jacobian_matrix), intent(inout) :: self
@@ -263,26 +297,39 @@ contains
         integer(int32), intent(in) :: n_local
         type(type_matrix_dense), intent(in) :: local_data
 
-        integer(int32) :: i, j, offset, block_index
-        real(real64), pointer :: val_bsr(:, :, :)
+        integer(int32) :: i, j, idx
+        integer(int32) :: sys
         real(real64), pointer, dimension(:, :) :: dense_val
 
         if (.not. allocated(self%matrix)) return
 
         dense_val => local_data%get_val()
-        offset = self%scatter_ptr(element_id) - 1
 
-        select type (matrix => self%matrix)
-        type is (type_matrix_bsr)
-            val_bsr => matrix%get_val()
+        select case (self%coupling_mode%ID)
+
+        case (COUPLING_MODES%MONOLITHIC%ID)
 
             do i = 1, n_local
                 do j = 1, n_local
-                    block_index = self%scatter_data(offset + (i - 1) * n_local + j)
-                    val_bsr(row_dof, col_dof, block_index) = &
-                        val_bsr(row_dof, col_dof, block_index) + dense_val(i, j)
+                    call self%scatter_map%get_index(element_id, [i, j], idx)
+                    call self%matrix(1)%set(MATRIX_OPS%ADD, idx, row_dof, col_dof, dense_val(i, j))
                 end do
             end do
+
+        case (COUPLING_MODES%STAGGERED%ID)
+            ! skip cross-physics coupling
+            if (row_dof /= col_dof) return
+
+            sys = self%physics_to_system(row_dof)
+            if (sys == 0) return
+
+            do i = 1, n_local
+                do j = 1, n_local
+                    call self%scatter_map%get_index(element_id, [i, j], idx)
+                    call self%matrix(sys)%set(MATRIX_OPS%ADD, idx, 1, 1, dense_val(i, j))
+                end do
+            end do
+
         end select
     end subroutine add_local_fast_jacobian_matrix
 
