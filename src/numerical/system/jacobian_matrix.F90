@@ -82,7 +82,7 @@ contains
 
         case (COUPLING_MODES%STAGGERED%ID)
             do i = 1, PHYSICS_TYPES%NUM_ID
-                call domain%get_start_dof_index(PHYSICS_TYPES%to_object(i), self%num_dofs_of_physics(i))
+                call domain%get_target_dof(PHYSICS_TYPES%to_object(i), self%num_dofs_of_physics(i))
             end do
 
             self%num_system = count(self%num_dofs_of_physics > 0)
@@ -97,7 +97,7 @@ contains
 
         select case (coupling_mode%ID)
         case (COUPLING_MODES%MONOLITHIC%ID)
-            call self%matrix(1)%initialize(self%num_nodes, row, col, self%num_dofs_per_node)
+            call self%matrix(1)%initialize(self%num_nodes, row, col, self%num_dofs_per_node, self%num_dofs_per_node)
         case (COUPLING_MODES%STAGGERED%ID)
             j = 0
             do i = 1, PHYSICS_TYPES%NUM_ID
@@ -106,7 +106,7 @@ contains
                 self%physics_to_system(i) = j
                 self%system_size(j) = self%num_nodes * self%num_dofs_of_physics(i)
                 call self%matrix(j)%initialize( &
-                    self%num_nodes, row, col, self%num_dofs_of_physics(i) &
+                    self%num_nodes, row, col, self%num_dofs_of_physics(i), self%num_dofs_of_physics(i) &
                     )
             end do
 
@@ -200,7 +200,11 @@ contains
 
         integer(int32) :: sys_id
 
-        sys_id = optval(physics_id%ID, 1)
+        if (present(physics_id)) then
+            sys_id = physics_id%ID
+        else
+            sys_id = 1
+        end if
 
         select case (self%coupling_mode%ID)
         case (COUPLING_MODES%MONOLITHIC%ID)

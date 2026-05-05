@@ -176,14 +176,42 @@ contains
 
         call self%control%profiler_start(PROFILER_TYPES%SOLVE)
 
-        K_ptr => self%K%get_matrix()
-        F_ptr => self%F%get_vector()
-        du_ptr => self%du%get_vector()
+        block
+            type(type_constant_id) :: active_physics
+            integer(int32) :: sys_id
 
-        if (.not. associated(du_ptr%get_data())) then
-            call self%du%initialize(self%domain)
-            du_ptr => self%du%get_vector()
-        end if
+            if (self%control%is_staggered()) then
+                ! In staggered mode, frozen_physics names the physics that is held
+                ! fixed; the active solve targets the OTHER physics.
+                if (present(frozen_physics) .and. frozen_physics%ID == PHYSICS_TYPES%HYDRAULIC%ID) then
+                    active_physics = PHYSICS_TYPES%THERMAL
+                else
+                    active_physics = PHYSICS_TYPES%HYDRAULIC
+                end if
+                K_ptr => self%K%get_matrix(active_physics)
+                sys_id = active_physics%ID
+                F_ptr => self%F%get_vector(sys_id)
+                du_ptr => self%du%get_vector(sys_id)
+            else
+                K_ptr => self%K%get_matrix()
+                F_ptr => self%F%get_vector()
+                du_ptr => self%du%get_vector()
+            end if
+
+            if (.not. associated(du_ptr%get_data())) then
+                block
+                    type(type_constant_id), pointer :: coupling_mode_ptr
+                    nullify (coupling_mode_ptr)
+                    call self%control%get_coupling_mode(coupling_mode_ptr)
+                    call self%du%initialize(self%domain, coupling_mode_ptr)
+                end block
+                if (self%control%is_staggered()) then
+                    du_ptr => self%du%get_vector(sys_id)
+                else
+                    du_ptr => self%du%get_vector()
+                end if
+            end if
+        end block
 
         call self%domain%get_total_dofs(num_total_dofs)
 
@@ -193,6 +221,14 @@ contains
         call du_ptr%zero()
         if (present(frozen_physics) .and. frozen_physics%ID == PHYSICS_TYPES%HYDRAULIC%ID &
             .and. allocated(self%solver_thermal)) then
+            block
+                real(real64), pointer :: dbg_F(:) => null()
+                dbg_F => F_ptr%get_data()
+                if (associated(dbg_F)) then
+                    write (*, '(A,ES12.4,A,ES12.4)') '[DBG-F_T] max=', maxval(abs(dbg_F)), ', norm2=', norm2(dbg_F)
+                    nullify (dbg_F)
+                end if
+            end block
             call self%solver_thermal%solve(K_ptr, F_ptr, du_ptr)
             call self%solver_thermal%check()
             if (.not. self%solver_thermal%is_success()) then

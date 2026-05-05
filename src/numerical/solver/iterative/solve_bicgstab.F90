@@ -21,6 +21,7 @@ contains
 
         self%num_nodes = solver_settings%num_nodes
         self%tolerance = solver_settings%tolerance
+        self%relative_tolerance = solver_settings%relative_tolerance
         self%max_iterations = solver_settings%max_iterations
         self%projection_enabled = solver_settings%projection_enabled
         self%projection_offset = solver_settings%projection_offset

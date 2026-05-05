@@ -278,6 +278,7 @@ module numerical_solver_preconditioner
         procedure :: setup => setup_preconditioner_iluk
         procedure, pass(self), private :: setup_csr_ilu0
         procedure, pass(self), private :: setup_bsr_ilu0
+        procedure, pass(self), private :: setup_bsr_point_ilu0
         procedure :: apply => apply_preconditioner_iluk
         procedure, pass(self), private :: apply_csr_ilu0
         procedure, pass(self), private :: apply_bsr_ilu0
@@ -308,6 +309,12 @@ module numerical_solver_preconditioner
             class(type_preconditioner_iluk), intent(inout) :: self
             class(type_matrix_bsr), intent(in) :: A
         end subroutine setup_bsr_ilu0
+
+        module subroutine setup_bsr_point_ilu0(self, A)
+            implicit none
+            class(type_preconditioner_iluk), intent(inout) :: self
+            class(type_matrix_bsr), intent(in) :: A
+        end subroutine setup_bsr_point_ilu0
 
         module subroutine apply_preconditioner_iluk(self, r, z)
             implicit none

@@ -55,7 +55,7 @@ contains
             if (self%is_block) then
                 call self%setup_bsr_ilu0(A)
             else
-                self%status = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+                call self%setup_bsr_point_ilu0(A)
             end if
 
         class default
@@ -157,6 +157,110 @@ contains
 
         self%status = SOLVER_STATUS%SUCCESS%ID
     end subroutine setup_csr_ilu0
+
+    !> Perform scalar ILU(0) for BSR with block_size=1 (treats val(1,1,:) as scalar CSR val).
+    module subroutine setup_bsr_point_ilu0(self, A)
+        implicit none
+        class(type_preconditioner_iluk), intent(inout) :: self
+        class(type_matrix_bsr), intent(in) :: A
+
+        integer(int32), dimension(:), pointer :: mat_ptr, mat_ind
+        real(real64), dimension(:, :, :), pointer :: mat_val_3d
+        integer(int32) :: i, k, j, jj, j_stop, nnz, col
+        real(real64) :: multiplier
+        real(real64), allocatable :: work_row(:), orig_diag(:)
+        integer(int32), allocatable :: work_pos(:)
+        ! Prevent sign-flipped pivots due to fill-in cancellation (modified ILU)
+        real(real64), parameter :: ILU_DIAG_ALPHA = 1.0d-4
+        real(real64), parameter :: ILU_DIAG_ABS_MIN = 1.0d-15
+        real(real64), parameter :: ILU_MULTIPLIER_MAX = 1.0d8
+
+        mat_ptr => A%get_ptr()
+        mat_ind => A%get_ind()
+        mat_val_3d => A%get_val()
+
+        if (.not. associated(mat_val_3d)) then
+            self%status = -1
+            return
+        end if
+
+        nnz = size(mat_val_3d, 3)
+
+        if (allocated(self%val)) deallocate (self%val)
+        if (allocated(self%ptr)) deallocate (self%ptr)
+        if (allocated(self%ind)) deallocate (self%ind)
+        if (allocated(self%diag_ptr)) deallocate (self%diag_ptr)
+
+        allocate (self%val(nnz))
+        allocate (self%ptr(self%num_rows + 1))
+        allocate (self%ind(nnz))
+        allocate (self%diag_ptr(self%num_rows))
+
+        self%ptr = mat_ptr
+        self%ind = mat_ind
+        self%val = mat_val_3d(1, 1, :)
+
+        allocate (work_row(self%num_rows))
+        allocate (work_pos(self%num_rows))
+        allocate (orig_diag(self%num_rows))
+        work_row = 0.0d0
+        work_pos = 0
+        orig_diag = 0.0d0
+
+        do i = 1, self%num_rows
+            self%diag_ptr(i) = -1
+            do k = self%ptr(i), self%ptr(i + 1) - 1
+                if (self%ind(k) == i) then
+                    self%diag_ptr(i) = k
+                    orig_diag(i) = self%val(k)
+                    exit
+                end if
+            end do
+            if (self%diag_ptr(i) == -1) then
+                self%status = SOLVER_STATUS%DECOMPOSITION_FAILURE%ID
+                return
+            end if
+        end do
+
+        do i = 1, self%num_rows
+            do k = self%ptr(i), self%ptr(i + 1) - 1
+                col = self%ind(k)
+                work_row(col) = self%val(k)
+                work_pos(col) = k
+            end do
+
+            j_stop = self%diag_ptr(i) - 1
+            do k = self%ptr(i), j_stop
+                col = self%ind(k)
+                multiplier = work_row(col) / self%val(self%diag_ptr(col))
+                if (abs(multiplier) > ILU_MULTIPLIER_MAX) &
+                    multiplier = sign(ILU_MULTIPLIER_MAX, multiplier)
+                work_row(col) = multiplier
+                self%val(k) = multiplier
+
+                do jj = self%diag_ptr(col) + 1, self%ptr(col + 1) - 1
+                    j = self%ind(jj)
+                    if (work_pos(j) /= 0) then
+                        work_row(j) = work_row(j) - multiplier * self%val(jj)
+                    end if
+                end do
+            end do
+
+            do k = self%ptr(i), self%ptr(i + 1) - 1
+                col = self%ind(k)
+                self%val(k) = work_row(col)
+                work_row(col) = 0.0d0
+                work_pos(col) = 0
+            end do
+
+            ! Prevent near-zero or sign-flipped pivot (fill-in cancellation for FEM matrices)
+            if (self%val(self%diag_ptr(i)) < max(ILU_DIAG_ALPHA * abs(orig_diag(i)), ILU_DIAG_ABS_MIN)) then
+                self%val(self%diag_ptr(i)) = max(ILU_DIAG_ALPHA * abs(orig_diag(i)), ILU_DIAG_ABS_MIN)
+            end if
+        end do
+
+        self%status = SOLVER_STATUS%SUCCESS%ID
+    end subroutine setup_bsr_point_ilu0
 
     !> Perform block ILU(0) factorization for a BSR matrix.
     module subroutine setup_bsr_ilu0(self, A)

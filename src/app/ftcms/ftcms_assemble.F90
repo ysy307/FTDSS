@@ -77,32 +77,12 @@ contains
 
                     ! $OMP CRITICAL(ftcms_global_assembly)
                     if (do_thermal) then
-                        if (use_scatter) then
-                            call self%K%add(thermal_dof, thermal_dof, elem_id, num_nodes_local, local_K_TT)
-                            if (do_hydraulic) then
-                                call self%K%add(thermal_dof, hydraulic_dof, elem_id, num_nodes_local, local_K_TH)
-                            end if
-                        else
-                            call self%K%add(thermal_dof, thermal_dof, p_connectivity, local_K_TT)
-                            if (do_hydraulic) then
-                                call self%K%add(thermal_dof, hydraulic_dof, p_connectivity, local_K_TH)
-                            end if
-                        end if
+                        call self%K%add(thermal_dof, thermal_dof, elem_id, num_nodes_local, local_K_TT)
                         call self%F%add(thermal_dof, p_connectivity, local_F_T)
                     end if
 
                     if (do_hydraulic) then
-                        if (use_scatter) then
-                            call self%K%add(hydraulic_dof, hydraulic_dof, elem_id, num_nodes_local, local_K_HH)
-                            if (do_thermal) then
-                                call self%K%add(hydraulic_dof, thermal_dof, elem_id, num_nodes_local, local_K_HT)
-                            end if
-                        else
-                            call self%K%add(hydraulic_dof, hydraulic_dof, p_connectivity, local_K_HH)
-                            if (do_thermal) then
-                                call self%K%add(hydraulic_dof, thermal_dof, p_connectivity, local_K_HT)
-                            end if
-                        end if
+                        call self%K%add(hydraulic_dof, hydraulic_dof, elem_id, num_nodes_local, local_K_HH)
                         call self%F%add(hydraulic_dof, p_connectivity, local_F_H)
                     end if
                     ! $OMP END CRITICAL(ftcms_global_assembly)

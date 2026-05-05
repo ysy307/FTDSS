@@ -91,7 +91,7 @@ contains
 
         case (COUPLING_MODES%STAGGERED%ID)
             do i = 1, PHYSICS_TYPES%NUM_ID
-                call domain%get_start_dof_index(PHYSICS_TYPES%to_object(i), self%num_dofs_of_physics(i))
+                call domain%get_target_dof(PHYSICS_TYPES%to_object(i), self%num_dofs_of_physics(i))
             end do
 
             self%num_system = count(self%num_dofs_of_physics > 0)

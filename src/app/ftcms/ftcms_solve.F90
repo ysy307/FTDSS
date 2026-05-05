@@ -56,6 +56,7 @@ contains
 
         call self%control%increment_nonlinear()
         call self%control%get_nonlinear_iter(iter)
+        write (*, '(A,I0)') '[DBG-SETUP] iter_after_increment=', iter
 
         if (iter == 1) then
             prescribe_bc = .true.
@@ -362,7 +363,7 @@ contains
         logical :: prescribe_bc
         integer(int32) :: iter_nl, coupling_iter, num_nodes, bdf_order
         integer(int32), parameter :: MAX_COUPLING_ITER = 1
-        integer(int32), parameter :: MAX_PHASE_NL_ITER = 20
+        integer(int32), parameter :: MAX_PHASE_NL_ITER = 1
         real(real64), parameter :: COUPLING_TOL = 1.0d-3
         real(real64), parameter :: THERMAL_INCREMENT_GUARD = 1.0d6
         real(real64), parameter :: HYDRAULIC_INCREMENT_GUARD = 1.0d8
@@ -552,6 +553,9 @@ contains
                 call self%reflect_variables()
 
                 call self%control%get_nonlinear_iter(iter_nl)
+                write (*, '(A,I0,A,L1,A,L1)') '[DBG-LOOP] iter_nl=', iter_nl, &
+                    ', is_converged=', self%control%is_converged(), &
+                    ', should_continue=', self%control%should_continue()
                 if ((.not. self%control%is_converged()) .and. iter_nl >= MAX_PHASE_NL_ITER) then
                     linear_failed = .true.
                     write (*, '(A,I0,A)') '   [THM_NL] reached nonlinear iteration cap (', MAX_PHASE_NL_ITER, &

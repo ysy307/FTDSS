@@ -20,6 +20,7 @@ module numerical_solver_interface
         integer(int32) :: id
         integer(int32) :: preconditioner_id
         real(real64) :: tolerance
+        real(real64) :: relative_tolerance = 1.0d-6
         integer(int32) :: max_iterations
         integer(int32) :: m_restart
         logical :: projection_enabled = .false.
@@ -185,7 +186,8 @@ module numerical_solver_interface
 
 contains
     subroutine set_solver_settings(self, id, num_nodes, tolerance, max_iterations, m_restart, &
-                                   projection_enabled, projection_offset, projection_stride)
+                                   projection_enabled, projection_offset, projection_stride, &
+                                   relative_tolerance)
         implicit none
         class(type_solver_settings), intent(inout) :: self
         integer(int32), intent(in) :: id
@@ -196,10 +198,13 @@ contains
         logical, intent(in), optional :: projection_enabled
         integer(int32), intent(in), optional :: projection_offset
         integer(int32), intent(in), optional :: projection_stride
+        real(real64), intent(in), optional :: relative_tolerance
 
         self%ID = id
         self%num_nodes = num_nodes
         self%tolerance = tolerance
+        self%relative_tolerance = 1.0d-6
+        if (present(relative_tolerance)) self%relative_tolerance = relative_tolerance
         self%max_iterations = max_iterations
         self%projection_enabled = .false.
         self%projection_offset = 0

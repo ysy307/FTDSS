@@ -109,10 +109,10 @@ contains
         call self%domain%get_total_dofs(num_total_dofs)
         call self%domain%get_num_nodes(num_nodes)
 
-        call self%K%initialize(self%domain)
+        call self%K%initialize(self%domain, config_control_manager%coupling_mode)
         call self%K%build_scatter_map(self%domain)
-        call self%F%initialize(self%domain)
-        call self%du%initialize(self%domain)
+        call self%F%initialize(self%domain, config_control_manager%coupling_mode)
+        call self%du%initialize(self%domain, config_control_manager%coupling_mode)
 
         max_bdf_order = input%basic%solver_settings%bdf_order
         call self%porosity%initialize(num_nodes, max_bdf_order)
@@ -155,22 +155,34 @@ contains
             if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc)) then
                 projection_enabled_selected = .true.
                 projection_offset_selected = self%hydraulic_start_dof
-                projection_stride_selected = self%K%get_num_dofs_per_node()
+                call self%K%get_num_dofs_per_node(projection_stride_selected)
                 write (*, '(A)') 'Notice: Enabling mean-zero nullspace projection for all-Neumann hydraulic component.'
             end if
 
-            call solver_info%set(solver_type_selected, &
-                                 num_total_dofs, &
-                                 linear_solver_settings%tolerance, &
-                                 linear_solver_settings%max_iterations, &
-                                 m_restart_selected, &
-                                 projection_enabled=projection_enabled_selected, &
-                                 projection_offset=projection_offset_selected, &
-                                 projection_stride=projection_stride_selected)
-            if (preconditioner_type_selected == PRECONDITIONER_TYPES%ILU%ID .or. &
-                preconditioner_type_selected == PRECONDITIONER_TYPES%ILUT%ID .or. &
-                preconditioner_type_selected == PRECONDITIONER_TYPES%SAAMG%ID) then
-                call pc_info%set(preconditioner_type_selected, num_nodes, self%K%get_num_dofs_per_node(), &
+            block
+                integer(int32) :: solver_size
+                if (self%control%is_staggered()) then
+                    solver_size = num_nodes
+                else
+                    solver_size = num_total_dofs
+                end if
+                call solver_info%set(solver_type_selected, &
+                                     solver_size, &
+                                     linear_solver_settings%tolerance, &
+                                     linear_solver_settings%max_iterations, &
+                                     m_restart_selected, &
+                                     projection_enabled=projection_enabled_selected, &
+                                     projection_offset=projection_offset_selected, &
+                                     projection_stride=projection_stride_selected)
+            end block
+            if (.not. self%control%is_staggered() .and. &
+                (preconditioner_type_selected == PRECONDITIONER_TYPES%ILU%ID .or. &
+                 preconditioner_type_selected == PRECONDITIONER_TYPES%ILUT%ID .or. &
+                 preconditioner_type_selected == PRECONDITIONER_TYPES%SAAMG%ID)) then
+                block
+                    integer(int32) :: dofs_per_node_local
+                    call self%K%get_num_dofs_per_node(dofs_per_node_local)
+                    call pc_info%set(preconditioner_type_selected, num_nodes, dofs_per_node_local, &
                                  amg_strength_threshold=linear_solver_settings%amg_strength_threshold, &
                                  amg_smoother_sweeps=linear_solver_settings%amg_smoother_sweeps, &
                                  amg_max_agg_size=linear_solver_settings%amg_max_agg_size, &
@@ -179,17 +191,24 @@ contains
                                  amg_smoother_type=linear_solver_settings%amg_smoother_type, &
                                  amg_rebuild_frequency=linear_solver_settings%amg_rebuild_frequency, &
                                  amg_rebuild_threshold=linear_solver_settings%amg_rebuild_threshold)
+                end block
             else
-                call pc_info%set(preconditioner_type_selected, num_total_dofs)
+                call pc_info%set(preconditioner_type_selected, &
+                                 merge(num_nodes, num_total_dofs, self%control%is_staggered()))
             end if
             call create_solver(self%solver, solver_info, pc_info, ierr)
 
-            ! Thermal phase solver uses Jacobi: ILU on the full BSR matrix degrades
-            ! when the hydraulic DOF rows are frozen to identity in the staggered scheme,
-            ! causing catastrophic GMRES divergence. Jacobi is stable but weaker;
-            ! the staggered coupling iterations absorb the residual.
             if (self%is_active_thermal()) then
-                call pc_info%set(PRECONDITIONER_TYPES%JACOBI%ID, num_total_dofs)
+                if (self%control%is_staggered()) then
+                    call pc_info%set(preconditioner_type_selected, num_nodes)
+                    call solver_info%set(solver_type_selected, num_nodes, &
+                                         linear_solver_settings%tolerance, &
+                                         linear_solver_settings%max_iterations, &
+                                         m_restart_selected, &
+                                         relative_tolerance=5.0d-2)
+                else
+                    call pc_info%set(PRECONDITIONER_TYPES%JACOBI%ID, num_total_dofs)
+                end if
                 call create_solver(self%solver_thermal, solver_info, pc_info, ierr)
             end if
         end associate
@@ -380,28 +399,34 @@ contains
             return
         end if
 
-        du => self%du%get_data()
-        if (.not. associated(du)) then
-            call allocate_array(variable, 0)
-            return
-        end if
-
         if (self%control%is_physics_active(variable_id)) then
             call self%domain%get_num_nodes(num_nodes)
-            call self%domain%get_num_dof_per_node(num_dofs_per_node)
-            call self%domain%get_start_dof_index(variable_id, target_dof)
-
             call allocate_array(variable, num_nodes)
 
-            start_idx = target_dof
-            end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
-
-            variable(:) = du(start_idx:end_idx:num_dofs_per_node)
+            if (self%control%is_staggered()) then
+                du => self%du%get_data(variable_id%ID)
+                if (.not. associated(du)) then
+                    variable(:) = 0.0d0
+                else
+                    variable(:) = du(1:num_nodes)
+                    nullify (du)
+                end if
+            else
+                du => self%du%get_data()
+                if (.not. associated(du)) then
+                    variable(:) = 0.0d0
+                else
+                    call self%domain%get_num_dof_per_node(num_dofs_per_node)
+                    call self%domain%get_start_dof_index(variable_id, target_dof)
+                    start_idx = target_dof
+                    end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
+                    variable(:) = du(start_idx:end_idx:num_dofs_per_node)
+                    nullify (du)
+                end if
+            end if
         else
             call allocate_array(variable, 0)
         end if
-
-        nullify (du)
 
     end subroutine get_variable_increment_ftcms
 
@@ -425,23 +450,31 @@ contains
             return
         end if
 
-        F => self%F%get_data()
-        if (.not. associated(F)) then
-            call allocate_array(variable, 0)
-            return
-        end if
-
         if (self%control%is_physics_active(variable_id)) then
             call self%domain%get_num_nodes(num_nodes)
-            call self%domain%get_num_dof_per_node(num_dofs_per_node)
-            call self%domain%get_start_dof_index(variable_id, target_dof)
-
             call allocate_array(variable, num_nodes)
 
-            start_idx = target_dof
-            end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
-
-            variable(:) = F(start_idx:end_idx:num_dofs_per_node)
+            if (self%control%is_staggered()) then
+                F => self%F%get_data(variable_id%ID)
+                if (.not. associated(F)) then
+                    variable(:) = 0.0d0
+                else
+                    variable(:) = F(1:num_nodes)
+                    nullify (F)
+                end if
+            else
+                F => self%F%get_data()
+                if (.not. associated(F)) then
+                    variable(:) = 0.0d0
+                else
+                    call self%domain%get_num_dof_per_node(num_dofs_per_node)
+                    call self%domain%get_start_dof_index(variable_id, target_dof)
+                    start_idx = target_dof
+                    end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
+                    variable(:) = F(start_idx:end_idx:num_dofs_per_node)
+                    nullify (F)
+                end if
+            end if
         else
             call allocate_array(variable, 0)
         end if
@@ -680,9 +713,11 @@ contains
                 call allocate_array(current_prev, size(current))
                 current_prev(:) = current(:)
 
-                if (allocated(du) .and. size(du) > 0) then
+                if (allocated(du) .and. size(du) > 0 .and. &
+                    ((.not. allocated(self%solver_thermal)) .or. self%solver_thermal%is_success())) then
+                    max_du = maxval(abs(du))
+                    write (*, '(A,ES13.5,A,L1)') '   [REFLECT] thermal max|du|=', max_du, ', is_none=', is_none
                     if (.not. is_none) then
-                        max_du = maxval(abs(du))
                         if (max_du > PICARD_MAX_DT_STEP) then
                             alpha = PICARD_MAX_DT_STEP / max_du
                             write (*, '(A,2(ES13.5,A))') '   [REFLECT] thermal Picard cap active: max|du|=', &
@@ -709,6 +744,17 @@ contains
             call self%temperature%compute_time_derivative(bdf_coeffs, bdf_order)
 
             call deallocate_array(du)
+
+            ! Zero the stored thermal increment to prevent double-application
+            ! when reflect_variables is called again from the hydraulic phase.
+            if (self%control%is_staggered()) then
+                block
+                    real(real64), pointer :: du_raw(:) => null()
+                    du_raw => self%du%get_data(PHYSICS_TYPES%THERMAL%ID)
+                    if (associated(du_raw)) du_raw(:) = 0.0d0
+                    nullify (du_raw)
+                end block
+            end if
         end if
 
         if (self%is_active_hydraulic()) then
@@ -747,6 +793,16 @@ contains
             call self%pressure%compute_time_derivative(bdf_coeffs, bdf_order)
 
             call deallocate_array(du)
+
+            ! Zero the stored hydraulic increment to prevent double-application.
+            if (self%control%is_staggered()) then
+                block
+                    real(real64), pointer :: du_raw(:) => null()
+                    du_raw => self%du%get_data(PHYSICS_TYPES%HYDRAULIC%ID)
+                    if (associated(du_raw)) du_raw(:) = 0.0d0
+                    nullify (du_raw)
+                end block
+            end if
         end if
 
         call self%control%profiler_stop(PROFILER_TYPES%SETUP)

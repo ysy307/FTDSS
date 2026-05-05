@@ -97,10 +97,14 @@ contains
         real(real64), pointer :: val(:, :, :) => null()
         class(abst_matrix), pointer :: matrix_ptr => null()
 
+        ! In staggered coupling each physics owns a separate matrix; freezing
+        ! the inactive one is structurally unnecessary and would touch the wrong
+        ! sub-system. The active phase solves only its own sub-matrix.
+        if (self%control%is_staggered()) return
+
         call self%domain%get_num_nodes(num_nodes)
         call self%domain%get_start_dof_index(physics_type, dof_index)
 
-        ! Eliminate couplings to the frozen variable in all equations.
         matrix_ptr => self%K%get_matrix()
         select type (matrix_ptr)
         type is (type_matrix_bsr)
@@ -114,6 +118,28 @@ contains
                     do k = row_start, row_end
                         val(:, dof_index, k) = 0.0d0
                     end do
+
+                    diag_val = 0.0d0
+                    do k = row_start, row_end
+                        if (ind(k) == i_node) then
+                            diag_val = val(dof_index, dof_index, k)
+                            exit
+                        end if
+                    end do
+
+                    do k = row_start, row_end
+                        val(dof_index, :, k) = 0.0d0
+                    end do
+
+                    if (abs(diag_val) < 1.0d-12) diag_val = 1.0d0
+                    do k = row_start, row_end
+                        if (ind(k) == i_node) then
+                            val(dof_index, dof_index, k) = diag_val
+                            exit
+                        end if
+                    end do
+
+                    call self%F%set(physics_type%ID, i_node, 0.0d0)
                 end do
             end if
             nullify (ptr)
@@ -123,20 +149,6 @@ contains
             continue
         end select
         nullify (matrix_ptr)
-
-        
-        do i_node = 1, num_nodes
-            ! 元の対角成分を取得
-            call self%K%get(dof_index, dof_index, i_node, i_node, diag_val)
-
-            call self%K%zero(i_node, dof_index)
-
-            ! ゼロにならないよう安全対策
-            if (abs(diag_val) < 1.0d-12) diag_val = 1.0d0
-
-            call self%K%set(dof_index, dof_index, i_node, i_node, diag_val)
-            call self%F%set(dof_index, i_node, 0.0d0)
-        end do
 
     end subroutine freeze_physics_dofs_ftcms
 
@@ -149,6 +161,8 @@ contains
 
         integer(int32) :: i_node, num_nodes, dof_index, num_dofs_per_node
         real(real64), pointer :: du(:) => null()
+
+        if (self%control%is_staggered()) return
 
         call self%domain%get_num_nodes(num_nodes)
         call self%domain%get_num_dof_per_node(num_dofs_per_node)
