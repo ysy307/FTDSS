@@ -54,6 +54,15 @@ target_link_libraries(SOLVER_SOLVE PUBLIC
 enable_build_flags(SOLVER_SOLVE)
 enable_thirdparty(SOLVER_SOLVE)
 
+# MKL PARDISO uses sNaN internally; override -init=snan per-file.
+if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
+    set_source_files_properties(direct/solve_pardiso.F90
+        PROPERTIES COMPILE_OPTIONS "-init=zero")
+elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
+    set_source_files_properties(direct/solve_pardiso.F90
+        PROPERTIES COMPILE_OPTIONS "-finit-real=zero")
+endif()
+
 # ------------------------------------------------------------
 # Namespaced alias
 # ------------------------------------------------------------
