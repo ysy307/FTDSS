@@ -77,13 +77,13 @@ contains
 
                     ! $OMP CRITICAL(ftcms_global_assembly)
                     if (do_thermal) then
-                        call self%K%add(thermal_dof, thermal_dof, elem_id, num_nodes_local, local_K_TT)
-                        call self%F%add(thermal_dof, p_connectivity, local_F_T)
+                        call self%K%add(PHYSICS_TYPES%THERMAL%ID, PHYSICS_TYPES%THERMAL%ID, elem_id, num_nodes_local, local_K_TT)
+                        call self%F%add(PHYSICS_TYPES%THERMAL%ID, p_connectivity, local_F_T)
                     end if
 
                     if (do_hydraulic) then
-                        call self%K%add(hydraulic_dof, hydraulic_dof, elem_id, num_nodes_local, local_K_HH)
-                        call self%F%add(hydraulic_dof, p_connectivity, local_F_H)
+                        call self%K%add(PHYSICS_TYPES%HYDRAULIC%ID, PHYSICS_TYPES%HYDRAULIC%ID, elem_id, num_nodes_local, local_K_HH)
+                        call self%F%add(PHYSICS_TYPES%HYDRAULIC%ID, p_connectivity, local_F_H)
                     end if
                     ! $OMP END CRITICAL(ftcms_global_assembly)
 

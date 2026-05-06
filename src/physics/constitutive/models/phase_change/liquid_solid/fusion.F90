@@ -81,10 +81,13 @@ contains
     !>
     !> @brief Calculate ice content based on thermodynamic state.
     !>
-    !> \[ \theta_{tot} = \theta_l + \frac{\rho_i}{\rho_l}\theta_i \]
+    !> \[ \theta_{tot} = \theta_{WRF}(-\psi_{cap}) + \frac{\rho_i}{\rho_l}\theta_i \]
     !> \[ \theta_{l,new} = \theta_{WRF}(-\psi_{eff}) \]
     !> \[ \theta_i = \left(\theta_{tot} - \theta_{l,new}\right)\frac{\rho_l}{\rho_i} \]
-    !> Assumptions: \(T < 0\) for phase change; \(\theta_{tot}\) is fixed by the state.
+    !> \(\theta_{WRF}(-\psi_{cap})\) approximates the post-hydraulic-solve liquid content
+    !> at current pressure without cryogenic suction, avoiding dependence on the stale
+    !> nodal water content field (updated only after convergence).
+    !> Assumptions: \(T < 0\) for phase change; \(\theta_i\) from state is the previous-iteration value.
     !> Numerical guarantee: No theoretical error bound available.
     !> Computational complexity: \(O(1)\) arithmetic and memory.
     !> Failure behavior: returns zero ice content when \(T \ge 0\) or \(\theta_{l,new} \ge \theta_{tot}\).
@@ -96,10 +99,10 @@ contains
 
         real(real64) :: pressure, temperature
         real(real64) :: psi_cap, psi_cryo, psi_eff
-        real(real64) :: theta_l_new
+        real(real64) :: theta_l_cap, theta_l_new
         real(real64) :: rho_w, rho_i
-        real(real64) :: current_qw, current_qi, theta_tot
-        logical :: qw_set, qi_set
+        real(real64) :: current_qi, theta_tot
+        logical :: qi_set
 
         call state%temperature%get(temperature)
         call state%pressure%get(pressure)
@@ -113,13 +116,13 @@ contains
                 return
             end if
 
-            call state%water_content%get(current_qw, qw_set)
-            call state%ice_content%get(current_qi, qi_set)
-            if (.not. qw_set) current_qw = 0.0d0
-            if (.not. qi_set) current_qi = 0.0d0
-            theta_tot = current_qw + (rho_i / rho_w) * current_qi
-
             psi_cap = max(0.0d0, -pressure)
+            call self%wrf%calc(-psi_cap, theta_l_cap)
+
+            call state%ice_content%get(current_qi, qi_set)
+            if (.not. qi_set) current_qi = 0.0d0
+            theta_tot = theta_l_cap + (rho_i / rho_w) * current_qi
+
             call self%gcc%calc(state, psi_cryo)
             call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
             call self%wrf%calc(-psi_eff, theta_l_new)
@@ -138,11 +141,12 @@ contains
     !>
     !> @brief Calculate derivatives of ice content w.r.t pressure and temperature.
     !>
-    !> \[ \frac{\partial \theta_i}{\partial P} = -\frac{\rho_l}{\rho_i}
-    !>    \frac{\partial \theta_{l,new}}{\partial P} \]
+    !> \[ \frac{\partial \theta_i}{\partial P} = \frac{\rho_l}{\rho_i}
+    !>    \left(\frac{\partial \theta_{l,cap}}{\partial P}
+    !>          - \frac{\partial \theta_{l,new}}{\partial P}\right) \]
     !> \[ \frac{\partial \theta_i}{\partial T} = -\frac{\rho_l}{\rho_i}
     !>    \frac{\partial \theta_{l,new}}{\partial T} \]
-    !> Assumptions: \(T < 0\) for phase change; \(\theta_{tot}\) is fixed by the state.
+    !> \(\theta_i\) from state is treated as fixed (previous-iteration value).
     !> Numerical guarantee: No theoretical error bound available.
     !> Computational complexity: \(O(1)\) arithmetic and memory.
     !> Failure behavior: returns zero derivatives when \(T \ge 0\) or \(\theta_{l,new} \ge \theta_{tot}\).
@@ -158,11 +162,12 @@ contains
         real(real64) :: d_psi_eff_dpsi_cap, d_psi_eff_dpsi_cryo
         real(real64) :: d_psi_cap_dP, d_psi_cryo_dP, d_psi_cryo_dT
         real(real64) :: d_psi_eff_dP, d_psi_eff_dT
-        real(real64) :: theta_l_new, dtheta_dPin_eff
-        real(real64) :: d_theta_eff_dP, d_theta_eff_dT
+        real(real64) :: theta_l_cap, theta_l_new
+        real(real64) :: dtheta_dPin_cap, dtheta_dPin_eff
+        real(real64) :: d_theta_cap_dP, d_theta_eff_dP, d_theta_eff_dT
         real(real64) :: rho_w, rho_i
-        real(real64) :: current_qw, current_qi, theta_tot
-        logical :: qw_set, qi_set
+        real(real64) :: current_qi, theta_tot
+        logical :: qi_set
 
         call state%temperature%get(temperature)
         call state%pressure%get(pressure)
@@ -177,12 +182,6 @@ contains
                 return
             end if
 
-            call state%water_content%get(current_qw, qw_set)
-            call state%ice_content%get(current_qi, qi_set)
-            if (.not. qw_set) current_qw = 0.0d0
-            if (.not. qi_set) current_qi = 0.0d0
-            theta_tot = current_qw + (rho_i / rho_w) * current_qi
-
             if (pressure < 0.0d0) then
                 psi_cap = -pressure
                 d_psi_cap_dP = -1.0d0
@@ -190,6 +189,14 @@ contains
                 psi_cap = 0.0d0
                 d_psi_cap_dP = 0.0d0
             end if
+
+            call self%wrf%calc(-psi_cap, theta_l_cap)
+            call self%wrf%deriv(-psi_cap, dtheta_dPin_cap)
+            d_theta_cap_dP = dtheta_dPin_cap * (-d_psi_cap_dP)
+
+            call state%ice_content%get(current_qi, qi_set)
+            if (.not. qi_set) current_qi = 0.0d0
+            theta_tot = theta_l_cap + (rho_i / rho_w) * current_qi
 
             call self%gcc%calc(state, psi_cryo)
             call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
@@ -206,7 +213,7 @@ contains
             d_theta_eff_dT = dtheta_dPin_eff * (-d_psi_eff_dT)
 
             if (theta_l_new < theta_tot) then
-                dice_dP = -d_theta_eff_dP * (rho_w / rho_i)
+                dice_dP = (d_theta_cap_dP - d_theta_eff_dP) * (rho_w / rho_i)
                 dice_dT = -d_theta_eff_dT * (rho_w / rho_i)
             else
                 dice_dP = 0.0d0

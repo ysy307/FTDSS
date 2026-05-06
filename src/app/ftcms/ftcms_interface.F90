@@ -46,6 +46,7 @@ module app_ftcms
         class(abst_solver), allocatable :: solver
         class(abst_solver), allocatable :: solver_thermal
 
+        integer(int32) :: current_physics_id = 0
         integer(int32) :: thermal_start_dof = 0
         integer(int32) :: hydraulic_start_dof = 0
         logical :: hydraulic_has_dirichlet_bc = .false.
@@ -198,16 +199,16 @@ module app_ftcms
         end subroutine freeze_physics_dofs_ftcms
 
         module subroutine zero_frozen_increment_ftcms(self, frozen_physics)
+            import :: type_ftcms, type_constant_id
             implicit none
             class(type_ftcms), intent(inout) :: self
             type(type_constant_id), intent(in) :: frozen_physics
         end subroutine zero_frozen_increment_ftcms
 
-        module subroutine solve_ftcms(self, frozen_physics)
+        module subroutine solve_ftcms(self)
+            import :: type_ftcms
             implicit none
             class(type_ftcms), intent(inout) :: self
-            type(type_constant_id), intent(in), optional :: frozen_physics
-
         end subroutine solve_ftcms
 
         module subroutine set_state_ftcms(self, node_id, element_id, state, calc_physics)

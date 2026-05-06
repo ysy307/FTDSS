@@ -441,89 +441,95 @@ contains
             phase_label = '[HYD_NL]'
             linear_failed = .false.
 
-            hydraulic_nl: do while (self%control%should_continue())
-                call self%solve_time_step_setup(prescribe_bc)
-                if (prescribe_bc) then
-                    call self%prescribe_dirichlet()
-                    call self%calc_gradient_temperature()
-                    call self%calc_gradient_pressure()
-                end if
-                call self%assemble()
-                call self%apply_bc(prescribed=.false.)
-                call self%freeze_physics_dofs(PHYSICS_TYPES%THERMAL)
-                call self%control%get_nonlinear_iter(iter_nl)
-                call self%solve(frozen_physics=PHYSICS_TYPES%THERMAL)
-                call self%zero_frozen_increment(PHYSICS_TYPES%THERMAL)
-
-                if (.not. self%solver%is_success()) then
-                    linear_failed = .true.
-                    call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
-                    call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
-                    exit hydraulic_nl
-                end if
-
-                excessive_update = .false.
-                phase_inc_max = 0.0d0
-                if (allocated(phase_increment)) deallocate (phase_increment)
-                call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, phase_increment)
-                if (allocated(phase_increment)) then
-                    if (size(phase_increment) > 0) then
-                        phase_inc_max = maxval(abs(phase_increment))
-                        excessive_update = phase_inc_max > HYDRAULIC_INCREMENT_GUARD
+            if (self%is_active_hydraulic()) then
+                hydraulic_nl: do while (self%control%should_continue())
+                    call self%solve_time_step_setup(prescribe_bc)
+                    if (prescribe_bc) then
+                        call self%prescribe_dirichlet()
+                        call self%calc_gradient_temperature()
+                        call self%calc_gradient_pressure()
                     end if
-                    deallocate (phase_increment)
-                end if
-                if (excessive_update) then
-                    write (*, '(A,ES13.5,A,ES13.5,A)') '   [HYD_NL] excessive hydraulic increment detected (> ', &
-                        HYDRAULIC_INCREMENT_GUARD, ', max=', phase_inc_max, '). Continue with damped update.'
-                end if
+                    call self%assemble()
+                    call self%apply_bc(prescribed=.false.)
+                    call self%freeze_physics_dofs(PHYSICS_TYPES%THERMAL)
+                    call self%control%get_nonlinear_iter(iter_nl)
+                    self%current_physics_id = PHYSICS_TYPES%HYDRAULIC%ID
+                    call self%solve()
+                    call self%zero_frozen_increment(PHYSICS_TYPES%THERMAL)
 
-                call self%solve_time_step_check_convergence(PHYSICS_TYPES%HYDRAULIC)
-                call self%reflect_variables()
-
-                call self%control%get_nonlinear_iter(iter_nl)
-                if ((.not. self%control%is_converged()) .and. iter_nl >= MAX_PHASE_NL_ITER) then
-                    linear_failed = .true.
-                    write (*, '(A,I0,A)') '   [HYD_NL] reached nonlinear iteration cap (', MAX_PHASE_NL_ITER, &
-                        '). Triggering timestep retry.'
-                    call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
-                    call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
-                    exit hydraulic_nl
-                end if
-
-                ! Anchor the all-Neumann null-mode to the initial mean pressure.
-                if ((.not. self%hydraulic_has_dirichlet_bc) .and. self%hydraulic_ref_mean_set) then
-                    call self%pressure%get_current(P_cur)
-                    if (associated(P_cur) .and. size(P_cur) > 0) then
-                        mean_pressure = sum(P_cur) / real(size(P_cur), real64)
-                        P_cur(:) = P_cur(:) - (mean_pressure - self%hydraulic_ref_mean)
+                    if (.not. self%solver%is_success()) then
+                        linear_failed = .true.
+                        call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
+                        call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
+                        exit hydraulic_nl
                     end if
-                    nullify (P_cur)
-                end if
 
-                if (self%control%is_none()) exit hydraulic_nl
-            end do hydraulic_nl
+                    excessive_update = .false.
+                    phase_inc_max = 0.0d0
+                    if (allocated(phase_increment)) deallocate (phase_increment)
+                    call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, phase_increment)
+                    if (allocated(phase_increment)) then
+                        if (size(phase_increment) > 0) then
+                            phase_inc_max = maxval(abs(phase_increment))
+                            excessive_update = phase_inc_max > HYDRAULIC_INCREMENT_GUARD
+                        end if
+                        deallocate (phase_increment)
+                    end if
+                    if (excessive_update) then
+                        write (*, '(A,ES13.5,A,ES13.5,A)') '   [HYD_NL] excessive hydraulic increment detected (> ', &
+                            HYDRAULIC_INCREMENT_GUARD, ', max=', phase_inc_max, '). Continue with damped update.'
+                    end if
 
-            if (.not. self%control%is_converged()) then
-                call self%control%get_nonlinear_iter(iter_nl)
-                h_res = 0.0d0
-                h_inc = 0.0d0
-                if (.not. linear_failed) then
-                    call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, &
-                                                       NONLINEAR_NORM_CRITERIA%RESIDUAL, NORM_TYPES%LINF, h_res)
-                    call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, &
-                                                       NONLINEAR_NORM_CRITERIA%UPDATE, NORM_TYPES%LINF, h_inc)
+                    call self%solve_time_step_check_convergence(PHYSICS_TYPES%HYDRAULIC)
+                    call self%reflect_variables()
+
+                    call self%control%get_nonlinear_iter(iter_nl)
+                    if ((.not. self%control%is_converged()) .and. iter_nl >= MAX_PHASE_NL_ITER) then
+                        linear_failed = .true.
+                        write (*, '(A,I0,A)') '   [HYD_NL] reached nonlinear iteration cap (', MAX_PHASE_NL_ITER, &
+                            '). Triggering timestep retry.'
+                        call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
+                        call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
+                        exit hydraulic_nl
+                    end if
+
+                    ! Anchor the all-Neumann null-mode to the initial mean pressure.
+                    if ((.not. self%hydraulic_has_dirichlet_bc) .and. self%hydraulic_ref_mean_set) then
+                        call self%pressure%get_current(P_cur)
+                        if (associated(P_cur) .and. size(P_cur) > 0) then
+                            mean_pressure = sum(P_cur) / real(size(P_cur), real64)
+                            P_cur(:) = P_cur(:) - (mean_pressure - self%hydraulic_ref_mean)
+                        end if
+                        nullify (P_cur)
+                    end if
+
+                    if (self%control%is_none()) exit hydraulic_nl
+                end do hydraulic_nl
+
+                if (.not. self%control%is_converged()) then
+                    call self%control%get_nonlinear_iter(iter_nl)
+                    h_res = 0.0d0
+                    h_inc = 0.0d0
+                    if (.not. linear_failed) then
+                        call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, &
+                                                           NONLINEAR_NORM_CRITERIA%RESIDUAL, NORM_TYPES%LINF, h_res)
+                        call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, &
+                                                           NONLINEAR_NORM_CRITERIA%UPDATE, NORM_TYPES%LINF, h_inc)
+                    end if
+                    if (linear_failed) then
+                        write (*, '(A,A,A,I0,A,L1,A)') '   ', phase_label, &
+                            ' failed: iter=', iter_nl, ', diverged=', self%control%is_diverged(), &
+                            ', linear solver failure.'
+                    else
+                        write (*, '(A,A,A,I0,A,L1,A,2(ES11.3,1X))') '   ', phase_label, &
+                            ' failed: iter=', iter_nl, ', diverged=', self%control%is_diverged(), &
+                            ', H_res/H_inc=', h_res, h_inc
+                    end if
+                    exit coupling_loop
                 end if
-                if (linear_failed) then
-                    write (*, '(A,A,A,I0,A,L1,A)') '   ', phase_label, &
-                        ' failed: iter=', iter_nl, ', diverged=', self%control%is_diverged(), &
-                        ', linear solver failure.'
-                else
-                    write (*, '(A,A,A,I0,A,L1,A,2(ES11.3,1X))') '   ', phase_label, &
-                        ' failed: iter=', iter_nl, ', diverged=', self%control%is_diverged(), &
-                        ', H_res/H_inc=', h_res, h_inc
-                end if
-                exit coupling_loop
+            else
+                call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .true.)
+                call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .false.)
             end if
 
             ! =============================================================
@@ -538,102 +544,109 @@ contains
 
             linear_failed = .false.
 
-            thermal_nl: do while (self%control%should_continue())
-                call self%solve_time_step_setup(prescribe_bc)
-                if (prescribe_bc) then
-                    call self%prescribe_dirichlet()
-                    call self%calc_gradient_temperature()
-                    call self%calc_gradient_pressure()
-                end if
-                call self%assemble()
-                call self%apply_bc(prescribed=.false.)
-                call self%freeze_physics_dofs(PHYSICS_TYPES%HYDRAULIC)
-                call self%control%get_nonlinear_iter(iter_nl)
-                call self%solve(frozen_physics=PHYSICS_TYPES%HYDRAULIC)
-                call self%zero_frozen_increment(PHYSICS_TYPES%HYDRAULIC)
+            if (self%is_active_thermal()) then
+                thermal_nl: do while (self%control%should_continue())
+                    call self%solve_time_step_setup(prescribe_bc)
+                    if (prescribe_bc) then
+                        call self%prescribe_dirichlet()
+                        call self%calc_gradient_temperature()
+                        call self%calc_gradient_pressure()
+                    end if
+                    call self%assemble()
+                    call self%apply_bc(prescribed=.false.)
+                    call self%freeze_physics_dofs(PHYSICS_TYPES%HYDRAULIC)
+                    call self%control%get_nonlinear_iter(iter_nl)
+                    self%current_physics_id = PHYSICS_TYPES%THERMAL%ID
+                    call self%solve()
+                    call self%zero_frozen_increment(PHYSICS_TYPES%HYDRAULIC)
 
-                if (allocated(self%solver_thermal)) then
-                    if (.not. self%solver_thermal%is_success()) then
+                    if (allocated(self%solver_thermal)) then
+                        if (.not. self%solver_thermal%is_success()) then
+                            linear_failed = .true.
+                            call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
+                            call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
+                            exit thermal_nl
+                        end if
+                    else if (.not. self%solver%is_success()) then
                         linear_failed = .true.
                         call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
                         call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
                         exit thermal_nl
                     end if
-                else if (.not. self%solver%is_success()) then
-                    linear_failed = .true.
-                    call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
-                    call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
-                    exit thermal_nl
-                end if
 
-                excessive_update = .false.
-                phase_inc_max = 0.0d0
-                if (allocated(phase_increment)) deallocate (phase_increment)
-                call self%get_variable_increment(PHYSICS_TYPES%THERMAL, phase_increment)
-                if (allocated(phase_increment)) then
-                    if (size(phase_increment) > 0) then
-                        phase_inc_max = maxval(abs(phase_increment))
-                        excessive_update = phase_inc_max > THERMAL_INCREMENT_GUARD
+                    excessive_update = .false.
+                    phase_inc_max = 0.0d0
+                    if (allocated(phase_increment)) deallocate (phase_increment)
+                    call self%get_variable_increment(PHYSICS_TYPES%THERMAL, phase_increment)
+                    if (allocated(phase_increment)) then
+                        if (size(phase_increment) > 0) then
+                            phase_inc_max = maxval(abs(phase_increment))
+                            excessive_update = phase_inc_max > THERMAL_INCREMENT_GUARD
+                        end if
+                        deallocate (phase_increment)
                     end if
-                    deallocate (phase_increment)
-                end if
-                if (excessive_update) then
-                    write (*, '(A,ES13.5,A,ES13.5,A)') '   [THM_NL] excessive thermal increment detected (> ', &
-                        THERMAL_INCREMENT_GUARD, ', max=', phase_inc_max, '). Continue with damped update.'
-                end if
-
-                call self%solve_time_step_check_convergence(PHYSICS_TYPES%THERMAL)
-                call self%reflect_variables()
-
-                call self%control%get_nonlinear_iter(iter_nl)
-                write (*, '(A,I0,A,L1,A,L1)') '[DBG-LOOP] iter_nl=', iter_nl, &
-                    ', is_converged=', self%control%is_converged(), &
-                    ', should_continue=', self%control%should_continue()
-                if ((.not. self%control%is_converged()) .and. iter_nl >= MAX_PHASE_NL_ITER) then
-                    linear_failed = .true.
-                    write (*, '(A,I0,A)') '   [THM_NL] reached nonlinear iteration cap (', MAX_PHASE_NL_ITER, &
-                        '). Triggering timestep retry.'
-                    call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
-                    call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
-                    exit thermal_nl
-                end if
-
-                ! Anchor the all-Neumann null-mode to the initial mean pressure.
-                if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc) &
-                    .and. self%hydraulic_ref_mean_set) then
-                    call self%pressure%get_current(P_cur)
-                    if (associated(P_cur) .and. size(P_cur) > 0) then
-                        mean_pressure = sum(P_cur) / real(size(P_cur), real64)
-                        P_cur(:) = P_cur(:) - (mean_pressure - self%hydraulic_ref_mean)
+                    if (excessive_update) then
+                        write (*, '(A,ES13.5,A,ES13.5,A)') '   [THM_NL] excessive thermal increment detected (> ', &
+                            THERMAL_INCREMENT_GUARD, ', max=', phase_inc_max, '). Continue with damped update.'
                     end if
-                    nullify (P_cur)
-                end if
 
-                if (self%control%is_none()) exit thermal_nl
-            end do thermal_nl
+                    call self%solve_time_step_check_convergence(PHYSICS_TYPES%THERMAL)
+                    call self%reflect_variables()
 
-            is_step_converged = self%control%is_converged()
+                    call self%control%get_nonlinear_iter(iter_nl)
+                    write (*, '(A,I0,A,L1,A,L1)') '[DBG-LOOP] iter_nl=', iter_nl, &
+                        ', is_converged=', self%control%is_converged(), &
+                        ', should_continue=', self%control%should_continue()
+                    if ((.not. self%control%is_converged()) .and. iter_nl >= MAX_PHASE_NL_ITER) then
+                        linear_failed = .true.
+                        write (*, '(A,I0,A)') '   [THM_NL] reached nonlinear iteration cap (', MAX_PHASE_NL_ITER, &
+                            '). Triggering timestep retry.'
+                        call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
+                        call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
+                        exit thermal_nl
+                    end if
 
-            if (.not. is_step_converged) then
-                call self%control%get_nonlinear_iter(iter_nl)
-                t_res = 0.0d0
-                t_inc = 0.0d0
-                if (.not. linear_failed) then
-                    call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, &
-                                                       NONLINEAR_NORM_CRITERIA%RESIDUAL, NORM_TYPES%LINF, t_res)
-                    call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, &
-                                                       NONLINEAR_NORM_CRITERIA%UPDATE, NORM_TYPES%LINF, t_inc)
+                    ! Anchor the all-Neumann null-mode to the initial mean pressure.
+                    if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc) &
+                        .and. self%hydraulic_ref_mean_set) then
+                        call self%pressure%get_current(P_cur)
+                        if (associated(P_cur) .and. size(P_cur) > 0) then
+                            mean_pressure = sum(P_cur) / real(size(P_cur), real64)
+                            P_cur(:) = P_cur(:) - (mean_pressure - self%hydraulic_ref_mean)
+                        end if
+                        nullify (P_cur)
+                    end if
+
+                    if (self%control%is_none()) exit thermal_nl
+                end do thermal_nl
+
+                is_step_converged = self%control%is_converged()
+
+                if (.not. is_step_converged) then
+                    call self%control%get_nonlinear_iter(iter_nl)
+                    t_res = 0.0d0
+                    t_inc = 0.0d0
+                    if (.not. linear_failed) then
+                        call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, &
+                                                           NONLINEAR_NORM_CRITERIA%RESIDUAL, NORM_TYPES%LINF, t_res)
+                        call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, &
+                                                           NONLINEAR_NORM_CRITERIA%UPDATE, NORM_TYPES%LINF, t_inc)
+                    end if
+                    if (linear_failed) then
+                        write (*, '(A,A,A,I0,A,L1,A)') '   ', phase_label, &
+                            ' failed: iter=', iter_nl, ', diverged=', self%control%is_diverged(), &
+                            ', linear solver failure.'
+                    else
+                        write (*, '(A,A,A,I0,A,L1,A,2(ES11.3,1X))') '   ', phase_label, &
+                            ' failed: iter=', iter_nl, ', diverged=', self%control%is_diverged(), &
+                            ', T_res/T_inc=', t_res, t_inc
+                    end if
+                    exit coupling_loop
                 end if
-                if (linear_failed) then
-                    write (*, '(A,A,A,I0,A,L1,A)') '   ', phase_label, &
-                        ' failed: iter=', iter_nl, ', diverged=', self%control%is_diverged(), &
-                        ', linear solver failure.'
-                else
-                    write (*, '(A,A,A,I0,A,L1,A,2(ES11.3,1X))') '   ', phase_label, &
-                        ' failed: iter=', iter_nl, ', diverged=', self%control%is_diverged(), &
-                        ', T_res/T_inc=', t_res, t_inc
-                end if
-                exit coupling_loop
+            else
+                call self%control%set_converged(PHYSICS_TYPES%THERMAL, .true.)
+                call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .false.)
+                is_step_converged = .true.
             end if
 
             if (coupling_iter == 1) cycle coupling_loop

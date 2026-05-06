@@ -1,16 +1,21 @@
 module numerical_solver_interface
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
+    use, intrinsic :: iso_c_binding, only: c_int
 !$  use omp_lib
     use :: stdlib_strings, only:strip
     use :: module_core
     use :: module_linalg
     use :: numerical_solver_preconditioner
+#ifdef _MKL
+    use :: linalg_mkl_interface, only: mkl_pardiso_handle
+#endif
     implicit none
     private
 
     public :: abst_solver
     public :: type_solver_bicgstab
     public :: type_solver_gmres
+    public :: type_solver_pardiso
 
     public :: type_solver_settings
     public :: create_solver
@@ -160,6 +165,23 @@ module numerical_solver_interface
         procedure :: destroy => destroy_type_solver_gmres
     end type type_solver_gmres
 
+    type, extends(abst_solver) :: type_solver_pardiso
+        integer(int32) :: mtype = 11
+        integer(int32) :: maxfct = 1
+        integer(int32) :: mnum = 1
+        integer(int32) :: msglvl = 0
+        integer(int32) :: nrhs = 1
+        integer(int32) :: last_error = 0
+#ifdef _MKL
+        type(mkl_pardiso_handle) :: pt(64)
+#endif
+        integer(c_int) :: iparm(64) = 0
+    contains
+        procedure :: initialize => initialize_type_solver_pardiso
+        procedure :: solve => solve_type_solver_pardiso
+        procedure :: destroy => destroy_type_solver_pardiso
+    end type type_solver_pardiso
+
     interface
         module subroutine initialize_type_solver_gmres(self, solver_settings, preconditioner_settings)
             implicit none
@@ -182,6 +204,30 @@ module numerical_solver_interface
             class(type_solver_gmres), intent(inout) :: self
 
         end subroutine destroy_type_solver_gmres
+    end interface
+
+    interface
+        module subroutine initialize_type_solver_pardiso(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_pardiso), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+
+        end subroutine initialize_type_solver_pardiso
+
+        module subroutine solve_type_solver_pardiso(self, A, b, x)
+            implicit none
+            class(type_solver_pardiso), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_pardiso
+
+        module subroutine destroy_type_solver_pardiso(self)
+            implicit none
+            class(type_solver_pardiso), intent(inout) :: self
+
+        end subroutine destroy_type_solver_pardiso
     end interface
 
 contains
@@ -408,6 +454,10 @@ contains
             ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
         case (LINEAR_SOLVER_TYPES%COCR%ID)
             ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%PARDISO%ID)
+            allocate (type_solver_pardiso :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case default
             ierr = SOLVER_STATUS%ILL_OPTIONS%ID
         end select

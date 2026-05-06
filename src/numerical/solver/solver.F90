@@ -8,6 +8,7 @@ module module_solver
     public :: abst_solver
     public :: type_solver_bicgstab
     public :: type_solver_gmres
+    public :: type_solver_pardiso
 
     public :: type_solver_settings
     public :: type_preconditioner_settings

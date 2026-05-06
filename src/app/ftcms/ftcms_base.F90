@@ -703,6 +703,7 @@ contains
         logical :: is_none
 
         real(real64) :: max_du, alpha
+        real(real64) :: temp_min, temp_max
         real(real64), parameter :: PICARD_MAX_DT_STEP = 2.0d1
         real(real64), parameter :: PICARD_MAX_DP_STEP = 2.0d5
         real(real64), parameter :: TEMP_MIN_C = -80.0d0
@@ -748,6 +749,11 @@ contains
                     end if
                 end if
 
+                temp_min = minval(current)
+                temp_max = maxval(current)
+                if (temp_min < TEMP_MIN_C .or. temp_max > TEMP_MAX_C) then
+                    write (*, '(A,2(ES13.5,A))') '   [REFLECT] thermal clamp: min=', temp_min, ', max=', temp_max, ''
+                end if
                 current(:) = min(max(current(:), TEMP_MIN_C), TEMP_MAX_C)
                 call self%temperature%set_delta(current(:) - current_prev(:))
 
@@ -758,6 +764,15 @@ contains
             call self%temperature%compute_time_derivative(bdf_coeffs, bdf_order)
 
             call deallocate_array(du)
+
+            if (self%control%is_staggered()) then
+                block
+                    real(real64), pointer :: du_raw(:) => null()
+                    du_raw => self%du%get_data(PHYSICS_TYPES%THERMAL%ID)
+                    if (associated(du_raw)) du_raw(:) = 0.0d0
+                    nullify (du_raw)
+                end block
+            end if
         end if
 
         if (self%is_active_hydraulic()) then
@@ -796,6 +811,15 @@ contains
             call self%pressure%compute_time_derivative(bdf_coeffs, bdf_order)
 
             call deallocate_array(du)
+
+            if (self%control%is_staggered()) then
+                block
+                    real(real64), pointer :: du_raw(:) => null()
+                    du_raw => self%du%get_data(PHYSICS_TYPES%HYDRAULIC%ID)
+                    if (associated(du_raw)) du_raw(:) = 0.0d0
+                    nullify (du_raw)
+                end block
+            end if
         end if
 
         call self%control%profiler_stop(PROFILER_TYPES%SETUP)

@@ -16,6 +16,9 @@ target_sources(SOLVER_SOLVE PRIVATE
     iterative/solve_gmres.F90
     # Keep only solvers declared in solver_interface.F90.
 
+    # --- Direct solvers ---
+    direct/solve_pardiso.F90
+
     # --- Preconditioners ---
     preconditioner/preconditioner_none.F90
     preconditioner/preconditioner_jacobi.F90

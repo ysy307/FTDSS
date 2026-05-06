@@ -203,7 +203,7 @@ contains
         buffer(3) = solver_type
 
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%solver_type, &
-                            is_required=.true., default_value=4, valid_range=[1, 20])
+                    is_required=.true., default_value=4, valid_range=[1, 26])
         buffer(3) = preconditioner_type
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%preconditioner_type, &
                             is_required=.true., default_value=1, valid_range=[0, 11])
@@ -258,7 +258,7 @@ contains
         legacy_buffer(2) = solver_type
         call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%solver_type, &
                     is_required=.false., default_value=self%solver_settings%linear_solver%solver_type, &
-                    valid_range=[1, 20])
+                    valid_range=[1, 26])
 
         legacy_buffer(2) = preconditioner_type
         call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%preconditioner_type, &

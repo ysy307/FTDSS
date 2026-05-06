@@ -311,10 +311,10 @@ contains
                         dq_du = bc_result%flux_derivative
 
                         do i = 1, num_nodes_loc
-                            call self%F%add(dof_offset, connectivity(i), psi(i) * q_flux * w_vol)
+                            call self%F%add(physics_type%ID, connectivity(i), psi(i) * q_flux * w_vol)
 
                             do j = 1, num_nodes_loc
-                                call self%K%add(dof_offset, dof_offset, &
+                                call self%K%add(physics_type%ID, physics_type%ID, &
                                                 connectivity(i), connectivity(j), &
                                                 psi(i) * dq_du * psi(j) * w_vol)
                             end do
@@ -383,12 +383,12 @@ contains
                     glob_node_id = bc_patch%connectivity%col_ind(i)
 
                     ! 1. Zero out the row of the Jacobian matrix
-                    call self%K%zero(glob_node_id, dof_offset)
+                    call self%K%zero(glob_node_id, physics_type%ID)
                     ! Set diagonal element to 1.0
-                    call self%K%set(dof_offset, dof_offset, glob_node_id, glob_node_id, 1.0d0)
+                    call self%K%set(physics_type%ID, physics_type%ID, glob_node_id, glob_node_id, 1.0d0)
 
                     ! 2. Set Residual/Force vector
-                    call self%F%set(dof_offset, glob_node_id, 0.0d0)
+                    call self%F%set(physics_type%ID, glob_node_id, 0.0d0)
                     num_dirichlet_nodes = num_dirichlet_nodes + 1
 
                     if (first_dirichlet_node == 0) then

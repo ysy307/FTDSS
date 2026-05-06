@@ -1,5 +1,6 @@
 module numerical_system_jacobian_matrix
     use, intrinsic :: iso_fortran_env
+    use, intrinsic :: ieee_arithmetic
     use :: stdlib_optval, only:optval
     use :: module_core
     use :: module_domain, only:type_domain
@@ -60,7 +61,7 @@ contains
         integer(int32), allocatable :: row(:), col(:)
         integer(int32) :: i, j
 
-        if (allocated(self%matrix)) call self%destroy()
+        call self%destroy()
 
         self%coupling_mode = coupling_mode
         self%physics_to_system(:) = 0
@@ -171,9 +172,16 @@ contains
             end do
             deallocate (self%matrix)
         end if
+
+        if (allocated(self%system_size)) deallocate (self%system_size)
+
         call self%scatter_map%destroy()
         self%size = 0
+        self%num_nodes = 0
         self%num_dofs_per_node = 0
+        self%num_system = 0
+        self%physics_to_system(:) = 0
+        self%num_dofs_of_physics(:) = 0
     end subroutine destroy_jacobian_matrix
 
     subroutine get_size_jacobian_matrix(self, size)
@@ -192,46 +200,53 @@ contains
         num_dofs = self%num_dofs_per_node
     end subroutine get_num_dofs_per_node
 
-    function get_underlying_matrix(self, physics_id) result(matrix)
+    function get_underlying_matrix(self, physics_id_in) result(matrix)
         implicit none
         class(type_jacobian_matrix), intent(in), target :: self
-        type(type_constant_id), intent(in), optional :: physics_id
+        type(type_constant_id), intent(in), optional :: physics_id_in
         class(abst_matrix), pointer :: matrix
 
-        integer(int32) :: sys_id
-
-        if (present(physics_id)) then
-            sys_id = physics_id%ID
-        else
-            sys_id = 1
-        end if
+        integer(int32) :: sys_id, physics_id
 
         select case (self%coupling_mode%ID)
         case (COUPLING_MODES%MONOLITHIC%ID)
-            if (sys_id /= 1) then
+            physics_id = 1
+            if (present(physics_id_in)) physics_id = physics_id_in%ID
+            if (physics_id /= 1) then
                 nullify (matrix)
                 return
             end if
+            matrix => self%matrix(1)
         case (COUPLING_MODES%STAGGERED%ID)
-            if (sys_id < 1 .or. sys_id > PHYSICS_TYPES%NUM_ID) then
+            if (.not. present(physics_id_in)) then
+                if (allocated(self%matrix) .and. size(self%matrix) > 0) then
+                    matrix => self%matrix(1)
+                else
+                    nullify (matrix)
+                end if
+                return
+            end if
+
+            physics_id = physics_id_in%ID
+            if (physics_id < 1 .or. physics_id > PHYSICS_TYPES%NUM_ID) then
                 nullify (matrix)
                 return
             end if
-            sys_id = self%physics_to_system(sys_id)
-            if (sys_id == 0) then
+            sys_id = self%physics_to_system(physics_id)
+            if (sys_id <= 0 .or. sys_id > size(self%matrix)) then
                 nullify (matrix)
                 return
             end if
+            matrix => self%matrix(sys_id)
         end select
 
-        matrix => self%matrix(sys_id)
     end function
 
-    subroutine set_value_jacobian_matrix(self, row_dof, col_dof, row_node, col_node, value)
+    subroutine set_value_jacobian_matrix(self, row_physics_id, col_physics_id, row_node, col_node, value)
         implicit none
         class(type_jacobian_matrix), intent(inout) :: self
-        integer(int32), intent(in) :: row_dof
-        integer(int32), intent(in) :: col_dof
+        integer(int32), intent(in) :: row_physics_id
+        integer(int32), intent(in) :: col_physics_id
         integer(int32), intent(in) :: row_node
         integer(int32), intent(in) :: col_node
         real(real64), intent(in) :: value
@@ -242,20 +257,21 @@ contains
 
         select case (self%coupling_mode%ID)
         case (COUPLING_MODES%MONOLITHIC%ID)
-            call self%matrix(1)%set(MATRIX_OPS%INS, row_node, col_node, row_dof, col_dof, value)
+            call self%matrix(1)%set(MATRIX_OPS%INS, row_node, col_node, row_physics_id, col_physics_id, value)
         case (COUPLING_MODES%STAGGERED%ID)
-            if (row_dof /= col_dof) return
-            sys = self%physics_to_system(row_dof)
+            if (row_physics_id /= col_physics_id) return
+            if (row_physics_id < 1 .or. row_physics_id > PHYSICS_TYPES%NUM_ID) return
+            sys = self%physics_to_system(row_physics_id)
             if (sys == 0) return
             call self%matrix(sys)%set(MATRIX_OPS%INS, row_node, col_node, 1, 1, value)
         end select
     end subroutine set_value_jacobian_matrix
 
-    subroutine add_value_jacobian_matrix(self, row_dof, col_dof, row_node, col_node, value)
+    subroutine add_value_jacobian_matrix(self, row_physics_id, col_physics_id, row_node, col_node, value)
         implicit none
         class(type_jacobian_matrix), intent(inout) :: self
-        integer(int32), intent(in) :: row_dof
-        integer(int32), intent(in) :: col_dof
+        integer(int32), intent(in) :: row_physics_id
+        integer(int32), intent(in) :: col_physics_id
         integer(int32), intent(in) :: row_node
         integer(int32), intent(in) :: col_node
         real(real64), intent(in) :: value
@@ -266,20 +282,21 @@ contains
 
         select case (self%coupling_mode%ID)
         case (COUPLING_MODES%MONOLITHIC%ID)
-            call self%matrix(1)%set(MATRIX_OPS%ADD, row_node, col_node, row_dof, col_dof, value)
+            call self%matrix(1)%set(MATRIX_OPS%ADD, row_node, col_node, row_physics_id, col_physics_id, value)
         case (COUPLING_MODES%STAGGERED%ID)
-            if (row_dof /= col_dof) return
-            sys = self%physics_to_system(row_dof)
+            if (row_physics_id /= col_physics_id) return
+            if (row_physics_id < 1 .or. row_physics_id > PHYSICS_TYPES%NUM_ID) return
+            sys = self%physics_to_system(row_physics_id)
             if (sys == 0) return
             call self%matrix(sys)%set(MATRIX_OPS%ADD, row_node, col_node, 1, 1, value)
         end select
     end subroutine add_value_jacobian_matrix
 
-    subroutine add_local_jacobian_matrix(self, row_dof, col_dof, element_id, n_local, local_data)
+    subroutine add_local_jacobian_matrix(self, row_physics_id, col_physics_id, element_id, n_local, local_data)
         implicit none
         class(type_jacobian_matrix), intent(inout) :: self
-        integer(int32), intent(in) :: row_dof
-        integer(int32), intent(in) :: col_dof
+        integer(int32), intent(in) :: row_physics_id
+        integer(int32), intent(in) :: col_physics_id
         integer(int32), intent(in) :: element_id
         integer(int32), intent(in) :: n_local
         type(type_matrix_dense), intent(in) :: local_data
@@ -291,6 +308,10 @@ contains
         if (.not. allocated(self%matrix)) return
 
         dense_val => local_data%get_val()
+        if (any(.not. ieee_is_finite(dense_val))) then
+            write (*, '(A,I0)') '[ERR-MATRIX] dense_val contains non-finite values for element_id=', element_id
+            return
+        end if
 
         select case (self%coupling_mode%ID)
 
@@ -299,14 +320,14 @@ contains
             do i = 1, n_local
                 do j = 1, n_local
                     call self%scatter_map%get_index(element_id, [i, j], idx)
-                    call self%matrix(1)%set(MATRIX_OPS%ADD, idx, row_dof, col_dof, dense_val(i, j))
+                    call self%matrix(1)%set(MATRIX_OPS%ADD, idx, row_physics_id, col_physics_id, dense_val(i, j))
                 end do
             end do
 
         case (COUPLING_MODES%STAGGERED%ID)
-            if (row_dof /= col_dof) return
-
-            sys = self%physics_to_system(row_dof)
+            if (row_physics_id /= col_physics_id) return
+            if (row_physics_id < 1 .or. row_physics_id > PHYSICS_TYPES%NUM_ID) return
+            sys = self%physics_to_system(row_physics_id)
             if (sys == 0) return
 
             do i = 1, n_local
@@ -331,21 +352,34 @@ contains
         end if
     end subroutine zero_all_jacobian_matrix
 
-    subroutine zero_row_jacobian_matrix(self, row_node, row_block)
+    subroutine zero_row_jacobian_matrix(self, row_node, row_physics_id)
         implicit none
         class(type_jacobian_matrix), intent(inout) :: self
         integer(int32), intent(in) :: row_node
-        integer(int32), intent(in), optional :: row_block
-        integer(int32) :: i
+        integer(int32), intent(in), optional :: row_physics_id
+        integer(int32) :: i, sys
 
         if (allocated(self%matrix)) then
-            do i = 1, size(self%matrix)
-                if (present(row_block)) then
-                    call self%matrix(i)%zero(row_node, row_block)
+            select case (self%coupling_mode%ID)
+            case (COUPLING_MODES%MONOLITHIC%ID)
+                do i = 1, size(self%matrix)
+                    if (present(row_physics_id)) then
+                        call self%matrix(i)%zero(row_node, row_physics_id)
+                    else
+                        call self%matrix(i)%zero(row_node)
+                    end if
+                end do
+            case (COUPLING_MODES%STAGGERED%ID)
+                if (present(row_physics_id)) then
+                    if (row_physics_id < 1 .or. row_physics_id > PHYSICS_TYPES%NUM_ID) return
+                    sys = self%physics_to_system(row_physics_id)
+                    if (sys > 0) call self%matrix(sys)%zero(row_node, 1)
                 else
-                    call self%matrix(i)%zero(row_node)
+                    do i = 1, size(self%matrix)
+                        call self%matrix(i)%zero(row_node)
+                    end do
                 end if
-            end do
+            end select
         end if
     end subroutine zero_row_jacobian_matrix
 

@@ -156,6 +156,7 @@ contains
         stagnant_count = 0
         no_progress_count = 0
         call self%residual_history%set(MATRIX_OPS%INS, 1, resid)
+        write (*, '(A,ES12.4,A,ES12.4)') '   [BiCG-H] resid0=', resid, ', tol=', self%tolerance
         if (resid < self%tolerance) then
             self%current_iteration = 0
             self%status = SOLVER_STATUS%SUCCESS%ID
@@ -350,6 +351,13 @@ contains
             if (.not. alpha_recovered) alpha = rho / denom
             if ((.not. ieee_is_finite(alpha)) .or. abs(alpha) > ALPHA_ABS_CAP) then
                 norm_r = vector_norm2(self%r)
+                if (norm_r < self%tolerance .or. &
+                    (resid0 > self%tolerance .and. norm_r < self%relative_tolerance * resid0)) then
+                    self%current_iteration = iter
+                    self%status = SOLVER_STATUS%SUCCESS%ID
+                    if (has_internal_x) call x%copy(self%x)
+                    return
+                end if
                 if (alpha_restart_count < MAX_ALPHA_RESTARTS) then
                     alpha_restart_count = alpha_restart_count + 1
                     ! Restart BiCG direction when alpha is numerically unsafe.
