@@ -171,7 +171,16 @@ contains
         type(type_vector_dp), pointer :: F_ptr => null()
         type(type_vector_dp), pointer :: du_ptr => null()
         type(type_vector_dp) :: lin_res_vec
+        type(type_vector_dp) :: K_diag
+        type(type_matrix_info) :: K_info
         integer(int32) :: num_total_dofs
+        real(real64), pointer :: diag_data(:) => null()
+        real(real64), pointer :: F_data(:) => null()
+        real(real64) :: diag_abs_min
+        real(real64) :: diag_abs_max
+        real(real64) :: F_abs_max
+        logical :: diag_has_nonfinite
+        logical :: F_has_nonfinite
         character(len=16) :: solve_phase
 
         call self%control%profiler_start(PROFILER_TYPES%SOLVE)
@@ -219,6 +228,35 @@ contains
         if (present(frozen_physics)) solve_phase = trim(frozen_physics%name)
 
         call du_ptr%zero()
+
+        call K_ptr%get_info(K_info)
+        if (K_info%num_block_rows > 0) then
+            call K_diag%initialize(K_info%num_nodes, K_info%num_block_rows)
+        else
+            call K_diag%initialize(K_info%num_nodes)
+        end if
+        call K_ptr%get_diagonal(K_diag)
+        diag_data => K_diag%get_data()
+        F_data => F_ptr%get_data()
+
+        if (associated(diag_data)) then
+            diag_abs_max = maxval(abs(diag_data))
+            if (any(abs(diag_data) > 0.0d0)) then
+                diag_abs_min = minval(abs(diag_data), mask=abs(diag_data) > 0.0d0)
+            else
+                diag_abs_min = 0.0d0
+            end if
+            diag_has_nonfinite = any(.not. ieee_is_finite(diag_data))
+            write (*, '(A,ES12.4,A,ES12.4,A,L1)') '[DBG-K] abs_min/abs_max=', diag_abs_min, '/', diag_abs_max, &
+                ', nonfinite=', diag_has_nonfinite
+        end if
+
+        if (associated(F_data)) then
+            F_abs_max = maxval(abs(F_data))
+            F_has_nonfinite = any(.not. ieee_is_finite(F_data))
+            write (*, '(A,ES12.4,A,ES12.4,A,L1)') '[DBG-F] abs_max=', F_abs_max, ', norm2=', norm2(F_data), &
+                ', nonfinite=', F_has_nonfinite
+        end if
         if (present(frozen_physics) .and. frozen_physics%ID == PHYSICS_TYPES%HYDRAULIC%ID &
             .and. allocated(self%solver_thermal)) then
             block

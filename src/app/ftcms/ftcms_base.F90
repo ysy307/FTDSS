@@ -152,6 +152,9 @@ contains
             projection_offset_selected = 0
             projection_stride_selected = 0
 
+            write (*, '(A,I0,A,I0)') 'Notice: linear solver type=', solver_type_selected, &
+                ', preconditioner type=', preconditioner_type_selected
+
             if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc)) then
                 projection_enabled_selected = .true.
                 projection_offset_selected = self%hydraulic_start_dof
@@ -542,6 +545,18 @@ contains
                        porosity_history=porosity_history(1:bdf_order + 1))
 
         block
+            real(real64) :: qw_val, qi_val, qa_val, qv_val
+            call self%Qw%get_current(node_id, qw_val)
+            call self%Qi%get_current(node_id, qi_val)
+            call self%Qa%get_current(node_id, qa_val)
+            call self%Qv%get_current(node_id, qv_val)
+            call state%water_content%set(qw_val)
+            call state%ice_content%set(qi_val)
+            call state%air_content%set(qa_val)
+            call state%vapor_content%set(qv_val)
+        end block
+
+        block
             real(real64) :: qi_seg_val
             call self%Qi_seg%get_current(node_id, qi_seg_val)
             call state%ice_content_seg%set(qi_seg_val)
@@ -713,8 +728,7 @@ contains
                 call allocate_array(current_prev, size(current))
                 current_prev(:) = current(:)
 
-                if (allocated(du) .and. size(du) > 0 .and. &
-                    ((.not. allocated(self%solver_thermal)) .or. self%solver_thermal%is_success())) then
+                if (allocated(du) .and. size(du) > 0) then
                     max_du = maxval(abs(du))
                     write (*, '(A,ES13.5,A,L1)') '   [REFLECT] thermal max|du|=', max_du, ', is_none=', is_none
                     if (.not. is_none) then
@@ -744,17 +758,6 @@ contains
             call self%temperature%compute_time_derivative(bdf_coeffs, bdf_order)
 
             call deallocate_array(du)
-
-            ! Zero the stored thermal increment to prevent double-application
-            ! when reflect_variables is called again from the hydraulic phase.
-            if (self%control%is_staggered()) then
-                block
-                    real(real64), pointer :: du_raw(:) => null()
-                    du_raw => self%du%get_data(PHYSICS_TYPES%THERMAL%ID)
-                    if (associated(du_raw)) du_raw(:) = 0.0d0
-                    nullify (du_raw)
-                end block
-            end if
         end if
 
         if (self%is_active_hydraulic()) then
@@ -793,16 +796,6 @@ contains
             call self%pressure%compute_time_derivative(bdf_coeffs, bdf_order)
 
             call deallocate_array(du)
-
-            ! Zero the stored hydraulic increment to prevent double-application.
-            if (self%control%is_staggered()) then
-                block
-                    real(real64), pointer :: du_raw(:) => null()
-                    du_raw => self%du%get_data(PHYSICS_TYPES%HYDRAULIC%ID)
-                    if (associated(du_raw)) du_raw(:) = 0.0d0
-                    nullify (du_raw)
-                end block
-            end if
         end if
 
         call self%control%profiler_stop(PROFILER_TYPES%SETUP)

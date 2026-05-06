@@ -1,4 +1,5 @@
 submodule(numerical_solver_preconditioner) solver_preconditioner_iluk
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
 
 contains
@@ -406,9 +407,29 @@ contains
 
         real(real64), dimension(:), pointer :: x
         integer(int32) :: i, k, col
+        real(real64) :: diag_val
+        logical, save :: reported_diag_issue = .false.
+        real(real64) :: val_abs_max
+        real(real64) :: x_abs_max
+        logical :: val_has_nonfinite
+        logical :: x_has_nonfinite
+        logical, save :: reported_stats = .false.
+        real(real64) :: mul_limit
+        logical, save :: reported_overflow_risk = .false.
 
         call z%copy(r)
         x => z%get_data()
+        mul_limit = sqrt(huge(1.0d0))
+
+        if (.not. reported_stats) then
+            val_abs_max = maxval(abs(self%val))
+            x_abs_max = maxval(abs(x))
+            val_has_nonfinite = any(.not. ieee_is_finite(self%val))
+            x_has_nonfinite = any(.not. ieee_is_finite(x))
+            write (*, '(A,ES12.4,A,ES12.4,A,L1,A,L1)') '   [ILU0] |val|max=', val_abs_max, &
+                ', |x|max=', x_abs_max, ', val_nonfinite=', val_has_nonfinite, ', x_nonfinite=', x_has_nonfinite
+            reported_stats = .true.
+        end if
 
         ! --- Size check ---
         if (size(x) /= self%num_rows) then
@@ -424,6 +445,17 @@ contains
         do i = 1, self%num_rows
             do k = self%ptr(i), self%diag_ptr(i) - 1
                 col = self%ind(k)
+                if (.not. reported_overflow_risk) then
+                    if (abs(self%val(k)) > 0.0d0) then
+                        if (abs(x(col)) > mul_limit / abs(self%val(k))) then
+                            write (*, '(A,I0,A,I0,A,ES13.5,A,ES13.5)') '   [ILU0] overflow risk at row=', i, &
+                                ', col=', col, ', val=', self%val(k), ', xcol=', x(col)
+                            reported_overflow_risk = .true.
+                            self%status = -1
+                            return
+                        end if
+                    end if
+                end if
                 x(i) = x(i) - self%val(k) * x(col)
             end do
         end do
@@ -432,9 +464,27 @@ contains
         do i = self%num_rows, 1, -1
             do k = self%diag_ptr(i) + 1, self%ptr(i + 1) - 1
                 col = self%ind(k)
+                if (.not. reported_overflow_risk) then
+                    if (abs(self%val(k)) > 0.0d0) then
+                        if (abs(x(col)) > mul_limit / abs(self%val(k))) then
+                            write (*, '(A,I0,A,I0,A,ES13.5,A,ES13.5)') '   [ILU0] overflow risk at row=', i, &
+                                ', col=', col, ', val=', self%val(k), ', xcol=', x(col)
+                            reported_overflow_risk = .true.
+                            self%status = -1
+                            return
+                        end if
+                    end if
+                end if
                 x(i) = x(i) - self%val(k) * x(col)
             end do
-            x(i) = x(i) / self%val(self%diag_ptr(i))
+            diag_val = self%val(self%diag_ptr(i))
+            if (.not. reported_diag_issue) then
+                if (.not. ieee_is_finite(diag_val) .or. abs(diag_val) < epsilon(1.0d0)) then
+                    write (*, '(A,I0,A,ES13.5)') '   [ILU0] diag issue at row=', i, ', diag=', diag_val
+                    reported_diag_issue = .true.
+                end if
+            end if
+            x(i) = x(i) / diag_val
         end do
     end subroutine apply_csr_ilu0
 

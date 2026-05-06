@@ -53,10 +53,43 @@ contains
         logical, intent(inout) :: prescribe_bc
 
         integer(int32) :: iter
+        real(real64), pointer, contiguous :: T_cur(:) => null()
+        real(real64), pointer, contiguous :: P_cur(:) => null()
+        real(real64), pointer, contiguous :: Qw_cur(:) => null()
+        real(real64), pointer, contiguous :: Qi_cur(:) => null()
 
         call self%control%increment_nonlinear()
         call self%control%get_nonlinear_iter(iter)
         write (*, '(A,I0)') '[DBG-SETUP] iter_after_increment=', iter
+
+        if (iter == 1) then
+            if (self%is_active_thermal()) then
+                call self%temperature%get_current(T_cur)
+                if (associated(T_cur)) then
+                    write (*, '(A,ES13.5,A,ES13.5)') '   [STATE] T_min=', minval(T_cur), ', T_max=', maxval(T_cur)
+                end if
+                nullify (T_cur)
+            end if
+            if (self%is_active_hydraulic()) then
+                call self%pressure%get_current(P_cur)
+                if (associated(P_cur)) then
+                    write (*, '(A,ES13.5,A,ES13.5)') '   [STATE] P_min=', minval(P_cur), ', P_max=', maxval(P_cur)
+                end if
+                nullify (P_cur)
+            end if
+
+            call self%Qw%get_current(Qw_cur)
+            if (associated(Qw_cur)) then
+                write (*, '(A,ES13.5,A,ES13.5)') '   [STATE] Qw_min=', minval(Qw_cur), ', Qw_max=', maxval(Qw_cur)
+            end if
+            nullify (Qw_cur)
+
+            call self%Qi%get_current(Qi_cur)
+            if (associated(Qi_cur)) then
+                write (*, '(A,ES13.5,A,ES13.5)') '   [STATE] Qi_min=', minval(Qi_cur), ', Qi_max=', maxval(Qi_cur)
+            end if
+            nullify (Qi_cur)
+        end if
 
         if (iter == 1) then
             prescribe_bc = .true.
