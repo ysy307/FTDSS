@@ -703,7 +703,6 @@ contains
         logical :: is_none
 
         real(real64) :: max_du, alpha
-        real(real64) :: temp_min, temp_max
         real(real64), parameter :: PICARD_MAX_DT_STEP = 2.0d1
         real(real64), parameter :: PICARD_MAX_DP_STEP = 2.0d5
         real(real64), parameter :: TEMP_MIN_C = -80.0d0
@@ -731,29 +730,39 @@ contains
 
                 if (allocated(du) .and. size(du) > 0) then
                     max_du = maxval(abs(du))
-                    write (*, '(A,ES13.5,A,L1)') '   [REFLECT] thermal max|du|=', max_du, ', is_none=', is_none
+                    ! Step limiter: prevent large updates regardless of solver mode
+                    if (max_du > PICARD_MAX_DT_STEP) then
+                        alpha = PICARD_MAX_DT_STEP / max_du
+                    else
+                        alpha = 1.0d0
+                    end if
+                    ! Backtracking line search: halve alpha until T stays within bounds
+                    block
+                        real(real64) :: alpha_ls
+                        real(real64), parameter :: LS_FACTOR = 0.5d0
+                        real(real64), parameter :: LS_MIN = 1.0d-4
+                        integer(int32) :: ls_iter
+                        alpha_ls = alpha
+                        do ls_iter = 1, 20
+                            if (minval(current + alpha_ls * du) >= TEMP_MIN_C .and. &
+                                maxval(current + alpha_ls * du) <= TEMP_MAX_C) exit
+                            alpha_ls = alpha_ls * LS_FACTOR
+                            if (alpha_ls < LS_MIN) then
+                                alpha_ls = LS_MIN
+                                exit
+                            end if
+                        end do
+                        alpha = alpha_ls
+                    end block
                     if (.not. is_none) then
-                        if (max_du > PICARD_MAX_DT_STEP) then
-                            alpha = PICARD_MAX_DT_STEP / max_du
-                            write (*, '(A,2(ES13.5,A))') '   [REFLECT] thermal Picard cap active: max|du|=', &
-                                max_du, ', alpha=', alpha, ''
-                        else
-                            alpha = 1.0d0
-                        end if
                         call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, alpha * du, current)
                         call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
-                        current(:) = current(:) + relaxation_factor * alpha * du(:)
                     else
-                        relaxation_factor = 1.0d0
-                        current(:) = current(:) + du(:)
+                        relaxation_factor = alpha
+                        current(:) = current(:) + alpha * du(:)
                     end if
                 end if
 
-                temp_min = minval(current)
-                temp_max = maxval(current)
-                if (temp_min < TEMP_MIN_C .or. temp_max > TEMP_MAX_C) then
-                    write (*, '(A,2(ES13.5,A))') '   [REFLECT] thermal clamp: min=', temp_min, ', max=', temp_max, ''
-                end if
                 current(:) = min(max(current(:), TEMP_MIN_C), TEMP_MAX_C)
                 call self%temperature%set_delta(current(:) - current_prev(:))
 
@@ -783,21 +792,37 @@ contains
                 current_prev(:) = current(:)
 
                 if (allocated(du) .and. size(du) > 0) then
+                    max_du = maxval(abs(du))
+                    ! Step limiter: prevent large pressure updates regardless of solver mode
+                    if (max_du > PICARD_MAX_DP_STEP) then
+                        alpha = PICARD_MAX_DP_STEP / max_du
+                    else
+                        alpha = 1.0d0
+                    end if
+                    ! Backtracking line search: halve alpha until P stays within bounds
+                    block
+                        real(real64) :: alpha_ls
+                        real(real64), parameter :: LS_FACTOR = 0.5d0
+                        real(real64), parameter :: LS_MIN = 1.0d-4
+                        integer(int32) :: ls_iter
+                        alpha_ls = alpha
+                        do ls_iter = 1, 20
+                            if (minval(current + alpha_ls * du) >= PRESS_MIN_PA .and. &
+                                maxval(current + alpha_ls * du) <= PRESS_MAX_PA) exit
+                            alpha_ls = alpha_ls * LS_FACTOR
+                            if (alpha_ls < LS_MIN) then
+                                alpha_ls = LS_MIN
+                                exit
+                            end if
+                        end do
+                        alpha = alpha_ls
+                    end block
                     if (.not. is_none) then
-                        max_du = maxval(abs(du))
-                        if (max_du > PICARD_MAX_DP_STEP) then
-                            alpha = PICARD_MAX_DP_STEP / max_du
-                            write (*, '(A,2(ES13.5,A))') '   [REFLECT] hydraulic Picard cap active: max|du|=', &
-                                max_du, ', alpha=', alpha, ''
-                        else
-                            alpha = 1.0d0
-                        end if
                         call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, alpha * du, current)
                         call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
-                        current(:) = current(:) + relaxation_factor * alpha * du(:)
                     else
-                        relaxation_factor = 1.0d0
-                        current(:) = current(:) + du(:)
+                        relaxation_factor = alpha
+                        current(:) = current(:) + alpha * du(:)
                     end if
                 end if
 
@@ -822,9 +847,47 @@ contains
             end if
         end if
 
+        call self%update_nodal_phases()
+
         call self%control%profiler_stop(PROFILER_TYPES%SETUP)
 
     end subroutine reflect_variables_ftcms
+
+    module subroutine update_nodal_phases_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        integer(int32) :: i_elem, num_elem, i_local, node_id
+        integer(int32), pointer, contiguous :: connectivity(:)
+        type(type_state) :: state
+        real(real64) :: qw_val, qi_val, qa_val, qv_val, qi_seg_val
+        logical :: qi_set, qw_set, qa_set, qv_set, qi_seg_set
+
+        nullify (connectivity)
+        call self%domain%get_num_fe(num_elem)
+        do i_elem = 1, num_elem
+            call self%domain%get_fe_connectivity(i_elem, connectivity)
+            do i_local = 1, size(connectivity)
+                node_id = connectivity(i_local)
+                if (node_id < 1) cycle
+                call self%set_state(node_id, i_elem, state, calc_physics=.true.)
+                qi_set = .false.; qw_set = .false.; qa_set = .false.
+                qv_set = .false.; qi_seg_set = .false.
+                call state%ice_content%get(qi_val, qi_set)
+                call state%water_content%get(qw_val, qw_set)
+                call state%air_content%get(qa_val, qa_set)
+                call state%vapor_content%get(qv_val, qv_set)
+                call state%ice_content_seg%get(qi_seg_val, qi_seg_set)
+                if (qi_set) call self%Qi%set_current(node_id, qi_val)
+                if (qw_set) call self%Qw%set_current(node_id, qw_val)
+                if (qa_set) call self%Qa%set_current(node_id, qa_val)
+                if (qv_set) call self%Qv%set_current(node_id, qv_val)
+                if (qi_seg_set) call self%Qi_seg%set_current(node_id, qi_seg_val)
+            end do
+            nullify (connectivity)
+        end do
+
+    end subroutine update_nodal_phases_ftcms
 
     module subroutine reset_ftcms(self)
         implicit none

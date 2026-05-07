@@ -184,7 +184,7 @@ contains
         n_hist = min(size(bdf_coeffs), size(temperature_history), size(pressure_history), size(porosity_history))
 
         do j = 1, n_hist
-            ! Reconstruct state from history data and recalculate enthalpy
+            call local_state%copy(state)
             call local_state%temperature%set(temperature_history(j))
             call local_state%pressure%set(pressure_history(j))
             call local_state%porosity%set(porosity_history(j))

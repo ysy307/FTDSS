@@ -53,43 +53,9 @@ contains
         logical, intent(inout) :: prescribe_bc
 
         integer(int32) :: iter
-        real(real64), pointer, contiguous :: T_cur(:) => null()
-        real(real64), pointer, contiguous :: P_cur(:) => null()
-        real(real64), pointer, contiguous :: Qw_cur(:) => null()
-        real(real64), pointer, contiguous :: Qi_cur(:) => null()
 
         call self%control%increment_nonlinear()
         call self%control%get_nonlinear_iter(iter)
-        write (*, '(A,I0)') '[DBG-SETUP] iter_after_increment=', iter
-
-        if (iter == 1) then
-            if (self%is_active_thermal()) then
-                call self%temperature%get_current(T_cur)
-                if (associated(T_cur)) then
-                    write (*, '(A,ES13.5,A,ES13.5)') '   [STATE] T_min=', minval(T_cur), ', T_max=', maxval(T_cur)
-                end if
-                nullify (T_cur)
-            end if
-            if (self%is_active_hydraulic()) then
-                call self%pressure%get_current(P_cur)
-                if (associated(P_cur)) then
-                    write (*, '(A,ES13.5,A,ES13.5)') '   [STATE] P_min=', minval(P_cur), ', P_max=', maxval(P_cur)
-                end if
-                nullify (P_cur)
-            end if
-
-            call self%Qw%get_current(Qw_cur)
-            if (associated(Qw_cur)) then
-                write (*, '(A,ES13.5,A,ES13.5)') '   [STATE] Qw_min=', minval(Qw_cur), ', Qw_max=', maxval(Qw_cur)
-            end if
-            nullify (Qw_cur)
-
-            call self%Qi%get_current(Qi_cur)
-            if (associated(Qi_cur)) then
-                write (*, '(A,ES13.5,A,ES13.5)') '   [STATE] Qi_min=', minval(Qi_cur), ', Qi_max=', maxval(Qi_cur)
-            end if
-            nullify (Qi_cur)
-        end if
 
         if (iter == 1) then
             prescribe_bc = .true.
@@ -406,8 +372,11 @@ contains
         real(real64) :: phase_inc_max
         real(real64), allocatable :: T_old(:), P_old(:)
         real(real64), allocatable :: phase_increment(:)
+        real(real64), allocatable :: Qw_save(:), dW_check(:)
+        real(real64), allocatable :: hyd_residual_local(:)
         real(real64), pointer, contiguous :: T_cur(:) => null()
         real(real64), pointer, contiguous :: P_cur(:) => null()
+        real(real64), pointer, contiguous :: Qw_cur(:) => null()
         logical :: linear_failed
         logical :: excessive_update
         character(len=16) :: phase_label
@@ -480,8 +449,38 @@ contains
                             HYDRAULIC_INCREMENT_GUARD, ', max=', phase_inc_max, '). Continue with damped update.'
                     end if
 
-                    call self%solve_time_step_check_convergence(PHYSICS_TYPES%HYDRAULIC)
+                    ! Save Qw before update to compute dW for convergence
+                    call self%Qw%get_current(Qw_cur)
+                    if (.not. allocated(Qw_save)) allocate (Qw_save(num_nodes))
+                    if (associated(Qw_cur)) then
+                        Qw_save(:) = Qw_cur(:)
+                    else
+                        Qw_save(:) = 0.0d0
+                    end if
+                    nullify (Qw_cur)
+
+                    ! Apply update (update_nodal_phases recomputes Qw inside)
                     call self%reflect_variables()
+
+                    ! Compute dW = Qw_new - Qw_old
+                    call self%Qw%get_current(Qw_cur)
+                    if (.not. allocated(dW_check)) allocate (dW_check(num_nodes))
+                    if (associated(Qw_cur)) then
+                        dW_check(:) = Qw_cur(:) - Qw_save(:)
+                    else
+                        dW_check(:) = 0.0d0
+                    end if
+                    nullify (Qw_cur)
+
+                    ! Convergence check: residual + dW (water-content-based update norm)
+                    call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, hyd_residual_local)
+                    if (.not. allocated(hyd_residual_local) .or. size(hyd_residual_local) == 0) then
+                        call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
+                    else if (has_nan(hyd_residual_local) .or. has_nan(dW_check)) then
+                        call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
+                    else
+                        call self%control%check_convergence(PHYSICS_TYPES%HYDRAULIC, hyd_residual_local, dW_check)
+                    end if
 
                     call self%control%get_nonlinear_iter(iter_nl)
                     if ((.not. self%control%is_converged()) .and. iter_nl >= MAX_PHASE_NL_ITER) then
@@ -594,9 +593,6 @@ contains
                     call self%reflect_variables()
 
                     call self%control%get_nonlinear_iter(iter_nl)
-                    write (*, '(A,I0,A,L1,A,L1)') '[DBG-LOOP] iter_nl=', iter_nl, &
-                        ', is_converged=', self%control%is_converged(), &
-                        ', should_continue=', self%control%should_continue()
                     if ((.not. self%control%is_converged()) .and. iter_nl >= MAX_PHASE_NL_ITER) then
                         linear_failed = .true.
                         write (*, '(A,I0,A)') '   [THM_NL] reached nonlinear iteration cap (', MAX_PHASE_NL_ITER, &

@@ -114,6 +114,7 @@ module app_ftcms
         procedure, private, pass(self) :: update_physical_properties_bulk => update_physical_properties_bulk_ftcms
 
         procedure, public, pass(self) :: reflect_variables => reflect_variables_ftcms
+        procedure, private, pass(self) :: update_nodal_phases => update_nodal_phases_ftcms
 
         procedure, public, pass(self) :: update_variables => update_variables_ftcms
         procedure, public, pass(self) :: update_segregation_ice => update_segregation_ice_ftcms
@@ -266,6 +267,11 @@ module app_ftcms
             real(real64), intent(in), optional :: step_scale
 
         end subroutine reflect_variables_ftcms
+
+        module subroutine update_nodal_phases_ftcms(self)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+        end subroutine update_nodal_phases_ftcms
 
         module subroutine calc_gradient_ftcms(self, values_vec, grad)
             implicit none

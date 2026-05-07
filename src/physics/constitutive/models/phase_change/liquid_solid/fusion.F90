@@ -101,8 +101,7 @@ contains
         real(real64) :: psi_cap, psi_cryo, psi_eff
         real(real64) :: theta_l_cap, theta_l_new
         real(real64) :: rho_w, rho_i
-        real(real64) :: current_qi, theta_tot
-        logical :: qi_set
+        real(real64) :: theta_tot
 
         call state%temperature%get(temperature)
         call state%pressure%get(pressure)
@@ -119,9 +118,7 @@ contains
             psi_cap = max(0.0d0, -pressure)
             call self%wrf%calc(-psi_cap, theta_l_cap)
 
-            call state%ice_content%get(current_qi, qi_set)
-            if (.not. qi_set) current_qi = 0.0d0
-            theta_tot = theta_l_cap + (rho_i / rho_w) * current_qi
+            theta_tot = theta_l_cap
 
             call self%gcc%calc(state, psi_cryo)
             call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
@@ -166,8 +163,7 @@ contains
         real(real64) :: dtheta_dPin_cap, dtheta_dPin_eff
         real(real64) :: d_theta_cap_dP, d_theta_eff_dP, d_theta_eff_dT
         real(real64) :: rho_w, rho_i
-        real(real64) :: current_qi, theta_tot
-        logical :: qi_set
+        real(real64) :: theta_tot
 
         call state%temperature%get(temperature)
         call state%pressure%get(pressure)
@@ -194,9 +190,7 @@ contains
             call self%wrf%deriv(-psi_cap, dtheta_dPin_cap)
             d_theta_cap_dP = dtheta_dPin_cap * (-d_psi_cap_dP)
 
-            call state%ice_content%get(current_qi, qi_set)
-            if (.not. qi_set) current_qi = 0.0d0
-            theta_tot = theta_l_cap + (rho_i / rho_w) * current_qi
+            theta_tot = theta_l_cap
 
             call self%gcc%calc(state, psi_cryo)
             call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
