@@ -361,7 +361,7 @@ contains
 
         logical :: prescribe_bc
         integer(int32) :: iter_nl, coupling_iter, num_nodes, bdf_order
-        integer(int32), parameter :: MAX_COUPLING_ITER = 1
+        integer(int32), parameter :: MAX_COUPLING_ITER = 10
         integer(int32), parameter :: MAX_PHASE_NL_ITER = 100
         real(real64), parameter :: COUPLING_TOL = 1.0d-3
         real(real64), parameter :: THERMAL_INCREMENT_GUARD = 1.0d6

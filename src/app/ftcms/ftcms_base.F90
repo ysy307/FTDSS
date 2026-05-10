@@ -186,14 +186,14 @@ contains
                     integer(int32) :: dofs_per_node_local
                     call self%K%get_num_dofs_per_node(dofs_per_node_local)
                     call pc_info%set(preconditioner_type_selected, num_nodes, dofs_per_node_local, &
-                                 amg_strength_threshold=linear_solver_settings%amg_strength_threshold, &
-                                 amg_smoother_sweeps=linear_solver_settings%amg_smoother_sweeps, &
-                                 amg_max_agg_size=linear_solver_settings%amg_max_agg_size, &
-                                 amg_drop_tolerance=linear_solver_settings%amg_drop_tolerance, &
-                                 amg_drop_strategy=linear_solver_settings%amg_drop_strategy, &
-                                 amg_smoother_type=linear_solver_settings%amg_smoother_type, &
-                                 amg_rebuild_frequency=linear_solver_settings%amg_rebuild_frequency, &
-                                 amg_rebuild_threshold=linear_solver_settings%amg_rebuild_threshold)
+                                     amg_strength_threshold=linear_solver_settings%amg_strength_threshold, &
+                                     amg_smoother_sweeps=linear_solver_settings%amg_smoother_sweeps, &
+                                     amg_max_agg_size=linear_solver_settings%amg_max_agg_size, &
+                                     amg_drop_tolerance=linear_solver_settings%amg_drop_tolerance, &
+                                     amg_drop_strategy=linear_solver_settings%amg_drop_strategy, &
+                                     amg_smoother_type=linear_solver_settings%amg_smoother_type, &
+                                     amg_rebuild_frequency=linear_solver_settings%amg_rebuild_frequency, &
+                                     amg_rebuild_threshold=linear_solver_settings%amg_rebuild_threshold)
                 end block
             else
                 call pc_info%set(preconditioner_type_selected, &
@@ -763,6 +763,19 @@ contains
                     end if
                 end if
 
+                ! Available-energy phase-change correction (Flerchinger-type):
+                ! for nodes that crossed T_melt in this Picard step, find T_r
+                ! satisfying H(T_r) = H_sensible(T_new), preventing latent-heat overshoot.
+                block
+                    real(real64), pointer, contiguous, dimension(:) :: t_prev
+                    nullify (t_prev)
+                    call self%temperature%get_previous(t_prev)
+                    if (associated(t_prev)) then
+                        call self%apply_phase_change_temperature_correction(t_prev, current)
+                    end if
+                end block
+                ! call self%apply_phase_change_temperature_correction(current_prev, current)
+
                 current(:) = min(max(current(:), TEMP_MIN_C), TEMP_MAX_C)
                 call self%temperature%set_delta(current(:) - current_prev(:))
 
@@ -852,6 +865,109 @@ contains
         call self%control%profiler_stop(PROFILER_TYPES%SETUP)
 
     end subroutine reflect_variables_ftcms
+
+    !> Correct temperature for nodes crossing T_melt during a Picard step.
+    !> Uses the available-energy (Flerchinger-type) method: finds T_r satisfying
+    !> \[ H(T_r) = H_{sensible}(T_{new}) \]
+    !> via a Secant iteration, ensuring energy conservation at the phase-change front.
+    module subroutine apply_phase_change_temperature_correction_ftcms(self, T_old, T_new)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        real(real64), intent(in) :: T_old(:)
+        real(real64), intent(inout) :: T_new(:)
+
+        real(real64), parameter :: T_F = 0.0d0
+        real(real64), parameter :: DT_FD = 0.5d0
+        integer(int32), parameter :: MAX_SECANT = 15
+        real(real64), parameter :: SECANT_RTOL = 1.0d-4
+
+        integer(int32) :: i_elem, num_elem, i_local, node_id, material_id, n_nodes, iter_s
+        integer(int32), pointer, contiguous :: connectivity(:)
+        type(type_state) :: ev
+        real(real64) :: T_old_i, T_new_i, P_i, phi_i
+        real(real64) :: H_low, H_high, C_unf, H_target, H_r
+        real(real64) :: G0, G1, T_r0, T_r1, T_r_new
+        logical, allocatable :: processed(:)
+
+        nullify (connectivity)
+        call self%domain%get_num_fe(num_elem)
+        call self%domain%get_num_nodes(n_nodes)
+        if (n_nodes <= 0) return
+
+        allocate (processed(n_nodes))
+        processed = .false.
+
+        do i_elem = 1, num_elem
+            call self%domain%get_fe_connectivity(i_elem, connectivity)
+            call self%domain%get_material_id(i_elem, material_id)
+
+            do i_local = 1, size(connectivity)
+                node_id = connectivity(i_local)
+                if (node_id < 1 .or. node_id > n_nodes) cycle
+                if (processed(node_id)) cycle
+
+                T_old_i = T_old(node_id)
+                T_new_i = T_new(node_id)
+                if (.not. ((T_old_i > T_F .and. T_new_i < T_F) .or. &
+                           (T_old_i < T_F .and. T_new_i > T_F))) cycle
+                processed(node_id) = .true.
+
+                call self%pressure%get_current(node_id, P_i)
+                call self%porosity%get_current(node_id, phi_i)
+
+                ! Unfrozen heat capacity C_unf via finite difference just above T_f
+                call ev%reset()
+                call ev%temperature%set(T_F + DT_FD)
+                call ev%pressure%set(P_i)
+                call ev%porosity%set(phi_i)
+                call self%thermal%update_water_phases(material_id, ev)
+                call self%thermal%calc_enthalpy_density(material_id, ev, H_low)
+
+                call ev%reset()
+                call ev%temperature%set(T_F + 2.0d0 * DT_FD)
+                call ev%pressure%set(P_i)
+                call ev%porosity%set(phi_i)
+                call self%thermal%update_water_phases(material_id, ev)
+                call self%thermal%calc_enthalpy_density(material_id, ev, H_high)
+
+                C_unf = (H_high - H_low) / DT_FD
+                if (C_unf <= 0.0d0) cycle
+
+                ! Sensible-only target enthalpy at T_new (no phase-change latent heat)
+                H_target = H_low + C_unf * (T_new_i - (T_F + DT_FD))
+
+                ! Secant: G(T_r) = H(T_r) - H_target = 0
+                ! G(T_f) = H(T_f) - H_target = -C_unf*(T_new_i - T_f) > 0
+                T_r0 = T_F
+                G0 = -C_unf * (T_new_i - T_F)
+
+                T_r1 = max(T_new_i, T_F - 2.0d0 * DT_FD)
+
+                do iter_s = 1, MAX_SECANT
+                    call ev%reset()
+                    call ev%temperature%set(T_r1)
+                    call ev%pressure%set(P_i)
+                    call ev%porosity%set(phi_i)
+                    call self%thermal%update_water_phases(material_id, ev)
+                    call self%thermal%calc_enthalpy_density(material_id, ev, H_r)
+
+                    G1 = H_r - H_target
+                    if (abs(G1) < SECANT_RTOL * abs(C_unf)) exit
+                    if (abs(G1 - G0) < 1.0d-30 * abs(C_unf)) exit
+
+                    T_r_new = T_r1 - G1 * (T_r1 - T_r0) / (G1 - G0)
+                    T_r0 = T_r1
+                    G0 = G1
+                    T_r1 = min(T_r_new, T_F)
+                    T_r1 = max(T_r1, T_new_i)
+                end do
+
+                T_new(node_id) = min(max(T_r1, T_new_i), T_F)
+            end do
+        end do
+
+        deallocate (processed)
+    end subroutine apply_phase_change_temperature_correction_ftcms
 
     module subroutine update_nodal_phases_ftcms(self)
         implicit none

@@ -101,7 +101,7 @@ contains
         real(real64) :: psi_cap, psi_cryo, psi_eff
         real(real64) :: theta_l_cap, theta_l_new
         real(real64) :: rho_w, rho_i
-        real(real64) :: theta_tot
+        real(real64) :: theta_tot, phi
 
         call state%temperature%get(temperature)
         call state%pressure%get(pressure)
@@ -118,7 +118,12 @@ contains
             psi_cap = max(0.0d0, -pressure)
             call self%wrf%calc(-psi_cap, theta_l_cap)
 
+            ! Cap theta_tot to phi*(rho_i/rho_w): prevents ice from volumetrically
+            ! overfilling pores (rho_w/rho_i>1 expansion factor), which would violate
+            ! mass conservation via the phase cap in phase_systems.F90.
             theta_tot = theta_l_cap
+            call state%porosity%get(phi)
+            if (phi > 0.0d0) theta_tot = min(theta_tot, phi * (rho_i / rho_w))
 
             call self%gcc%calc(state, psi_cryo)
             call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
@@ -163,7 +168,7 @@ contains
         real(real64) :: dtheta_dPin_cap, dtheta_dPin_eff
         real(real64) :: d_theta_cap_dP, d_theta_eff_dP, d_theta_eff_dT
         real(real64) :: rho_w, rho_i
-        real(real64) :: theta_tot
+        real(real64) :: theta_tot, phi, d_theta_tot_dP
 
         call state%temperature%get(temperature)
         call state%pressure%get(pressure)
@@ -190,7 +195,16 @@ contains
             call self%wrf%deriv(-psi_cap, dtheta_dPin_cap)
             d_theta_cap_dP = dtheta_dPin_cap * (-d_psi_cap_dP)
 
+            ! Same cap as calc_ice_content: limit to phi*(rho_i/rho_w).
+            ! When active the cap value is constant w.r.t. P, so d_theta_tot_dP = 0.
             theta_tot = theta_l_cap
+            call state%porosity%get(phi)
+            if (phi > 0.0d0 .and. theta_l_cap >= phi * (rho_i / rho_w)) then
+                theta_tot = phi * (rho_i / rho_w)
+                d_theta_tot_dP = 0.0d0
+            else
+                d_theta_tot_dP = d_theta_cap_dP
+            end if
 
             call self%gcc%calc(state, psi_cryo)
             call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
@@ -207,7 +221,7 @@ contains
             d_theta_eff_dT = dtheta_dPin_eff * (-d_psi_eff_dT)
 
             if (theta_l_new < theta_tot) then
-                dice_dP = (d_theta_cap_dP - d_theta_eff_dP) * (rho_w / rho_i)
+                dice_dP = (d_theta_tot_dP - d_theta_eff_dP) * (rho_w / rho_i)
                 dice_dT = -d_theta_eff_dT * (rho_w / rho_i)
             else
                 dice_dP = 0.0d0

@@ -255,15 +255,21 @@ contains
             dT = 0.0d0
         end if
 
+        ! if (present(scheme_opt)) then
+        !     use_scheme = scheme_opt
+        ! else
+        !     ! Legacy logic: stabilize with Secant if temperature change is large, otherwise use Tangent
+        !     if (abs(dT) > 1.0d-6) then
+        !         use_scheme = SCHEME_SECANT
+        !     else
+        !         use_scheme = SCHEME_TANGENT
+        !     end if
+        ! end if
         if (present(scheme_opt)) then
             use_scheme = scheme_opt
         else
-            ! Legacy logic: stabilize with Secant if temperature change is large, otherwise use Tangent
-            if (abs(dT) > 1.0d-6) then
-                use_scheme = SCHEME_SECANT
-            else
-                use_scheme = SCHEME_TANGENT
-            end if
+            ! Force Tangent method to prevent Secant instability in coupled phase-change
+            use_scheme = SCHEME_TANGENT
         end if
 
         C_TT = 0.0d0
@@ -281,14 +287,27 @@ contains
 
         if (use_scheme == SCHEME_SECANT) then
 
+            ! ! Current U
+            ! call self%calc_enthalpy_density(material_id, state, C_TT_current)
+
+            ! ! Old U (from previous time step)
+            ! call temp_state%copy(state)
+            ! call temp_state%temperature%set(temperature_history(2))
+            ! call temp_state%pressure%set(pressure_history(2))
+            ! call temp_state%porosity%set(porosity_history(2))
+            ! call self%update_water_phases(material_id, temp_state)
+            ! call self%calc_enthalpy_density(material_id, temp_state, C_TT_old)
+
+            ! ! Prevent division by zero
+            ! dT = sign(max(abs(dT), 1.0d-8), dT)
+            ! C_TT = (C_TT_current - C_TT_old) / dT
+
             ! Current U
             call self%calc_enthalpy_density(material_id, state, C_TT_current)
 
-            ! Old U (from previous time step)
+            ! Old U evaluated with current pressure and porosity
             call temp_state%copy(state)
             call temp_state%temperature%set(temperature_history(2))
-            call temp_state%pressure%set(pressure_history(2))
-            call temp_state%porosity%set(porosity_history(2))
             call self%update_water_phases(material_id, temp_state)
             call self%calc_enthalpy_density(material_id, temp_state, C_TT_old)
 

@@ -114,6 +114,8 @@ module app_ftcms
         procedure, private, pass(self) :: update_physical_properties_bulk => update_physical_properties_bulk_ftcms
 
         procedure, public, pass(self) :: reflect_variables => reflect_variables_ftcms
+        procedure, private, pass(self) :: apply_phase_change_temperature_correction => &
+            apply_phase_change_temperature_correction_ftcms
         procedure, private, pass(self) :: update_nodal_phases => update_nodal_phases_ftcms
 
         procedure, public, pass(self) :: update_variables => update_variables_ftcms
@@ -424,6 +426,13 @@ module app_ftcms
             class(type_ftcms), intent(inout) :: self
 
         end subroutine run_ftcms
+
+        module subroutine apply_phase_change_temperature_correction_ftcms(self, T_old, T_new)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            real(real64), intent(in) :: T_old(:)
+            real(real64), intent(inout) :: T_new(:)
+        end subroutine apply_phase_change_temperature_correction_ftcms
 
         module subroutine destroy_type_ftcms(self)
             implicit none
