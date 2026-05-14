@@ -56,6 +56,7 @@ module physics_constitutive_manager
         procedure, public :: calc_cryo_suction_deriv_T
         procedure, public :: calc_segregation_sink
         procedure, public :: is_segregation_active
+        procedure, public :: has_cryo_transport
 
     end type type_constitutive_manager
 
@@ -477,5 +478,14 @@ contains
 
         active = self%models(self%materials_id_map(material_id))%is_segregation_active()
     end function is_segregation_active
+
+    pure function has_cryo_transport(self, material_id) result(active)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        logical :: active
+
+        active = self%models(self%materials_id_map(material_id))%has_cryo_transport()
+    end function has_cryo_transport
 
 end module physics_constitutive_manager

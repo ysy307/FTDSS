@@ -704,7 +704,9 @@ contains
 
         real(real64) :: max_du, alpha
         real(real64), parameter :: PICARD_MAX_DT_STEP = 2.0d1
-        real(real64), parameter :: PICARD_MAX_DP_STEP = 2.0d5
+        real(real64), parameter :: PICARD_MAX_DT_STEP_PHASE = 0.5d0   ! K near T_melt
+        real(real64), parameter :: PICARD_PHASE_ZONE = 2.0d0           ! °C half-width
+        real(real64), parameter :: PICARD_MAX_DP_STEP = 5.0d3
         real(real64), parameter :: TEMP_MIN_C = -80.0d0
         real(real64), parameter :: TEMP_MAX_C = 80.0d0
         real(real64), parameter :: PRESS_MIN_PA = -1.0d7
@@ -730,12 +732,20 @@ contains
 
                 if (allocated(du) .and. size(du) > 0) then
                     max_du = maxval(abs(du))
-                    ! Step limiter: prevent large updates regardless of solver mode
-                    if (max_du > PICARD_MAX_DT_STEP) then
-                        alpha = PICARD_MAX_DT_STEP / max_du
-                    else
-                        alpha = 1.0d0
-                    end if
+                    ! Step limiter: tighter limit near T_melt to prevent C-C amplification
+                    block
+                        real(real64) :: local_max_step
+                        if (minval(abs(current)) < PICARD_PHASE_ZONE) then
+                            local_max_step = PICARD_MAX_DT_STEP_PHASE
+                        else
+                            local_max_step = PICARD_MAX_DT_STEP
+                        end if
+                        if (max_du > local_max_step) then
+                            alpha = local_max_step / max_du
+                        else
+                            alpha = 1.0d0
+                        end if
+                    end block
                     ! Backtracking line search: halve alpha until T stays within bounds
                     block
                         real(real64) :: alpha_ls

@@ -63,6 +63,7 @@ module physics_governing_base
         procedure, private, pass(self) :: set_bdf_info => set_bdf_info
 
         procedure, public, pass(self) :: lerp => lerp_states
+        procedure, public, pass(self) :: lerp_dqi_dt => lerp_dqi_dt_from_nodes
 
         procedure, public, pass(self) :: compute_K1 => compute_K1_assemble_workspace
         procedure, public, pass(self) :: compute_K1_lumped => compute_K1_lumped_assemble_workspace
@@ -406,6 +407,37 @@ contains
         nullify (work_history_ptr)
 
     end subroutine lerp_states
+
+    ! Interpolate dQi_dT from node states to Gauss point states.
+    ! Called after update_physical_properties_bulk to fix the phase-transition
+    ! front element: Gauss point T > T_f0 gives dQi_dT=0 (no latent heat),
+    ! but node-interpolated values correctly carry latent heat from frozen nodes.
+    subroutine lerp_dqi_dt_from_nodes(self)
+        implicit none
+        class(type_assemble_workspace), intent(inout) :: self
+
+        integer(int32) :: i
+        type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp
+        real(real64), allocatable :: dqi_dt_nodes(:)
+        real(real64) :: dqi_dt_gp
+
+        nullify (gp)
+        call self%fe%get_gauss(gp)
+        allocate (dqi_dt_nodes(self%num_fe_nodes))
+
+        do i = 1, self%num_fe_nodes
+            call self%state(i)%dQi_dT%get(dqi_dt_nodes(i))
+        end do
+
+        do i = 1, self%num_fe_gauss
+            call self%fe%lerp(gp(i), dqi_dt_nodes(1:self%num_fe_nodes), dqi_dt_gp)
+            call self%state_gp(i)%dQi_dT%set(dqi_dt_gp)
+        end do
+
+        deallocate (dqi_dt_nodes)
+        nullify (gp)
+
+    end subroutine lerp_dqi_dt_from_nodes
 
     subroutine compute_K1_assemble_workspace(self, A_gp, local_matrix)
         implicit none

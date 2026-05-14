@@ -36,6 +36,9 @@ contains
         real(real64), allocatable :: work_C_HT(:)
         real(real64), allocatable :: work_D_HT(:, :, :)
         real(real64), allocatable :: work_matrix_coupling(:, :)
+        real(real64), allocatable :: dpsi_cryo_dT_nodes(:), K_flh_nodes(:)
+        type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp_coords
+        real(real64) :: dpsi_cryo_dT_gp, K_vT_lerp, K_flh_lerp
 
         real(real64), allocatable :: work_sink(:)
 
@@ -44,6 +47,7 @@ contains
         n_dim = workspace%num_fe_dimension
         allocate (local_vec_res(n_nodes))
         allocate (work_sink(n_gauss))
+        ! BDF coefficient for mass matrix: α_0 = 1/dt (current step)
         bdf0 = workspace%bdf_coeffs(1)
         dt_local = 0.0d0
         call control%get_dt(dt_local)
@@ -56,6 +60,7 @@ contains
         work_sink(:) = 0.0d0
 
         ! Coupling workspace
+        nullify (gp_coords)
         if (present(K_HT)) then
             allocate (work_C_HT(n_gauss))
             allocate (work_D_HT(n_dim, n_dim, n_gauss))
@@ -63,6 +68,15 @@ contains
             work_C_HT(:) = 0.0d0
             work_D_HT(:, :, :) = 0.0d0
             work_matrix_coupling(:, :) = 0.0d0
+            ! Lerp dpsi_cryo/dT and K_flh from nodes to GPs to capture cryo-suction at front elements
+            ! (GP temperatures are unfrozen averages; must lerp both to avoid overestimating D_HT)
+            allocate (dpsi_cryo_dT_nodes(n_nodes))
+            allocate (K_flh_nodes(n_nodes))
+            call workspace%fe%get_gauss(gp_coords)
+            do i = 1, n_nodes
+                call self%physics%calc_cryo_suction_deriv_T(workspace%material_id, workspace%state(i), dpsi_cryo_dT_nodes(i))
+                call self%physics%calc_Kflh(workspace%material_id, workspace%state(i), K_flh_nodes(i))
+            end do
         end if
 
         ! 1. Gauss Loop
@@ -80,7 +94,21 @@ contains
 
             if (present(K_HT)) then
                 call self%compute_coupling_mass_term(workspace%material_id, workspace%state_gp(i), work_C_HT(i))
-                call self%compute_coupling_diffusion_term(workspace%material_id, workspace%state_gp(i), work_D_HT(:, :, i))
+                ! Lerp both dpsi_cryo/dT and K_flh from nodes: prevents overestimating D_HT
+                ! when GP is unfrozen (K_flh_gp is full permeability) but nodes are freezing
+                call workspace%fe%lerp(gp_coords(i), dpsi_cryo_dT_nodes(1:n_nodes), dpsi_cryo_dT_gp)
+                call workspace%fe%lerp(gp_coords(i), K_flh_nodes(1:n_nodes), K_flh_lerp)
+                call self%calc_K_vT(workspace%material_id, workspace%state_gp(i), K_vT_lerp)
+                work_D_HT(:, :, i) = 0.0d0
+                if (self%physics%has_cryo_transport(workspace%material_id)) then
+                    do d = 1, n_dim
+                        work_D_HT(d, d, i) = K_vT_lerp - K_flh_lerp / g * dpsi_cryo_dT_gp
+                    end do
+                else
+                    do d = 1, n_dim
+                        work_D_HT(d, d, i) = K_vT_lerp
+                    end do
+                end if
             end if
 
             call self%calc_segregation_sink(workspace%material_id, workspace%state_gp(i), dt_local, work_sink(i))
@@ -171,6 +199,9 @@ contains
         if (allocated(work_C_HT)) deallocate (work_C_HT)
         if (allocated(work_D_HT)) deallocate (work_D_HT)
         if (allocated(work_matrix_coupling)) deallocate (work_matrix_coupling)
+        if (allocated(dpsi_cryo_dT_nodes)) deallocate (dpsi_cryo_dT_nodes)
+        if (allocated(K_flh_nodes)) deallocate (K_flh_nodes)
+        if (associated(gp_coords)) nullify (gp_coords)
 
     end subroutine assemble_local_picard_hydraulic
 

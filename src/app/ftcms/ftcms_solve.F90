@@ -262,18 +262,6 @@ contains
                 ! Update solution with relaxation (Aitken for Picard, damped for Newton)
                 call self%reflect_variables()
 
-                ! Anchor the all-Neumann null-mode to the initial mean pressure
-                ! (preserves absolute level required by the WRF).
-                if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc) &
-                    .and. self%hydraulic_ref_mean_set) then
-                    call self%pressure%get_current(P_cur)
-                    if (associated(P_cur) .and. size(P_cur) > 0) then
-                        mean_pressure = sum(P_cur) / real(size(P_cur), real64)
-                        P_cur(:) = P_cur(:) - (mean_pressure - self%hydraulic_ref_mean)
-                    end if
-                    nullify (P_cur)
-                end if
-
                 ! Force exit after one iteration when config is NONE (linear solve)
                 if (self%control%is_none()) exit nonlinear
 
@@ -492,16 +480,6 @@ contains
                         exit hydraulic_nl
                     end if
 
-                    ! Anchor the all-Neumann null-mode to the initial mean pressure.
-                    if ((.not. self%hydraulic_has_dirichlet_bc) .and. self%hydraulic_ref_mean_set) then
-                        call self%pressure%get_current(P_cur)
-                        if (associated(P_cur) .and. size(P_cur) > 0) then
-                            mean_pressure = sum(P_cur) / real(size(P_cur), real64)
-                            P_cur(:) = P_cur(:) - (mean_pressure - self%hydraulic_ref_mean)
-                        end if
-                        nullify (P_cur)
-                    end if
-
                     if (self%control%is_none()) exit hydraulic_nl
                 end do hydraulic_nl
 
@@ -600,17 +578,6 @@ contains
                         call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
                         call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
                         exit thermal_nl
-                    end if
-
-                    ! Anchor the all-Neumann null-mode to the initial mean pressure.
-                    if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc) &
-                        .and. self%hydraulic_ref_mean_set) then
-                        call self%pressure%get_current(P_cur)
-                        if (associated(P_cur) .and. size(P_cur) > 0) then
-                            mean_pressure = sum(P_cur) / real(size(P_cur), real64)
-                            P_cur(:) = P_cur(:) - (mean_pressure - self%hydraulic_ref_mean)
-                        end if
-                        nullify (P_cur)
                     end if
 
                     if (self%control%is_none()) exit thermal_nl

@@ -85,6 +85,8 @@ contains
                         call self%K%add(PHYSICS_TYPES%HYDRAULIC%ID, PHYSICS_TYPES%HYDRAULIC%ID, elem_id, num_nodes_local, local_K_HH)
                         call self%F%add(PHYSICS_TYPES%HYDRAULIC%ID, p_connectivity, local_F_H)
                     end if
+
+
                     ! $OMP END CRITICAL(ftcms_global_assembly)
 
                 end do
@@ -137,11 +139,13 @@ contains
 
         call workspace%initialize(fe, material_id, element_id, computation_type%ID, coordinates, self%control)
 
-        call self%set_states_from_connectivity(connectivity_local, element_id, workspace%state, calc_physics=.false.)
+        call self%set_states_from_connectivity(connectivity_local, element_id, workspace%state, calc_physics=.true.)
 
         call workspace%lerp()
 
         call self%update_physical_properties_bulk(material_id, workspace%state_gp)
+
+        call workspace%lerp_dqi_dt()
         call fe%get_num_nodes(num_nodes)
 
         if (present(local_K_TT)) call check_initialize_matrix(local_K_TT, num_nodes)

@@ -34,6 +34,7 @@ module constitutive_models_manager
         procedure, public :: calc_cryo_suction_deriv_T
         procedure, public :: calc_segregation_sink
         procedure, public :: is_segregation_active
+        procedure, public :: has_cryo_transport
     end type type_models_manager
 
 contains
@@ -167,5 +168,16 @@ contains
 
         active = self%segregation%is_active()
     end function is_segregation_active
+
+    ! Returns .true. when any GCC model is active. Cryogenic suction (dψ_cryo/dT)
+    ! drives the D_HT coupling term, which is the primary mechanism for water
+    ! redistribution in freezing soil regardless of segregation mode.
+    pure function has_cryo_transport(self) result(active)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        logical :: active
+
+        active = allocated(self%gcc%p)
+    end function has_cryo_transport
 
 end module constitutive_models_manager

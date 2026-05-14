@@ -339,12 +339,12 @@ contains
 
             ! Ice (including latent heat derivative)
             ! Pore ice only: segregated ice latent heat is handled by explicit source term
-            if (Qi > 0.0d0) then
+            call state%dQi_dT%get(dQi_dT)
+            if (Qi > 0.0d0 .or. dQi_dT /= 0.0d0) then
                 call self%physics%calc_density_ice(state, rho_i)
                 call self%physics%calc_specific_heat_ice(state, c_i)
                 C_TT = C_TT + rho_i * c_i * Qi
                 call self%physics%calc_latent_heat_fusion(material_id, state, Lf)
-                call state%dQi_dT%get(dQi_dT)
                 C_TT = C_TT - Lf * rho_i * dQi_dT
             end if
 
