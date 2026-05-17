@@ -86,6 +86,10 @@ contains
                         call self%F%add(PHYSICS_TYPES%HYDRAULIC%ID, p_connectivity, local_F_H)
                     end if
 
+                    if (do_thermal .and. do_hydraulic) then
+                        call self%K%add(PHYSICS_TYPES%THERMAL%ID, PHYSICS_TYPES%HYDRAULIC%ID, elem_id, num_nodes_local, local_K_TH)
+                        call self%K%add(PHYSICS_TYPES%HYDRAULIC%ID, PHYSICS_TYPES%THERMAL%ID, elem_id, num_nodes_local, local_K_HT)
+                    end if
 
                     ! $OMP END CRITICAL(ftcms_global_assembly)
 

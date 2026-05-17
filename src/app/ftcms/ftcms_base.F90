@@ -279,6 +279,13 @@ contains
         real(real64), allocatable, target :: ice_content(:)
         real(real64), pointer, contiguous, dimension(:) :: vapor_content
 
+        type(type_coordinate_array_dp) :: water_flux_arr
+        integer(int32) :: num_nodes_wf, num_fe_wf, i_elem_wf, i_local_wf, node_id_wf
+        integer(int32), pointer, contiguous :: conn_wf(:)
+        type(type_state) :: state_wf
+        type(type_coordinate_dp), pointer :: wf_ptr
+        logical :: has_water_flux
+
         call self%control%profiler_start(PROFILER_TYPES%IO)
 
         nullify (temperature)
@@ -304,16 +311,54 @@ contains
             call self%Qv%get_previous(vapor_content)
             allocate (ice_content(size(ice_pore)))
             ice_content(:) = ice_pore(:) + ice_seg(:)
-            call self%output%output_fields(file_counts=iter, &
-                                           temperature=temperature, &
-                                           water_content=water_content, &
-                                           ice_content=ice_content, &
-                                           vapor_content=vapor_content, &
-                                           pressure=pressure)
+
+            has_water_flux = .false.
+            if (self%is_active_hydraulic()) then
+                nullify (conn_wf)
+                nullify (wf_ptr)
+                call self%domain%get_num_nodes(num_nodes_wf)
+                call self%domain%get_num_fe(num_fe_wf)
+                call water_flux_arr%initialize(num_nodes_wf)
+                do i_elem_wf = 1, num_fe_wf
+                    call self%domain%get_fe_connectivity(i_elem_wf, conn_wf)
+                    do i_local_wf = 1, size(conn_wf)
+                        node_id_wf = conn_wf(i_local_wf)
+                        if (node_id_wf < 1) cycle
+                        call self%set_state(node_id_wf, i_elem_wf, state_wf, calc_physics=.true.)
+                        nullify (wf_ptr)
+                        call state_wf%get(water_flux=wf_ptr)
+                        if (associated(wf_ptr)) then
+                            water_flux_arr%x(node_id_wf) = wf_ptr%x
+                            water_flux_arr%y(node_id_wf) = wf_ptr%y
+                            water_flux_arr%z(node_id_wf) = wf_ptr%z
+                        end if
+                    end do
+                    nullify (conn_wf)
+                end do
+                has_water_flux = .true.
+            end if
+
+            if (has_water_flux) then
+                call self%output%output_fields(file_counts=iter, &
+                                               temperature=temperature, &
+                                               water_content=water_content, &
+                                               ice_content=ice_content, &
+                                               vapor_content=vapor_content, &
+                                               pressure=pressure, &
+                                               water_flux=water_flux_arr)
+            else
+                call self%output%output_fields(file_counts=iter, &
+                                               temperature=temperature, &
+                                               water_content=water_content, &
+                                               ice_content=ice_content, &
+                                               vapor_content=vapor_content, &
+                                               pressure=pressure)
+            end if
 
             call self%control%update_output(OUTPUT_TYPES%FIELD, current_time)
 
             deallocate (ice_content)
+            call water_flux_arr%destroy()
             nullify (temperature)
             nullify (pressure)
             nullify (ice_pore)

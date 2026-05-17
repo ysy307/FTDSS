@@ -14,7 +14,7 @@ module models_phase_change_fusion
 
     ! Smooth blending scale [Pa] for effective suction max(psi_cap, psi_cryo).
     ! A small positive epsilon avoids non-differentiable switching at psi_cap=psi_cryo.
-    real(real64), parameter :: SUCTION_BLEND_EPS = 1.0d4
+    real(real64), parameter :: SUCTION_BLEND_EPS = 1.0d2
     !
 
     !>

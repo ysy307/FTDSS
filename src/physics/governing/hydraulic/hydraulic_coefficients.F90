@@ -186,15 +186,16 @@ contains
         real(real64), intent(inout) :: D_HT(:, :)
 
         real(real64) :: K_vT, K_flh, dpsi_cryo_dT
-        real(real64) :: coeff_D
+        real(real64) :: coeff_D, temperature_local
         integer(int32) :: i
 
         call self%calc_K_vT(material_id, state, K_vT)
+        call state%temperature%get(temperature_local)
 
-        ! For segregation-type GCC, cryogenic suction gradient drives net water migration
-        ! toward the frozen front and must appear in D_HT. For non-segregation GCC, ice
-        ! forms from local pore water only (no net flow), so the cryo term is suppressed.
-        if (self%physics%has_cryo_transport(material_id)) then
+        ! D_HT = K_flh/g * |dpsi_cryo/dT|  (active for any T < T_f0)
+        ! The transition-element-only guard in hydraulic_matrix prevents runaway
+        ! in fully-frozen zones where K_HH ~ K_min.
+        if (self%physics%has_cryo_transport(material_id) .and. temperature_local < 0.0d0) then
             call self%physics%calc_Kflh(material_id, state, K_flh)
             call self%physics%calc_cryo_suction_deriv_T(material_id, state, dpsi_cryo_dT)
             coeff_D = K_vT - K_flh / g * dpsi_cryo_dT

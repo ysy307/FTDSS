@@ -17,7 +17,7 @@ contains
 
     end subroutine assemble_local_hydraulic
 
-    !> @brief Assemble Picard local components
+    !> @brief Assemble Picard local components (backward Euler, no BDF history)
     module subroutine assemble_local_picard_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
         implicit none
         class(type_hydraulic), intent(in) :: self
@@ -36,9 +36,11 @@ contains
         real(real64), allocatable :: work_C_HT(:)
         real(real64), allocatable :: work_D_HT(:, :, :)
         real(real64), allocatable :: work_matrix_coupling(:, :)
-        real(real64), allocatable :: dpsi_cryo_dT_nodes(:), K_flh_nodes(:)
+        real(real64), allocatable :: C_HT_nodes(:)
+        real(real64), allocatable :: D_HT_scalar_nodes(:)
+        real(real64), allocatable :: D_HT_tmp(:, :)
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp_coords
-        real(real64) :: dpsi_cryo_dT_gp, K_vT_lerp, K_flh_lerp
+        real(real64) :: C_HT_gp, D_HT_gp_scalar
 
         real(real64), allocatable :: work_sink(:)
 
@@ -47,7 +49,7 @@ contains
         n_dim = workspace%num_fe_dimension
         allocate (local_vec_res(n_nodes))
         allocate (work_sink(n_gauss))
-        ! BDF coefficient for mass matrix: α_0 = 1/dt (current step)
+
         bdf0 = workspace%bdf_coeffs(1)
         dt_local = 0.0d0
         call control%get_dt(dt_local)
@@ -65,18 +67,36 @@ contains
             allocate (work_C_HT(n_gauss))
             allocate (work_D_HT(n_dim, n_dim, n_gauss))
             allocate (work_matrix_coupling(n_nodes, n_nodes))
+            allocate (C_HT_nodes(n_nodes))
+            allocate (D_HT_scalar_nodes(n_nodes))
+            allocate (D_HT_tmp(n_dim, n_dim))
             work_C_HT(:) = 0.0d0
             work_D_HT(:, :, :) = 0.0d0
             work_matrix_coupling(:, :) = 0.0d0
-            ! Lerp dpsi_cryo/dT and K_flh from nodes to GPs to capture cryo-suction at front elements
-            ! (GP temperatures are unfrozen averages; must lerp both to avoid overestimating D_HT)
-            allocate (dpsi_cryo_dT_nodes(n_nodes))
-            allocate (K_flh_nodes(n_nodes))
             call workspace%fe%get_gauss(gp_coords)
             do i = 1, n_nodes
-                call self%physics%calc_cryo_suction_deriv_T(workspace%material_id, workspace%state(i), dpsi_cryo_dT_nodes(i))
-                call self%physics%calc_Kflh(workspace%material_id, workspace%state(i), K_flh_nodes(i))
+                call self%compute_coupling_mass_term(workspace%material_id, workspace%state(i), C_HT_nodes(i))
+                D_HT_tmp(:, :) = 0.0d0
+                call self%compute_coupling_diffusion_term(workspace%material_id, workspace%state(i), D_HT_tmp)
+                D_HT_scalar_nodes(i) = D_HT_tmp(1, 1)
             end do
+            deallocate (D_HT_tmp)
+            ! D_HT lerp is physically valid only at ice-water transition elements.
+            ! In fully-frozen elements (all nodes T < 0), K_flh -> 0 prevents Darcy
+            ! transport, so D_HT flux inside the frozen zone causes pressure blowup.
+            block
+                real(real64) :: temp_node_val
+                logical :: has_unfrozen
+                has_unfrozen = .false.
+                do i = 1, n_nodes
+                    call workspace%state(i)%temperature%get(temp_node_val)
+                    if (temp_node_val >= 0.0d0) then
+                        has_unfrozen = .true.
+                        exit
+                    end if
+                end do
+                if (.not. has_unfrozen) D_HT_scalar_nodes(:) = 0.0d0
+            end block
         end if
 
         ! 1. Gauss Loop
@@ -84,37 +104,27 @@ contains
             call self%compute_mass_term(workspace%material_id, workspace%state_gp(i), workspace%work_C(i))
             workspace%work_C(i) = max(workspace%work_C(i), C_min)
             call self%compute_diffusion_term(workspace%material_id, workspace%state_gp(i), workspace%work_D(:, :, i))
-            do d = 1, workspace%num_fe_dimension
+            do d = 1, n_dim
                 workspace%work_D(d, d, i) = max(workspace%work_D(d, d, i), K_min)
             end do
             call self%compute_advective_term(workspace%material_id, workspace%state_gp(i), workspace%work_V(:, i))
-            call self%compute_transient_term(workspace%material_id, workspace%state_gp(i), &
-                                             workspace%bdf_coeffs(1:workspace%bdf_order + 1), &
-                                             workspace%work_d_dt(i))
+            call self%compute_transient_term_mixed(workspace%material_id, workspace%state_gp(i), &
+                                                   workspace%bdf_coeffs, workspace%work_d_dt(i))
 
             if (present(K_HT)) then
-                call self%compute_coupling_mass_term(workspace%material_id, workspace%state_gp(i), work_C_HT(i))
-                ! Lerp both dpsi_cryo/dT and K_flh from nodes: prevents overestimating D_HT
-                ! when GP is unfrozen (K_flh_gp is full permeability) but nodes are freezing
-                call workspace%fe%lerp(gp_coords(i), dpsi_cryo_dT_nodes(1:n_nodes), dpsi_cryo_dT_gp)
-                call workspace%fe%lerp(gp_coords(i), K_flh_nodes(1:n_nodes), K_flh_lerp)
-                call self%calc_K_vT(workspace%material_id, workspace%state_gp(i), K_vT_lerp)
-                work_D_HT(:, :, i) = 0.0d0
-                if (self%physics%has_cryo_transport(workspace%material_id)) then
-                    do d = 1, n_dim
-                        work_D_HT(d, d, i) = K_vT_lerp - K_flh_lerp / g * dpsi_cryo_dT_gp
-                    end do
-                else
-                    do d = 1, n_dim
-                        work_D_HT(d, d, i) = K_vT_lerp
-                    end do
-                end if
+                call workspace%fe%lerp(gp_coords(i), C_HT_nodes(1:n_nodes), C_HT_gp)
+                work_C_HT(i) = C_HT_gp
+                D_HT_gp_scalar = 0.0d0
+                call workspace%fe%lerp(gp_coords(i), D_HT_scalar_nodes(1:n_nodes), D_HT_gp_scalar)
+                do d = 1, n_dim
+                    work_D_HT(d, d, i) = D_HT_gp_scalar
+                end do
             end if
 
             call self%calc_segregation_sink(workspace%material_id, workspace%state_gp(i), dt_local, work_sink(i))
         end do
 
-        ! 2. Mass Matrix (LHS)
+        ! 2. Mass Matrix (LHS, factor bdf0)
         call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
         if (present(K_HH)) then
             do j = 1, n_nodes
@@ -124,44 +134,24 @@ contains
             end do
         end if
 
-        ! 3. Diffusion Matrix (LHS) & Flux Calculation
-        call workspace%compute_K2(workspace%work_D, workspace%work_matrix)
-        if (present(K_HH)) then
-            do j = 1, n_nodes
-                do i = 1, n_nodes
-                    call K_HH%set(MATRIX_OPS%ADD, i, j, workspace%work_matrix(i, j))
-                end do
-            end do
-        end if
-
-        ! Calculate Diffusion Flux (Current K * Current P)
-        if (present(F_H)) then
-            do i = 1, n_nodes
-                do j = 1, n_nodes
-                    local_vec_res(i) = local_vec_res(i) + workspace%work_matrix(i, j) * workspace%P_node(j)
-                end do
-            end do
-        end if
-
-        ! 4. Coupling: K_HT assembly (temperature coupling)
+        ! 3. Coupling K_HT mass part (K1, factor bdf0, lerped C_HT)
         if (present(K_HT)) then
-            ! C_HT mass coupling -> K_HT
             call workspace%compute_K1(work_C_HT, work_matrix_coupling)
             do j = 1, n_nodes
                 do i = 1, n_nodes
                     call K_HT%set(MATRIX_OPS%ADD, i, j, bdf0 * work_matrix_coupling(i, j))
                 end do
             end do
+        end if
 
-            ! D_HT diffusion coupling -> K_HT
+        ! 4. Coupling K_HT diffusion part (K2 D_HT) + F_H coupling flux
+        if (present(K_HT)) then
             call workspace%compute_K2(work_D_HT, work_matrix_coupling)
             do j = 1, n_nodes
                 do i = 1, n_nodes
                     call K_HT%set(MATRIX_OPS%ADD, i, j, work_matrix_coupling(i, j))
                 end do
             end do
-
-            ! Coupling flux contribution to F_H: -D_HT_matrix * T_node
             if (present(F_H)) then
                 workspace%work_vec(:) = 0.0d0
                 call matvec(work_matrix_coupling, workspace%T_node, workspace%work_vec, ierr)
@@ -171,24 +161,37 @@ contains
             end if
         end if
 
+        ! 5. Diffusion Matrix (LHS, factor 1.0) + F_H diffusion flux
+        call workspace%compute_K2(workspace%work_D, workspace%work_matrix)
+        if (present(K_HH)) then
+            do j = 1, n_nodes
+                do i = 1, n_nodes
+                    call K_HH%set(MATRIX_OPS%ADD, i, j, workspace%work_matrix(i, j))
+                end do
+            end do
+        end if
+        if (present(F_H)) then
+            do i = 1, n_nodes
+                do j = 1, n_nodes
+                    local_vec_res(i) = local_vec_res(i) + workspace%work_matrix(i, j) * workspace%P_node(j)
+                end do
+            end do
+        end if
+
         ! 5. Residual Assembly
         if (present(F_H)) then
-            ! Add Transient Term
             workspace%work_vec(:) = 0.0d0
             call workspace%compute_R1(workspace%work_d_dt, workspace%work_vec)
             local_vec_res(:) = local_vec_res(:) + workspace%work_vec(:)
 
-            ! Add Gravity Term
             workspace%work_vec(:) = 0.0d0
             call workspace%compute_R2(workspace%work_V, workspace%work_vec)
             local_vec_res(:) = local_vec_res(:) - workspace%work_vec(:)
 
-            ! Add Segregation Sink Term
             workspace%work_vec(:) = 0.0d0
             call workspace%compute_R1(work_sink, workspace%work_vec)
             local_vec_res(:) = local_vec_res(:) + workspace%work_vec(:)
 
-            ! F = - Residual
             do i = 1, n_nodes
                 call F_H%set(VECTOR_OPS%ADD, i, -local_vec_res(i))
             end do
@@ -199,8 +202,8 @@ contains
         if (allocated(work_C_HT)) deallocate (work_C_HT)
         if (allocated(work_D_HT)) deallocate (work_D_HT)
         if (allocated(work_matrix_coupling)) deallocate (work_matrix_coupling)
-        if (allocated(dpsi_cryo_dT_nodes)) deallocate (dpsi_cryo_dT_nodes)
-        if (allocated(K_flh_nodes)) deallocate (K_flh_nodes)
+        if (allocated(D_HT_scalar_nodes)) deallocate (D_HT_scalar_nodes)
+        if (allocated(C_HT_nodes)) deallocate (C_HT_nodes)
         if (associated(gp_coords)) nullify (gp_coords)
 
     end subroutine assemble_local_picard_hydraulic
@@ -297,10 +300,6 @@ contains
                 end do
             end do
 
-            ! Segregation sink: removes water mass at freezing fringe.
-            ! The effective S_seg is clamped to match the forward-Euler
-            ! Qi_seg update so the PDE sink equals the ice accumulation
-            ! rate (water-equivalent) — preserving total-water conservation.
             block
                 real(real64) :: S_seg
                 S_seg = 0.0d0
