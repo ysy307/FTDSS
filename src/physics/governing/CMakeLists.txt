@@ -50,8 +50,12 @@ target_sources(SOLVER_GOVERNING PRIVATE
     hydraulic/hydraulic_matrix.F90
     hydraulic/hydraulic_coefficients.F90
     # ====================================================
-    # 6. Atmosphere
+    # 6. Atmosphere / Data Assimilation (ETKF)
     # ====================================================
+    atmosphere/ensemble_manager.F90
+    atmosphere/observation_manager.F90
+    atmosphere/etkf_solver.F90
+    atmosphere/assimilation_controller.F90
     atmosphere/atmosphere.F90
     # ====================================================
     # 7. Monolithic (Coupled P-T Newton-Raphson)

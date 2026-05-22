@@ -11,6 +11,7 @@ module types_config_control_output_manager
         real(real64) :: interval_val
         type(type_constant_value) :: interval_unit
         type(type_constant_value) :: output_unit
+        real(real64) :: output_time_offset = 0.0d0  ! added to converted time (e.g. 1.0 for DOY)
         type(type_constant_id) :: file_format
     contains
         procedure, public, pass(self) :: copy => copy_config_output_manager
@@ -29,6 +30,7 @@ contains
             call self%set(self%interval_val, source%interval_val)
             call self%set(self%interval_unit, source%interval_unit)
             call self%set(self%output_unit, source%output_unit)
+            self%output_time_offset = source%output_time_offset
             call self%set(self%file_format, source%file_format)
         class default
             call self%reset()
@@ -42,6 +44,7 @@ contains
         self%interval_val = 0.0d0
         self%interval_unit = type_constant_value("", "", -1, "", 0)
         self%output_unit = type_constant_value("", "", -1, "", 0)
+        self%output_time_offset = 0.0d0
         self%file_format = FILE_FORMATS%NONE
     end subroutine reset_config_output_manager
 

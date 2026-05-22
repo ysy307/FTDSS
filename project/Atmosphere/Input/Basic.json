@@ -12,7 +12,7 @@
         "partitioning": true
     },
     "geometry_settings": {
-        "mesh_file_name": "atms_@RANK@.vtu",
+        "mesh_file_name": "atms_@RANK@_fixed.vtu",
         "global_node_id_key": "global_node_id",
         "node_type_key": "node_type",
         "num_sharing_ranks_key": "num_sharing_ranks",
@@ -94,11 +94,12 @@
                 "model": "Durner",
                 "unit": "m",
                 "theta_s": 0.744,
-                "theta_r": 0.041e-2,
+                "theta_r": 0.00041,
                 "alpha1": 2.44,
-                "alpha2": 1.01e-6,
+                "alpha2": 1.01e-06,
                 "n1": 2.44,
                 "n2": 1.47,
+                "w1": 0.59,
                 "l": 0.5
             },
             "hydraulic_conductivity_model": {

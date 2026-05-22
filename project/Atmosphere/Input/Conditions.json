@@ -1,9 +1,9 @@
 {
     "time_controls": {
         "simulation_period": {
-            "unit": "hour",
+            "unit": "second",
             "start": 0.0,
-            "end": 50.0
+            "end": 5011200.0
         },
         "time_stepping": {
             "unit": "second",
@@ -75,9 +75,9 @@
             "calculate_hydraulic": true,
             "calculate_mechanical": false,
             "thermal": {
-                "type": "robin",
+                "type": "flux",
                 "value_type": "constant",
-                "values": [28.0, -6.0]
+                "values": [0.0]
             },
             "hydraulic": {
                 "type": "flux",
@@ -89,17 +89,17 @@
     "initial_conditions": {
         "thermal": {
             "type": "uniform",
-            "value": 6.7,
+            "value": 12.0,
             "field_name": "Temperature"
         },
         "hydraulic": {
             "type": "uniform",
-            "value": -54065.7412,
+            "value": -980665.0,
             "field_name": "Pressure"
         },
         "porosity": {
             "type": "uniform",
-            "value": 0.535
+            "value": 0.744
         }
     }
 }

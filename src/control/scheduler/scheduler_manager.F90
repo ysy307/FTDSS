@@ -14,7 +14,8 @@ module control_scheduler
         real(real64), private :: interval_seconds = 0.0d0 ! Always stored in seconds
         real(real64), private :: next_output_seconds = 0.0d0 ! Always stored in seconds
         integer(int32), private :: current_step = 0
-        type(type_constant_value), private :: output_time_unit ! For output time conversion
+        type(type_constant_value), private :: output_time_unit   ! For output time conversion
+        real(real64), private :: output_time_offset = 0.0d0    ! Added to converted time (e.g. 1.0 for DOY)
     contains
         procedure, pass(self), public :: initialize => initialize_manager
         procedure, pass(self), public :: is_output_triggered => check_output_timing
@@ -39,6 +40,7 @@ contains
         self%next_output_seconds = 0.0d0
         self%current_step = 0
         self%output_time_unit = type_constant_value("", "", -1, "", 0.0d0)
+        self%output_time_offset = 0.0d0
 
         if (config%file_format%ID <= 0) then
             return
@@ -53,8 +55,9 @@ contains
         ! 1. Convert interval to seconds and store
         self%interval_seconds = config%interval_val * config%interval_unit%value
 
-        ! 2. Store output unit object
+        ! 2. Store output unit object and offset
         self%output_time_unit = config%output_unit
+        self%output_time_offset = config%output_time_offset
 
         ! 3. Set next output time in seconds
         self%next_output_seconds = current_time_seconds
@@ -115,9 +118,9 @@ contains
         real(real64), intent(inout) :: converted_time
 
         if (self%output_time_unit%value > 0.0d0) then
-            converted_time = current_time_seconds / self%output_time_unit%value
+            converted_time = self%output_time_offset + current_time_seconds / self%output_time_unit%value
         else
-            converted_time = current_time_seconds
+            converted_time = self%output_time_offset + current_time_seconds
         end if
     end subroutine get_output_time_scheduler_manager
 

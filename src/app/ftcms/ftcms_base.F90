@@ -260,9 +260,72 @@ contains
         call self%output_fields()
         call self%output_history()
 
-        ! !
-        ! call global_logger%log_information(message="FTCMS module initialized successfully.")
+        call initialize_assimilation_ftcms(self, input%input_path)
+
     end subroutine initialize_type_ftcms
+
+    subroutine initialize_assimilation_ftcms(self, input_path)
+        use :: json_module, only: json_file
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        character(*), intent(in) :: input_path
+
+        type(json_file) :: jf
+        type(type_da_config) :: da_cfg
+        character(len=512) :: da_file
+        character(:), allocatable :: str_val
+        logical :: found, file_ok
+        integer(int32) :: ierr, myrank
+        logical :: da_enabled_flag
+
+        call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
+
+        da_file = trim(input_path)//'DataAssimilation.json'
+        inquire (file=trim(da_file), exist=file_ok)
+        if (.not. file_ok) return
+
+        call jf%initialize()
+        call jf%load(trim(da_file))
+        if (jf%failed()) return
+
+        da_enabled_flag = .true.
+        call jf%get('enabled', da_enabled_flag, found)
+        if (found .and. .not. da_enabled_flag) then
+            call jf%destroy()
+            return
+        end if
+
+        call jf%get('ensemble.size', da_cfg%ensemble_size, found)
+        call jf%get('ensemble.max_height', da_cfg%max_height, found)
+        call jf%get('ensemble.num_nodes', da_cfg%num_nodes, found)
+        call jf%get('observation.csv_file', str_val, found)
+        if (found .and. allocated(str_val)) da_cfg%csv_file = str_val
+        call jf%get('observation.interval_seconds', da_cfg%interval_seconds, found)
+        call jf%get('observation.sigma_T', da_cfg%sigma_T, found)
+        call jf%get('observation.sigma_q', da_cfg%sigma_q, found)
+        call jf%get('observation.sigma_U', da_cfg%sigma_U, found)
+        call jf%get('surface.z0', da_cfg%z0, found)
+        call jf%get('surface.albedo', da_cfg%albedo, found)
+        call jf%get('surface.emissivity', da_cfg%emissivity, found)
+        call jf%get('surface.Pmin', da_cfg%Pmin, found)
+        call jf%get('surface.Pmax', da_cfg%Pmax, found)
+        call jf%get('surface.lambda_soil', da_cfg%lambda_soil, found)
+        call jf%get('surface.stomatal_resistance', da_cfg%stomatal_resistance, found)
+        call jf%get('reference_datetime', str_val, found)
+        if (found .and. allocated(str_val)) da_cfg%reference_datetime = str_val
+        call jf%get('solar.latitude', da_cfg%latitude, found)
+        call jf%get('solar.longitude', da_cfg%longitude, found)
+        call jf%get('solar.tau_atm', da_cfg%tau_atm, found)
+        call jf%destroy()
+
+        call self%assimilation%initialize(da_cfg, &
+            bc_entity_thermal=3, bc_entity_hydraulic=3)
+        self%assimilation_enabled = .true.
+
+        if (myrank == 0) then
+            write (*, '(A)') '[DA] Data assimilation enabled from DataAssimilation.json.'
+        end if
+    end subroutine initialize_assimilation_ftcms
 
     module subroutine output_fields_ftcms(self)
         implicit none

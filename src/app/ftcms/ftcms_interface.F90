@@ -18,6 +18,7 @@ module app_ftcms
     use :: module_linalg
 
     use :: module_governing
+    use :: governing_atmosphere, only: type_da_config, type_assimilation_controller
     use :: module_solver
     implicit none
 
@@ -64,6 +65,9 @@ module app_ftcms
 
         type(type_control) :: control
         type(type_output_manager) :: output
+
+        type(type_assimilation_controller) :: assimilation
+        logical :: assimilation_enabled = .false.
 
     contains
         ! ---- Lifecycle ----
@@ -144,6 +148,7 @@ module app_ftcms
         procedure, public, pass(self) :: is_active_hydraulic => is_active_hydraulic_ftcms
 
         procedure, public, pass(self) :: run => run_ftcms
+        procedure, public, pass(self) :: run_assimilation => run_assimilation_ftcms
 
     end type type_ftcms
 
@@ -426,6 +431,13 @@ module app_ftcms
             class(type_ftcms), intent(inout) :: self
 
         end subroutine run_ftcms
+
+        module subroutine run_assimilation_ftcms(self, current_time, current_doy)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            real(real64), intent(in) :: current_time
+            real(real64), intent(in) :: current_doy
+        end subroutine run_assimilation_ftcms
 
         module subroutine apply_phase_change_temperature_correction_ftcms(self, T_old, T_new)
             implicit none

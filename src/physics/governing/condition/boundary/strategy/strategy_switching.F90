@@ -49,7 +49,34 @@ contains
         real(real64), intent(in) :: u_curr
         type(type_bc_result), intent(inout) :: result
 
+        ! values(1) = q_potential [m/s]: positive=evaporation, negative=infiltration
+        ! values(2) = Pmin [m]: drying pressure limit
+        ! values(3) = Pmax [m]: saturation pressure limit
+        real(real64) :: values(3)
+        real(real64) :: q_pot, Pmin_v, Pmax_v
+
         call result%initialize()
+        call self%provider%get_data(current_time, values)
+
+        q_pot  = values(1)
+        Pmin_v = values(2)
+        Pmax_v = values(3)
+
+        if (q_pot < 0.0d0) then
+            if (u_curr >= Pmax_v) then
+                result%is_dirichlet     = .true.
+                result%prescribed_value = Pmax_v
+            else
+                result%flux_value = q_pot
+            end if
+        else
+            if (u_curr <= Pmin_v) then
+                result%is_dirichlet     = .true.
+                result%prescribed_value = Pmin_v
+            else
+                result%flux_value = q_pot
+            end if
+        end if
     end subroutine evaluate_seepage_bc
 
 end submodule strategy_switching

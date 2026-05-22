@@ -684,6 +684,7 @@ contains
                 call self%shift()
 
                 call self%update_variables()
+                call self%run_assimilation(time_s, 1.0d0 + time_s / 86400.0d0)
                 call self%output_fields()
                 call self%output_history()
             else

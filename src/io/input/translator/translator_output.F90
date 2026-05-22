@@ -21,6 +21,7 @@ contains
 
             config%interval_unit = TIME_UNITS%to_object(output%output_interval_unit)
             config%output_unit = TIME_UNITS%to_object(output%output_time_unit)
+            config%output_time_offset = output%output_time_offset
         end associate
 
     end subroutine execute_output_field
@@ -47,6 +48,7 @@ contains
 
                 config%interval_unit = TIME_UNITS%to_object(output%output_interval_unit)
                 config%output_unit = TIME_UNITS%to_object(output%output_time_unit)
+                config%output_time_offset = output%output_time_offset
             end associate
 
         case (OUTPUT_TYPES%HISTORY%ID)
@@ -58,11 +60,13 @@ contains
                     config%interval_val = 0.0d0
                     config%interval_unit = TIME_UNITS%to_object("second")
                     config%output_unit = TIME_UNITS%to_object("second")
+                    config%output_time_offset = 0.0d0
                     return
                 end if
 
                 config%interval_unit = TIME_UNITS%to_object(output%output_interval_unit)
                 config%output_unit = TIME_UNITS%to_object(output%output_time_unit)
+                config%output_time_offset = output%output_time_offset
             end associate
 
         case default

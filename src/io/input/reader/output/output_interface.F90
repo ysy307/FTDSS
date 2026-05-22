@@ -28,6 +28,7 @@ module io_input_output_conditions
     type :: type_field_output
         character(:), allocatable :: file_format
         character(:), allocatable :: output_time_unit
+        real(real64) :: output_time_offset = 0.0d0
         character(:), allocatable :: output_interval_unit
         real(real64) :: output_interval_step
         character(:), allocatable :: variable_names(:)
@@ -47,6 +48,7 @@ module io_input_output_conditions
         character(:), allocatable :: file_format
         character(:), allocatable :: observation_type
         character(:), allocatable :: output_time_unit
+        real(real64) :: output_time_offset = 0.0d0
         character(:), allocatable :: output_interval_unit
         real(real64) :: output_interval_step
         character(:), allocatable :: variable_names(:)
