@@ -123,8 +123,10 @@ contains
             end if
         end do
 
-        ! Mass matrix (LHS, factor bdf0)
-        call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
+        ! Mass matrix (LHS, factor bdf0) — lumped to satisfy discrete maximum principle
+        ! Consistent mass matrix creates positive off-diagonals (bdf0*M_ij ≫ K2_ij)
+        ! causing interior temperatures to spuriously exceed boundary values (DMP violation).
+        call workspace%compute_K1_lumped(workspace%work_C, workspace%work_matrix)
         if (associated(K_TT_val)) then
             K_TT_val(1:n_nodes, 1:n_nodes) = &
                 K_TT_val(1:n_nodes, 1:n_nodes) + &

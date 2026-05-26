@@ -29,6 +29,7 @@ target_sources(SOLVER_GOVERNING PRIVATE
     # ====================================================
     condition/initial/initial_interface.F90
     condition/initial/initial_uniform.F90
+    condition/initial/initial_from_file.F90
     condition/initial/initial_manager.F90
     condition/initial/initial.F90
     # ====================================================

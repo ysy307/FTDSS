@@ -309,15 +309,23 @@ contains
                         call self%bc(physics_type%ID)%evaluate(bc_idx, current_time, u_curr, bc_result)
                         q_flux = bc_result%flux_value
                         dq_du = bc_result%flux_derivative
+                        ! Element assembly uses mass flux [kg/(m^2 s)] but BC provides Darcy velocity [m/s].
+                        ! Convert: multiply by rho_w = 1000 kg/m^3.
+                        if (physics_type%ID == PHYSICS_TYPES%HYDRAULIC%ID) then
+                            q_flux = q_flux * 1000.0d0
+                            dq_du = dq_du * 1000.0d0
+                        end if
 
                         do i = 1, num_nodes_loc
                             call self%F%add(physics_type%ID, connectivity(i), psi(i) * q_flux * w_vol)
 
-                            do j = 1, num_nodes_loc
-                                call self%K%add(physics_type%ID, physics_type%ID, &
-                                                connectivity(i), connectivity(j), &
-                                                psi(i) * dq_du * psi(j) * w_vol)
-                            end do
+                            if (abs(dq_du) > 0.0d0) then
+                                do j = 1, num_nodes_loc
+                                    call self%K%add(physics_type%ID, physics_type%ID, &
+                                                    connectivity(i), connectivity(j), &
+                                                    psi(i) * dq_du * psi(j) * w_vol)
+                                end do
+                            end if
                         end do
                     end do
                 end do
@@ -344,6 +352,7 @@ contains
         integer(int32) :: n_dim
         integer(int32) :: first_dirichlet_node
         real(real64) :: first_dirichlet_coord(3)
+        real(real64) :: val_curr
         real(real64), allocatable :: node_coord(:)
         logical, save :: printed_thermal_dirichlet_location = .false.
         logical, save :: printed_hydraulic_dirichlet_location = .false.
@@ -372,35 +381,34 @@ contains
             if (bc_idx < 0) cycle
             num_matched_patches = num_matched_patches + 1
 
-            call self%bc(physics_type%ID)%evaluate(bc_idx, current_time, 0.0d0, bc_result)
+            if (.not. allocated(bc_patch%connectivity%col_ind)) cycle
 
-            if (.not. bc_result%is_dirichlet) then
-                cycle
-            end if
+            do i = 1, size(bc_patch%connectivity%col_ind)
+                glob_node_id = bc_patch%connectivity%col_ind(i)
 
-            if (allocated(bc_patch%connectivity%col_ind)) then
-                do i = 1, size(bc_patch%connectivity%col_ind)
-                    glob_node_id = bc_patch%connectivity%col_ind(i)
+                call variable%get_current(glob_node_id, val_curr)
+                call self%bc(physics_type%ID)%evaluate(bc_idx, current_time, val_curr, bc_result)
 
-                    ! 1. Zero out the row of the Jacobian matrix
-                    call self%K%zero(glob_node_id, physics_type%ID)
-                    ! Set diagonal element to 1.0
-                    call self%K%set(physics_type%ID, physics_type%ID, glob_node_id, glob_node_id, 1.0d0)
+                if (.not. bc_result%is_dirichlet) cycle
 
-                    ! 2. Set Residual/Force vector
-                    call self%F%set(physics_type%ID, glob_node_id, 0.0d0)
-                    num_dirichlet_nodes = num_dirichlet_nodes + 1
+                ! 1. Zero out the row of the Jacobian matrix
+                call self%K%zero(glob_node_id, physics_type%ID)
+                ! Set diagonal element to 1.0
+                call self%K%set(physics_type%ID, physics_type%ID, glob_node_id, glob_node_id, 1.0d0)
 
-                    if (first_dirichlet_node == 0) then
-                        first_dirichlet_node = glob_node_id
-                        if (allocated(node_coord)) then
-                            call self%domain%nodes%get_coordinate(glob_node_id, node_coord)
-                            first_dirichlet_coord(:) = 0.0d0
-                            first_dirichlet_coord(1:min(3, n_dim)) = node_coord(1:min(3, n_dim))
-                        end if
+                ! 2. Set Residual/Force vector
+                call self%F%set(physics_type%ID, glob_node_id, 0.0d0)
+                num_dirichlet_nodes = num_dirichlet_nodes + 1
+
+                if (first_dirichlet_node == 0) then
+                    first_dirichlet_node = glob_node_id
+                    if (allocated(node_coord)) then
+                        call self%domain%nodes%get_coordinate(glob_node_id, node_coord)
+                        first_dirichlet_coord(:) = 0.0d0
+                        first_dirichlet_coord(1:min(3, n_dim)) = node_coord(1:min(3, n_dim))
                     end if
-                end do
-            end if
+                end if
+            end do
         end do
 
         if (num_dirichlet_nodes > 0) then

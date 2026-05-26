@@ -49,10 +49,10 @@ contains
         ! --- B. Compute Determinant ---
         if (present(determinant_jacobian)) then
             call matrix_determinant(local_J, local_det_J, ierr)
-            if (local_det_J <= 0.0_real64) then
-                error stop "Negative or zero Jacobian determinant"
+            if (local_det_J == 0.0_real64) then
+                error stop "Zero Jacobian determinant: degenerate element"
             end if
-            determinant_jacobian = local_det_J
+            determinant_jacobian = abs(local_det_J)
         end if
 
         ! Determine whether the inverse Jacobian is needed (also required for dpsi_dx)

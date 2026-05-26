@@ -17,6 +17,7 @@ module physics_governing_atmosphere_observation
         real(real64) :: T_obs        = 0.0d0   ! temperature [C]
         real(real64) :: q_obs        = 0.0d0   ! specific humidity [kg/kg]
         real(real64) :: U_obs        = 0.0d0   ! wind speed [m/s]
+        real(real64) :: precip_rate  = 0.0d0   ! precipitation [m/s]
         logical      :: is_valid     = .false.
     end type type_obs_record
 
@@ -73,7 +74,7 @@ contains
     end subroutine destroy_obs_manager
 
     !> Reads CSV from FTCMS_PROJECT_PATH/Input/<csv_filename>.
-    !> Expected header: valid_time,T_obs,q_obs,U_obs
+    !> Expected header: valid_time,T_obs,q_obs,U_obs,precip_rate
     subroutine read_csv_obs_manager(self, csv_filename)
         implicit none
         class(type_observation_manager), intent(inout) :: self
@@ -83,7 +84,7 @@ contains
         character(len=32)  :: dt_str
         integer(int32) :: io_unit, stat, n_lines, i, status_env
         integer(int32) :: yr, mo, dy
-        real(real64) :: T_v, q_v, U_v, hr_frac, elapsed
+        real(real64) :: T_v, q_v, U_v, pr_v, hr_frac, elapsed
 
         call get_environment_variable('FTCMS_PROJECT_PATH', project_path, status=status_env)
         if (status_env /= 0) then
@@ -120,7 +121,7 @@ contains
             if (stat /= 0) exit
             if (len_trim(line) == 0) cycle
 
-            call parse_csv_line_atm(line, dt_str, T_v, q_v, U_v, stat)
+            call parse_csv_line_atm(line, dt_str, T_v, q_v, U_v, pr_v, stat)
             if (stat /= 0) cycle
 
             call self%parse_datetime_obs(trim(dt_str), yr, mo, dy)
@@ -133,6 +134,7 @@ contains
             self%records(self%n_records)%T_obs         = T_v
             self%records(self%n_records)%q_obs         = q_v
             self%records(self%n_records)%U_obs         = U_v
+            self%records(self%n_records)%precip_rate    = pr_v
             self%records(self%n_records)%is_valid       = .true.
         end do
 
@@ -140,21 +142,23 @@ contains
         write (*, '(A,I0,A,A)') '[DA] Loaded ', self%n_records, ' obs records from ', trim(csv_filename)
     end subroutine read_csv_obs_manager
 
-    !> Returns observation vector y(3), error covariance R(3,3), and availability flag.
-    subroutine get_observation_obs_manager(self, current_time, y, R, is_available)
+    !> Returns observation vector y(3), error covariance R(3,3), availability flag, and precipitation.
+    subroutine get_observation_obs_manager(self, current_time, y, R, is_available, precip_rate)
         implicit none
         class(type_observation_manager), intent(inout) :: self
         real(real64), intent(in) :: current_time
         real(real64), intent(inout) :: y(N_OBS_ATM)
         real(real64), intent(inout) :: R(N_OBS_ATM, N_OBS_ATM)
         logical, intent(inout) :: is_available
+        real(real64), intent(inout) :: precip_rate
 
         integer(int32) :: i, best_idx
         real(real64) :: dt, best_dt, tol
 
-        is_available = .false.
-        y = 0.0d0
-        R = 0.0d0
+        is_available  = .false.
+        y             = 0.0d0
+        R             = 0.0d0
+        precip_rate   = 0.0d0
 
         ! tol = half a 300s timestep: assimilates only when current_time is at an obs epoch.
         tol      = 150.0d0
@@ -180,6 +184,7 @@ contains
         y(1) = self%records(best_idx)%T_obs
         y(2) = self%records(best_idx)%q_obs
         y(3) = self%records(best_idx)%U_obs
+        precip_rate = self%records(best_idx)%precip_rate
 
         R(1, 1) = self%sigma_T**2
         R(2, 2) = self%sigma_q**2
@@ -283,7 +288,17 @@ contains
 
         hr_frac = 0.0d0
         t_pos   = index(dt_str, 'T')
-        if (t_pos == 0 .or. len_trim(dt_str) < t_pos + 7) return
+        if (t_pos == 0) then
+            ! Space-separated: "YYYY-MM-DD HH:MM:SS"
+            if (len_trim(dt_str) >= 19) then
+                read (dt_str(12:13), *, iostat=stat) hr
+                read (dt_str(15:16), *, iostat=stat) mn
+                read (dt_str(18:19), *, iostat=stat) sc
+                hr_frac = real(hr, real64) + real(mn, real64)/60.0d0 + real(sc, real64)/3600.0d0
+            end if
+            return
+        end if
+        if (len_trim(dt_str) < t_pos + 7) return
         read (dt_str(t_pos + 1:t_pos + 2), *, iostat=stat) hr
         read (dt_str(t_pos + 4:t_pos + 5), *, iostat=stat) mn
         read (dt_str(t_pos + 7:t_pos + 8), *, iostat=stat) sc
@@ -309,27 +324,36 @@ contains
         doy = real(julian_day_atm(yr, mo, dy) - julian_day_atm(yr, 1, 1) + 1, real64)
     end function day_of_year_atm
 
-    subroutine parse_csv_line_atm(line, dt_str, T_v, q_v, U_v, stat)
+    subroutine parse_csv_line_atm(line, dt_str, T_v, q_v, U_v, pr_v, stat)
         implicit none
         character(len=*), intent(in) :: line
         character(len=32), intent(inout) :: dt_str
-        real(real64), intent(inout) :: T_v, q_v, U_v
+        real(real64), intent(inout) :: T_v, q_v, U_v, pr_v
         integer(int32), intent(inout) :: stat
 
-        integer(int32) :: c1, c2, c3
+        integer(int32) :: c1, c2, c3, c4
 
-        stat = 1
+        stat  = 1
+        pr_v  = 0.0d0
         c1 = index(line, ',')
         if (c1 == 0) return
         c2 = c1 + index(line(c1 + 1:), ',')
         if (c2 == c1) return
         c3 = c2 + index(line(c2 + 1:), ',')
         if (c3 == c2) return
+        c4 = c3 + index(line(c3 + 1:), ',')
 
         dt_str = line(1:c1 - 1)
         read (line(c1 + 1:c2 - 1), *, iostat=stat) T_v; if (stat /= 0) return
         read (line(c2 + 1:c3 - 1), *, iostat=stat) q_v; if (stat /= 0) return
-        read (line(c3 + 1:), *, iostat=stat) U_v
+        if (c4 /= c3) then
+            ! 5-column format: valid_time,T,q,U,precip
+            read (line(c3 + 1:c4 - 1), *, iostat=stat) U_v; if (stat /= 0) return
+            read (line(c4 + 1:), *, iostat=stat) pr_v
+        else
+            ! 4-column fallback: valid_time,T,q,U
+            read (line(c3 + 1:), *, iostat=stat) U_v
+        end if
     end subroutine parse_csv_line_atm
 
 end module physics_governing_atmosphere_observation

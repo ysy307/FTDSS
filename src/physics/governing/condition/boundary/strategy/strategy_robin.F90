@@ -20,7 +20,7 @@ contains
         env_value = values(2)
 
         result%flux_value = -transfer_coeff * (u_curr - env_value)
-        result%flux_derivative = transfer_coeff
+        result%flux_derivative = -transfer_coeff
 
     end subroutine evaluate_robin_bc
 

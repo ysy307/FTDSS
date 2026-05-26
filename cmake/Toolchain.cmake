@@ -90,7 +90,7 @@ function(enable_build_flags target)
             # Fortran: Intel / IntelLLVM
             $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:Intel,IntelLLVM>>:
             -stand f18 -fpp -fpscomp logicals -extend-source -g -traceback
-            $<$<CONFIG:Release>:-O3 -xHost>
+            $<$<CONFIG:Release>:-O2>
             $<$<CONFIG:Debug>:-O0 -check all -init=snan -init=arrays -warn all -warn errors -implicitnone -fstack-protector-all>
             >
             # Fortran: GNU

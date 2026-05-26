@@ -3,7 +3,8 @@ module models_phase_change_fusion
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core, only:type_state
     use :: constitutive_constants, only: &
-        Tf0 => water_freezing_point_at_standard_atmospheric_pressure
+        Tf0 => water_freezing_point_at_standard_atmospheric_pressure, &
+        g => gravity_acceleration, rho_std => reference_water_density
     use :: physics_constitutive_base, only:abst_constitutive
     use :: models_wrf, only:abst_wrf
     use :: models_phase_change_gcc, only:abst_gcc
@@ -116,7 +117,7 @@ contains
             end if
 
             psi_cap = max(0.0d0, -pressure)
-            call self%wrf%calc(-psi_cap, theta_l_cap)
+            call self%wrf%calc(-psi_cap / (rho_std * g), theta_l_cap)
 
             ! Cap theta_tot to phi*(rho_i/rho_w): prevents ice from volumetrically
             ! overfilling pores (rho_w/rho_i>1 expansion factor), which would violate
@@ -127,7 +128,7 @@ contains
 
             call self%gcc%calc(state, psi_cryo)
             call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
-            call self%wrf%calc(-psi_eff, theta_l_new)
+            call self%wrf%calc(-psi_eff / (rho_std * g), theta_l_new)
 
             if (theta_l_new < theta_tot) then
                 ice_content = (theta_tot - theta_l_new) * (rho_w / rho_i)
@@ -191,9 +192,9 @@ contains
                 d_psi_cap_dP = 0.0d0
             end if
 
-            call self%wrf%calc(-psi_cap, theta_l_cap)
-            call self%wrf%deriv(-psi_cap, dtheta_dPin_cap)
-            d_theta_cap_dP = dtheta_dPin_cap * (-d_psi_cap_dP)
+            call self%wrf%calc(-psi_cap / (rho_std * g), theta_l_cap)
+            call self%wrf%deriv(-psi_cap / (rho_std * g), dtheta_dPin_cap)
+            d_theta_cap_dP = dtheta_dPin_cap * (-d_psi_cap_dP) / (rho_std * g)
 
             ! Same cap as calc_ice_content: limit to phi*(rho_i/rho_w).
             ! When active the cap value is constant w.r.t. P, so d_theta_tot_dP = 0.
@@ -214,11 +215,11 @@ contains
             d_psi_eff_dP = d_psi_eff_dpsi_cap * d_psi_cap_dP + d_psi_eff_dpsi_cryo * d_psi_cryo_dP
             d_psi_eff_dT = d_psi_eff_dpsi_cryo * d_psi_cryo_dT
 
-            call self%wrf%calc(-psi_eff, theta_l_new)
-            call self%wrf%deriv(-psi_eff, dtheta_dPin_eff)
+            call self%wrf%calc(-psi_eff / (rho_std * g), theta_l_new)
+            call self%wrf%deriv(-psi_eff / (rho_std * g), dtheta_dPin_eff)
 
-            d_theta_eff_dP = dtheta_dPin_eff * (-d_psi_eff_dP)
-            d_theta_eff_dT = dtheta_dPin_eff * (-d_psi_eff_dT)
+            d_theta_eff_dP = dtheta_dPin_eff * (-d_psi_eff_dP) / (rho_std * g)
+            d_theta_eff_dT = dtheta_dPin_eff * (-d_psi_eff_dT) / (rho_std * g)
 
             if (theta_l_new < theta_tot) then
                 dice_dP = (d_theta_tot_dP - d_theta_eff_dP) * (rho_w / rho_i)
@@ -261,8 +262,8 @@ contains
         call self%gcc%calc(state, psi_cryo)
         call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
 
-        ! Pass negative pressure to WRF
-        call self%wrf%calc(-psi_eff, water_content)
+        ! Pass negative pressure head [m] to WRF
+        call self%wrf%calc(-psi_eff / (rho_std * g), water_content)
 
     end subroutine calc_water_content
 
@@ -306,18 +307,13 @@ contains
         d_psi_eff_dP = d_psi_eff_dpsi_cap*d_psi_cap_dP + d_psi_eff_dpsi_cryo*d_psi_cryo_dP
         d_psi_eff_dT = d_psi_eff_dpsi_cryo*d_psi_cryo_dT
 
-        ! 3. Compute moisture capacity (dTheta/dPress)
-        ! Pass negative pressure to WRF
-        call self%wrf%deriv(-psi_eff, d_theta_liquid_dPress)
+        ! 3. Compute moisture capacity (dTheta/dh) where h is in meters
+        call self%wrf%deriv(-psi_eff / (rho_std * g), d_theta_liquid_dPress)
 
-        ! 4. Assemble liquid water content derivatives (chain rule)
-        ! Input is -psi_eff, so chain rule multiplies by -d(psi)/dX
-
-        ! d(Theta_l)/dP = (dTheta/dP_in) * d(-Psi_eff)/dP
-        dwater_dP = d_theta_liquid_dPress * (-d_psi_eff_dP)
-
-        ! d(Theta_l)/dT = (dTheta/dP_in) * d(-Psi_eff)/dT
-        dwater_dT = d_theta_liquid_dPress * (-d_psi_eff_dT)
+        ! 4. Assemble liquid water content derivatives (chain rule):
+        !    dTheta/dP = (dTheta/dh) * dh/dP = (dTheta/dh) * (-dpsi_eff/dP) / (rho_std*g)
+        dwater_dP = d_theta_liquid_dPress * (-d_psi_eff_dP) / (rho_std * g)
+        dwater_dT = d_theta_liquid_dPress * (-d_psi_eff_dT) / (rho_std * g)
 
     end subroutine calc_water_content_derivatives
 

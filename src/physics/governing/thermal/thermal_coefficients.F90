@@ -268,8 +268,13 @@ contains
         if (present(scheme_opt)) then
             use_scheme = scheme_opt
         else
-            ! Force Tangent method to prevent Secant instability in coupled phase-change
-            use_scheme = SCHEME_TANGENT
+            ! Use Secant method (Effective Heat Capacity) to stabilize phase change 
+            ! when temperature crosses the freezing point between steps.
+            if (abs(dT) > 1.0d-4) then
+                use_scheme = SCHEME_SECANT
+            else
+                use_scheme = SCHEME_TANGENT
+            end if
         end if
 
         C_TT = 0.0d0
@@ -377,7 +382,7 @@ contains
 
         real(real64) :: temperature
         real(real64) :: rho_w, rho_i
-        real(real64) :: c_w, c_i, c_v
+        real(real64) :: c_i, c_v
         real(real64) :: Lf, Lv
         real(real64) :: dQw_dP, dQi_dP, dQv_dP
 
@@ -392,14 +397,14 @@ contains
 
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_density_ice(state, rho_i)
-        call self%physics%calc_specific_heat_water(state, c_w)
         call self%physics%calc_specific_heat_ice(state, c_i)
         call self%physics%calc_specific_heat_vapor(state, c_v)
         call self%physics%calc_latent_heat_fusion(material_id, state, Lf)
         call self%physics%calc_latent_heat_vaporization(material_id, state, Lv)
 
-        C_TH = (rho_w * c_w * temperature) * dQw_dP &
-               + (rho_i * c_i * temperature - Lf * rho_i) * dQi_dP &
+        ! Liquid water enthalpy coupling (rho_w*c_w*T)*dQw/dP is omitted:
+        ! the balancing divergence term T*nabla*q_w is absent from the formulation.
+        C_TH = (rho_i * c_i * temperature - Lf * rho_i) * dQi_dP &
                + (rho_w * c_v * temperature + Lv * rho_w) * dQv_dP
 
     end subroutine compute_coupling_mass_term_thermal

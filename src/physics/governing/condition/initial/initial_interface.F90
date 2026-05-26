@@ -7,6 +7,7 @@ module condition_initial
 
     public :: abst_ic
     public :: type_ic_uniform
+    public :: type_ic_from_file
 
     public :: holder_ics
 
@@ -29,6 +30,13 @@ module condition_initial
         procedure, public, pass(self) :: initialize => initialize_ic
         procedure, public, pass(self) :: apply => apply_ic_uniform
     end type type_ic_uniform
+
+    type, extends(abst_ic) :: type_ic_from_file
+        real(real64), allocatable :: values(:)
+    contains
+        procedure, public, pass(self) :: initialize => initialize_ic_from_file
+        procedure, public, pass(self) :: apply => apply_ic_from_file
+    end type type_ic_from_file
 
     abstract interface
         subroutine abst_initialize_ic(self, config)
@@ -59,6 +67,18 @@ module condition_initial
             class(type_ic_uniform), intent(in) :: self
             type(type_variable), intent(inout) :: variable
         end subroutine apply_ic_uniform
+
+        module subroutine initialize_ic_from_file(self, config)
+            implicit none
+            class(type_ic_from_file), intent(inout) :: self
+            type(type_config_ic), intent(in) :: config
+        end subroutine initialize_ic_from_file
+
+        module subroutine apply_ic_from_file(self, variable)
+            implicit none
+            class(type_ic_from_file), intent(in) :: self
+            type(type_variable), intent(inout) :: variable
+        end subroutine apply_ic_from_file
     end interface
 
 end module condition_initial

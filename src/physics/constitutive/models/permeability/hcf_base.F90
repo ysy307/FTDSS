@@ -127,7 +127,7 @@ contains
 
         call state%pressure%get(pressure)
 
-        call self%base%calc_kr(pressure, kr_base)
+        call self%base%calc_kr(pressure / (rho_std * g), kr_base)
         kflh = self%config%k_sat * kr_base
 
     end subroutine calc_kflh_base
@@ -176,7 +176,7 @@ contains
         call state%pressure%get(pressure)
         call state%ice_content%get(ice_content)
 
-        call self%base%calc_kr(pressure, kr_base)
+        call self%base%calc_kr(pressure / (rho_std * g), kr_base)
         call self%impedance%calc_impedance(ice_content, kr_impedance)
         kflh = self%config%k_sat * kr_base * kr_impedance
 
@@ -194,7 +194,7 @@ contains
         call state%temperature%get(temperature)
         call state%pressure%get(pressure)
 
-        call self%base%calc_kr(pressure, kr_base)
+        call self%base%calc_kr(pressure / (rho_std * g), kr_base)
         call self%viscosity%calc_viscosity(temperature, kr_viscosity)
         kflh = self%config%k_sat * kr_base * kr_viscosity
 
@@ -231,7 +231,7 @@ contains
         call state%ice_content%get(ice_content)
         call state%pressure%get(pressure)
 
-        call self%base%calc_kr(pressure, kr_base)
+        call self%base%calc_kr(pressure / (rho_std * g), kr_base)
         call self%impedance%calc_impedance(ice_content, kr_impedance)
         call self%viscosity%calc_viscosity(temperature, kr_viscosity)
         kflh = self%config%k_sat * kr_base * kr_impedance * kr_viscosity
@@ -255,7 +255,7 @@ contains
         pressure_head = pressure/(rho_std * g)
 
         if (allocated(self%base)) then
-            call self%base%calc_kr(pressure, Klh_r)
+            call self%base%calc_kr(pressure_head, Klh_r)
             call calc_derivative_surface_tension(temperature, dgamma_dT)
             klT = self%config%k_sat * Klh_r * pressure_head * self%config%gain_factor * (dgamma_dT / gamma_0)
         else

@@ -14,10 +14,12 @@ contains
         ! reset() may set the compute solver to NONE when config is NONE.
         call self%control%reset_iteration()
 
-        ! [Important] Compute solver must always be PICARD or NEWTON.
-        ! Even for NONE (linear) config, Picard discretization is used,
-        ! so explicitly set PICARD here to override the reset state.
-        call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
+        ! [Important] Compute solver must always be PICARD or NEWTON if not NONE.
+        ! Even for linear config (where iter=1 is forced), Picard discretization 
+        ! is often the base, but if explicitly NONE, we should respect it.
+        if (.not. self%control%is_none()) then
+            call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
+        end if
 
         call self%control%increment_total()
         call self%control%reset_acceleration()
@@ -663,6 +665,8 @@ contains
 
         ! Loop until end time
         time_loop: do while (.not. self%control%is_end_time())
+            call self%control%get_time(time_s)
+            call self%run_assimilation(time_s, 1.0d0 + time_s / 86400.0d0)
             call self%solve_time_step(is_step_converged)
 
             ! Update time and adaptive time stepping
@@ -684,7 +688,6 @@ contains
                 call self%shift()
 
                 call self%update_variables()
-                call self%run_assimilation(time_s, 1.0d0 + time_s / 86400.0d0)
                 call self%output_fields()
                 call self%output_history()
             else

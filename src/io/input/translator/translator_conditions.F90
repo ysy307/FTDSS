@@ -85,6 +85,40 @@ contains
                         configs(num_active)%values(1, i) = physics_data%values(i)%values(1)
                         configs(num_active)%values(2, i) = physics_data%values(i)%values(2)
                     end do
+
+                case (HYDRAULIC_BC_TYPES%SEEPAGE%ID)
+                    configs(num_active)%num_variables = 3
+                    call allocate_array(configs(num_active)%time_points, &
+                                        configs(num_active)%num_time_points)
+                    call allocate_array(configs(num_active)%values, &
+                                        configs(num_active)%num_variables, &
+                                        configs(num_active)%num_time_points)
+
+                    do i = 1, configs(num_active)%num_time_points
+                        configs(num_active)%time_points(i) = physics_data%values(i)%time
+
+                        if (.not. allocated(physics_data%values(i)%values)) then
+                            error stop 'Seepage BC requires three values [q_pot, Pmin, Pmax].'
+                        end if
+                        if (size(physics_data%values(i)%values) < 3) then
+                            error stop 'Seepage BC requires at least three values [q_pot, Pmin, Pmax].'
+                        end if
+
+                        configs(num_active)%values(1, i) = physics_data%values(i)%values(1)
+                        configs(num_active)%values(2, i) = physics_data%values(i)%values(2)
+                        configs(num_active)%values(3, i) = physics_data%values(i)%values(3)
+                    end do
+
+                case (THERMAL_BC_TYPES%ATMOSPHERIC%ID, HYDRAULIC_BC_TYPES%ATMOSPHERIC%ID)
+                    ! Atmospheric BC: initialized to zeros; DA controller updates each cycle.
+                    configs(num_active)%num_variables = 3
+                    configs(num_active)%bc_data_kind = BC_DATA_PROVIDERS%CONSTANT
+                    configs(num_active)%num_time_points = 1
+                    call allocate_array(configs(num_active)%time_points, 1)
+                    call allocate_array(configs(num_active)%values, 3, 1)
+                    configs(num_active)%time_points(1) = 0.0d0
+                    configs(num_active)%values(:, 1) = 0.0d0
+
                 case default
                     configs(num_active)%num_variables = 0
                 end select
@@ -118,8 +152,23 @@ contains
             config%ic_kind = IC_METHODS%to_object(condition_data%type)
             if (config%ic_kind == IC_METHODS%UNIFORM) then
                 config%value = condition_data%value
-            else
-                ! Handle other IC methods if needed
+            else if (config%ic_kind == IC_METHODS%FROM_FILE) then
+                block
+                    integer(int32) :: k, field_idx
+                    field_idx = -1
+                    if (allocated(input%geometry%point_data_names)) then
+                        do k = 1, size(input%geometry%point_data_names)
+                            if (trim(input%geometry%point_data_names(k)) == &
+                                trim(condition_data%field_name)) then
+                                field_idx = k
+                                exit
+                            end if
+                        end do
+                    end if
+                    if (field_idx > 0) then
+                        allocate (config%values, source=input%geometry%vtk%point_field_values(:, field_idx))
+                    end if
+                end block
             end if
         end associate
 

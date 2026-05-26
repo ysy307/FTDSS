@@ -9,7 +9,18 @@ contains
         real(real64), intent(in) :: u_curr
         type(type_bc_result), intent(inout) :: result
 
+        real(real64) :: values(3)
+        real(real64) :: h_eff, ref_val
+
+        call self%provider%get_data(current_time, values)
         call result%initialize()
+
+        h_eff   = values(1)  ! heat transfer coefficient or analogous [W/m^2/K]
+        ref_val = values(2)  ! reference value (T_ref [C] for thermal, analogous for hydraulic)
+
+        ! F = -R convention: R_BC = +h*(u - ref); so F_BC = -h*(u - ref).
+        result%flux_value      = -h_eff * (u_curr - ref_val)
+        result%flux_derivative = -h_eff
     end subroutine evaluate_atmospheric_bc
 
     module subroutine evaluate_radiation_bc(self, current_time, u_curr, result)
@@ -38,8 +49,8 @@ contains
         transfer_coeff = values(1)
         env_value = values(2)
 
-        result%flux_value = transfer_coeff * (u_curr - env_value)
-        result%flux_derivative = transfer_coeff
+        result%flux_value = -transfer_coeff * (u_curr - env_value)
+        result%flux_derivative = -transfer_coeff
     end subroutine evaluate_convective_bc
 
     module subroutine evaluate_seepage_bc(self, current_time, u_curr, result)

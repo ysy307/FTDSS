@@ -143,6 +143,39 @@ contains
         ! Apply initial Dirichlet boundary conditions to field variables
         call self%apply_bc()
 
+        ! Explicit scan: switching BCs (e.g. seepage) may provide conditional Dirichlet.
+        ! Evaluate each boundary node at its actual IC pressure value to detect initial Dirichlet state.
+        if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc)) then
+            block
+                integer(int32) :: n_pat_scan, i_pat_scan, bc_id_scan, i_node_scan, glob_id_scan
+                real(real64) :: val_scan
+                type(type_boundary_patch), pointer :: patch_scan => null()
+                type(type_bc_result) :: bc_res_scan
+                logical :: found_dirichlet
+
+                found_dirichlet = .false.
+                call self%domain%get_num_bc_patches(n_pat_scan)
+                outer: do i_pat_scan = 1, n_pat_scan
+                    call self%domain%get_bc_patch(i_pat_scan, patch_scan)
+                    call self%bc(PHYSICS_TYPES%HYDRAULIC%ID)%get_bc_index(patch_scan%entity_id, bc_id_scan)
+                    if (bc_id_scan < 0) cycle
+                    if (.not. allocated(patch_scan%connectivity%col_ind)) cycle
+                    do i_node_scan = 1, size(patch_scan%connectivity%col_ind)
+                        glob_id_scan = patch_scan%connectivity%col_ind(i_node_scan)
+                        call self%pressure%get_current(glob_id_scan, val_scan)
+                        call self%bc(PHYSICS_TYPES%HYDRAULIC%ID)%evaluate(bc_id_scan, 0.0d0, val_scan, bc_res_scan)
+                        if (bc_res_scan%is_dirichlet) then
+                            found_dirichlet = .true.
+                            write (*, '(A,I0,A)') 'Notice: Hydraulic Dirichlet detected from switching BC on entity ', &
+                                patch_scan%entity_id, '. Disabling nullspace projection.'
+                            exit outer
+                        end if
+                    end do
+                end do outer
+                self%hydraulic_has_dirichlet_bc = found_dirichlet
+            end block
+        end if
+
         ! Initialize solver strictly from input settings.
         associate (linear_solver_settings => input%basic%solver_settings%linear_solver)
             solver_type_selected = linear_solver_settings%solver_type
@@ -155,6 +188,8 @@ contains
             write (*, '(A,I0,A,I0)') 'Notice: linear solver type=', solver_type_selected, &
                 ', preconditioner type=', preconditioner_type_selected
 
+            ! Near saturation, C_HH = rho_w * d(theta_w)/dP -> 0, so the BDF mass term does not
+            ! regularize the all-Neumann system. Nullspace projection is required regardless of BDF order.
             if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc)) then
                 projection_enabled_selected = .true.
                 projection_offset_selected = self%hydraulic_start_dof
@@ -216,9 +251,9 @@ contains
             end if
         end associate
 
-        ! Capture initial mean pressure to anchor the all-Neumann null-mode
-        ! without shifting the absolute level (WRF depends on absolute P).
-        if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc)) then
+        ! Capture initial mean pressure for steady-state all-Neumann null-mode anchoring only.
+        if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc) &
+            .and. projection_enabled_selected) then
             nullify (phase_values)
             call self%pressure%get_current(phase_values)
             if (associated(phase_values) .and. size(phase_values) > 0) then
@@ -230,6 +265,13 @@ contains
 
         ! Populate initial phase variables from initial T/P/porosity before first output.
         call self%update_variables()
+        ! Sync previous-step values with IC so the BDF transient term is zero at t=0.
+        nullify (phase_values)
+        call self%temperature%get_current(phase_values)
+        if (associated(phase_values)) call self%temperature%set_previous(phase_values)
+        nullify (phase_values)
+        call self%pressure%get_current(phase_values)
+        if (associated(phase_values)) call self%pressure%set_previous(phase_values)
         nullify (phase_values)
         call self%Qw%get_current(phase_values)
         if (associated(phase_values)) call self%Qw%set_previous(phase_values)
@@ -300,6 +342,8 @@ contains
         call jf%get('ensemble.num_nodes', da_cfg%num_nodes, found)
         call jf%get('observation.csv_file', str_val, found)
         if (found .and. allocated(str_val)) da_cfg%csv_file = str_val
+        call jf%get('observation.upper_bc_file', str_val, found)
+        if (found .and. allocated(str_val)) da_cfg%upper_bc_file = str_val
         call jf%get('observation.interval_seconds', da_cfg%interval_seconds, found)
         call jf%get('observation.sigma_T', da_cfg%sigma_T, found)
         call jf%get('observation.sigma_q', da_cfg%sigma_q, found)
@@ -316,6 +360,7 @@ contains
         call jf%get('solar.latitude', da_cfg%latitude, found)
         call jf%get('solar.longitude', da_cfg%longitude, found)
         call jf%get('solar.tau_atm', da_cfg%tau_atm, found)
+        call jf%get('solar.utc_offset_hours', da_cfg%utc_offset_hours, found)
         call jf%destroy()
 
         call self%assimilation%initialize(da_cfg, &
@@ -445,6 +490,14 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: vapor_content
         real(real64), pointer, contiguous, dimension(:) :: ice_seg
         real(real64), allocatable, target :: ice_content(:)
+        type(type_coordinate_array_dp) :: liq_flux_arr, vap_flux_arr
+        integer(int32) :: num_nodes_hf, i_obs_fe, i_local_hf, node_id_hf
+        integer(int32), pointer, contiguous :: conn_hf(:)
+        integer(int32), allocatable :: obs_fe_ids(:)
+        type(type_state) :: state_hf
+        type(type_coordinate_dp), pointer :: wf_liq_ptr, wf_vap_ptr
+        logical :: has_flux
+
         call self%control%profiler_start(PROFILER_TYPES%IO)
 
         nullify (temperature)
@@ -469,15 +522,66 @@ contains
             call self%Qi_seg%get_previous(ice_seg)
             allocate (ice_content(size(ice_pore)))
             ice_content(:) = ice_pore(:) + ice_seg(:)
+
+            ! Compute per-node liquid and vapor fluxes for observation elements only
+            has_flux = .false.
+            if (self%is_active_hydraulic()) then
+                call self%output%get_obs_fe_ids(obs_fe_ids)
+                if (size(obs_fe_ids) > 0 .and. all(obs_fe_ids > 0)) then
+                    nullify (conn_hf)
+                    call self%domain%get_num_nodes(num_nodes_hf)
+                    call liq_flux_arr%initialize(num_nodes_hf)
+                    call vap_flux_arr%initialize(num_nodes_hf)
+                    do i_obs_fe = 1, size(obs_fe_ids)
+                        call self%domain%get_fe_connectivity(obs_fe_ids(i_obs_fe), conn_hf)
+                        do i_local_hf = 1, size(conn_hf)
+                            node_id_hf = conn_hf(i_local_hf)
+                            if (node_id_hf < 1) cycle
+                            nullify (wf_liq_ptr, wf_vap_ptr)
+                            call self%set_state(node_id_hf, obs_fe_ids(i_obs_fe), state_hf, calc_physics=.true.)
+                            call state_hf%get(water_flux=wf_liq_ptr, vapor_flux=wf_vap_ptr)
+                            if (associated(wf_liq_ptr)) then
+                                liq_flux_arr%x(node_id_hf) = wf_liq_ptr%x
+                                liq_flux_arr%y(node_id_hf) = wf_liq_ptr%y
+                                liq_flux_arr%z(node_id_hf) = wf_liq_ptr%z
+                            end if
+                            if (associated(wf_vap_ptr)) then
+                                vap_flux_arr%x(node_id_hf) = wf_vap_ptr%x
+                                vap_flux_arr%y(node_id_hf) = wf_vap_ptr%y
+                                vap_flux_arr%z(node_id_hf) = wf_vap_ptr%z
+                            end if
+                        end do
+                        nullify (conn_hf)
+                    end do
+                    has_flux = .true.
+                end if
+                if (allocated(obs_fe_ids)) deallocate (obs_fe_ids)
+            end if
+
             call self%control%get_output_time(OUTPUT_TYPES%HISTORY, current_time, current_time_converted)
-            call self%output%output_history(time=current_time_converted, &
-                                            temperature=temperature, &
-                                            water_content=water_content, &
-                                            ice_content=ice_content, &
-                                            vapor_content=vapor_content, &
-                                            pressure=pressure)
+            if (has_flux) then
+                call self%output%output_history(time=current_time_converted, &
+                                                temperature=temperature, &
+                                                water_content=water_content, &
+                                                ice_content=ice_content, &
+                                                vapor_content=vapor_content, &
+                                                pressure=pressure, &
+                                                water_flux=liq_flux_arr, &
+                                                vapor_flux=vap_flux_arr)
+            else
+                call self%output%output_history(time=current_time_converted, &
+                                                temperature=temperature, &
+                                                water_content=water_content, &
+                                                ice_content=ice_content, &
+                                                vapor_content=vapor_content, &
+                                                pressure=pressure)
+            end if
             call self%control%update_output(OUTPUT_TYPES%HISTORY, current_time)
 
+            if (has_flux) then
+                call liq_flux_arr%destroy()
+                call vap_flux_arr%destroy()
+            end if
             deallocate (ice_content)
             nullify (water_content)
             nullify (ice_pore)
