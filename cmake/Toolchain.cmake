@@ -64,8 +64,10 @@ if(NOT TARGET LAPACK::LAPACK)
 endif()
 
 if(NOT TARGET SPBLAS::SPBLAS)
-    add_library(SPBLAS::SPBLAS INTERFACE IMPORTED)
-    target_link_libraries(SPBLAS::SPBLAS INTERFACE MKL::MKL)
+    add_library(mkl_spblas_lib STATIC "${MKL_ROOT}/include/mkl_spblas.f90")
+    target_include_directories(mkl_spblas_lib PRIVATE "${MKL_ROOT}/include")
+    target_link_libraries(mkl_spblas_lib PUBLIC MKL::MKL)
+    add_library(SPBLAS::SPBLAS ALIAS mkl_spblas_lib)
 endif()
 
 if(ENABLE_MPI AND NOT TARGET SCALAPACK::SCALAPACK)
