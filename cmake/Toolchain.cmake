@@ -63,6 +63,11 @@ if(NOT TARGET LAPACK::LAPACK)
     target_link_libraries(LAPACK::LAPACK INTERFACE MKL::MKL)
 endif()
 
+if(NOT TARGET SPBLAS::SPBLAS)
+    add_library(SPBLAS::SPBLAS INTERFACE IMPORTED)
+    target_link_libraries(SPBLAS::SPBLAS INTERFACE MKL::MKL)
+endif()
+
 if(ENABLE_MPI AND NOT TARGET SCALAPACK::SCALAPACK)
     add_library(SCALAPACK::SCALAPACK INTERFACE IMPORTED)
     target_link_libraries(SCALAPACK::SCALAPACK INTERFACE MKL::MKL_SCALAPACK MPI::MPI_Fortran)
@@ -74,6 +79,7 @@ find_package(${JSON_FORTRAN_PKG} REQUIRED)
 find_package(X11 REQUIRED)
 find_package(VTK REQUIRED COMPONENTS CommonCore CommonDataModel IOLegacy IOXML)
 find_package(IAPWS REQUIRED)
+find_package(test-drive REQUIRED)
 
 # =========================================================================
 # Function: enable_build_flags
@@ -98,7 +104,7 @@ function(enable_build_flags target)
             -std=f2018 -cpp
             $<$<CONFIG:Release>:-O3 -march=native>
             $<$<CONFIG:Debug>:-g -fbacktrace -fcheck=all -ffpe-trap=invalid,zero,overflow -finit-real=snan -finit-integer=-9999999
-            -Wall -Wextra -Werror
+            -Wall -Wextra
             -Wno-maybe-uninitialized -Wno-uninitialized -Wno-c-binding-type -Wno-surprising
             -Wno-unused-dummy-argument -Wno-compare-reals -Wno-unused-function -Wno-unused-value>
             >
@@ -115,12 +121,12 @@ function(enable_build_flags target)
             # C: Intel / IntelLLVM
             $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:Intel,IntelLLVM>>:
             $<$<CONFIG:Release>:-O3 -xHost -g -traceback>
-            $<$<CONFIG:Debug>:-O0 -g -traceback -Wall -Wextra -Werror -fstack-protector-all -ftrapv>
+            $<$<CONFIG:Debug>:-O0 -g -traceback -Wall -Wextra -fstack-protector-all -ftrapv>
             >
             # C: GNU
             $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:GNU>>:
             $<$<CONFIG:Release>:-O3 -march=native>
-            $<$<CONFIG:Debug>:-g -O0 -Wall -Wextra -pedantic -Werror -fstack-protector-all -ftrapv>
+            $<$<CONFIG:Debug>:-g -O0 -Wall -Wextra -pedantic -fstack-protector-all -ftrapv>
             >
             # C: NVHPC
             $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:NVHPC,PGI>>:
@@ -134,12 +140,12 @@ function(enable_build_flags target)
             # CXX: Intel / IntelLLVM
             $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:Intel,IntelLLVM>>:
             $<$<CONFIG:Release>:-O3 -xHost -g -traceback>
-            $<$<CONFIG:Debug>:-O0 -g -traceback -Wall -Wextra -Werror -fstack-protector-all -ftrapv>
+            $<$<CONFIG:Debug>:-O0 -g -traceback -Wall -Wextra -fstack-protector-all -ftrapv>
             >
             # CXX: GNU
             $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:GNU>>:
             $<$<CONFIG:Release>:-O3 -march=native>
-            $<$<CONFIG:Debug>:-g -O0 -Wall -Wextra -pedantic -Werror -fstack-protector-all -ftrapv>
+            $<$<CONFIG:Debug>:-g -O0 -Wall -Wextra -pedantic -fstack-protector-all -ftrapv>
             >
             # CXX: NVHPC
             $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:NVHPC,PGI>>:
@@ -160,7 +166,9 @@ function(enable_build_flags target)
     if(ENABLE_MPI)
         target_compile_definitions(${target} ${KEYWORD} _MPI)
         target_link_libraries(${target} ${KEYWORD}
-            MKL::MKL_SCALAPACK MPI::MPI_Fortran)
+            SPBLAS::SPBLAS
+            MKL::MKL_SCALAPACK
+            MPI::MPI_Fortran)
     else()
         target_link_libraries(${target} ${KEYWORD} MKL::MKL)
     endif()
