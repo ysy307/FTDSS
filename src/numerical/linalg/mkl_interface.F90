@@ -6,7 +6,7 @@
 #ifdef _MKL
 module linalg_mkl_interface
     use, intrinsic :: iso_fortran_env, only: int32, real64
-    use, intrinsic :: iso_c_binding, only: c_int, c_double
+    use, intrinsic :: iso_c_binding, only: c_int, c_double, c_intptr_t
     implicit none
     private
 
@@ -24,9 +24,9 @@ module linalg_mkl_interface
     public :: pardiso
     public :: pardisoinit
 
-    !> Opaque handle matching MKL_PARDISO_HANDLE (integer(8) dummy).
-    type :: mkl_pardiso_handle
-        integer(8) :: dummy = 0
+    !> C-interoperable opaque handle matching MKL_PARDISO_HANDLE (void* per element).
+    type, BIND(C) :: mkl_pardiso_handle
+        integer(c_intptr_t) :: dummy = 0
     end type mkl_pardiso_handle
 
     interface

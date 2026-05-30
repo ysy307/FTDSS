@@ -1,6 +1,9 @@
 module linalg_matrix_operations
     use, intrinsic :: iso_fortran_env
     use :: module_core
+#ifdef _MKL
+    use :: mkl_spblas
+#endif
     implicit none
     private
 
@@ -431,6 +434,7 @@ contains
 
     !> Perform general matrix-vector multiplication for BSR matrices.
     !> Computes \( y = \alpha A x + \beta y \).
+    !> Uses MKL Inspector-Executor SpMV when handle is committed; falls back to manual loop otherwise.
     subroutine gemv_matrix_bsr(alpha, A, x, beta, y, ierr)
         implicit none
         !> Scalar \( \alpha \)
@@ -447,41 +451,64 @@ contains
         integer(int32), intent(inout) :: ierr
 
         type(type_matrix_info) :: info
-        integer(int32), dimension(:), pointer :: ind
-        integer(int32), dimension(:), pointer :: ptr
-        real(real64), dimension(:, :, :), pointer :: val
-        integer(int32) :: i, k, rb, cb, col
         integer(int32) :: R, C
-        integer(int32) :: x_idx, y_idx
-        real(real64) :: sum, term
-        real(real64) :: mul_limit
 
         call A%get_info(info)
-
-        ! Block dimensions
         R = info%num_block_rows
         C = info%num_block_cols
 
-        ! Validate dimensions
         if (info%num_nodes * C /= size(x) .or. info%num_nodes * R /= size(y)) then
             ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
             return
         end if
+
+#ifdef _MKL
+        if (A%is_mkl_handle_ready()) then
+            block
+                type(matrix_descr) :: descr
+                integer(int32) :: mkl_info
+                descr%type = SPARSE_MATRIX_TYPE_GENERAL
+                mkl_info = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, alpha, &
+                                           A%get_mkl_handle(), descr, x, beta, y)
+                ierr = MATRIX_STATUS%SUCCESS%ID
+            end block
+            return
+        end if
+#endif
+
+        ! Fallback: manual blocked SpMV
+        call gemv_matrix_bsr_manual(alpha, A, x, beta, y, info, R, C, ierr)
+
+    end subroutine gemv_matrix_bsr
+
+    !> Manual BSR SpMV fallback (overflow-guarded).
+    subroutine gemv_matrix_bsr_manual(alpha, A, x, beta, y, info, R, C, ierr)
+        implicit none
+        real(real64), intent(in) :: alpha
+        class(type_matrix_bsr), intent(in) :: A
+        real(real64), intent(in) :: x(:)
+        real(real64), intent(in) :: beta
+        real(real64), intent(inout) :: y(:)
+        type(type_matrix_info), intent(in) :: info
+        integer(int32), intent(in) :: R, C
+        integer(int32), intent(inout) :: ierr
+
+        integer(int32), dimension(:), pointer :: ind, ptr
+        real(real64), dimension(:, :, :), pointer :: val
+        integer(int32) :: i, k, rb, cb, col, x_idx, y_idx
+        real(real64) :: sum, term, mul_limit
 
         ind => A%get_ind()
         ptr => A%get_ptr()
         val => A%get_val()
         mul_limit = sqrt(huge(1.0d0))
 
-        !$omp parallel do private(i, k, col, rb, cb, x_idx, y_idx, sum)
-        do i = 1, info%num_nodes ! Iterate over block rows
-            ! Iterate over rows within the current block row (local DOF)
+        !$omp parallel do private(i, k, col, rb, cb, x_idx, y_idx, sum, term)
+        do i = 1, info%num_nodes
             do rb = 1, R
                 sum = 0.0d0
-                ! Iterate over blocks in the row
                 do k = ptr(i), ptr(i + 1) - 1
                     col = ind(k)
-                    ! Perform block multiplication for the current local row
                     do cb = 1, C
                         x_idx = (col - 1) * C + cb
                         term = sign(min(abs(val(rb, cb, k)), mul_limit), val(rb, cb, k)) * &
@@ -510,7 +537,7 @@ contains
 
         ierr = MATRIX_STATUS%SUCCESS%ID
 
-    end subroutine gemv_matrix_bsr
+    end subroutine gemv_matrix_bsr_manual
 
     !> General matrix-matrix multiplication.
     !> [FIX] Added contiguous attribute to inputs.

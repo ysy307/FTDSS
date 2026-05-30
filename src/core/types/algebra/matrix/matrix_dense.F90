@@ -18,8 +18,7 @@ contains
         integer(int32), intent(in), optional :: row_blocks
         integer(int32), intent(in), optional :: col_blocks
 
-        ! 既存割り当ての解除
-        if (allocated(self%val)) call deallocate_array(self%val)
+        call deallocate_array(self%val)
 
         self%num_nodes = num_nodes
         self%num_rows = num_nodes
@@ -101,35 +100,21 @@ contains
             return
         end if
 
-        ! 範囲チェック
         if (.not. value_in_range(row, 1, self%num_rows) .or. &
             .not. value_in_range(col, 1, self%num_cols)) then
             self%status = MATRIX_STATUS%OUT_OF_MEMORY
             return
         end if
 
-        if (op == MATRIX_OPS%INS) then
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
             self%val(row, col) = value
-        else if (op == MATRIX_OPS%ADD) then
+        case (MATRIX_OPS%ADD%ID)
             self%val(row, col) = self%val(row, col) + value
-        else
+        case default
             self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
+        end select
     end subroutine set_value_dense
-
-    !>
-    !> Sets the value of a block (Not implemented for dense yet, usually for BSR).
-    !>
-    module subroutine set_value_block_dense(self, op, row, col, row_block, col_block, value)
-        implicit none
-        class(type_matrix_dense), intent(inout) :: self
-        type(type_constant_id), intent(in) :: op
-        integer(int32), intent(in) :: row, col
-        integer(int32), intent(in) :: row_block, col_block
-        real(real64), intent(in) :: value
-
-        self%status = MATRIX_STATUS%NOT_IMPLEMENTED
-    end subroutine set_value_block_dense
 
     !>
     !> Sets all entries in a specified row to a single scalar value.
@@ -152,52 +137,15 @@ contains
             return
         end if
 
-        if (op == MATRIX_OPS%INS) then
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
             self%val(row, :) = value
-        else if (op == MATRIX_OPS%ADD) then
+        case (MATRIX_OPS%ADD%ID)
             self%val(row, :) = self%val(row, :) + value
-        else
+        case default
             self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
-
+        end select
     end subroutine set_row_dense
-
-    !>
-    !> Sets all entries in the matrix to a single scalar value.
-    !>
-    module subroutine set_all_dense(self, op, value)
-        implicit none
-        class(type_matrix_dense), intent(inout) :: self
-        type(type_constant_id), intent(in) :: op
-        real(real64), intent(in) :: value
-
-        if (.not. MATRIX_OPS%is_valid(op)) then
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-            return
-        end if
-
-        if (.not. allocated(self%val)) return
-
-        if (op == MATRIX_OPS%INS) then
-            self%val(:, :) = value
-        else if (op == MATRIX_OPS%ADD) then
-            self%val(:, :) = self%val(:, :) + value
-        else
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
-
-    end subroutine set_all_dense
-
-    module subroutine set_by_index_dense(self, op, index, row_block, col_block, value)
-        implicit none
-        class(type_matrix_dense), intent(inout) :: self
-        type(type_constant_id), intent(in) :: op
-        integer(int32), intent(in) :: index
-        integer(int32), intent(in) :: row_block, col_block
-        real(real64), intent(in) :: value
-
-        self%status = MATRIX_STATUS%NOT_IMPLEMENTED
-    end subroutine set_by_index_dense
 
 !>
     !> Scales all stored values in the Dense matrix (2D array).
@@ -222,20 +170,14 @@ contains
 
         alpha_data => alpha%get_data()
 
-        ! alphaのサイズチェック (行数分必要)
         if (size(alpha_data) < nrows) then
             self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
-        !-------------------------------------------------
-        ! Symmetric Scaling: A_ij <- A_ij * alpha(i) * alpha(j)
-        !-------------------------------------------------
-        if (op == MATRIX_OPS%SCALE_SYMM_DIAG) then
-            ! Fortranは列優先(Column-Major)なので、j(列)を外側、i(行)を内側にするのが
-            ! メモリアクセス的には最速ですが、alpha(j)へのアクセス頻度等を考慮し
-            ! コンパイラの最適化に任せつつ、OpenMPは列(j)で切ります。
-
+        select case (op%ID)
+        case (MATRIX_OPS%SCALE_SYMM_DIAG%ID)
+            ! Column-major: outer loop on j gives contiguous inner loop on i
             !$omp parallel do default(shared) private(i, j)
             do j = 1, ncols
                 do i = 1, nrows
@@ -243,31 +185,19 @@ contains
                 end do
             end do
             !$omp end parallel do
-
             self%status = MATRIX_STATUS%SUCCESS
-
-            !-------------------------------------------------
-            ! Jacobi Scaling: A_ij <- A_ij * alpha(i)
-            ! (左からのスケーリング: 行 i に alpha(i) を掛ける)
-            !-------------------------------------------------
-        else if (op == MATRIX_OPS%SCALE_JACOBI) then
-
+        case (MATRIX_OPS%SCALE_JACOBI%ID)
             !$omp parallel do default(shared) private(i, j)
             do j = 1, ncols
                 do i = 1, nrows
-                    ! ここで val(i, j) はメモリ連続アクセス
-                    ! alpha(i) は各ステップで値が変わるがキャッシュに載りやすい
                     self%val(i, j) = self%val(i, j) * alpha_data(i)
                 end do
             end do
             !$omp end parallel do
-
             self%status = MATRIX_STATUS%SUCCESS
-
-        else
+        case default
             self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
-
+        end select
     end subroutine scale_dense
 
     !>
@@ -298,25 +228,6 @@ contains
     end subroutine zero_row_dense
 
     !>
-    !> Finds the storage index of a matrix entry.
-    !>
-    module pure function find_dense(self, row, col) result(index)
-        implicit none
-        class(type_matrix_dense), intent(in) :: self
-        integer(int32), intent(in) :: row, col
-        integer(int32) :: index
-
-        if (.not. value_in_range(row, 1, self%num_rows) .or. &
-            .not. value_in_range(col, 1, self%num_cols)) then
-            index = -1 ! Not found / Invalid
-
-        else
-            ! Column-major index for 2D array
-            index = (col - 1) * self%num_rows + row
-        end if
-    end function find_dense
-
-    !>
     !> Prints the contents of the dense matrix to standard output.
     !>
     module subroutine display_dense(self, unit_in)
@@ -339,5 +250,16 @@ contains
             write (unit, '(10(es16.8e3))') (self%val(i, j), j=1, self%num_cols)
         end do
     end subroutine display_dense
+
+    module subroutine set_local_matrix_dense(self, op, n_local, indices, row_sys, col_sys, local_data)
+        implicit none
+        class(type_matrix_dense), intent(inout) :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: n_local
+        integer(int32), intent(in) :: indices(:, :)
+        integer(int32), intent(in) :: row_sys, col_sys
+        real(real64), dimension(:, :), intent(in) :: local_data
+        self%status = MATRIX_STATUS%NOT_IMPLEMENTED
+    end subroutine set_local_matrix_dense
 
 end submodule algebra_matrix_dense

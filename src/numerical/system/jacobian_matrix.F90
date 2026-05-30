@@ -257,13 +257,14 @@ contains
 
         select case (self%coupling_mode%ID)
         case (COUPLING_MODES%MONOLITHIC%ID)
-            call self%matrix(1)%set(MATRIX_OPS%INS, row_node, col_node, row_physics_id, col_physics_id, value)
+            call bsr_set_node_entry(self%matrix(1), MATRIX_OPS%INS, row_node, col_node, &
+                                    row_physics_id, col_physics_id, value)
         case (COUPLING_MODES%STAGGERED%ID)
             if (row_physics_id /= col_physics_id) return
             if (row_physics_id < 1 .or. row_physics_id > PHYSICS_TYPES%NUM_ID) return
             sys = self%physics_to_system(row_physics_id)
             if (sys == 0) return
-            call self%matrix(sys)%set(MATRIX_OPS%INS, row_node, col_node, 1, 1, value)
+            call bsr_set_node_entry(self%matrix(sys), MATRIX_OPS%INS, row_node, col_node, 1, 1, value)
         end select
     end subroutine set_value_jacobian_matrix
 
@@ -282,15 +283,37 @@ contains
 
         select case (self%coupling_mode%ID)
         case (COUPLING_MODES%MONOLITHIC%ID)
-            call self%matrix(1)%set(MATRIX_OPS%ADD, row_node, col_node, row_physics_id, col_physics_id, value)
+            call bsr_set_node_entry(self%matrix(1), MATRIX_OPS%ADD, row_node, col_node, &
+                                    row_physics_id, col_physics_id, value)
         case (COUPLING_MODES%STAGGERED%ID)
             if (row_physics_id /= col_physics_id) return
             if (row_physics_id < 1 .or. row_physics_id > PHYSICS_TYPES%NUM_ID) return
             sys = self%physics_to_system(row_physics_id)
             if (sys == 0) return
-            call self%matrix(sys)%set(MATRIX_OPS%ADD, row_node, col_node, 1, 1, value)
+            call bsr_set_node_entry(self%matrix(sys), MATRIX_OPS%ADD, row_node, col_node, 1, 1, value)
         end select
     end subroutine add_value_jacobian_matrix
+
+    subroutine bsr_set_node_entry(mat, op, row_node, col_node, row_sys, col_sys, value)
+        implicit none
+        class(abst_matrix), intent(inout) :: mat
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: row_node, col_node, row_sys, col_sys
+        real(real64), intent(in) :: value
+
+        integer(int32) :: idx_arr(1, 1)
+        real(real64) :: val_arr(1, 1)
+        integer(int32), pointer :: ptr_p(:), ind_p(:)
+
+        select type (m => mat)
+        type is (type_matrix_bsr)
+            ptr_p => m%get_ptr()
+            ind_p => m%get_ind()
+            idx_arr(1, 1) = binary_find(col_node, ind_p, ptr_p(row_node), ptr_p(row_node + 1) - 1)
+            val_arr(1, 1) = value
+            call m%set(op, 1, idx_arr, row_sys, col_sys, val_arr)
+        end select
+    end subroutine bsr_set_node_entry
 
     subroutine add_local_jacobian_matrix(self, row_physics_id, col_physics_id, element_id, n_local, local_data)
         implicit none
@@ -301,8 +324,8 @@ contains
         integer(int32), intent(in) :: n_local
         type(type_matrix_dense), intent(in) :: local_data
 
-        integer(int32) :: i, j, idx
-        integer(int32) :: sys
+        integer(int32) :: i, j, sys
+        integer(int32), allocatable :: indices(:, :)
         real(real64), pointer, dimension(:, :) :: dense_val
 
         if (.not. allocated(self%matrix)) return
@@ -313,31 +336,38 @@ contains
             return
         end if
 
+        ! Build global BSR block index array from scatter_map (O(1) per entry)
+        allocate (indices(n_local, n_local))
+        do j = 1, n_local
+            do i = 1, n_local
+                call self%scatter_map%get_index(element_id, [i, j], indices(i, j))
+            end do
+        end do
+
         select case (self%coupling_mode%ID)
 
         case (COUPLING_MODES%MONOLITHIC%ID)
-
-            do i = 1, n_local
-                do j = 1, n_local
-                    call self%scatter_map%get_index(element_id, [i, j], idx)
-                    call self%matrix(1)%set(MATRIX_OPS%ADD, idx, row_physics_id, col_physics_id, dense_val(i, j))
-                end do
-            end do
+            call self%matrix(1)%set(MATRIX_OPS%ADD, n_local, indices, 1, 1, dense_val)
 
         case (COUPLING_MODES%STAGGERED%ID)
-            if (row_physics_id /= col_physics_id) return
-            if (row_physics_id < 1 .or. row_physics_id > PHYSICS_TYPES%NUM_ID) return
+            if (row_physics_id /= col_physics_id) then
+                deallocate (indices)
+                return
+            end if
+            if (row_physics_id < 1 .or. row_physics_id > PHYSICS_TYPES%NUM_ID) then
+                deallocate (indices)
+                return
+            end if
             sys = self%physics_to_system(row_physics_id)
-            if (sys == 0) return
-
-            do i = 1, n_local
-                do j = 1, n_local
-                    call self%scatter_map%get_index(element_id, [i, j], idx)
-                    call self%matrix(sys)%set(MATRIX_OPS%ADD, idx, 1, 1, dense_val(i, j))
-                end do
-            end do
+            if (sys == 0) then
+                deallocate (indices)
+                return
+            end if
+            call self%matrix(sys)%set(MATRIX_OPS%ADD, n_local, indices, 1, 1, dense_val)
 
         end select
+
+        deallocate (indices)
     end subroutine add_local_jacobian_matrix
 
     subroutine zero_all_jacobian_matrix(self)

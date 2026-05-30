@@ -3,6 +3,9 @@
 !> Row Storage (bsr) sparse matrix.
 !>
 submodule(core_types_algebra_matrix) algebra_matrix_bsr
+#ifdef _MKL
+    use :: mkl_spblas
+#endif
     implicit none
 
 contains
@@ -10,7 +13,7 @@ contains
     !>
     !> Initializes the DOF-level bsr matrix structure.
     !>
-    module subroutine initialize_type_matrix_bsr(self, num_nodes, row, col, row_blocks, col_blocks)
+    module subroutine initialize_bsr(self, num_nodes, row, col, row_blocks, col_blocks)
         implicit none
         class(type_matrix_bsr), intent(inout) :: self
         integer(int32), intent(in) :: num_nodes
@@ -56,7 +59,7 @@ contains
 
         self%is_initialized_matrix = .true.
         self%status = MATRIX_STATUS%SUCCESS
-    end subroutine initialize_type_matrix_bsr
+    end subroutine initialize_bsr
 
     !>
     !> Deallocates all internal arrays.
@@ -64,7 +67,13 @@ contains
     module subroutine destroy_bsr(self)
         implicit none
         class(type_matrix_bsr), intent(inout) :: self
-
+#ifdef _MKL
+        integer(int32) :: info
+        if (self%is_mkl_committed) then
+            info = mkl_sparse_destroy(self%mkl_handle)
+            self%is_mkl_committed = .false.
+        end if
+#endif
         call deallocate_array(self%ptr)
         call deallocate_array(self%ind)
         call deallocate_array(self%val)
@@ -169,67 +178,14 @@ contains
         val => self%val
     end function get_val_bsr
 
-    !>
-    !> Sets the value of a specific entry (Not fully implemented for BSR yet, use block version).
-    !>
     module subroutine set_value_bsr(self, op, row, col, value)
         implicit none
         class(type_matrix_bsr), intent(inout) :: self
         type(type_constant_id), intent(in) :: op
-        integer(int32), intent(in) :: row
-        integer(int32), intent(in) :: col
+        integer(int32), intent(in) :: row, col
         real(real64), intent(in) :: value
-
-        self%status = MATRIX_STATUS%NOT_IMPLEMENTED
+        error stop "Error: set_value is only permitted for dense matrix."
     end subroutine set_value_bsr
-
-    !>
-    !> Sets the value of a specific entry in the sparse matrix (Block level).
-    !>
-    module subroutine set_value_block_bsr(self, op, row, col, row_block, col_block, value)
-        implicit none
-        class(type_matrix_bsr), intent(inout) :: self
-        type(type_constant_id), intent(in) :: op
-        integer(int32), intent(in) :: row ! Block row index (Node index)
-        integer(int32), intent(in) :: col ! Block col index (Node index)
-        integer(int32), intent(in) :: row_block ! Local row index within block
-        integer(int32), intent(in) :: col_block ! Local col index within block
-        real(real64), intent(in) :: value
-
-        integer(int32) :: index
-
-        if (.not. MATRIX_OPS%is_valid(op)) then
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-            return
-        end if
-
-#ifdef USE_DEBUG
-        if (.not. value_in_range(row_block, 1, self%num_block_rows) .or. &
-            .not. value_in_range(col_block, 1, self%num_block_cols)) then
-            self%status = MATRIX_STATUS%OUT_OF_MEMORY
-            return
-        end if
-#endif
-
-        index = self%find(row, col)
-
-#ifdef USE_DEBUG
-        if (index < 0) then
-            self%status = MATRIX_STATUS%OUT_OF_MEMORY
-            return
-        end if
-#endif
-
-        if (op == MATRIX_OPS%INS) then
-            ! Access val(rKow_in_block, col_in_block, block_index)
-            self%val(row_block, col_block, index) = value
-        else if (op == MATRIX_OPS%ADD) then
-            self%val(row_block, col_block, index) = self%val(row_block, col_block, index) + value
-        else
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
-
-    end subroutine set_value_block_bsr
 
     !>
     !> Sets all non-zero entries in a specific row to a single scalar value.
@@ -242,7 +198,7 @@ contains
         real(real64), intent(in) :: value
         integer(int32), intent(in), optional :: row_block
 
-        integer(int32) :: is, ie, k, col_node
+        integer(int32) :: is, ie, k
         integer(int32) :: r_start, r_end, r
 
         if (.not. MATRIX_OPS%is_valid(op)) then
@@ -271,13 +227,12 @@ contains
             r_end = self%num_block_rows
         end if
 
-        if (op == MATRIX_OPS%INS) then
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
             do k = is, ie
-                col_node = self%ind(k)
-                ! Access val(row_in_block, col_in_block, block_index)
                 self%val(r_start:r_end, :, k) = value
             end do
-        else if (op == MATRIX_OPS%ADD) then
+        case (MATRIX_OPS%ADD%ID)
             do k = is, ie
                 if (self%ind(k) == row) then
                     do r = r_start, r_end
@@ -286,63 +241,14 @@ contains
                     exit
                 end if
             end do
-        else
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
-
-        self%status = MATRIX_STATUS%SUCCESS
-    end subroutine set_row_bsr
-
-    !>
-    !> Sets all stored non-zero values.
-    !>
-    module subroutine set_all_bsr(self, op, value)
-        implicit none
-        class(type_matrix_bsr), intent(inout) :: self
-        type(type_constant_id), intent(in) :: op
-        real(real64), intent(in) :: value
-
-        if (.not. MATRIX_OPS%is_valid(op)) then
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-            return
-        end if
-
-        if (op == MATRIX_OPS%INS) then
-            self%val(:, :, :) = value
-        else if (op == MATRIX_OPS%ADD) then
-            self%val(:, :, :) = self%val(:, :, :) + value
-        else
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
-
-        self%status = MATRIX_STATUS%SUCCESS
-    end subroutine set_all_bsr
-
-    module subroutine set_by_index_bsr(self, op, index, row_block, col_block, value)
-        implicit none
-        class(type_matrix_bsr), intent(inout) :: self
-        type(type_constant_id), intent(in) :: op
-        integer(int32), intent(in) :: index
-        integer(int32), intent(in) :: row_block, col_block
-        real(real64), intent(in) :: value
-
-        if (.not. MATRIX_OPS%is_valid(op)) then
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-            return
-        end if
-
-        select case (op%ID)
-        case (MATRIX_OPS%INS%ID)
-            self%val(row_block, col_block, index) = value
-        case (MATRIX_OPS%ADD%ID)
-            self%val(row_block, col_block, index) = &
-                self%val(row_block, col_block, index) + value
         case default
             self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
         end select
 
+        self%is_mkl_committed = .false.
         self%status = MATRIX_STATUS%SUCCESS
-    end subroutine set_by_index_bsr
+    end subroutine set_row_bsr
 
     module subroutine scale_bsr(self, op, alpha)
         implicit none
@@ -363,56 +269,36 @@ contains
             return
         end if
 
-        ! ポインタの関連付け
         alpha_data => alpha%get_data()
 
-        !--------------------------------------------------------
-        ! 変数名の可読性と安全性のためのエイリアス
-        ! self%num_block_rows が「ブロックサイズ(bnr)」であることを前提としています
-        !--------------------------------------------------------
         bnr = self%num_block_rows
         bnc = self%num_block_cols
 
-        ! 正方ブロックチェック (Symmetric Scalingの場合に必須)
+        ! SCALE_SYMM_DIAG requires square blocks
         if (op == MATRIX_OPS%SCALE_SYMM_DIAG .and. bnr /= bnc) then
             self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
-        ! ベクトルサイズチェック
-        ! num_nodes が「全ブロック数」あるいは「全ノード数」を指すと仮定
         nrequired = bnr * self%num_nodes
-
         if (size(alpha_data) /= nrequired) then
             self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
-        !-------------------------------------------
-        ! Symmetric Scaling: A <- D^{-1/2} A D^{-1/2}
-        !-------------------------------------------
-        if (op == MATRIX_OPS%SCALE_SYMM_DIAG) then
-            ! private変数に bnr, bnc は不要(read only sharedで良い)
+        select case (op%ID)
+        case (MATRIX_OPS%SCALE_SYMM_DIAG%ID)
+            ! A <- D^{-1/2} A D^{-1/2}
             !$omp parallel do default(shared) private(i,j,rb,cb,col,row_start,row_end,row_dof,col_dof)
             do i = 1, self%num_ptrs - 1
                 row_start = self%ptr(i)
                 row_end = self%ptr(i + 1) - 1
-
                 do j = row_start, row_end
                     col = self%ind(j)
-
-                    ! ブロック内の計算
-                    ! ループ順序: rb(行)を一番内側にするとメモリアクセスが連続になる
-                    ! ただし，alpha_dataのアクセス回数を減らす最適化も考えられる
                     do cb = 1, bnc
-                        ! 列側のスケーリング係数はこのcbループ内で不変
-                        ! col_dof は (ブロックColID - 1)*BlockSize + LocalColID
                         col_dof = (col - 1) * bnr + cb
-
                         do rb = 1, bnr
                             row_dof = (i - 1) * bnr + rb
-
-                            ! val(rb, cb, j) -> Fortranは第1次元(rb)が連続
                             self%val(rb, cb, j) = self%val(rb, cb, j) * &
                                                   (alpha_data(row_dof) * alpha_data(col_dof))
                         end do
@@ -421,24 +307,16 @@ contains
             end do
             !$omp end parallel do
             self%status = MATRIX_STATUS%SUCCESS
-
-            !-------------------------------------------
-            ! Jacobi Scaling: A <- D^{-1} A
-            !-------------------------------------------
-        else if (op == MATRIX_OPS%SCALE_JACOBI) then
-
+        case (MATRIX_OPS%SCALE_JACOBI%ID)
+            ! A <- D^{-1} A
             !$omp parallel do default(shared) private(i,j,rb,cb,row_start,row_end,row_dof)
             do i = 1, self%num_ptrs - 1
                 row_start = self%ptr(i)
                 row_end = self%ptr(i + 1) - 1
-
                 do j = row_start, row_end
-                    ! Jacobiの場合，列(cb)方向には同じ行スケーリング係数がかかるため
-                    ! cbを外側，rbを内側にして連続アクセスを最大化
                     do cb = 1, bnc
                         do rb = 1, bnr
                             row_dof = (i - 1) * bnr + rb
-
                             self%val(rb, cb, j) = self%val(rb, cb, j) * alpha_data(row_dof)
                         end do
                     end do
@@ -446,20 +324,14 @@ contains
             end do
             !$omp end parallel do
             self%status = MATRIX_STATUS%SUCCESS
-
-            !-------------------------------------------
-            ! Column Scaling: A(:,j) <- A(:,j) * alpha(j)
-            !-------------------------------------------
-        else if (op == MATRIX_OPS%SCALE_COL) then
-
+        case (MATRIX_OPS%SCALE_COL%ID)
+            ! A(:,j) <- A(:,j) * alpha(j)
             !$omp parallel do default(shared) private(i,j,cb,col,row_start,row_end,col_dof)
             do i = 1, self%num_ptrs - 1
                 row_start = self%ptr(i)
                 row_end = self%ptr(i + 1) - 1
-
                 do j = row_start, row_end
                     col = self%ind(j)
-
                     do cb = 1, bnc
                         col_dof = (col - 1) * bnr + cb
                         self%val(:, cb, j) = self%val(:, cb, j) * alpha_data(col_dof)
@@ -468,10 +340,12 @@ contains
             end do
             !$omp end parallel do
             self%status = MATRIX_STATUS%SUCCESS
-
-        else
+        case default
             self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
+            return
+        end select
+
+        self%is_mkl_committed = .false.
 
     end subroutine scale_bsr
     !>
@@ -482,6 +356,7 @@ contains
         class(type_matrix_bsr), intent(inout) :: self
 
         self%val(:, :, :) = 0.0d0
+        self%is_mkl_committed = .false.
         self%status = MATRIX_STATUS%SUCCESS
     end subroutine zero_all_bsr
 
@@ -493,7 +368,7 @@ contains
         integer(int32), intent(in), optional :: row_block
 
         integer(int32) :: is, ie, k, r_start, r_end, r
-        ! 範囲チェック
+
         if (.not. value_in_range(row, 1, self%num_rows)) then
             self%status = MATRIX_STATUS%OUT_OF_MEMORY
             return
@@ -515,38 +390,14 @@ contains
         end if
 
         do k = is, ie
-            ! Access val(row_in_block, col_in_block, block_index)
             do r = r_start, r_end
                 self%val(r, :, k) = 0.0d0
             end do
         end do
 
+        self%is_mkl_committed = .false.
         self%status = MATRIX_STATUS%SUCCESS
     end subroutine zero_row_bsr
-
-    !>
-    !> Find index.
-    !>
-    pure module function find_bsr(self, row, col) result(index)
-        implicit none
-        class(type_matrix_bsr), intent(in) :: self
-        integer(int32), intent(in) :: row, col
-        integer(int32) :: index
-        integer(int32) :: ptr_start, ptr_end
-
-        index = 0
-
-        if (.not. value_in_range(row, 1, self%num_nodes) .or. &
-            .not. value_in_range(col, 1, self%num_nodes)) then
-            index = -1
-            return
-        end if
-
-        ptr_start = self%ptr(row)
-        ptr_end = self%ptr(row + 1) - 1
-
-        index = binary_find(col, self%ind, ptr_start, ptr_end)
-    end function find_bsr
 
     !>
     !> Display.
@@ -581,5 +432,137 @@ contains
             end do
         end do
     end subroutine display_bsr
+
+    !>
+    !> Scatter a local element matrix into BSR global matrix using pre-computed block indices.
+    !> O(1) direct address scatter — no binary search.
+    !> row_sys/col_sys: 1-based DOF offsets within the BSR block for sub-block scattering.
+    !> op = MATRIX_OPS%INS overwrites; op = MATRIX_OPS%ADD accumulates.
+    !>
+    module subroutine set_local_matrix_bsr(self, op, n_local, indices, row_sys, col_sys, local_data)
+        implicit none
+        class(type_matrix_bsr), intent(inout) :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: n_local
+        integer(int32), intent(in) :: indices(:, :)
+        integer(int32), intent(in) :: row_sys, col_sys
+        real(real64), dimension(:, :), intent(in) :: local_data
+
+        integer(int32) :: i_node, j_node, rb, cb, idx, local_row, local_col
+        integer(int32) :: n_dof_row, n_dof_col
+
+        n_dof_row = size(local_data, 1) / n_local
+        n_dof_col = size(local_data, 2) / n_local
+
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
+            do j_node = 1, n_local
+                do i_node = 1, n_local
+                    idx = indices(i_node, j_node)
+                    if (idx > 0) then
+                        do cb = 1, n_dof_col
+                            do rb = 1, n_dof_row
+                                local_row = (i_node - 1) * n_dof_row + rb
+                                local_col = (j_node - 1) * n_dof_col + cb
+                                self%val(row_sys + rb - 1, col_sys + cb - 1, idx) = &
+                                    local_data(local_row, local_col)
+                            end do
+                        end do
+                    end if
+                end do
+            end do
+        case (MATRIX_OPS%ADD%ID)
+            do j_node = 1, n_local
+                do i_node = 1, n_local
+                    idx = indices(i_node, j_node)
+                    if (idx > 0) then
+                        do cb = 1, n_dof_col
+                            do rb = 1, n_dof_row
+                                local_row = (i_node - 1) * n_dof_row + rb
+                                local_col = (j_node - 1) * n_dof_col + cb
+                                self%val(row_sys + rb - 1, col_sys + cb - 1, idx) = &
+                                    self%val(row_sys + rb - 1, col_sys + cb - 1, idx) + &
+                                    local_data(local_row, local_col)
+                            end do
+                        end do
+                    end if
+                end do
+            end do
+        case default
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end select
+
+        self%is_mkl_committed = .false.
+    end subroutine set_local_matrix_bsr
+
+    !>
+    !> Register val/ptr/ind with MKL Sparse BLAS (Inspector phase) and run mkl_sparse_optimize.
+    !> Must be called after assembly is complete and before any SpMV via gemv_matrix_bsr.
+    !>
+    module subroutine commit_to_mkl_bsr(self, ierr)
+        implicit none
+        class(type_matrix_bsr), intent(inout) :: self
+        integer(int32), intent(out), optional :: ierr
+#ifdef _MKL
+        integer(int32) :: info
+
+        if (.not. self%is_initialized_matrix) then
+            if (present(ierr)) ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
+            return
+        end if
+        if (self%num_block_rows /= self%num_block_cols) then
+            if (present(ierr)) ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
+            return
+        end if
+
+        if (self%is_mkl_committed) then
+            info = mkl_sparse_destroy(self%mkl_handle)
+            self%is_mkl_committed = .false.
+        end if
+
+        info = mkl_sparse_d_create_bsr( &
+            self%mkl_handle, &
+            SPARSE_INDEX_BASE_ONE, &
+            SPARSE_LAYOUT_COLUMN_MAJOR, &
+            self%num_nodes, self%num_nodes, self%num_block_rows, &
+            self%ptr(1), self%ptr(2), &
+            self%ind(1), self%val(1, 1, 1))
+
+        if (info == SPARSE_STATUS_SUCCESS) then
+            info = mkl_sparse_optimize(self%mkl_handle)
+            self%is_mkl_committed = .true.
+            if (present(ierr)) then
+                if (info == SPARSE_STATUS_SUCCESS) then
+                    ierr = MATRIX_STATUS%SUCCESS%ID
+                else
+                    ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
+                end if
+            end if
+        else
+            if (present(ierr)) ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
+        end if
+#else
+        if (present(ierr)) ierr = MATRIX_STATUS%NOT_IMPLEMENTED%ID
+#endif
+    end subroutine commit_to_mkl_bsr
+
+    !> Returns .true. if MKL handle has been committed and is ready for SpMV.
+    pure module function is_mkl_handle_ready_bsr(self) result(ready)
+        implicit none
+        class(type_matrix_bsr), intent(in) :: self
+        logical :: ready
+        ready = self%is_mkl_committed
+    end function is_mkl_handle_ready_bsr
+
+#ifdef _MKL
+    !> Return the committed MKL sparse handle.
+    module function get_mkl_handle_bsr(self) result(handle)
+        implicit none
+        class(type_matrix_bsr), intent(in) :: self
+        type(sparse_matrix_t) :: handle
+        handle = self%mkl_handle
+    end function get_mkl_handle_bsr
+#endif
 
 end submodule algebra_matrix_bsr

@@ -5,22 +5,33 @@ file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/log)
 # Function: add_solver_test
 # ====================================================================
 function(add_solver_test test_name)
+    set(options "")
+    set(oneValueArgs "")
+    set(multiValueArgs SOURCES LIBS)
+    cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
     set(target_name "test_${test_name}")
 
-    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${target_name}.F90")
-        message(FATAL_ERROR "Test source file not found: ${target_name}.F90")
+    # ソースファイルが指定されていない場合はデフォルトパスを使用
+    if(ARG_SOURCES)
+        set(test_sources ${ARG_SOURCES})
+    else()
+        set(test_sources "${CMAKE_CURRENT_SOURCE_DIR}/${target_name}.F90")
+        if(NOT EXISTS "${test_sources}")
+            message(FATAL_ERROR "Test source file not found: ${test_sources}")
+        endif()
     endif()
 
-    add_executable(${target_name} ${target_name}.F90)
+    add_executable(${target_name} ${test_sources})
     set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE Fortran)
 
     # Apply general build flags and third-party libraries by default
     enable_build_flags(${target_name})
     enable_thirdparty(${target_name})
 
-    # Link internal solver libraries passed via ARGN
-    if(ARGN)
-        target_link_libraries(${target_name} PRIVATE ${ARGN})
+    # Link internal solver libraries passed via LIBS
+    if(ARG_LIBS)
+        target_link_libraries(${target_name} PRIVATE ${ARG_LIBS})
     endif()
 
     # Link test-drive framework
@@ -56,20 +67,45 @@ endfunction()
 # Register each test with its specific dependencies
 # --------------------------------------------------------------------
 
-# test_mkl requires only default flags and third-party libraries
-add_solver_test(mkl)
+# test_mkl: BSR assembly + MKL Inspector-Executor SpMV integration test
+add_solver_test(mkl
+    LIBS
+        SOLVER::CORE
+        SOLVER::LINALG
+)
+
+# test_matrix: Fypp-generated lifecycle + assembly + MKL handle-state tests
+fypp_F90("" "test_matrix.fypp" TEST_MATRIX_GENERATED)
+add_solver_test(matrix
+    SOURCES
+        ${TEST_MATRIX_GENERATED}
+    LIBS
+        SOLVER::CORE
+        SOLVER::LINALG
+)
+
+# test_vector: Fypp-generated tests for type_vector_dp and type_vector_int
+fypp_F90("" "test_vector.fypp" TEST_VECTOR_GENERATED)
+add_solver_test(vector
+    SOURCES
+        ${TEST_VECTOR_GENERATED}
+    LIBS
+        SOLVER::CORE
+        SOLVER::LINALG
+)
 
 # test_main requires all solver libraries
 add_solver_test(main
-    SOLVER::CORE
-    SOLVER::LINALG
-    SOLVER::PARALLEL
-    SOLVER::SOLVER
-    SOLVER::SYSTEM
-    SOLVER::DOMAIN
-    SOLVER::INPUT
-    SOLVER::OUTPUT
-    SOLVER::CONSTITUTIVE
-    SOLVER::GOVERNING
-    SOLVER::FTCMS
+    LIBS
+        SOLVER::CORE
+        SOLVER::LINALG
+        SOLVER::PARALLEL
+        SOLVER::SOLVER
+        SOLVER::SYSTEM
+        SOLVER::DOMAIN
+        SOLVER::INPUT
+        SOLVER::OUTPUT
+        SOLVER::CONSTITUTIVE
+        SOLVER::GOVERNING
+        SOLVER::FTCMS
 )

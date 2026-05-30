@@ -11,7 +11,7 @@ contains
     !> It assumes the input node-level `row` and `col` arrays are sorted appropriately
     !> to produce a sorted DOF-level COO matrix without requiring an explicit sort.
     !>
-    module subroutine initialize_type_matrix_coo(self, num_nodes, row, col, row_blocks, col_blocks)
+    module subroutine initialize_coo(self, num_nodes, row, col, row_blocks, col_blocks)
         implicit none
         !> The COO matrix object to initialize.
         class(type_matrix_coo), intent(inout) :: self
@@ -52,7 +52,7 @@ contains
 
         self%is_initialized_matrix = .true.
         self%status = MATRIX_STATUS%SUCCESS
-    end subroutine initialize_type_matrix_coo
+    end subroutine initialize_coo
 
     !>
     !> Deallocates all internal arrays of the COO matrix object.
@@ -149,61 +149,12 @@ contains
     !>
     module subroutine set_value_coo(self, op, row, col, value)
         implicit none
-        !> The COO matrix object.
         class(type_matrix_coo), intent(inout) :: self
-        !> The operation to perform
         type(type_constant_id), intent(in) :: op
-        !> The 1-based node index for the row.
-        integer(int32), intent(in) :: row
-        !> The 1-based node index for the column.
-        integer(int32), intent(in) :: col
-        !> The value to set at the specified entry.
+        integer(int32), intent(in) :: row, col
         real(real64), intent(in) :: value
-
-        integer(int32) :: index
-
-        if (.not. MATRIX_OPS%is_valid(op)) then
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-            return
-        end if
-
-        index = self%find(row, col)
-#ifdef USE_DEBUG
-        if (index > 0) then
-#endif
-            if (op == MATRIX_OPS%INS) then
-                self%val(index) = value
-            else if (op == MATRIX_OPS%ADD) then
-                self%val(index) = self%val(index) + value
-            else
-                self%status = MATRIX_STATUS%ILL_OPERATIONS
-            end if
-#ifdef USE_DEBUG
-        else
-            self%status = MATRIX_STATUS%OUT_OF_MEMORY
-        end if
-#endif
+        error stop "Error: set_value is only permitted for dense matrix."
     end subroutine set_value_coo
-
-    module subroutine set_value_block_coo(self, op, row, col, row_block, col_block, value)
-        implicit none
-        !> The COO matrix object.
-        class(type_matrix_coo), intent(inout) :: self
-        !> The operation to perform
-        type(type_constant_id), intent(in) :: op
-        !> The 1-based node index for the row.
-        integer(int32), intent(in) :: row
-        !> The 1-based node index for the column.
-        integer(int32), intent(in) :: col
-        !> The block row index.
-        integer(int32), intent(in) :: row_block
-        !> The block column index.
-        integer(int32), intent(in) :: col_block
-        !> The value to set at the specified entry.
-        real(real64), intent(in) :: value
-
-        self%status = MATRIX_STATUS%NOT_IMPLEMENTED
-    end subroutine set_value_block_coo
 
     !>
     !> Sets all non-zero entries in a specified row to a single scalar value.
@@ -229,63 +180,19 @@ contains
             return
         end if
 
-        do i = 1, self%nnz
-            if (self%row(i) == row) then
-                if (op == MATRIX_OPS%INS) then
-                    self%val(i) = value
-                else if (op == MATRIX_OPS%ADD) then
-                    self%val(i) = self%val(i) + value
-                else
-                    self%status = MATRIX_STATUS%ILL_OPERATIONS
-                end if
-            end if
-        end do
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
+            do i = 1, self%nnz
+                if (self%row(i) == row) self%val(i) = value
+            end do
+        case (MATRIX_OPS%ADD%ID)
+            do i = 1, self%nnz
+                if (self%row(i) == row) self%val(i) = self%val(i) + value
+            end do
+        case default
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end select
     end subroutine set_row_coo
-
-    !>
-    !> Sets all stored non-zero values in the matrix to a single scalar value.
-    !>
-    module subroutine set_all_coo(self, op, value)
-        implicit none
-        !> The COO matrix object.
-        class(type_matrix_coo), intent(inout) :: self
-        !> The operation to perform
-        type(type_constant_id), intent(in) :: op
-        !> The scalar value to assign to all non-zero entries.
-        real(real64), intent(in) :: value
-
-        if (.not. MATRIX_OPS%is_valid(op)) then
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-            return
-        end if
-
-        if (op == MATRIX_OPS%INS) then
-            self%val = value
-        else if (op == MATRIX_OPS%ADD) then
-            self%val = self%val + value
-        else
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
-
-    end subroutine set_all_coo
-
-    module subroutine set_by_index_coo(self, op, index, row_block, col_block, value)
-        implicit none
-        !> The COO matrix object.
-        class(type_matrix_coo), intent(inout) :: self
-        !> The operation to perform
-        type(type_constant_id), intent(in) :: op
-        !> The 1-based index in the `val`/`ind`/`col` arrays.
-        integer(int32), intent(in) :: index
-        !> The block row index.
-        integer(int32), intent(in) :: row_block
-        !> The block column index.
-        integer(int32), intent(in) :: col_block
-        !> The value to set at the specified entry.
-        real(real64), intent(in) :: value
-
-        self%status = MATRIX_STATUS%NOT_IMPLEMENTED
-    end subroutine set_by_index_coo
 
     !>
     !> Scales all stored values in the matrix by a scalar factor vector.
@@ -303,47 +210,32 @@ contains
         real(real64), dimension(:), pointer :: alpha_data
         alpha_data => alpha%get_data()
 
-        ! alphaは行列の次元数(n)と同じであるべき
         if (size(alpha_data) /= self%num_nodes) then
             self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
-        !-------------------------------------------------
-        ! Symmetric Scaling: A_ij <- A_ij * alpha(i) * alpha(j)
-        ! (alpha には 1/sqrt(|D|) が入っている)
-        !-------------------------------------------------
-        if (op == MATRIX_OPS%SCALE_SYMM_DIAG) then
+        select case (op%ID)
+        case (MATRIX_OPS%SCALE_SYMM_DIAG%ID)
             !$omp parallel do default(shared) private(i, r, c)
             do i = 1, self%nnz
-                r = self%row(i) ! 行インデックス (1-based)
-                c = self%col(i) ! 列インデックス (1-based)
-
+                r = self%row(i)
+                c = self%col(i)
                 self%val(i) = self%val(i) * alpha_data(r) * alpha_data(c)
             end do
             !$omp end parallel do
-
             self%status = MATRIX_STATUS%SUCCESS
-
-            !-------------------------------------------------
-            ! Jacobi Scaling: A_ij <- A_ij * alpha(i)
-            ! (alpha には 1/D が入っている)
-            !-------------------------------------------------
-        else if (op == MATRIX_OPS%SCALE_JACOBI) then
+        case (MATRIX_OPS%SCALE_JACOBI%ID)
             !$omp parallel do default(shared) private(i, r)
             do i = 1, self%nnz
                 r = self%row(i)
-                ! Jacobiは左から掛けるだけなので列インデックスは不要
-
                 self%val(i) = self%val(i) * alpha_data(r)
             end do
             !$omp end parallel do
-
             self%status = MATRIX_STATUS%SUCCESS
-
-        else
+        case default
             self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
+        end select
     end subroutine scale_coo
 
     !>
@@ -378,34 +270,6 @@ contains
     end subroutine zero_row_coo
 
     !>
-    !> Finds the 1-based storage index for a specific matrix entry using a linear search.
-    !> Note: This is an O(nnz) operation and can be a significant bottleneck for
-    !> frequent access on large matrices. The CRS format is recommended for such cases.
-    !>
-    module pure function find_coo(self, row, col) result(index)
-        implicit none
-        !> The COO matrix object.
-        class(type_matrix_coo), intent(in) :: self
-        !> The 1-based node index for the row.
-        integer(int32), intent(in) :: row
-        !> The 1-based node index for the column.
-        integer(int32), intent(in) :: col
-        !> The 1-based index in the `val`/`ind`/`col` arrays, or 0 if not found.
-        integer(int32) :: index
-
-        integer(int32) :: i
-
-        index = 0
-        ! Linear search through all non-zero entries.
-        do i = 1, self%nnz
-            if (self%row(i) == row .and. self%col(i) == col) then
-                index = i
-                return
-            end if
-        end do
-    end function find_coo
-
-    !>
     !> Prints the non-zero entries of the COO matrix to standard output.
     !>
     module subroutine display_coo(self, unit_in)
@@ -424,5 +288,35 @@ contains
             write (unit, '(2(i8, ", "), es16.8e3)') self%row(i), self%col(i), self%val(i)
         end do
     end subroutine display_coo
+
+    module subroutine set_local_matrix_coo(self, op, n_local, indices, row_sys, col_sys, local_data)
+        implicit none
+        class(type_matrix_coo), intent(inout) :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: n_local
+        integer(int32), intent(in) :: indices(:, :)
+        integer(int32), intent(in) :: row_sys, col_sys
+        real(real64), dimension(:, :), intent(in) :: local_data
+        integer(int32) :: i, j, idx
+
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
+            do j = 1, n_local
+                do i = 1, n_local
+                    idx = indices(i, j)
+                    if (idx > 0) self%val(idx) = local_data(i, j)
+                end do
+            end do
+        case (MATRIX_OPS%ADD%ID)
+            do j = 1, n_local
+                do i = 1, n_local
+                    idx = indices(i, j)
+                    if (idx > 0) self%val(idx) = self%val(idx) + local_data(i, j)
+                end do
+            end do
+        case default
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end select
+    end subroutine set_local_matrix_coo
 
 end submodule algebra_matrix_coo

@@ -12,7 +12,7 @@ contains
     !> It assumes the input node-level column indices (`col`) are sorted for each row segment.
     !> This routine expands the node-level graph into a full DOF-level matrix sparsity pattern.
     !>
-    module subroutine initialize_type_matrix_csr(self, num_nodes, row, col, row_blocks, col_blocks)
+    module subroutine initialize_csr(self, num_nodes, row, col, row_blocks, col_blocks)
         implicit none
         class(type_matrix_csr), intent(inout) :: self
         integer(int32), intent(in) :: num_nodes
@@ -46,7 +46,7 @@ contains
 
         self%is_initialized_matrix = .true.
         self%status = MATRIX_STATUS%SUCCESS
-    end subroutine initialize_type_matrix_csr
+    end subroutine initialize_csr
 
     !>
     !> Deallocates all internal arrays of the csr matrix object.
@@ -149,65 +149,12 @@ contains
     !>
     module subroutine set_value_csr(self, op, row, col, value)
         implicit none
-        !> The csr matrix object.
         class(type_matrix_csr), intent(inout) :: self
-        !> The operation to perform.
         type(type_constant_id), intent(in) :: op
-        !> The 1-based node index for the row.
-        integer(int32), intent(in) :: row
-        !> The 1-based node index for the column.
-        integer(int32), intent(in) :: col
-        !> The value to set at the specified entry.
+        integer(int32), intent(in) :: row, col
         real(real64), intent(in) :: value
-
-        integer(int32) :: index
-
-        if (.not. MATRIX_OPS%is_valid(op)) then
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-            return
-        end if
-
-        index = self%find(row, col)
-#ifdef USE_DEBUG
-        if (index > 0) then
-#endif
-            if (op == MATRIX_OPS%INS) then
-                self%val(index) = value
-            else if (op == MATRIX_OPS%ADD) then
-                self%val(index) = self%val(index) + value
-            else
-                self%status = MATRIX_STATUS%ILL_OPERATIONS
-            end if
-
-#ifdef USE_DEBUG
-        else
-            self%status = MATRIX_STATUS%OUT_OF_MEMORY
-        end if
-#endif
+        error stop "Error: set_value is only permitted for dense matrix."
     end subroutine set_value_csr
-
-    !>
-    !> Sets the value of a specific entry in the sparse matrix.
-    !>
-    module subroutine set_value_block_csr(self, op, row, col, row_block, col_block, value)
-        implicit none
-        !> The csr matrix object.
-        class(type_matrix_csr), intent(inout) :: self
-        !> The operation to perform.
-        type(type_constant_id), intent(in) :: op
-        !> The 1-based node index for the row.
-        integer(int32), intent(in) :: row
-        !> The 1-based node index for the column.
-        integer(int32), intent(in) :: col
-        !> The block row index within the block.
-        integer(int32), intent(in) :: row_block
-        !> The block column index within the block.
-        integer(int32), intent(in) :: col_block
-        !> The value to set at the specified entry.
-        real(real64), intent(in) :: value
-
-        self%status = MATRIX_STATUS%NOT_IMPLEMENTED
-    end subroutine set_value_block_csr
 
     !>
     !> Sets all non-zero entries in a specific row to a single scalar value.
@@ -235,69 +182,15 @@ contains
         is = self%ptr(row)
         ie = self%ptr(row + 1) - 1
 
-        if (op == MATRIX_OPS%INS) then
-            self%val(is:ie) = value
-        else if (op == MATRIX_OPS%ADD) then
-            self%val(is:ie) = self%val(is:ie) + value
-        else
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
-
-    end subroutine set_row_csr
-
-    !>
-    !> Sets all entries in a specific block row to a single scalar value.
-    module subroutine set_by_index_csr(self, op, index, row_block, col_block, value)
-        implicit none
-        class(type_matrix_csr), intent(inout) :: self
-        type(type_constant_id), intent(in) :: op
-        integer(int32), intent(in) :: index
-        integer(int32), intent(in) :: row_block, col_block
-        real(real64), intent(in) :: value
-
-        if (.not. MATRIX_OPS%is_valid(op)) then
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-            return
-        end if
-
         select case (op%ID)
         case (MATRIX_OPS%INS%ID)
-            self%val(index) = value
+            self%val(is:ie) = value
         case (MATRIX_OPS%ADD%ID)
-            self%val(index) = self%val(index) + value
+            self%val(is:ie) = self%val(is:ie) + value
         case default
             self%status = MATRIX_STATUS%ILL_OPERATIONS
         end select
-
-        self%status = MATRIX_STATUS%SUCCESS
-    end subroutine set_by_index_csr
-
-    !>
-    !> Sets all stored non-zero values in the matrix to a single scalar value.
-    !>
-    module subroutine set_all_csr(self, op, value)
-        implicit none
-        !> The csr matrix object.
-        class(type_matrix_csr), intent(inout) :: self
-        !> The operation to perform.
-        type(type_constant_id), intent(in) :: op
-        !> The scalar value to assign to all non-zero entries.
-        real(real64), intent(in) :: value
-
-        if (.not. MATRIX_OPS%is_valid(op)) then
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-            return
-        end if
-
-        if (op == MATRIX_OPS%INS) then
-            self%val = value
-        else if (op == MATRIX_OPS%ADD) then
-            self%val = self%val + value
-        else
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
-
-    end subroutine set_all_csr
+    end subroutine set_row_csr
 
     !>
     !> Scales all stored values in the CSR matrix.
@@ -320,52 +213,34 @@ contains
 
         alpha_data => alpha%get_data()
 
-        ! alphaのサイズチェック
         if (size(alpha_data) /= self%num_nodes) then
             self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
-        !-------------------------------------------------
-        ! Symmetric Scaling: A_ij <- A_ij * alpha(i) * alpha(j)
-        ! (alpha には 1/sqrt(|D|) が入っている)
-        !-------------------------------------------------
-        if (op == MATRIX_OPS%SCALE_SYMM_DIAG) then
+        select case (op%ID)
+        case (MATRIX_OPS%SCALE_SYMM_DIAG%ID)
             !$omp parallel do default(shared) private(i, k, col) schedule(static)
             do i = 1, self%num_nodes
-                ! i行目の非ゼロ要素を走査
                 do k = self%ptr(i), self%ptr(i + 1) - 1
-                    col = self%ind(k) ! 列番号を取得
-
-                    ! A_ij = A_ij * D_i * D_j
+                    col = self%ind(k)
                     self%val(k) = self%val(k) * alpha_data(i) * alpha_data(col)
                 end do
             end do
             !$omp end parallel do
-
             self%status = MATRIX_STATUS%SUCCESS
-
-            !-------------------------------------------------
-            ! Jacobi Scaling: A_ij <- A_ij * alpha(i)
-            ! (alpha には 1/D が入っている)
-            !-------------------------------------------------
-        else if (op == MATRIX_OPS%SCALE_JACOBI) then
-
+        case (MATRIX_OPS%SCALE_JACOBI%ID)
             !$omp parallel do default(shared) private(i, k) schedule(static)
             do i = 1, self%num_nodes
-                ! i行目の全要素に対して、一律に alpha(i) を掛ける
-                ! 行単位でアクセスするため、CSR形式では非常にキャッシュ効率が良い
                 do k = self%ptr(i), self%ptr(i + 1) - 1
                     self%val(k) = self%val(k) * alpha_data(i)
                 end do
             end do
             !$omp end parallel do
-
             self%status = MATRIX_STATUS%SUCCESS
-
-        else
+        case default
             self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
+        end select
 
     end subroutine scale_csr
 
@@ -400,34 +275,6 @@ contains
     !>
     !> Finds the 1-based index in the `val` and `ind` arrays corresponding to a specific matrix entry.
     !>
-    pure module function find_csr(self, row, col) result(index)
-        implicit none
-        !> The csr matrix object.
-        class(type_matrix_csr), intent(in) :: self
-        !> The 1-based node index for the row.
-        integer(int32), intent(in) :: row
-        !> The 1-based node index for the column.
-        integer(int32), intent(in) :: col
-        !> The 1-based index in the `val`/`ind` arrays, or 0 if not found.
-
-        integer(int32) :: index
-        integer(int32) :: ptr_start, ptr_end
-
-        index = 0
-
-#ifdef USE_DEBUG
-        if (row < 1 .or. row > self%num_nodes) return
-        if (col < 1 .or. col > self%num_nodes) return
-#endif
-
-        ptr_start = self%ptr(row)
-        ptr_end = self%ptr(row + 1) - 1
-
-        ! Perform a binary search within the relevant segment of the index array.
-        index = binary_find(col, self%ind, ptr_start, ptr_end)
-
-    end function find_csr
-
     !>
     !> Prints the non-zero contents of the sparse matrix to standard output.
     !>
@@ -451,5 +298,35 @@ contains
             end do
         end do
     end subroutine display_csr
+
+    module subroutine set_local_matrix_csr(self, op, n_local, indices, row_sys, col_sys, local_data)
+        implicit none
+        class(type_matrix_csr), intent(inout) :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: n_local
+        integer(int32), intent(in) :: indices(:, :)
+        integer(int32), intent(in) :: row_sys, col_sys
+        real(real64), dimension(:, :), intent(in) :: local_data
+        integer(int32) :: i, j, idx
+
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
+            do j = 1, n_local
+                do i = 1, n_local
+                    idx = indices(i, j)
+                    if (idx > 0) self%val(idx) = local_data(i, j)
+                end do
+            end do
+        case (MATRIX_OPS%ADD%ID)
+            do j = 1, n_local
+                do i = 1, n_local
+                    idx = indices(i, j)
+                    if (idx > 0) self%val(idx) = self%val(idx) + local_data(i, j)
+                end do
+            end do
+        case default
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end select
+    end subroutine set_local_matrix_csr
 
 end submodule algebra_matrix_csr

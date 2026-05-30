@@ -1,0 +1,542 @@
+#:set MTYPES = ['dense', 'csr', 'coo', 'bsr', 'dia']
+
+! Common procedure bindings (11 procedures, identical pattern for all 5 types)
+#:def common_bindings(T)
+    procedure, pass(self) :: initialize => initialize_${T}$
+    procedure, pass(self) :: destroy => destroy_${T}$
+    procedure, pass(self) :: get_info => get_info_${T}$
+    procedure, pass(self) :: get_diagonal => get_diagonal_${T}$
+    procedure, pass(self) :: set_value => set_value_${T}$
+    procedure, pass(self) :: set_row => set_row_${T}$
+    procedure, pass(self) :: scale => scale_${T}$
+    procedure, pass(self) :: zero_all => zero_all_${T}$
+    procedure, pass(self) :: zero_row => zero_row_${T}$
+    procedure, pass(self) :: display => display_${T}$
+    procedure, pass(self) :: set_local_matrix => set_local_matrix_${T}$
+#:enddef
+
+! Common module interface declarations (11 procedures × 5 types)
+#:def common_iface(T)
+    !> Initializes the ${T}$ matrix from node count and optional sparsity patte rn.
+    module subroutine initialize_${T}$ (self, num_nodes, row, col, row_blocks, col_blocks)
+        implicit none
+        class(type_matrix_${T}$), intent(inout) :: self
+        integer(int32), intent(in) :: num_nodes
+        integer(int32), intent(in), optional :: row(:)
+        integer(int32), intent(in), optional :: col(:)
+        integer(int32), intent(in), optional :: row_blocks
+        integer(int32), intent(in), optional :: col_blocks
+    end subroutine initialize_${T}$
+    !> Deallocates all internal arrays of the ${T}$ matrix.
+    module subroutine destroy_${T}$ (self)
+        implicit none
+        class(type_matrix_${T}$), intent(inout) :: self
+    end subroutine destroy_${T}$
+    !> Returns format-specific information for the ${T}$ matrix.
+    module subroutine get_info_${T}$ (self, info)
+        implicit none
+        class(type_matrix_${T}$), intent(in) :: self
+        type(type_matrix_info), intent(inout) :: info
+    end subroutine get_info_${T}$
+    !> Extracts the main diagonal of the ${T}$ matrix into a vector.
+    module subroutine get_diagonal_${T}$ (self, diagonal)
+        implicit none
+        class(type_matrix_${T}$), intent(in) :: self
+        type(type_vector_dp), intent(inout) :: diagonal
+    end subroutine get_diagonal_${T}$
+    !> Sets a single scalar entry; permitted only for dense format (error stop otherwise).
+    module subroutine set_value_${T}$ (self, op, row, col, value)
+        implicit none
+        class(type_matrix_${T}$), intent(inout) :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: row, col
+        real(real64), intent(in) :: value
+    end subroutine set_value_${T}$
+    !> Sets all non-zero entries in a block-row to a scalar.
+    module subroutine set_row_${T}$ (self, op, row, value, row_block)
+        implicit none
+        class(type_matrix_${T}$), intent(inout) :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: row
+        real(real64), intent(in) :: value
+        integer(int32), intent(in), optional :: row_block
+    end subroutine set_row_${T}$
+    !> Scales the ${T}$ matrix by a diagonal vector.
+    module subroutine scale_${T}$ (self, op, alpha)
+        implicit none
+        class(type_matrix_${T}$), intent(inout) :: self
+        type(type_constant_id), intent(in) :: op
+        type(type_vector_dp), intent(in) :: alpha
+    end subroutine scale_${T}$
+    !> Sets all stored entries to zero.
+    module subroutine zero_all_${T}$ (self)
+        implicit none
+        class(type_matrix_${T}$), intent(inout) :: self
+    end subroutine zero_all_${T}$
+    !> Sets all entries in a specified block-row to zero.
+    module subroutine zero_row_${T}$ (self, row, row_block)
+        implicit none
+        class(type_matrix_${T}$), intent(inout) :: self
+        integer(int32), intent(in) :: row
+        integer(int32), intent(in), optional :: row_block
+    end subroutine zero_row_${T}$
+    !> Prints the ${T}$ matrix contents to the specified unit.
+    module subroutine display_${T}$ (self, unit_in)
+        implicit none
+        class(type_matrix_${T}$), intent(in) :: self
+        integer(int32), intent(in), optional :: unit_in
+    end subroutine display_${T}$
+    !> Scatters a local element matrix into the global ${T}$ matrix using pre-computed
+    !> flat block indices. op=INS overwrites; op=ADD accumulates.
+    module subroutine set_local_matrix_${T}$ (self, op, n_local, indices, row_sys, col_sys, local_data)
+        implicit none
+        class(type_matrix_${T}$), intent(inout) :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: n_local
+        integer(int32), intent(in) :: indices(:, :)
+        integer(int32), intent(in) :: row_sys, col_sys
+        real(real64), dimension(:, :), intent(in) :: local_data
+    end subroutine set_local_matrix_${T}$
+#:enddef
+
+!>
+!> Abstract matrix type and five concrete storage formats:
+!> dense, CSR, COO, BSR (block sparse row), and DIA (diagonal).
+!>
+!> All formats share a uniform API via the abst_matrix polymorphic interface.
+!> set_value is restricted to dense; all other formats use set_local_matrix.
+!>
+module core_types_algebra_matrix
+    use, intrinsic :: iso_fortran_env
+!$  use :: omp_lib
+    use :: stdlib_optval, only:optval
+    use :: core_constants
+    use :: core_allocate, only:allocate_array
+    use :: core_deallocate, only:deallocate_array
+    use :: core_findings, only:binary_find
+    use :: core_check_range, only:value_in_range
+    use :: core_types_algebra_vector, only:type_vector_dp
+#ifdef _MKL
+    use :: mkl_spblas
+#endif
+    implicit none
+    private
+
+    public :: abst_matrix
+    public :: type_matrix_dense
+    public :: type_matrix_coo
+    public :: type_matrix_csr
+    public :: type_matrix_bsr
+    public :: type_matrix_dia
+    public :: type_matrix_info
+
+    ! ==========================================================
+    ! Matrix metadata
+    ! ==========================================================
+    type :: type_matrix_info
+        sequence
+        integer(int32) :: num_nodes = 0
+        integer(int32) :: num_rows = 0
+        integer(int32) :: num_cols = 0
+        integer(int32) :: num_ptrs = 0
+        integer(int32) :: num_blocks = 0
+        integer(int32) :: num_block_rows = 0
+        integer(int32) :: num_block_cols = 0
+        integer(int32) :: nnz = 0
+    end type type_matrix_info
+
+    ! ==========================================================
+    ! Abstract base type
+    ! ==========================================================
+    !>
+    !> Polymorphic base for all matrix storage formats.
+    !> Addressing: (node_index, dof_index_within_node).
+    !>
+    type, abstract :: abst_matrix
+        private
+        integer(int32) :: num_nodes = 0
+        type(type_constant_id) :: status = MATRIX_STATUS%SUCCESS
+        logical :: is_initialized_matrix = .false.
+    contains
+        ! ---- Lifecycle ----
+        procedure(abst_initialize), public, pass(self), deferred :: initialize
+        procedure(abst_destroy), public, pass(self), deferred :: destroy
+        ! ---- Mutator ----
+        procedure(abst_set_value), private, pass(self), deferred :: set_value
+        procedure(abst_set_row), private, pass(self), deferred :: set_row
+        procedure(abst_set_local_matrix), private, pass(self), deferred :: set_local_matrix
+        generic, public :: set => set_value, set_row, set_local_matrix
+        procedure(abst_zero_all), public, pass(self), deferred :: zero_all
+        procedure(abst_zero_row), public, pass(self), deferred :: zero_row
+        generic, public :: zero => zero_all, zero_row
+        procedure(abst_scale), public, pass(self), deferred :: scale
+        procedure, public, pass(self) :: commit_to_mkl => commit_to_mkl_base
+        ! ---- Getter ----
+        procedure(abst_get_info), public, pass(self), deferred :: get_info
+        procedure(abst_get_diagonal), public, pass(self), deferred :: get_diagonal
+        procedure, public, pass(self) :: get_status
+        ! ---- Meta / Utility ----
+        procedure(abst_display), public, pass(self), deferred :: display
+        procedure, public, pass(self) :: check => check_matrix_status
+        ! ---- Inquiry ----
+        procedure, public, pass(self) :: is_initialized
+        procedure, public, pass(self) :: is_mkl_handle_ready => is_mkl_handle_ready_base
+    end type abst_matrix
+
+    abstract interface
+        subroutine abst_initialize(self, num_nodes, row, col, row_blocks, col_blocks)
+            import :: abst_matrix, int32
+            implicit none
+            class(abst_matrix), intent(inout) :: self
+            integer(int32), intent(in) :: num_nodes
+            integer(int32), intent(in), optional :: row(:)
+            integer(int32), intent(in), optional :: col(:)
+            integer(int32), intent(in), optional :: row_blocks
+            integer(int32), intent(in), optional :: col_blocks
+        end subroutine abst_initialize
+
+        subroutine abst_get_info(self, info)
+            import :: abst_matrix, type_matrix_info
+            implicit none
+            class(abst_matrix), intent(in) :: self
+            type(type_matrix_info), intent(inout) :: info
+        end subroutine abst_get_info
+
+        subroutine abst_get_diagonal(self, diagonal)
+            import :: abst_matrix, type_vector_dp
+            implicit none
+            class(abst_matrix), intent(in) :: self
+            type(type_vector_dp), intent(inout) :: diagonal
+        end subroutine abst_get_diagonal
+
+        subroutine abst_set_value(self, op, row, col, value)
+            import :: abst_matrix, type_constant_id, int32, real64
+            implicit none
+            class(abst_matrix), intent(inout) :: self
+            type(type_constant_id), intent(in) :: op
+            integer(int32), intent(in) :: row, col
+            real(real64), intent(in) :: value
+        end subroutine abst_set_value
+
+        subroutine abst_set_row(self, op, row, value, row_block)
+            import :: abst_matrix, type_constant_id, real64, int32
+            implicit none
+            class(abst_matrix), intent(inout) :: self
+            type(type_constant_id), intent(in) :: op
+            integer(int32), intent(in) :: row
+            real(real64), intent(in) :: value
+            integer(int32), intent(in), optional :: row_block
+        end subroutine abst_set_row
+
+        subroutine abst_scale(self, op, alpha)
+            import :: abst_matrix, type_constant_id, type_vector_dp
+            implicit none
+            class(abst_matrix), intent(inout) :: self
+            type(type_constant_id), intent(in) :: op
+            type(type_vector_dp), intent(in) :: alpha
+        end subroutine abst_scale
+
+        subroutine abst_zero_all(self)
+            import :: abst_matrix
+            implicit none
+            class(abst_matrix), intent(inout) :: self
+        end subroutine abst_zero_all
+
+        subroutine abst_zero_row(self, row, row_block)
+            import :: abst_matrix, int32
+            implicit none
+            class(abst_matrix), intent(inout) :: self
+            integer(int32), intent(in) :: row
+            integer(int32), intent(in), optional :: row_block
+        end subroutine abst_zero_row
+
+        !> Scatter a local element matrix into the global matrix.
+        !> indices(n_local,n_local): pre-computed flat block indices from scatter_map.
+        !> row_sys/col_sys: 1-based DOF offsets within the block.
+        subroutine abst_set_local_matrix(self, op, n_local, indices, row_sys, col_sys, local_data)
+            import :: abst_matrix, type_constant_id, int32, real64
+            implicit none
+            class(abst_matrix), intent(inout) :: self
+            type(type_constant_id), intent(in) :: op
+            integer(int32), intent(in) :: n_local
+            integer(int32), intent(in) :: indices(:, :)
+            integer(int32), intent(in) :: row_sys, col_sys
+            real(real64), dimension(:, :), intent(in) :: local_data
+        end subroutine abst_set_local_matrix
+
+        subroutine abst_display(self, unit_in)
+            import :: abst_matrix, int32
+            implicit none
+            class(abst_matrix), intent(in) :: self
+            integer(int32), intent(in), optional :: unit_in
+        end subroutine abst_display
+
+        subroutine abst_destroy(self)
+            import :: abst_matrix
+            implicit none
+            class(abst_matrix), intent(inout) :: self
+        end subroutine abst_destroy
+    end interface
+
+    ! ==========================================================
+    ! Dense matrix  val(num_rows, num_cols)
+    ! ==========================================================
+    !> Dense matrix stored as a 2-D contiguous array.
+    type, extends(abst_matrix) :: type_matrix_dense
+        integer(int32) :: num_rows = 0
+        integer(int32) :: num_cols = 0
+        real(real64), allocatable :: val(:, :)
+    contains
+        $:common_bindings('dense')
+        procedure, pass(self) :: get_val => get_val_dense
+    end type type_matrix_dense
+
+    interface
+        $:common_iface('dense')
+        !> Returns a pointer to the 2-D value array.
+        module function get_val_dense(self) result(val)
+            implicit none
+            class(type_matrix_dense), intent(in), target :: self
+            real(real64), dimension(:, :), pointer :: val
+        end function get_val_dense
+    end interface
+
+    ! ==========================================================
+    ! CSR matrix  ptr(num_rows+1), ind(nnz), val(nnz)
+    ! ==========================================================
+    !> Compressed Row Storage sparse matrix.
+    type, extends(abst_matrix) :: type_matrix_csr
+        integer(int32) :: nnz = 0
+        integer(int32) :: num_rows = 0
+        integer(int32) :: num_ptrs = 0
+        integer(int32), allocatable :: ptr(:)
+        integer(int32), allocatable :: ind(:)
+        real(real64), allocatable :: val(:)
+    contains
+        $:common_bindings('csr')
+        procedure, pass(self) :: get_ptr => get_ptr_csr
+        procedure, pass(self) :: get_ind => get_ind_csr
+        procedure, pass(self) :: get_val => get_val_csr
+    end type type_matrix_csr
+
+    interface
+        $:common_iface('csr')
+        module function get_ptr_csr(self) result(ptr)
+            implicit none
+            class(type_matrix_csr), intent(in), target :: self
+            integer(int32), dimension(:), pointer :: ptr
+        end function get_ptr_csr
+
+        module function get_ind_csr(self) result(ind)
+            implicit none
+            class(type_matrix_csr), intent(in), target :: self
+            integer(int32), dimension(:), pointer :: ind
+        end function get_ind_csr
+
+        module function get_val_csr(self) result(val)
+            implicit none
+            class(type_matrix_csr), intent(in), target :: self
+            real(real64), dimension(:), pointer :: val
+        end function get_val_csr
+    end interface
+
+    ! ==========================================================
+    ! COO matrix  row(nnz), col(nnz), val(nnz)
+    ! ==========================================================
+    !> Coordinate (COO) sparse matrix.
+    type, extends(abst_matrix) :: type_matrix_coo
+        integer(int32) :: nnz = 0
+        integer(int32) :: num_rows = 0
+        integer(int32) :: num_cols = 0
+        integer(int32), allocatable :: row(:)
+        integer(int32), allocatable :: col(:)
+        real(real64), allocatable :: val(:)
+    contains
+        $:common_bindings('coo')
+        procedure, pass(self) :: get_row => get_row_coo
+        procedure, pass(self) :: get_col => get_col_coo
+        procedure, pass(self) :: get_val => get_val_coo
+    end type type_matrix_coo
+
+    interface
+        $:common_iface('coo')
+        module function get_row_coo(self) result(row)
+            implicit none
+            class(type_matrix_coo), intent(in), target :: self
+            integer(int32), dimension(:), pointer :: row
+        end function get_row_coo
+
+        module function get_col_coo(self) result(col)
+            implicit none
+            class(type_matrix_coo), intent(in), target :: self
+            integer(int32), dimension(:), pointer :: col
+        end function get_col_coo
+
+        module function get_val_coo(self) result(val)
+            implicit none
+            class(type_matrix_coo), intent(in), target :: self
+            real(real64), dimension(:), pointer :: val
+        end function get_val_coo
+    end interface
+
+    ! ==========================================================
+    ! BSR matrix  ptr(num_rows+1), ind(num_blocks), val(rb,cb,num_blocks)
+    ! ==========================================================
+    !> Block Sparse Row matrix with optional MKL Inspector-Executor back-end.
+    type, extends(abst_matrix) :: type_matrix_bsr
+        integer(int32) :: nnz = 0
+        integer(int32) :: num_rows = 0
+        integer(int32) :: num_ptrs = 0
+        integer(int32) :: num_blocks = 0
+        integer(int32) :: num_block_rows = 0
+        integer(int32) :: num_block_cols = 0
+        integer(int32), allocatable :: ptr(:)
+        integer(int32), allocatable :: ind(:)
+        !> val(row_in_block, col_in_block, block_index)
+        real(real64), allocatable :: val(:, :, :)
+#ifdef _MKL
+        type(sparse_matrix_t) :: mkl_handle
+#endif
+        logical, private :: is_mkl_committed = .false.
+    contains
+        $:common_bindings('bsr')
+        procedure, pass(self), public :: get_diagonal_block => get_diagonal_block_bsr
+        procedure, pass(self) :: get_ptr => get_ptr_bsr
+        procedure, pass(self) :: get_ind => get_ind_bsr
+        procedure, pass(self) :: get_val => get_val_bsr
+        procedure, pass(self) :: commit_to_mkl => commit_to_mkl_bsr
+        procedure, pass(self) :: is_mkl_handle_ready => is_mkl_handle_ready_bsr
+#ifdef _MKL
+        procedure, pass(self) :: get_mkl_handle => get_mkl_handle_bsr
+#endif
+    end type type_matrix_bsr
+
+    interface
+        $:common_iface('bsr')
+        module function get_ptr_bsr(self) result(ptr)
+            implicit none
+            class(type_matrix_bsr), intent(in), target :: self
+            integer(int32), dimension(:), pointer :: ptr
+        end function get_ptr_bsr
+
+        module function get_ind_bsr(self) result(ind)
+            implicit none
+            class(type_matrix_bsr), intent(in), target :: self
+            integer(int32), dimension(:), pointer :: ind
+        end function get_ind_bsr
+
+        module function get_val_bsr(self) result(val)
+            implicit none
+            class(type_matrix_bsr), intent(in), target :: self
+            real(real64), dimension(:, :, :), pointer :: val
+        end function get_val_bsr
+
+        !> Copies the diagonal block for node target_block into diagonal_block(:,:).
+        module subroutine get_diagonal_block_bsr(self, target_block, diagonal_block)
+            implicit none
+            class(type_matrix_bsr), intent(in) :: self
+            integer(int32), intent(in) :: target_block
+            real(real64), intent(inout) :: diagonal_block(:, :)
+        end subroutine get_diagonal_block_bsr
+
+        !> Registers val/ptr/ind with MKL Sparse BLAS (Inspector phase) and runs
+        !> mkl_sparse_optimize.  Must be called after assembly and before SpMV.
+        module subroutine commit_to_mkl_bsr(self, ierr)
+            implicit none
+            class(type_matrix_bsr), intent(inout) :: self
+            integer(int32), intent(out), optional :: ierr
+        end subroutine commit_to_mkl_bsr
+
+        !> Returns .true. if the MKL handle is committed and ready for SpMV.
+        module pure function is_mkl_handle_ready_bsr(self) result(ready)
+            implicit none
+            class(type_matrix_bsr), intent(in) :: self
+            logical :: ready
+        end function is_mkl_handle_ready_bsr
+
+#ifdef _MKL
+        module function get_mkl_handle_bsr(self) result(handle)
+            implicit none
+            class(type_matrix_bsr), intent(in) :: self
+            type(sparse_matrix_t) :: handle
+        end function get_mkl_handle_bsr
+#endif
+    end interface
+
+    ! ==========================================================
+    ! DIA matrix  val(num_rows, num_diags)
+    ! ==========================================================
+    !> Diagonal (DIA) sparse matrix.  Each column of val(:,:) is one diagonal.
+    type, extends(abst_matrix) :: type_matrix_dia
+        integer(int32) :: nnz = 0
+        integer(int32) :: num_rows = 0
+        integer(int32) :: num_cols = 0
+        integer(int32) :: num_diags = 0
+        !> Diagonal offsets: 0=main, <0=lower, >0=upper.
+        integer(int32), allocatable :: offsets(:)
+        !> val(row_index, diagonal_index)
+        real(real64), allocatable :: val(:, :)
+    contains
+        $:common_bindings('dia')
+        procedure, pass(self) :: get_val => get_val_dia
+        procedure, pass(self) :: get_offsets => get_offsets_dia
+    end type type_matrix_dia
+
+    interface
+        $:common_iface('dia')
+        module function get_val_dia(self) result(val)
+            implicit none
+            class(type_matrix_dia), intent(in), target :: self
+            real(real64), dimension(:, :), pointer :: val
+        end function get_val_dia
+
+        module function get_offsets_dia(self) result(offsets)
+            implicit none
+            class(type_matrix_dia), intent(in), target :: self
+            integer(int32), dimension(:), pointer :: offsets
+        end function get_offsets_dia
+    end interface
+
+contains
+
+    subroutine commit_to_mkl_base(self, ierr)
+        implicit none
+        class(abst_matrix), intent(inout) :: self
+        integer(int32), intent(out), optional :: ierr
+
+        self%status = MATRIX_STATUS%NOT_IMPLEMENTED
+        if (present(ierr)) ierr = MATRIX_STATUS%NOT_IMPLEMENTED%ID
+    end subroutine commit_to_mkl_base
+
+    pure function is_mkl_handle_ready_base(self) result(ready)
+        implicit none
+        class(abst_matrix), intent(in) :: self
+        logical :: ready
+        ready = .false.
+    end function is_mkl_handle_ready_base
+
+    pure function get_status(self) result(status)
+        implicit none
+        class(abst_matrix), intent(in) :: self
+        type(type_constant_id) :: status
+        status = self%status
+    end function get_status
+
+    pure function is_initialized(self) result(initialized)
+        implicit none
+        class(abst_matrix), intent(in) :: self
+        logical :: initialized
+        initialized = self%is_initialized_matrix
+    end function is_initialized
+
+    subroutine check_matrix_status(self)
+        implicit none
+        class(abst_matrix), intent(in) :: self
+
+        if (self%status /= MATRIX_STATUS%SUCCESS) then
+            write (*, '(a,i0)') "Matrix error status: ", self%status%ID
+            error stop "Matrix check failed."
+        end if
+    end subroutine check_matrix_status
+
+end module core_types_algebra_matrix
