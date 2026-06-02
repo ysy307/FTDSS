@@ -92,6 +92,7 @@ module domain_domain_manager
         procedure, public, pass(self) :: get_bc_patch => get_bc_patch_domain
         procedure, public, pass(self) :: get_num_bc_patches => get_num_bc_patches_domain
         procedure, public, pass(self) :: get_config => get_config_domain
+        procedure, public, pass(self) :: export_topology => export_topology_domain
 
         ! ---- Meta / Utility ----
         ! display, to_string, etc.
@@ -554,6 +555,58 @@ contains
         call allocate_array(config%connectivity, p_conn)
 
     end subroutine get_config_domain
+
+    !> Export the minimal topology / sizing information required by the numerical
+    !> system layer (Jacobian matrix and residual vector) into a domain-independent
+    !> carrier. The element connectivity is packed into CSR layout so the carrier
+    !> holds no references back into the domain.
+    subroutine export_topology_domain(self, topology)
+        implicit none
+        class(type_domain), intent(in) :: self
+        type(type_system_topology), intent(inout) :: topology
+
+        integer(int32) :: total_dofs, num_nodes, num_dof_per_node, num_fe
+        integer(int32) :: num_dofs_of_physics(PHYSICS_TYPES%NUM_ID)
+        integer(int32), allocatable :: row(:), col(:)
+        integer(int32), allocatable :: conn_ptr(:), conn_idx(:)
+        integer(int32), pointer, contiguous :: connectivity(:)
+        integer(int32) :: i, n_local, offset
+
+        call self%get_total_dofs(total_dofs)
+        call self%get_num_nodes(num_nodes)
+        call self%get_num_dof_per_node(num_dof_per_node)
+
+        do i = 1, PHYSICS_TYPES%NUM_ID
+            call self%get_target_dof(PHYSICS_TYPES%to_object(i), num_dofs_of_physics(i))
+        end do
+
+        call self%get_node_adjacency(MATRIX_TYPES%CSR, row, col)
+        if (.not. allocated(row)) allocate (row(0))
+        if (.not. allocated(col)) allocate (col(0))
+
+        call self%get_num_fe(num_fe)
+
+        ! Pack per-element connectivity into CSR layout (conn_ptr / conn_idx).
+        allocate (conn_ptr(num_fe + 1))
+        conn_ptr(1) = 1
+        do i = 1, num_fe
+            call self%get_fe_connectivity(i, connectivity)
+            conn_ptr(i + 1) = conn_ptr(i) + size(connectivity)
+        end do
+
+        allocate (conn_idx(conn_ptr(num_fe + 1) - 1))
+        do i = 1, num_fe
+            call self%get_fe_connectivity(i, connectivity)
+            n_local = size(connectivity)
+            offset = conn_ptr(i)
+            conn_idx(offset:offset + n_local - 1) = connectivity
+        end do
+
+        call topology%initialize(num_nodes, total_dofs, num_dof_per_node, &
+                                 num_dofs_of_physics, row, col, num_fe, conn_ptr, conn_idx)
+
+        deallocate (row, col, conn_ptr, conn_idx)
+    end subroutine export_topology_domain
 
     ! --------------------------------------------------------------------------
     ! Display Procedures for Debugging

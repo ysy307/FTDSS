@@ -5,7 +5,6 @@ module numerical_system_residual_vector
     use, intrinsic :: iso_fortran_env
     use :: stdlib_optval, only:optval
     use :: module_core
-    use :: module_domain, only:type_domain
     use :: module_linalg
     implicit none
     private
@@ -40,6 +39,7 @@ module numerical_system_residual_vector
         procedure, public, pass(self) :: get_vector => get_underlying_vector
         procedure, public, pass(self) :: get_data => get_data_vector
 
+        procedure, pass(self), private :: resolve_target_vector
         procedure, pass(self), private :: set_scalar_residual_vector
         procedure, pass(self), private :: set_array_residual_vector
         procedure, pass(self), private :: set_value_at_index_residual_vector
@@ -64,10 +64,10 @@ module numerical_system_residual_vector
 
 contains
 
-    subroutine initialize_residual_vector(self, domain, coupling_mode)
+    subroutine initialize_residual_vector(self, topology, coupling_mode)
         implicit none
         class(type_residual_vector), intent(inout) :: self
-        class(type_domain), intent(in) :: domain
+        type(type_system_topology), intent(in) :: topology
         type(type_constant_id), intent(in) :: coupling_mode
 
         integer(int32) :: i, j
@@ -78,12 +78,12 @@ contains
         self%physics_to_system(:) = 0
         self%num_dofs_of_physics(:) = 0
 
-        call domain%get_total_dofs(self%size)
-        call domain%get_num_nodes(self%num_nodes)
+        call topology%get_total_dofs(self%size)
+        call topology%get_num_nodes(self%num_nodes)
 
         select case (coupling_mode%ID)
         case (COUPLING_MODES%MONOLITHIC%ID)
-            call domain%get_num_dof_per_node(self%num_dofs_per_node)
+            call topology%get_num_dof_per_node(self%num_dofs_per_node)
             self%num_system = 1
 
             allocate (self%system_size(1))
@@ -91,7 +91,7 @@ contains
 
         case (COUPLING_MODES%STAGGERED%ID)
             do i = 1, PHYSICS_TYPES%NUM_ID
-                call domain%get_target_dof(PHYSICS_TYPES%to_object(i), self%num_dofs_of_physics(i))
+                call topology%get_target_dof(PHYSICS_TYPES%to_object(i), self%num_dofs_of_physics(i))
             end do
 
             self%num_system = count(self%num_dofs_of_physics > 0)
@@ -186,23 +186,37 @@ contains
         end if
     end function get_data_vector
 
+    !> Resolve the target vector pointer and the effective block index for a
+    !> given physics id, encapsulating the coupling-mode logic in one place.
+    !> Returns a nullified pointer when the physics is out of range or inactive.
+    subroutine resolve_target_vector(self, physics_id, vec, row_block)
+        implicit none
+        class(type_residual_vector), intent(in), target :: self
+        integer(int32), intent(in) :: physics_id
+        class(type_vector_dp), pointer, intent(inout) :: vec
+        integer(int32), intent(inout) :: row_block
+
+        vec => self%get_vector(physics_id)
+
+        select case (self%coupling_mode%ID)
+        case (COUPLING_MODES%MONOLITHIC%ID)
+            row_block = physics_id
+        case (COUPLING_MODES%STAGGERED%ID)
+            row_block = 1
+        end select
+    end subroutine resolve_target_vector
+
     subroutine set_scalar_residual_vector(self, physics_id, value)
         implicit none
         class(type_residual_vector), intent(inout) :: self
         integer(int32), intent(in) :: physics_id
         real(real64), intent(in) :: value
-        integer(int32) :: sys
+        class(type_vector_dp), pointer :: vec
+        integer(int32) :: row_block
 
-        if (.not. allocated(self%data)) return
-
-        select case (self%coupling_mode%ID)
-        case (COUPLING_MODES%MONOLITHIC%ID)
-            call self%data(1)%set(VECTOR_OPS%INS, value, row_block=physics_id)
-        case (COUPLING_MODES%STAGGERED%ID)
-            if (physics_id < 1 .or. physics_id > PHYSICS_TYPES%NUM_ID) return
-            sys = self%physics_to_system(physics_id)
-            if (sys > 0) call self%data(sys)%set(VECTOR_OPS%INS, value, row_block=1)
-        end select
+        call self%resolve_target_vector(physics_id, vec, row_block)
+        if (.not. associated(vec)) return
+        call vec%set(VECTOR_OPS%INS, value, row_block=row_block)
     end subroutine set_scalar_residual_vector
 
     subroutine set_array_residual_vector(self, physics_id, values)
@@ -210,18 +224,12 @@ contains
         class(type_residual_vector), intent(inout) :: self
         integer(int32), intent(in) :: physics_id
         real(real64), intent(in) :: values(:)
-        integer(int32) :: sys
+        class(type_vector_dp), pointer :: vec
+        integer(int32) :: row_block
 
-        if (.not. allocated(self%data)) return
-
-        select case (self%coupling_mode%ID)
-        case (COUPLING_MODES%MONOLITHIC%ID)
-            call self%data(1)%set(VECTOR_OPS%INS, values, row_block=physics_id)
-        case (COUPLING_MODES%STAGGERED%ID)
-            if (physics_id < 1 .or. physics_id > PHYSICS_TYPES%NUM_ID) return
-            sys = self%physics_to_system(physics_id)
-            if (sys > 0) call self%data(sys)%set(VECTOR_OPS%INS, values, row_block=1)
-        end select
+        call self%resolve_target_vector(physics_id, vec, row_block)
+        if (.not. associated(vec)) return
+        call vec%set(VECTOR_OPS%INS, values, row_block=row_block)
     end subroutine set_array_residual_vector
 
     subroutine set_value_at_index_residual_vector(self, physics_id, global_index, value)
@@ -230,18 +238,12 @@ contains
         integer(int32), intent(in) :: physics_id
         integer(int32), intent(in) :: global_index
         real(real64), intent(in) :: value
-        integer(int32) :: sys
+        class(type_vector_dp), pointer :: vec
+        integer(int32) :: row_block
 
-        if (.not. allocated(self%data)) return
-
-        select case (self%coupling_mode%ID)
-        case (COUPLING_MODES%MONOLITHIC%ID)
-            call self%data(1)%set(VECTOR_OPS%INS, global_index, value, row_block=physics_id)
-        case (COUPLING_MODES%STAGGERED%ID)
-            if (physics_id < 1 .or. physics_id > PHYSICS_TYPES%NUM_ID) return
-            sys = self%physics_to_system(physics_id)
-            if (sys > 0) call self%data(sys)%set(VECTOR_OPS%INS, global_index, value, row_block=1)
-        end select
+        call self%resolve_target_vector(physics_id, vec, row_block)
+        if (.not. associated(vec)) return
+        call vec%set(VECTOR_OPS%INS, global_index, value, row_block=row_block)
     end subroutine set_value_at_index_residual_vector
 
     subroutine set_values_at_indices_residual_vector(self, physics_id, global_indices, values)
@@ -250,18 +252,12 @@ contains
         integer(int32), intent(in) :: physics_id
         integer(int32), intent(in) :: global_indices(:)
         real(real64), intent(in) :: values(:)
-        integer(int32) :: sys
+        class(type_vector_dp), pointer :: vec
+        integer(int32) :: row_block
 
-        if (.not. allocated(self%data)) return
-
-        select case (self%coupling_mode%ID)
-        case (COUPLING_MODES%MONOLITHIC%ID)
-            call self%data(1)%set(VECTOR_OPS%INS, global_indices, values, row_block=physics_id)
-        case (COUPLING_MODES%STAGGERED%ID)
-            if (physics_id < 1 .or. physics_id > PHYSICS_TYPES%NUM_ID) return
-            sys = self%physics_to_system(physics_id)
-            if (sys > 0) call self%data(sys)%set(VECTOR_OPS%INS, global_indices, values, row_block=1)
-        end select
+        call self%resolve_target_vector(physics_id, vec, row_block)
+        if (.not. associated(vec)) return
+        call vec%set(VECTOR_OPS%INS, global_indices, values, row_block=row_block)
     end subroutine set_values_at_indices_residual_vector
 
     subroutine add_value_residual_vector(self, physics_id, value)
@@ -269,18 +265,12 @@ contains
         class(type_residual_vector), intent(inout) :: self
         integer(int32), intent(in) :: physics_id
         real(real64), intent(in) :: value
-        integer(int32) :: sys
+        class(type_vector_dp), pointer :: vec
+        integer(int32) :: row_block
 
-        if (.not. allocated(self%data)) return
-
-        select case (self%coupling_mode%ID)
-        case (COUPLING_MODES%MONOLITHIC%ID)
-            call self%data(1)%set(VECTOR_OPS%ADD, value, row_block=physics_id)
-        case (COUPLING_MODES%STAGGERED%ID)
-            if (physics_id < 1 .or. physics_id > PHYSICS_TYPES%NUM_ID) return
-            sys = self%physics_to_system(physics_id)
-            if (sys > 0) call self%data(sys)%set(VECTOR_OPS%ADD, value, row_block=1)
-        end select
+        call self%resolve_target_vector(physics_id, vec, row_block)
+        if (.not. associated(vec)) return
+        call vec%set(VECTOR_OPS%ADD, value, row_block=row_block)
     end subroutine add_value_residual_vector
 
     subroutine add_array_residual_vector(self, physics_id, values)
@@ -288,18 +278,12 @@ contains
         class(type_residual_vector), intent(inout) :: self
         integer(int32), intent(in) :: physics_id
         real(real64), intent(in) :: values(:)
-        integer(int32) :: sys
+        class(type_vector_dp), pointer :: vec
+        integer(int32) :: row_block
 
-        if (.not. allocated(self%data)) return
-
-        select case (self%coupling_mode%ID)
-        case (COUPLING_MODES%MONOLITHIC%ID)
-            call self%data(1)%set(VECTOR_OPS%ADD, values, row_block=physics_id)
-        case (COUPLING_MODES%STAGGERED%ID)
-            if (physics_id < 1 .or. physics_id > PHYSICS_TYPES%NUM_ID) return
-            sys = self%physics_to_system(physics_id)
-            if (sys > 0) call self%data(sys)%set(VECTOR_OPS%ADD, values, row_block=1)
-        end select
+        call self%resolve_target_vector(physics_id, vec, row_block)
+        if (.not. associated(vec)) return
+        call vec%set(VECTOR_OPS%ADD, values, row_block=row_block)
     end subroutine add_array_residual_vector
 
     subroutine add_value_at_index_residual_vector(self, physics_id, global_index, value)
@@ -308,18 +292,12 @@ contains
         integer(int32), intent(in) :: physics_id
         integer(int32), intent(in) :: global_index
         real(real64), intent(in) :: value
-        integer(int32) :: sys
+        class(type_vector_dp), pointer :: vec
+        integer(int32) :: row_block
 
-        if (.not. allocated(self%data)) return
-
-        select case (self%coupling_mode%ID)
-        case (COUPLING_MODES%MONOLITHIC%ID)
-            call self%data(1)%set(VECTOR_OPS%ADD, global_index, value, row_block=physics_id)
-        case (COUPLING_MODES%STAGGERED%ID)
-            if (physics_id < 1 .or. physics_id > PHYSICS_TYPES%NUM_ID) return
-            sys = self%physics_to_system(physics_id)
-            if (sys > 0) call self%data(sys)%set(VECTOR_OPS%ADD, global_index, value, row_block=1)
-        end select
+        call self%resolve_target_vector(physics_id, vec, row_block)
+        if (.not. associated(vec)) return
+        call vec%set(VECTOR_OPS%ADD, global_index, value, row_block=row_block)
     end subroutine add_value_at_index_residual_vector
 
     subroutine add_values_at_indices_residual_vector(self, physics_id, global_indices, values)
@@ -328,18 +306,12 @@ contains
         integer(int32), intent(in) :: physics_id
         integer(int32), intent(in) :: global_indices(:)
         real(real64), intent(in) :: values(:)
-        integer(int32) :: sys
+        class(type_vector_dp), pointer :: vec
+        integer(int32) :: row_block
 
-        if (.not. allocated(self%data)) return
-
-        select case (self%coupling_mode%ID)
-        case (COUPLING_MODES%MONOLITHIC%ID)
-            call self%data(1)%set(VECTOR_OPS%ADD, global_indices, values, row_block=physics_id)
-        case (COUPLING_MODES%STAGGERED%ID)
-            if (physics_id < 1 .or. physics_id > PHYSICS_TYPES%NUM_ID) return
-            sys = self%physics_to_system(physics_id)
-            if (sys > 0) call self%data(sys)%set(VECTOR_OPS%ADD, global_indices, values, row_block=1)
-        end select
+        call self%resolve_target_vector(physics_id, vec, row_block)
+        if (.not. associated(vec)) return
+        call vec%set(VECTOR_OPS%ADD, global_indices, values, row_block=row_block)
     end subroutine add_values_at_indices_residual_vector
 
     subroutine add_values_from_vector_residual_vector(self, physics_id, global_indices, values)
@@ -349,21 +321,15 @@ contains
         integer(int32), intent(in) :: global_indices(:)
         type(type_vector_dp), intent(in) :: values
         real(real64), pointer, dimension(:) :: vals_data
-        integer(int32) :: sys
-
-        if (.not. allocated(self%data)) return
+        class(type_vector_dp), pointer :: vec
+        integer(int32) :: row_block
 
         vals_data => values%get_data()
         if (.not. associated(vals_data)) return
 
-        select case (self%coupling_mode%ID)
-        case (COUPLING_MODES%MONOLITHIC%ID)
-            call self%data(1)%set(VECTOR_OPS%ADD, global_indices, vals_data, row_block=physics_id)
-        case (COUPLING_MODES%STAGGERED%ID)
-            if (physics_id < 1 .or. physics_id > PHYSICS_TYPES%NUM_ID) return
-            sys = self%physics_to_system(physics_id)
-            if (sys > 0) call self%data(sys)%set(VECTOR_OPS%ADD, global_indices, vals_data, row_block=1)
-        end select
+        call self%resolve_target_vector(physics_id, vec, row_block)
+        if (.not. associated(vec)) return
+        call vec%set(VECTOR_OPS%ADD, global_indices, vals_data, row_block=row_block)
     end subroutine add_values_from_vector_residual_vector
 
     subroutine scale_residual_vector(self, alpha)
@@ -420,7 +386,7 @@ contains
             deallocate (self%data)
         end if
 
-        if (allocated(self%system_size)) deallocate (self%system_size)
+        call deallocate_array(self%system_size)
 
         self%size = 0
         self%num_nodes = 0

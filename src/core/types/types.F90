@@ -76,6 +76,8 @@ module core_types
         type_csr_index
     use :: core_types_topology_scatter_map, only: &
         type_scatter_map
+    use :: core_types_topology_system_topology, only: &
+        type_system_topology
 
     !-----------------------------------------------------------------
     ! Physics

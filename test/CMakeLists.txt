@@ -94,6 +94,14 @@ add_solver_test(vector
         SOLVER::LINALG
 )
 
+# test_field: domain-free system layer (Jacobian/residual via type_system_topology)
+add_solver_test(field
+    LIBS
+        SOLVER::CORE
+        SOLVER::LINALG
+        SOLVER::SYSTEM
+)
+
 # test_main requires all solver libraries
 add_solver_test(main
     LIBS

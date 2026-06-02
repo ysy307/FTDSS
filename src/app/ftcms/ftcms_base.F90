@@ -1,4 +1,5 @@
 submodule(app_ftcms) ftcms_base
+    use :: core_types_topology_system_topology, only:type_system_topology
     implicit none
 contains
 
@@ -109,10 +110,17 @@ contains
         call self%domain%get_total_dofs(num_total_dofs)
         call self%domain%get_num_nodes(num_nodes)
 
-        call self%K%initialize(self%domain, config_control_manager%coupling_mode)
-        call self%K%build_scatter_map(self%domain)
-        call self%F%initialize(self%domain, config_control_manager%coupling_mode)
-        call self%du%initialize(self%domain, config_control_manager%coupling_mode)
+        block
+            ! Domain-independent carrier injected into the system layer, so the
+            ! Jacobian / residual no longer depend on type_domain directly.
+            type(type_system_topology) :: topology
+
+            call self%domain%export_topology(topology)
+            call self%K%initialize(topology, config_control_manager%coupling_mode)
+            call self%K%build_scatter_map(topology)
+            call self%F%initialize(topology, config_control_manager%coupling_mode)
+            call self%du%initialize(topology, config_control_manager%coupling_mode)
+        end block
 
         max_bdf_order = input%basic%solver_settings%bdf_order
         call self%porosity%initialize(num_nodes, max_bdf_order)

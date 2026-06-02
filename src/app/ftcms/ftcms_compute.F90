@@ -6,6 +6,7 @@
 !> - L2 projection (lumped mass) for nodal gradient calculations
 !> - Evaluation of water and vapor fluxes based on the Darcy law
 submodule(app_ftcms) ftcms_compute
+    use :: core_types_topology_system_topology, only:type_system_topology
     use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
 contains
@@ -139,7 +140,11 @@ contains
                     type(type_constant_id), pointer :: coupling_mode_ptr
                     nullify (coupling_mode_ptr)
                     call self%control%get_coupling_mode(coupling_mode_ptr)
-                    call self%du%initialize(self%domain, coupling_mode_ptr)
+                    block
+                        type(type_system_topology) :: topology
+                        call self%domain%export_topology(topology)
+                        call self%du%initialize(topology, coupling_mode_ptr)
+                    end block
                 end block
                 if (self%control%is_staggered()) then
                     du_ptr => self%du%get_vector(sys_id)
