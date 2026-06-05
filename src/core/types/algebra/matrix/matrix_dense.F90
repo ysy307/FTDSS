@@ -116,6 +116,39 @@ contains
         end select
     end subroutine set_value_dense
 
+    !> Sets a stored entry by its flat (column-major) position in val(:,:) (no search).
+    module subroutine set_value_at_dense(self, op, idx, value)
+        implicit none
+        class(type_matrix_dense), intent(inout), target :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: idx
+        real(real64), intent(in) :: value
+
+        real(real64), pointer, contiguous :: flat(:)
+        integer(int32) :: n
+
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
+
+        n = size(self%val)
+        if (.not. value_in_range(idx, 1, n)) then
+            self%status = MATRIX_STATUS%OUT_OF_MEMORY
+            return
+        end if
+
+        flat(1:n) => self%val
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
+            flat(idx) = value
+        case (MATRIX_OPS%ADD%ID)
+            flat(idx) = flat(idx) + value
+        case default
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end select
+    end subroutine set_value_at_dense
+
     !>
     !> Sets all entries in a specified row to a single scalar value.
     !>

@@ -354,16 +354,32 @@ contains
         real(real64), dimension(:), pointer :: val
         integer(int32) :: i, j, is, ie
         real(real64) :: sum
+#ifdef _MKL
+        type(matrix_descr) :: descr
+        integer(int32) :: mkl_info
+#endif
 
         call A%get_info(info)
         if (info%num_nodes /= size(x) .or. info%num_nodes /= size(y)) then
             ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
             return
         end if
+
+#ifdef _MKL
+        if (A%is_mkl_handle_ready()) then
+            descr%type = SPARSE_MATRIX_TYPE_GENERAL
+            mkl_info = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, alpha, &
+                                       A%get_mkl_handle(), descr, x, beta, y)
+            ierr = MATRIX_STATUS%SUCCESS%ID
+            return
+        end if
+#endif
+
         ind => A%get_ind()
         ptr => A%get_ptr()
         val => A%get_val()
 
+        ! Fallback: manual CSR SpMV (non-MKL build or uncommitted handle).
         !$omp parallel do private(i, j, is, ie, sum)
         do i = 1, info%num_rows
             sum = 0.0d0
@@ -402,12 +418,27 @@ contains
         integer(int32), dimension(:), pointer :: col
         integer(int32), dimension(:), pointer :: row
         real(real64), dimension(:), pointer :: val
+#ifdef _MKL
+        type(matrix_descr) :: descr
+        integer(int32) :: mkl_info
+#endif
 
         call A%get_info(info)
         if (info%num_nodes /= size(x) .or. info%num_nodes /= size(y)) then
             ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
             return
         end if
+
+#ifdef _MKL
+        if (A%is_mkl_handle_ready()) then
+            descr%type = SPARSE_MATRIX_TYPE_GENERAL
+            mkl_info = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, alpha, &
+                                       A%get_mkl_handle(), descr, x, beta, y)
+            ierr = MATRIX_STATUS%SUCCESS%ID
+            return
+        end if
+#endif
+
         col => A%get_col()
         row => A%get_row()
         val => A%get_val()
@@ -452,6 +483,10 @@ contains
 
         type(type_matrix_info) :: info
         integer(int32) :: R, C
+#ifdef _MKL
+        type(matrix_descr) :: descr
+        integer(int32) :: mkl_info
+#endif
 
         call A%get_info(info)
         R = info%num_block_rows
@@ -464,14 +499,10 @@ contains
 
 #ifdef _MKL
         if (A%is_mkl_handle_ready()) then
-            block
-                type(matrix_descr) :: descr
-                integer(int32) :: mkl_info
-                descr%type = SPARSE_MATRIX_TYPE_GENERAL
-                mkl_info = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, alpha, &
-                                           A%get_mkl_handle(), descr, x, beta, y)
-                ierr = MATRIX_STATUS%SUCCESS%ID
-            end block
+            descr%type = SPARSE_MATRIX_TYPE_GENERAL
+            mkl_info = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, alpha, &
+                                       A%get_mkl_handle(), descr, x, beta, y)
+            ierr = MATRIX_STATUS%SUCCESS%ID
             return
         end if
 #endif
@@ -496,14 +527,15 @@ contains
         integer(int32), dimension(:), pointer :: ind, ptr
         real(real64), dimension(:, :, :), pointer :: val
         integer(int32) :: i, k, rb, cb, col, x_idx, y_idx
-        real(real64) :: sum, term, mul_limit
+        real(real64) :: sum
 
         ind => A%get_ind()
         ptr => A%get_ptr()
         val => A%get_val()
-        mul_limit = sqrt(huge(1.0d0))
 
-        !$omp parallel do private(i, k, col, rb, cb, x_idx, y_idx, sum, term)
+        ! Plain blocked SpMV: y = alpha * A x + beta * y.
+        ! Used only when no MKL handle is committed (e.g. non-MKL build).
+        !$omp parallel do private(i, k, col, rb, cb, x_idx, y_idx, sum)
         do i = 1, info%num_nodes
             do rb = 1, R
                 sum = 0.0d0
@@ -511,26 +543,11 @@ contains
                     col = ind(k)
                     do cb = 1, C
                         x_idx = (col - 1) * C + cb
-                        term = sign(min(abs(val(rb, cb, k)), mul_limit), val(rb, cb, k)) * &
-                               sign(min(abs(x(x_idx)), mul_limit), x(x_idx))
-                        if (abs(sum) > huge(1.0d0) - abs(term)) then
-                            sum = sign(0.5d0*huge(1.0d0), sum)
-                        else
-                            sum = sum + term
-                        end if
+                        sum = sum + val(rb, cb, k) * x(x_idx)
                     end do
                 end do
                 y_idx = (i - 1) * R + rb
-                term = sign(min(abs(alpha), mul_limit), alpha) * sign(min(abs(sum), mul_limit), sum)
-                if (abs(beta) > 0.0d0) then
-                    if (abs(term) > huge(1.0d0) - abs(beta*y(y_idx))) then
-                        y(y_idx) = sign(0.5d0*huge(1.0d0), term)
-                    else
-                        y(y_idx) = term + beta * y(y_idx)
-                    end if
-                else
-                    y(y_idx) = term
-                end if
+                y(y_idx) = alpha * sum + beta * y(y_idx)
             end do
         end do
         !$omp end parallel do

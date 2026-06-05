@@ -140,8 +140,8 @@ contains
         real(real64), intent(inout), optional, target :: work_vec(:) ! For M_grad_psi_j [dim]
 
         integer(int32) :: p, i, j, num_nodes, dim, num_gauss
-        integer(int32) :: ierr
-        real(real64) :: w, det_J
+        integer(int32) :: d, kk
+        real(real64) :: w, det_J, dotv, wdet
         type(type_coordinate_dp) :: r
 
         real(real64), pointer :: p_psi(:)
@@ -192,12 +192,23 @@ contains
 
             call self%calc_shape_function(r, nodes, psi=p_psi, dpsi_dx=p_dpsi_dx, determinant_jacobian=det_J)
 
+            wdet = w * abs(det_J)
             do j = 1, num_nodes
-                call matvec(M_gp(1:dim, 1:dim, p), p_dpsi_dx(1:dim, j), p_M_grad_psi_j(1:dim), ierr)
+                ! M_grad_psi_j = M_gp(:,:,p) . dpsi_dx(:,j)  (small dim=2/3: inline, not MKL)
+                do d = 1, dim
+                    p_M_grad_psi_j(d) = 0.0d0
+                    do kk = 1, dim
+                        p_M_grad_psi_j(d) = p_M_grad_psi_j(d) + M_gp(d, kk, p) * p_dpsi_dx(kk, j)
+                    end do
+                end do
 
                 do i = 1, num_nodes
-                    elem_mat(i, j) = elem_mat(i, j) + &
-                                     w * abs(det_J) * vector_dot(p_dpsi_dx(1:dim, i), p_M_grad_psi_j(1:dim))
+                    ! elem_mat(i,j) += wdet * (dpsi_dx(:,i) . M_grad_psi_j)  (inline dot)
+                    dotv = 0.0d0
+                    do d = 1, dim
+                        dotv = dotv + p_dpsi_dx(d, i) * p_M_grad_psi_j(d)
+                    end do
+                    elem_mat(i, j) = elem_mat(i, j) + wdet * dotv
                 end do
             end do
         end do
@@ -227,7 +238,7 @@ contains
         real(real64), intent(inout), optional, target :: work_psi(:)
         real(real64), intent(inout), optional, target :: work_dpsi_dx(:, :)
 
-        integer(int32) :: p, i, j, num_nodes, dim, num_gauss
+        integer(int32) :: p, i, j, num_nodes, dim, num_gauss, d
         real(real64) :: w, det_J, M_val, grad_dot
         type(type_coordinate_dp) :: r
 
@@ -267,7 +278,10 @@ contains
 
             do j = 1, num_nodes
                 do i = 1, num_nodes
-                    grad_dot = vector_dot(p_dpsi_dx(1:dim, i), p_dpsi_dx(1:dim, j))
+                    grad_dot = 0.0d0
+                    do d = 1, dim
+                        grad_dot = grad_dot + p_dpsi_dx(d, i) * p_dpsi_dx(d, j)
+                    end do
 
                     elem_mat(i, j) = elem_mat(i, j) + &
                                      w * abs(det_J) * M_val * grad_dot
@@ -297,7 +311,7 @@ contains
         real(real64), intent(inout), optional, target :: work_psi(:)
         real(real64), intent(inout), optional, target :: work_dpsi_dx(:, :)
 
-        integer(int32) :: p, i, j, num_nodes, dim, num_gauss
+        integer(int32) :: p, i, j, num_nodes, dim, num_gauss, d
         real(real64) :: w, det_J, grad_psi_j_dot_V
         type(type_coordinate_dp) :: r
 
@@ -337,7 +351,10 @@ contains
 
             do i = 1, num_nodes
                 do j = 1, num_nodes
-                    grad_psi_j_dot_V = vector_dot(p_dpsi_dx(1:dim, j), V_gp(1:dim, p))
+                    grad_psi_j_dot_V = 0.0d0
+                    do d = 1, dim
+                        grad_psi_j_dot_V = grad_psi_j_dot_V + p_dpsi_dx(d, j) * V_gp(d, p)
+                    end do
                     elem_mat(i, j) = elem_mat(i, j) + w * abs(det_J) * p_psi(i) * grad_psi_j_dot_V
                 end do
             end do
@@ -479,7 +496,7 @@ contains
         real(real64), intent(inout) :: elem_vec(:)
         real(real64), intent(inout), optional, target :: work_dpsi_dx(:, :)
 
-        integer(int32) :: p, i, num_nodes, dim, num_gauss
+        integer(int32) :: p, i, num_nodes, dim, num_gauss, d
         real(real64) :: w, det_J, grad_psi_i_dot_F
         type(type_coordinate_dp) :: r
 
@@ -507,7 +524,10 @@ contains
             call self%calc_shape_function(r, nodes, dpsi_dx=p_dpsi_dx, determinant_jacobian=det_J)
 
             do i = 1, num_nodes
-                grad_psi_i_dot_F = vector_dot(p_dpsi_dx(1:dim, i), F_gp(1:dim, p))
+                grad_psi_i_dot_F = 0.0d0
+                do d = 1, dim
+                    grad_psi_i_dot_F = grad_psi_i_dot_F + p_dpsi_dx(d, i) * F_gp(d, p)
+                end do
 
                 elem_vec(i) = elem_vec(i) + w * abs(det_J) * grad_psi_i_dot_F
             end do

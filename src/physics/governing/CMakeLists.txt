@@ -59,10 +59,6 @@ target_sources(SOLVER_GOVERNING PRIVATE
     atmosphere/assimilation_controller.F90
     atmosphere/atmosphere.F90
     # ====================================================
-    # 7. Monolithic (Coupled P-T Newton-Raphson)
-    # ====================================================
-    monolithic/monolithic_element.F90
-    # ====================================================
     # \
     # ====================================================
     governing.F90

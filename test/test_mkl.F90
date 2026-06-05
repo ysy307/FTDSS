@@ -42,9 +42,61 @@ contains
             new_unittest("bsr_set_local_matrix", test_set_local_matrix), &
             new_unittest("bsr_commit_to_mkl", test_commit_to_mkl), &
             new_unittest("bsr_spmv_mkl", test_spmv_mkl), &
-            new_unittest("bsr_spmv_reference", test_spmv_reference) &
+            new_unittest("bsr_spmv_reference", test_spmv_reference), &
+            new_unittest("csr_spmv_mkl", test_csr_spmv_mkl), &
+            new_unittest("csr_spmv_reference", test_csr_spmv_reference), &
+            new_unittest("coo_spmv_mkl", test_coo_spmv_mkl), &
+            new_unittest("coo_spmv_reference", test_coo_spmv_reference) &
             ]
     end subroutine collect_tests
+
+    ! ----------------------------------------------------------------
+    ! Helper: build the same 4x4 matrix A as a 4-node scalar CSR.
+    !   A = [ 1  0 -1  0; 0  1  0 -1; -1  0  1  0; 0 -1  0  1 ]
+    !   ptr=[1,3,5,7,9], ind=[1,3, 2,4, 1,3, 2,4]
+    !   val=[1,-1, 1,-1, -1,1, -1,1]  (flat order matches ind)
+    ! Values are set search-free via set_value_at (flat position).
+    ! ----------------------------------------------------------------
+    subroutine build_test_matrix_csr(mat)
+        implicit none
+        type(type_matrix_csr), intent(inout) :: mat
+
+        integer(int32) :: ptr(5), ind(8)
+        real(real64) :: vals(8)
+        integer(int32) :: k
+
+        ptr = [1, 3, 5, 7, 9]
+        ind = [1, 3, 2, 4, 1, 3, 2, 4]
+        vals = [1.0d0, -1.0d0, 1.0d0, -1.0d0, -1.0d0, 1.0d0, -1.0d0, 1.0d0]
+
+        call mat%initialize(4, ptr, ind)
+        do k = 1, 8
+            call mat%set_value_at(MATRIX_OPS%INS, k, vals(k))
+        end do
+    end subroutine build_test_matrix_csr
+
+    ! ----------------------------------------------------------------
+    ! Helper: build the same 4x4 matrix A as a 4-node scalar COO.
+    !   row=[1,1,2,2,3,3,4,4], col=[1,3,2,4,1,3,2,4]
+    !   val=[1,-1, 1,-1, -1,1, -1,1]  (flat order matches row/col)
+    ! ----------------------------------------------------------------
+    subroutine build_test_matrix_coo(mat)
+        implicit none
+        type(type_matrix_coo), intent(inout) :: mat
+
+        integer(int32) :: ridx(8), cidx(8)
+        real(real64) :: vals(8)
+        integer(int32) :: k
+
+        ridx = [1, 1, 2, 2, 3, 3, 4, 4]
+        cidx = [1, 3, 2, 4, 1, 3, 2, 4]
+        vals = [1.0d0, -1.0d0, 1.0d0, -1.0d0, -1.0d0, 1.0d0, -1.0d0, 1.0d0]
+
+        call mat%initialize(4, ridx, cidx)
+        do k = 1, 8
+            call mat%set_value_at(MATRIX_OPS%INS, k, vals(k))
+        end do
+    end subroutine build_test_matrix_coo
 
     ! ----------------------------------------------------------------
     ! Helper: build 2-node, 2-DOF/node BSR matrix with known values
@@ -213,5 +265,163 @@ contains
         call yv%destroy()
         call mat%destroy()
     end subroutine test_spmv_reference
+
+    ! ----------------------------------------------------------------
+    ! Test 5: CSR SpMV via MKL Inspector-Executor (committed handle)
+    ! ----------------------------------------------------------------
+    subroutine test_csr_spmv_mkl(error)
+        implicit none
+        type(error_type), allocatable, intent(out) :: error
+
+        type(type_matrix_csr) :: mat
+        type(type_vector_dp)  :: xv, yv
+        real(real64), parameter :: tol = 1.0d-10
+        real(real64) :: y_ref(4)
+        real(real64), dimension(:), pointer :: y_data
+        integer(int32) :: ierr, i
+
+        y_ref = [-2.0d0, -2.0d0, 2.0d0, 2.0d0]
+
+        call build_test_matrix_csr(mat)
+        ierr = MATRIX_STATUS%SUCCESS%ID
+        call mat%commit_to_mkl(ierr)
+        call check(error, ierr == MATRIX_STATUS%SUCCESS%ID); if (allocated(error)) return
+        call check(error, mat%is_mkl_handle_ready()); if (allocated(error)) return
+
+        call xv%initialize(4)
+        call yv%initialize(4)
+        call xv%set(VECTOR_OPS%INS, [1.0d0, 2.0d0, 3.0d0, 4.0d0])
+        call yv%set(VECTOR_OPS%INS, 0.0d0)
+
+        call matvec(mat, xv, yv, ierr)
+        call check(error, ierr == MATRIX_STATUS%SUCCESS%ID); if (allocated(error)) return
+
+        y_data => yv%get_data()
+        do i = 1, 4
+            call check(error, abs(y_data(i) - y_ref(i)) < tol)
+            if (allocated(error)) return
+        end do
+
+        call xv%destroy()
+        call yv%destroy()
+        call mat%destroy()
+    end subroutine test_csr_spmv_mkl
+
+    ! ----------------------------------------------------------------
+    ! Test 6: CSR SpMV fallback (no committed handle)
+    ! ----------------------------------------------------------------
+    subroutine test_csr_spmv_reference(error)
+        implicit none
+        type(error_type), allocatable, intent(out) :: error
+
+        type(type_matrix_csr) :: mat
+        type(type_vector_dp)  :: xv, yv
+        real(real64), parameter :: tol = 1.0d-10
+        real(real64) :: y_ref(4)
+        real(real64), dimension(:), pointer :: y_data
+        integer(int32) :: ierr, i
+
+        y_ref = [-2.0d0, -2.0d0, 2.0d0, 2.0d0]
+
+        call build_test_matrix_csr(mat)
+        ! Do NOT commit_to_mkl — exercise the manual CSR SpMV fallback.
+
+        call xv%initialize(4)
+        call yv%initialize(4)
+        call xv%set(VECTOR_OPS%INS, [1.0d0, 2.0d0, 3.0d0, 4.0d0])
+        call yv%set(VECTOR_OPS%INS, 0.0d0)
+
+        call matvec(mat, xv, yv, ierr)
+        call check(error, ierr == MATRIX_STATUS%SUCCESS%ID); if (allocated(error)) return
+
+        y_data => yv%get_data()
+        do i = 1, 4
+            call check(error, abs(y_data(i) - y_ref(i)) < tol)
+            if (allocated(error)) return
+        end do
+
+        call xv%destroy()
+        call yv%destroy()
+        call mat%destroy()
+    end subroutine test_csr_spmv_reference
+
+    ! ----------------------------------------------------------------
+    ! Test 7: COO SpMV via MKL Inspector-Executor (committed handle)
+    ! ----------------------------------------------------------------
+    subroutine test_coo_spmv_mkl(error)
+        implicit none
+        type(error_type), allocatable, intent(out) :: error
+
+        type(type_matrix_coo) :: mat
+        type(type_vector_dp)  :: xv, yv
+        real(real64), parameter :: tol = 1.0d-10
+        real(real64) :: y_ref(4)
+        real(real64), dimension(:), pointer :: y_data
+        integer(int32) :: ierr, i
+
+        y_ref = [-2.0d0, -2.0d0, 2.0d0, 2.0d0]
+
+        call build_test_matrix_coo(mat)
+        ierr = MATRIX_STATUS%SUCCESS%ID
+        call mat%commit_to_mkl(ierr)
+        call check(error, ierr == MATRIX_STATUS%SUCCESS%ID); if (allocated(error)) return
+        call check(error, mat%is_mkl_handle_ready()); if (allocated(error)) return
+
+        call xv%initialize(4)
+        call yv%initialize(4)
+        call xv%set(VECTOR_OPS%INS, [1.0d0, 2.0d0, 3.0d0, 4.0d0])
+        call yv%set(VECTOR_OPS%INS, 0.0d0)
+
+        call matvec(mat, xv, yv, ierr)
+        call check(error, ierr == MATRIX_STATUS%SUCCESS%ID); if (allocated(error)) return
+
+        y_data => yv%get_data()
+        do i = 1, 4
+            call check(error, abs(y_data(i) - y_ref(i)) < tol)
+            if (allocated(error)) return
+        end do
+
+        call xv%destroy()
+        call yv%destroy()
+        call mat%destroy()
+    end subroutine test_coo_spmv_mkl
+
+    ! ----------------------------------------------------------------
+    ! Test 8: COO SpMV fallback (no committed handle)
+    ! ----------------------------------------------------------------
+    subroutine test_coo_spmv_reference(error)
+        implicit none
+        type(error_type), allocatable, intent(out) :: error
+
+        type(type_matrix_coo) :: mat
+        type(type_vector_dp)  :: xv, yv
+        real(real64), parameter :: tol = 1.0d-10
+        real(real64) :: y_ref(4)
+        real(real64), dimension(:), pointer :: y_data
+        integer(int32) :: ierr, i
+
+        y_ref = [-2.0d0, -2.0d0, 2.0d0, 2.0d0]
+
+        call build_test_matrix_coo(mat)
+        ! Do NOT commit_to_mkl — exercise the manual COO SpMV fallback.
+
+        call xv%initialize(4)
+        call yv%initialize(4)
+        call xv%set(VECTOR_OPS%INS, [1.0d0, 2.0d0, 3.0d0, 4.0d0])
+        call yv%set(VECTOR_OPS%INS, 0.0d0)
+
+        call matvec(mat, xv, yv, ierr)
+        call check(error, ierr == MATRIX_STATUS%SUCCESS%ID); if (allocated(error)) return
+
+        y_data => yv%get_data()
+        do i = 1, 4
+            call check(error, abs(y_data(i) - y_ref(i)) < tol)
+            if (allocated(error)) return
+        end do
+
+        call xv%destroy()
+        call yv%destroy()
+        call mat%destroy()
+    end subroutine test_coo_spmv_reference
 
 end program test_mkl_bsr

@@ -274,13 +274,19 @@ contains
         ! Populate initial phase variables from initial T/P/porosity before first output.
         call self%update_variables()
         ! Sync previous-step values with IC so the BDF transient term is zero at t=0.
+        ! Only active-physics state variables are initialized (see guarded init above);
+        ! inactive ones are not retained, matching the is_active_* gating used throughout.
         nullify (phase_values)
-        call self%temperature%get_current(phase_values)
-        if (associated(phase_values)) call self%temperature%set_previous(phase_values)
-        nullify (phase_values)
-        call self%pressure%get_current(phase_values)
-        if (associated(phase_values)) call self%pressure%set_previous(phase_values)
-        nullify (phase_values)
+        if (self%is_active_thermal()) then
+            call self%temperature%get_current(phase_values)
+            if (associated(phase_values)) call self%temperature%set_previous(phase_values)
+            nullify (phase_values)
+        end if
+        if (self%is_active_hydraulic()) then
+            call self%pressure%get_current(phase_values)
+            if (associated(phase_values)) call self%pressure%set_previous(phase_values)
+            nullify (phase_values)
+        end if
         call self%Qw%get_current(phase_values)
         if (associated(phase_values)) call self%Qw%set_previous(phase_values)
         nullify (phase_values)
@@ -1142,7 +1148,13 @@ contains
                            (T_old_i < T_F .and. T_new_i > T_F))) cycle
                 processed(node_id) = .true.
 
-                call self%pressure%get_current(node_id, P_i)
+                ! Pressure is only retained when hydraulic is active; use the
+                ! reference pressure otherwise (same convention as set_state_ftcms).
+                if (self%is_active_hydraulic()) then
+                    call self%pressure%get_current(node_id, P_i)
+                else
+                    P_i = 0.0d0
+                end if
                 call self%porosity%get_current(node_id, phi_i)
 
                 ! Unfrozen heat capacity C_unf via finite difference just above T_f

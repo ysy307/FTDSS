@@ -1,5 +1,4 @@
 submodule(physics_governing_hydraulic) hydraulic_matrix
-    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
 contains
 
@@ -31,24 +30,25 @@ contains
         real(real64) :: bdf0, dt_local
         real(real64), parameter :: C_min = 1.0d-12
         real(real64), parameter :: K_min = 1.0d-12
-        real(real64), allocatable :: local_vec_res(:)
 
-        real(real64), allocatable :: work_C_HT(:)
-        real(real64), allocatable :: work_D_HT(:, :, :)
-        real(real64), allocatable :: work_matrix_coupling(:, :)
-        real(real64), allocatable :: C_HT_nodes(:)
-        real(real64), allocatable :: D_HT_scalar_nodes(:)
-        real(real64), allocatable :: D_HT_tmp(:, :)
+        ! Automatic (stack) arrays — bounds from the dummy workspace at entry,
+        ! so no per-element heap allocate/deallocate in the assembly hot path.
+        real(real64) :: local_vec_res(workspace%num_fe_nodes)
+        real(real64) :: work_sink(workspace%num_fe_gauss)
+        real(real64) :: work_C_HT(workspace%num_fe_gauss)
+        real(real64) :: work_D_HT(workspace%num_fe_dimension, workspace%num_fe_dimension, workspace%num_fe_gauss)
+        real(real64) :: work_matrix_coupling(workspace%num_fe_nodes, workspace%num_fe_nodes)
+        real(real64) :: C_HT_nodes(workspace%num_fe_nodes)
+        real(real64) :: D_HT_scalar_nodes(workspace%num_fe_nodes)
+        real(real64) :: D_HT_tmp(workspace%num_fe_dimension, workspace%num_fe_dimension)
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp_coords
         real(real64) :: C_HT_gp, D_HT_gp_scalar
-
-        real(real64), allocatable :: work_sink(:)
+        real(real64) :: temp_node_val
+        logical :: has_unfrozen
 
         n_nodes = workspace%num_fe_nodes
         n_gauss = workspace%num_fe_gauss
         n_dim = workspace%num_fe_dimension
-        allocate (local_vec_res(n_nodes))
-        allocate (work_sink(n_gauss))
 
         bdf0 = workspace%bdf_coeffs(1)
         dt_local = 0.0d0
@@ -64,12 +64,6 @@ contains
         ! Coupling workspace
         nullify (gp_coords)
         if (present(K_HT)) then
-            allocate (work_C_HT(n_gauss))
-            allocate (work_D_HT(n_dim, n_dim, n_gauss))
-            allocate (work_matrix_coupling(n_nodes, n_nodes))
-            allocate (C_HT_nodes(n_nodes))
-            allocate (D_HT_scalar_nodes(n_nodes))
-            allocate (D_HT_tmp(n_dim, n_dim))
             work_C_HT(:) = 0.0d0
             work_D_HT(:, :, :) = 0.0d0
             work_matrix_coupling(:, :) = 0.0d0
@@ -80,23 +74,18 @@ contains
                 call self%compute_coupling_diffusion_term(workspace%material_id, workspace%state(i), D_HT_tmp)
                 D_HT_scalar_nodes(i) = D_HT_tmp(1, 1)
             end do
-            deallocate (D_HT_tmp)
             ! D_HT lerp is physically valid only at ice-water transition elements.
             ! In fully-frozen elements (all nodes T < 0), K_flh -> 0 prevents Darcy
             ! transport, so D_HT flux inside the frozen zone causes pressure blowup.
-            block
-                real(real64) :: temp_node_val
-                logical :: has_unfrozen
-                has_unfrozen = .false.
-                do i = 1, n_nodes
-                    call workspace%state(i)%temperature%get(temp_node_val)
-                    if (temp_node_val >= 0.0d0) then
-                        has_unfrozen = .true.
-                        exit
-                    end if
-                end do
-                if (.not. has_unfrozen) D_HT_scalar_nodes(:) = 0.0d0
-            end block
+            has_unfrozen = .false.
+            do i = 1, n_nodes
+                call workspace%state(i)%temperature%get(temp_node_val)
+                if (temp_node_val >= 0.0d0) then
+                    has_unfrozen = .true.
+                    exit
+                end if
+            end do
+            if (.not. has_unfrozen) D_HT_scalar_nodes(:) = 0.0d0
         end if
 
         ! 1. Gauss Loop
@@ -197,13 +186,6 @@ contains
             end do
         end if
 
-        if (allocated(local_vec_res)) deallocate (local_vec_res)
-        if (allocated(work_sink)) deallocate (work_sink)
-        if (allocated(work_C_HT)) deallocate (work_C_HT)
-        if (allocated(work_D_HT)) deallocate (work_D_HT)
-        if (allocated(work_matrix_coupling)) deallocate (work_matrix_coupling)
-        if (allocated(D_HT_scalar_nodes)) deallocate (D_HT_scalar_nodes)
-        if (allocated(C_HT_nodes)) deallocate (C_HT_nodes)
         if (associated(gp_coords)) nullify (gp_coords)
 
     end subroutine assemble_local_picard_hydraulic
@@ -226,8 +208,14 @@ contains
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gauss_pts
         real(real64), pointer, contiguous, dimension(:) :: weights
 
-        real(real64), allocatable :: D_HH(:, :), D_HT(:, :), V_H(:)
-        real(real64), allocatable :: grad_P(:), grad_T(:), flux(:)
+        ! Automatic (stack) arrays — bounds from the dummy workspace at entry.
+        real(real64) :: D_HH(workspace%num_fe_dimension, workspace%num_fe_dimension)
+        real(real64) :: D_HT(workspace%num_fe_dimension, workspace%num_fe_dimension)
+        real(real64) :: V_H(workspace%num_fe_dimension)
+        real(real64) :: grad_P(workspace%num_fe_dimension)
+        real(real64) :: grad_T(workspace%num_fe_dimension)
+        real(real64) :: flux(workspace%num_fe_dimension)
+        real(real64) :: S_seg
 
         nullify (gauss_pts)
         nullify (weights)
@@ -239,9 +227,6 @@ contains
 
         J_elem = 0.0d0
         R_elem = 0.0d0
-
-        allocate (D_HH(n_dim, n_dim), D_HT(n_dim, n_dim), V_H(n_dim))
-        allocate (grad_P(n_dim), grad_T(n_dim), flux(n_dim))
 
         call workspace%fe%get_gauss(gauss_pts)
         call workspace%fe%get_weight(weights)
@@ -268,12 +253,12 @@ contains
             call self%compute_advective_term(material_id, workspace%state_gp(gp), V_H)
             call self%compute_transient_term_mixed(material_id, workspace%state_gp(gp), bdf_coeffs, dTheta_dt)
 
-            if (.not. ieee_is_finite(Ceq) .or. abs(Ceq) > 1.0d120) then
+            if (abs(Ceq) > 1.0d120) then
                 write (*, '(A,I0,A,I0,A,ES13.5)') 'Error: Hydraulic C_eq exploded. mat=', &
                     material_id, ', gp=', gp, ', Ceq=', Ceq
                 error stop 'assemble_element_hydraulic: C_eq overflow.'
             end if
-            if (.not. ieee_is_finite(dTheta_dt) .or. abs(dTheta_dt) > 1.0d120) then
+            if (abs(dTheta_dt) > 1.0d120) then
                 write (*, '(A,I0,A,I0,A,ES13.5)') 'Error: Hydraulic dTheta/dt exploded. mat=', &
                     material_id, ', gp=', gp, ', dTdt=', dTheta_dt
                 error stop 'assemble_element_hydraulic: dTheta_dt overflow.'
@@ -300,21 +285,17 @@ contains
                 end do
             end do
 
-            block
-                real(real64) :: S_seg
-                S_seg = 0.0d0
-                call self%calc_segregation_sink(material_id, workspace%state_gp(gp), dt, S_seg)
-                if (abs(S_seg) > 0.0d0) then
-                    do i = 1, n_nodes
-                        R_elem(i) = R_elem(i) + wJ * workspace%work_psi(i) * S_seg
-                    end do
-                end if
-            end block
+            S_seg = 0.0d0
+            call self%calc_segregation_sink(material_id, workspace%state_gp(gp), dt, S_seg)
+            if (abs(S_seg) > 0.0d0) then
+                do i = 1, n_nodes
+                    R_elem(i) = R_elem(i) + wJ * workspace%work_psi(i) * S_seg
+                end do
+            end if
         end do
 
         nullify (gauss_pts)
         nullify (weights)
-        deallocate (D_HH, D_HT, V_H, grad_P, grad_T, flux)
 
     end subroutine assemble_element_hydraulic
 

@@ -7,6 +7,7 @@
     procedure, pass(self) :: get_info => get_info_${T}$
     procedure, pass(self) :: get_diagonal => get_diagonal_${T}$
     procedure, pass(self) :: set_value => set_value_${T}$
+    procedure, pass(self) :: set_value_at => set_value_at_${T}$
     procedure, pass(self) :: set_row => set_row_${T}$
     procedure, pass(self) :: scale => scale_${T}$
     procedure, pass(self) :: zero_all => zero_all_${T}$
@@ -52,6 +53,15 @@
         integer(int32), intent(in) :: row, col
         real(real64), intent(in) :: value
     end subroutine set_value_${T}$
+    !> Sets a single stored entry addressed by its pre-computed flat position
+    !> in the contiguous value storage (no row/col search). op=INS overwrites; op=ADD accumulates.
+    module subroutine set_value_at_${T}$ (self, op, idx, value)
+        implicit none
+        class(type_matrix_${T}$), intent(inout), target :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: idx
+        real(real64), intent(in) :: value
+    end subroutine set_value_at_${T}$
     !> Sets all non-zero entries in a block-row to a scalar.
     module subroutine set_row_${T}$ (self, op, row, value, row_block)
         implicit none
@@ -104,7 +114,8 @@
 !> dense, CSR, COO, BSR (block sparse row), and DIA (diagonal).
 !>
 !> All formats share a uniform API via the abst_matrix polymorphic interface.
-!> set_value is restricted to dense; all other formats use set_local_matrix.
+!> set_value (row,col) is restricted to dense; sparse formats use set_local_matrix or
+!> the search-free set_value_at(idx) addressing the flat value storage by position.
 !>
 module core_types_algebra_matrix
     use, intrinsic :: iso_fortran_env
@@ -163,6 +174,7 @@ module core_types_algebra_matrix
         procedure(abst_destroy), public, pass(self), deferred :: destroy
         ! ---- Mutator ----
         procedure(abst_set_value), private, pass(self), deferred :: set_value
+        procedure(abst_set_value_at), public, pass(self), deferred :: set_value_at
         procedure(abst_set_row), private, pass(self), deferred :: set_row
         procedure(abst_set_local_matrix), private, pass(self), deferred :: set_local_matrix
         generic, public :: set => set_value, set_row, set_local_matrix
@@ -217,6 +229,15 @@ module core_types_algebra_matrix
             integer(int32), intent(in) :: row, col
             real(real64), intent(in) :: value
         end subroutine abst_set_value
+
+        subroutine abst_set_value_at(self, op, idx, value)
+            import :: abst_matrix, type_constant_id, int32, real64
+            implicit none
+            class(abst_matrix), intent(inout), target :: self
+            type(type_constant_id), intent(in) :: op
+            integer(int32), intent(in) :: idx
+            real(real64), intent(in) :: value
+        end subroutine abst_set_value_at
 
         subroutine abst_set_row(self, op, row, value, row_block)
             import :: abst_matrix, type_constant_id, real64, int32
@@ -312,11 +333,20 @@ module core_types_algebra_matrix
         integer(int32), allocatable :: ptr(:)
         integer(int32), allocatable :: ind(:)
         real(real64), allocatable :: val(:)
+#ifdef _MKL
+        type(sparse_matrix_t) :: mkl_handle
+#endif
+        logical, private :: is_mkl_committed = .false.
     contains
         $:common_bindings('csr')
         procedure, pass(self) :: get_ptr => get_ptr_csr
         procedure, pass(self) :: get_ind => get_ind_csr
         procedure, pass(self) :: get_val => get_val_csr
+        procedure, pass(self) :: commit_to_mkl => commit_to_mkl_csr
+        procedure, pass(self) :: is_mkl_handle_ready => is_mkl_handle_ready_csr
+#ifdef _MKL
+        procedure, pass(self) :: get_mkl_handle => get_mkl_handle_csr
+#endif
     end type type_matrix_csr
 
     interface
@@ -338,6 +368,29 @@ module core_types_algebra_matrix
             class(type_matrix_csr), intent(in), target :: self
             real(real64), dimension(:), pointer :: val
         end function get_val_csr
+
+        !> Registers ptr/ind/val with MKL Sparse BLAS (Inspector phase) and runs
+        !> mkl_sparse_optimize.  Must be called after assembly and before SpMV.
+        module subroutine commit_to_mkl_csr(self, ierr)
+            implicit none
+            class(type_matrix_csr), intent(inout) :: self
+            integer(int32), intent(out), optional :: ierr
+        end subroutine commit_to_mkl_csr
+
+        !> Returns .true. if the MKL handle is committed and ready for SpMV.
+        module pure function is_mkl_handle_ready_csr(self) result(ready)
+            implicit none
+            class(type_matrix_csr), intent(in) :: self
+            logical :: ready
+        end function is_mkl_handle_ready_csr
+
+#ifdef _MKL
+        module function get_mkl_handle_csr(self) result(handle)
+            implicit none
+            class(type_matrix_csr), intent(in) :: self
+            type(sparse_matrix_t) :: handle
+        end function get_mkl_handle_csr
+#endif
     end interface
 
     ! ==========================================================
@@ -351,11 +404,20 @@ module core_types_algebra_matrix
         integer(int32), allocatable :: row(:)
         integer(int32), allocatable :: col(:)
         real(real64), allocatable :: val(:)
+#ifdef _MKL
+        type(sparse_matrix_t) :: mkl_handle
+#endif
+        logical, private :: is_mkl_committed = .false.
     contains
         $:common_bindings('coo')
         procedure, pass(self) :: get_row => get_row_coo
         procedure, pass(self) :: get_col => get_col_coo
         procedure, pass(self) :: get_val => get_val_coo
+        procedure, pass(self) :: commit_to_mkl => commit_to_mkl_coo
+        procedure, pass(self) :: is_mkl_handle_ready => is_mkl_handle_ready_coo
+#ifdef _MKL
+        procedure, pass(self) :: get_mkl_handle => get_mkl_handle_coo
+#endif
     end type type_matrix_coo
 
     interface
@@ -377,6 +439,28 @@ module core_types_algebra_matrix
             class(type_matrix_coo), intent(in), target :: self
             real(real64), dimension(:), pointer :: val
         end function get_val_coo
+
+        !> Registers row/col/val with MKL Sparse BLAS and optimizes for SpMV.
+        module subroutine commit_to_mkl_coo(self, ierr)
+            implicit none
+            class(type_matrix_coo), intent(inout) :: self
+            integer(int32), intent(out), optional :: ierr
+        end subroutine commit_to_mkl_coo
+
+        !> Returns .true. if the MKL handle is committed and ready for SpMV.
+        module pure function is_mkl_handle_ready_coo(self) result(ready)
+            implicit none
+            class(type_matrix_coo), intent(in) :: self
+            logical :: ready
+        end function is_mkl_handle_ready_coo
+
+#ifdef _MKL
+        module function get_mkl_handle_coo(self) result(handle)
+            implicit none
+            class(type_matrix_coo), intent(in) :: self
+            type(sparse_matrix_t) :: handle
+        end function get_mkl_handle_coo
+#endif
     end interface
 
     ! ==========================================================

@@ -80,7 +80,9 @@ contains
             #:endif
 
             integer(int32) :: ierr
+            integer(int32) :: n_flat
             logical :: mkl_ready
+            real(real64), pointer :: dp(:)
 
             #:if TYPE == 'bsr'
                 real(real64), pointer :: vp(:, :, :)
@@ -217,15 +219,12 @@ contains
                 call diag_vec%initialize(N)
             #:endif
             call mat%get_diagonal(diag_vec)
-            block
-                real(real64), pointer :: dp(:)
-                dp => diag_vec%get_data()
-                #:if TYPE == 'dense' or TYPE == 'dia'
-                    call check(error, abs(dp(1) - 1.0_real64) < ${TOL}$); if (allocated(error)) return
-                #:else
-                    call check(error, abs(dp(1) - 3.0_real64) < ${TOL}$); if (allocated(error)) return
-                #:endif
-            end block
+            dp => diag_vec%get_data()
+            #:if TYPE == 'dense' or TYPE == 'dia'
+                call check(error, abs(dp(1) - 1.0_real64) < ${TOL}$); if (allocated(error)) return
+            #:else
+                call check(error, abs(dp(1) - 3.0_real64) < ${TOL}$); if (allocated(error)) return
+            #:endif
 
             ! ---- scale JACOBI by 1.0 vector → values unchanged ----
             #:if TYPE == 'bsr'
@@ -287,6 +286,38 @@ contains
                 call check(error, abs(vp(1)) < ${TOL}$); if (allocated(error)) return
                 call check(error, abs(vp(size(vp))) < ${TOL}$); if (allocated(error)) return
             #:endif
+
+            ! ---- set_value_at: search-free flat-index addressing ----
+            !  Matrix is all-zero here (after zero_all).
+            !  idx=1     : INS 5.0 then ADD 2.0 -> first flat element = 7.0
+            !  idx=n_flat: INS 4.0             -> last  flat element = 4.0
+            ! ----
+            vp => mat%get_val()
+            n_flat = size(vp)
+            call mat%set_value_at(MATRIX_OPS%INS, 1, 5.0_real64)
+            call mat%set_value_at(MATRIX_OPS%ADD, 1, 2.0_real64)
+            call mat%set_value_at(MATRIX_OPS%INS, n_flat, 4.0_real64)
+            cur_status = mat%get_status()
+            call check(error, cur_status == MATRIX_STATUS%SUCCESS); if (allocated(error)) return
+            vp => mat%get_val()
+            #:if TYPE == 'bsr'
+                call check(error, abs(vp(1, 1, 1) - 7.0_real64) < ${TOL}$); if (allocated(error)) return
+                call check(error, abs(vp(BLK, BLK, size(vp, 3)) - 4.0_real64) < ${TOL}$); if (allocated(error)) return
+            #:elif TYPE == 'dense'
+                call check(error, abs(vp(1, 1) - 7.0_real64) < ${TOL}$); if (allocated(error)) return
+                call check(error, abs(vp(N, N) - 4.0_real64) < ${TOL}$); if (allocated(error)) return
+            #:elif TYPE == 'dia'
+                call check(error, abs(vp(1, 1) - 7.0_real64) < ${TOL}$); if (allocated(error)) return
+                call check(error, abs(vp(N, size(vp, 2)) - 4.0_real64) < ${TOL}$); if (allocated(error)) return
+            #:else
+                call check(error, abs(vp(1) - 7.0_real64) < ${TOL}$); if (allocated(error)) return
+                call check(error, abs(vp(size(vp)) - 4.0_real64) < ${TOL}$); if (allocated(error)) return
+            #:endif
+
+            ! ---- set_value_at: out-of-range index sets error status ----
+            call mat%set_value_at(MATRIX_OPS%INS, n_flat + 1, 1.0_real64)
+            cur_status = mat%get_status()
+            call check(error, cur_status == MATRIX_STATUS%OUT_OF_MEMORY); if (allocated(error)) return
 
             ! ---- commit_to_mkl + is_mkl_handle_ready ----
             call mat%commit_to_mkl(ierr)

@@ -18,6 +18,7 @@ module linalg_mkl_interface
     public :: dasum
     public :: dnrm2
     public :: ddot
+    public :: daxpy
 
     public :: idamax
 
@@ -180,6 +181,25 @@ module linalg_mkl_interface
             !> The computed dot product, \( \sum x_i y_i \).
             double precision :: ddot
         end function
+
+        !>
+        !> Computes \( y \leftarrow a x + y \) (BLAS-1 AXPY).
+        !>
+        subroutine daxpy(n, a, x, incx, y, incy)
+            implicit none
+            !> The number of elements in the vectors.
+            integer, intent(in) :: n
+            !> The scalar multiplier a.
+            double precision, intent(in) :: a
+            !> The input vector x.
+            double precision, intent(in) :: x(*)
+            !> The storage spacing between elements of x.
+            integer, intent(in) :: incx
+            !> The input/output vector y, overwritten with a*x + y.
+            double precision, intent(inout) :: y(*)
+            !> The storage spacing between elements of y.
+            integer, intent(in) :: incy
+        end subroutine
 
         !>
         !> Finds the index of the element with the maximum absolute value in a vector.

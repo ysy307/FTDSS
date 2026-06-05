@@ -61,6 +61,13 @@ contains
         implicit none
         !> The COO matrix object to destroy.
         class(type_matrix_coo), intent(inout) :: self
+#ifdef _MKL
+        integer(int32) :: info
+        if (self%is_mkl_committed) then
+            info = mkl_sparse_destroy(self%mkl_handle)
+            self%is_mkl_committed = .false.
+        end if
+#endif
 
         call deallocate_array(self%row)
         call deallocate_array(self%col)
@@ -70,9 +77,70 @@ contains
         self%num_cols = 0
         self%nnz = 0
 
+        self%is_mkl_committed = .false.
         self%is_initialized_matrix = .false.
         self%status = MATRIX_STATUS%SUCCESS
     end subroutine destroy_coo
+
+    !> Registers row/col/val with MKL Sparse BLAS and optimizes for SpMV.
+    !> The matrix is square with dimension num_nodes (num_rows/num_cols store nnz).
+    module subroutine commit_to_mkl_coo(self, ierr)
+        implicit none
+        class(type_matrix_coo), intent(inout) :: self
+        integer(int32), intent(out), optional :: ierr
+#ifdef _MKL
+        integer(int32) :: info
+
+        if (.not. self%is_initialized_matrix) then
+            if (present(ierr)) ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
+            return
+        end if
+
+        if (self%is_mkl_committed) then
+            info = mkl_sparse_destroy(self%mkl_handle)
+            self%is_mkl_committed = .false.
+        end if
+
+        info = mkl_sparse_d_create_coo( &
+            self%mkl_handle, &
+            SPARSE_INDEX_BASE_ONE, &
+            self%num_nodes, self%num_nodes, self%nnz, &
+            self%row(1), self%col(1), self%val(1))
+
+        if (info == SPARSE_STATUS_SUCCESS) then
+            info = mkl_sparse_optimize(self%mkl_handle)
+            self%is_mkl_committed = .true.
+            if (present(ierr)) then
+                if (info == SPARSE_STATUS_SUCCESS) then
+                    ierr = MATRIX_STATUS%SUCCESS%ID
+                else
+                    ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
+                end if
+            end if
+        else
+            if (present(ierr)) ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
+        end if
+#else
+        if (present(ierr)) ierr = MATRIX_STATUS%NOT_IMPLEMENTED%ID
+#endif
+    end subroutine commit_to_mkl_coo
+
+    !> Returns .true. if the MKL handle is committed and ready for SpMV.
+    pure module function is_mkl_handle_ready_coo(self) result(ready)
+        implicit none
+        class(type_matrix_coo), intent(in) :: self
+        logical :: ready
+        ready = self%is_mkl_committed
+    end function is_mkl_handle_ready_coo
+
+#ifdef _MKL
+    module function get_mkl_handle_coo(self) result(handle)
+        implicit none
+        class(type_matrix_coo), intent(in) :: self
+        type(sparse_matrix_t) :: handle
+        handle = self%mkl_handle
+    end function get_mkl_handle_coo
+#endif
 
     !>
     !> Returns the number of non-zero entries in the matrix.
@@ -155,6 +223,34 @@ contains
         real(real64), intent(in) :: value
         error stop "Error: set_value is only permitted for dense matrix."
     end subroutine set_value_coo
+
+    !> Sets a stored entry by its flat position in val(:) (no search).
+    module subroutine set_value_at_coo(self, op, idx, value)
+        implicit none
+        class(type_matrix_coo), intent(inout), target :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: idx
+        real(real64), intent(in) :: value
+
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
+
+        if (.not. value_in_range(idx, 1, self%nnz)) then
+            self%status = MATRIX_STATUS%OUT_OF_MEMORY
+            return
+        end if
+
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
+            self%val(idx) = value
+        case (MATRIX_OPS%ADD%ID)
+            self%val(idx) = self%val(idx) + value
+        case default
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end select
+    end subroutine set_value_at_coo
 
     !>
     !> Sets all non-zero entries in a specified row to a single scalar value.

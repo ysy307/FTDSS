@@ -23,11 +23,13 @@ module linalg_mkl_backend
     public :: norm_2_mkl
     public :: norm_inf_mkl
     public :: dot_mkl
+    public :: axpy_mkl
 #else
     public :: norm_1_native
     public :: norm_2_native
     public :: norm_inf_native
     public :: dot_native
+    public :: axpy_native
 #endif
 
 contains
@@ -187,6 +189,26 @@ contains
     call ieee_set_flag(ieee_invalid, .false.)
 
     end function dot_mkl
+
+    !>
+    !> Computes \( y \leftarrow \alpha x + y \) using the MKL DAXPY routine.
+    !> Element-wise and local: no MPI communication required.
+    !>
+    subroutine axpy_mkl(alpha, x, y)
+        implicit none
+        !> The scalar multiplier.
+        real(real64), intent(in) :: alpha
+        !> The input vector x.
+        real(real64), intent(in) :: x(:)
+        !> The input/output vector y, overwritten with alpha*x + y.
+        real(real64), intent(inout) :: y(:)
+
+        if (is_contiguous(x) .and. is_contiguous(y)) then
+            call daxpy(int(size(x), int32), alpha, x, 1, y, 1)
+        else
+            y = y + alpha * x
+        end if
+    end subroutine axpy_mkl
 #endif
 
     ! =========================================================================
@@ -290,6 +312,21 @@ contains
         product = local_prod
 #endif
     end function dot_native
+
+    !>
+    !> Computes \( y \leftarrow \alpha x + y \) using native Fortran array arithmetic.
+    !>
+    subroutine axpy_native(alpha, x, y)
+        implicit none
+        !> The scalar multiplier.
+        real(real64), intent(in) :: alpha
+        !> The input vector x.
+        real(real64), intent(in) :: x(:)
+        !> The input/output vector y, overwritten with alpha*x + y.
+        real(real64), intent(inout) :: y(:)
+
+        y = y + alpha * x
+    end subroutine axpy_native
 #endif
 
 end module linalg_mkl_backend

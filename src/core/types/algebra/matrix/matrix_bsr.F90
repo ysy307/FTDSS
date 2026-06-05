@@ -187,6 +187,39 @@ contains
         error stop "Error: set_value is only permitted for dense matrix."
     end subroutine set_value_bsr
 
+    !> Sets a stored entry by its flat (column-major) position in val(:,:,:) (no search).
+    module subroutine set_value_at_bsr(self, op, idx, value)
+        implicit none
+        class(type_matrix_bsr), intent(inout), target :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: idx
+        real(real64), intent(in) :: value
+
+        real(real64), pointer, contiguous :: flat(:)
+        integer(int32) :: n
+
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
+
+        n = size(self%val)
+        if (.not. value_in_range(idx, 1, n)) then
+            self%status = MATRIX_STATUS%OUT_OF_MEMORY
+            return
+        end if
+
+        flat(1:n) => self%val
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
+            flat(idx) = value
+        case (MATRIX_OPS%ADD%ID)
+            flat(idx) = flat(idx) + value
+        case default
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end select
+    end subroutine set_value_at_bsr
+
     !>
     !> Sets all non-zero entries in a specific row to a single scalar value.
     !>

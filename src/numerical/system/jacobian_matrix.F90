@@ -1,6 +1,5 @@
 module numerical_system_jacobian_matrix
     use, intrinsic :: iso_fortran_env
-    use, intrinsic :: ieee_arithmetic
     use :: stdlib_optval, only:optval
     use :: module_core
     use :: module_linalg
@@ -339,20 +338,16 @@ contains
         type(type_matrix_dense), intent(in) :: local_data
 
         integer(int32) :: i, j, row_blk, col_blk
-        integer(int32), allocatable :: indices(:, :)
+        integer(int32) :: indices(n_local, n_local)
         real(real64), pointer, dimension(:, :) :: dense_val
         class(abst_matrix), pointer :: mat
 
         if (.not. allocated(self%matrix)) return
 
         dense_val => local_data%get_val()
-        if (any(.not. ieee_is_finite(dense_val))) then
-            write (*, '(A,I0)') '[ERR-MATRIX] dense_val contains non-finite values for element_id=', element_id
-            return
-        end if
 
-        ! Build global BSR block index array from scatter_map (O(1) per entry)
-        allocate (indices(n_local, n_local))
+        ! Build global BSR block index array from scatter_map (O(1) per entry).
+        ! indices is an automatic (stack) array — no per-element heap allocation.
         do j = 1, n_local
             do i = 1, n_local
                 call self%scatter_map%get_index(element_id, [i, j], indices(i, j))
@@ -364,8 +359,6 @@ contains
         ! differs, which the helper resolves.
         call self%resolve_block_target(row_physics_id, col_physics_id, mat, row_blk, col_blk)
         if (associated(mat)) call mat%set(MATRIX_OPS%ADD, n_local, indices, 1, 1, dense_val)
-
-        deallocate (indices)
     end subroutine add_local_jacobian_matrix
 
     subroutine zero_all_jacobian_matrix(self)

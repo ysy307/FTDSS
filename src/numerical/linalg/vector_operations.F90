@@ -208,6 +208,14 @@ module linalg_vector_operations
             real(real64), intent(in) :: vector(:)
             real(real64) :: res
         end function
+
+        subroutine abst_axpy_subroutine(alpha, x, y)
+            import :: real64
+            implicit none
+            real(real64), intent(in) :: alpha
+            real(real64), intent(in) :: x(:)
+            real(real64), intent(inout) :: y(:)
+        end subroutine
     end interface
 
     !> Procedure pointer for the backend implementation of the 1-norm.
@@ -218,6 +226,8 @@ module linalg_vector_operations
     procedure(abst_real_from_vector_for_inf_norm_function), pointer, private :: compute_norm_inf_backend => null()
     !> Procedure pointer for the backend implementation of the dot product.
     procedure(abst_real_from_two_vectors_function), pointer, private :: compute_dot_product_backend => null()
+    !> Procedure pointer for the backend implementation of AXPY (y <- alpha*x + y).
+    procedure(abst_axpy_subroutine), pointer, private :: compute_axpy_backend => null()
 
     !> Flag to ensure the backend pointers are initialized only once.
     logical, private :: is_mkl_initialized = .false.
@@ -253,11 +263,13 @@ contains
         compute_norm_2_backend => norm_2_mkl
         compute_norm_inf_backend => norm_inf_mkl
         compute_dot_product_backend => dot_mkl
+        compute_axpy_backend => axpy_mkl
 #else
         compute_norm_1_backend => norm_1_native
         compute_norm_2_backend => norm_2_native
         compute_norm_inf_backend => norm_inf_native
         compute_dot_product_backend => dot_native
+        compute_axpy_backend => axpy_native
 #endif
         is_mkl_initialized = .true.
     end subroutine initialize_mkl_backend
@@ -1688,7 +1700,8 @@ contains
 #ifdef USE_DEBUG
         call check_match_length(ptr_x, ptr_y, 'axpy_vector_dp')
 #endif
-        ptr_y = ptr_y + alpha * ptr_x
+        if (.not. is_mkl_initialized) call initialize_mkl_backend()
+        call compute_axpy_backend(alpha, ptr_x, ptr_y)
     end subroutine axpy_vector_dp
 
     subroutine axpy_vector_int(alpha, x, y)
@@ -1726,7 +1739,9 @@ contains
 #ifdef USE_DEBUG
         call check_match_length(ptr_x, ptr_y, 'xpay_vector_dp')
 #endif
-        ptr_y = alpha * ptr_x + ptr_y
+        ! Current semantics: y <- alpha*x + y (identical to AXPY). Route through MKL backend.
+        if (.not. is_mkl_initialized) call initialize_mkl_backend()
+        call compute_axpy_backend(alpha, ptr_x, ptr_y)
     end subroutine xpay_vector_dp
 
     subroutine xpay_vector_int(alpha, x, y)

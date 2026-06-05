@@ -54,6 +54,13 @@ contains
     module subroutine destroy_csr(self)
         implicit none
         class(type_matrix_csr), intent(inout) :: self
+#ifdef _MKL
+        integer(int32) :: info
+        if (self%is_mkl_committed) then
+            info = mkl_sparse_destroy(self%mkl_handle)
+            self%is_mkl_committed = .false.
+        end if
+#endif
 
         call deallocate_array(self%ptr)
         call deallocate_array(self%ind)
@@ -64,9 +71,72 @@ contains
         self%num_ptrs = 0
         self%nnz = 0
 
+        self%is_mkl_committed = .false.
         self%is_initialized_matrix = .false.
         self%status = MATRIX_STATUS%SUCCESS
     end subroutine destroy_csr
+
+    !> Registers ptr/ind/val with MKL Sparse BLAS and optimizes for SpMV.
+    module subroutine commit_to_mkl_csr(self, ierr)
+        implicit none
+        class(type_matrix_csr), intent(inout) :: self
+        integer(int32), intent(out), optional :: ierr
+#ifdef _MKL
+        integer(int32) :: info
+
+        if (.not. self%is_initialized_matrix) then
+            if (present(ierr)) ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
+            return
+        end if
+
+        if (self%is_mkl_committed) then
+            info = mkl_sparse_destroy(self%mkl_handle)
+            self%is_mkl_committed = .false.
+        end if
+
+        ! Square DOF/node matrix: cols == num_rows. rows_start/rows_end use the
+        ! overlapping-ptr trick (ptr(1:n) and ptr(2:n+1)).
+        info = mkl_sparse_d_create_csr( &
+            self%mkl_handle, &
+            SPARSE_INDEX_BASE_ONE, &
+            self%num_rows, self%num_rows, &
+            self%ptr(1), self%ptr(2), &
+            self%ind(1), self%val(1))
+
+        if (info == SPARSE_STATUS_SUCCESS) then
+            info = mkl_sparse_optimize(self%mkl_handle)
+            self%is_mkl_committed = .true.
+            if (present(ierr)) then
+                if (info == SPARSE_STATUS_SUCCESS) then
+                    ierr = MATRIX_STATUS%SUCCESS%ID
+                else
+                    ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
+                end if
+            end if
+        else
+            if (present(ierr)) ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
+        end if
+#else
+        if (present(ierr)) ierr = MATRIX_STATUS%NOT_IMPLEMENTED%ID
+#endif
+    end subroutine commit_to_mkl_csr
+
+    !> Returns .true. if the MKL handle is committed and ready for SpMV.
+    pure module function is_mkl_handle_ready_csr(self) result(ready)
+        implicit none
+        class(type_matrix_csr), intent(in) :: self
+        logical :: ready
+        ready = self%is_mkl_committed
+    end function is_mkl_handle_ready_csr
+
+#ifdef _MKL
+    module function get_mkl_handle_csr(self) result(handle)
+        implicit none
+        class(type_matrix_csr), intent(in) :: self
+        type(sparse_matrix_t) :: handle
+        handle = self%mkl_handle
+    end function get_mkl_handle_csr
+#endif
 
     !>
     !> Returns the number of rows in the matrix.
@@ -155,6 +225,34 @@ contains
         real(real64), intent(in) :: value
         error stop "Error: set_value is only permitted for dense matrix."
     end subroutine set_value_csr
+
+    !> Sets a stored entry by its flat position in val(:) (no search).
+    module subroutine set_value_at_csr(self, op, idx, value)
+        implicit none
+        class(type_matrix_csr), intent(inout), target :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: idx
+        real(real64), intent(in) :: value
+
+        if (.not. MATRIX_OPS%is_valid(op)) then
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
+
+        if (.not. value_in_range(idx, 1, self%nnz)) then
+            self%status = MATRIX_STATUS%OUT_OF_MEMORY
+            return
+        end if
+
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
+            self%val(idx) = value
+        case (MATRIX_OPS%ADD%ID)
+            self%val(idx) = self%val(idx) + value
+        case default
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end select
+    end subroutine set_value_at_csr
 
     !>
     !> Sets all non-zero entries in a specific row to a single scalar value.

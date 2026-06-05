@@ -18,7 +18,6 @@ contains
         real(real64), intent(inout), optional :: determinant_jacobian
 
         integer(int32) :: i, j, k, dim
-        integer(int32) :: ierr
         ! Use fixed-size arrays on the stack, allocated for max dimension and controlled by dim
         real(real64) :: local_J(self%dimension, self%dimension)
         real(real64) :: local_inv_J(self%dimension, self%dimension)
@@ -46,24 +45,45 @@ contains
         ! --- A. Compute Jacobian Matrix (ONCE) ---
         call self%calc_jacobian(r, node_coords, local_J)
 
-        ! --- B. Compute Determinant ---
-        if (present(determinant_jacobian)) then
-            call matrix_determinant(local_J, local_det_J, ierr)
-            if (local_det_J == 0.0_real64) then
-                error stop "Zero Jacobian determinant: degenerate element"
-            end if
-            determinant_jacobian = abs(local_det_J)
+        ! --- B. Determinant (analytic for dim<=3; avoids LAPACK overhead on tiny J) ---
+        if (dim == 1) then
+            local_det_J = local_J(1, 1)
+        else if (dim == 2) then
+            local_det_J = local_J(1, 1) * local_J(2, 2) - local_J(1, 2) * local_J(2, 1)
+        else
+            local_det_J = local_J(1, 1) * (local_J(2, 2) * local_J(3, 3) - local_J(2, 3) * local_J(3, 2)) &
+                          - local_J(1, 2) * (local_J(2, 1) * local_J(3, 3) - local_J(2, 3) * local_J(3, 1)) &
+                          + local_J(1, 3) * (local_J(2, 1) * local_J(3, 2) - local_J(2, 2) * local_J(3, 1))
         end if
+        if (local_det_J == 0.0_real64) then
+            error stop "Zero Jacobian determinant: degenerate element"
+        end if
+        if (present(determinant_jacobian)) determinant_jacobian = abs(local_det_J)
 
         ! Determine whether the inverse Jacobian is needed (also required for dpsi_dx)
         need_inverse = present(inverse_jacobian) .or. present(dpsi_dx)
 
         if (.not. need_inverse) return
 
-        ! --- C. Compute Inverse Jacobian ---
-        ! Copy local_J to preserve its contents
-        local_inv_J(1:dim, 1:dim) = local_J(1:dim, 1:dim)
-        call matrix_inverse(local_inv_J(1:dim, 1:dim), ierr)
+        ! --- C. Inverse Jacobian (analytic for dim<=3) ---
+        if (dim == 1) then
+            local_inv_J(1, 1) = 1.0d0 / local_det_J
+        else if (dim == 2) then
+            local_inv_J(1, 1) = local_J(2, 2) / local_det_J
+            local_inv_J(1, 2) = -local_J(1, 2) / local_det_J
+            local_inv_J(2, 1) = -local_J(2, 1) / local_det_J
+            local_inv_J(2, 2) = local_J(1, 1) / local_det_J
+        else
+            local_inv_J(1, 1) = (local_J(2, 2) * local_J(3, 3) - local_J(2, 3) * local_J(3, 2)) / local_det_J
+            local_inv_J(1, 2) = -(local_J(1, 2) * local_J(3, 3) - local_J(1, 3) * local_J(3, 2)) / local_det_J
+            local_inv_J(1, 3) = (local_J(1, 2) * local_J(2, 3) - local_J(1, 3) * local_J(2, 2)) / local_det_J
+            local_inv_J(2, 1) = -(local_J(2, 1) * local_J(3, 3) - local_J(2, 3) * local_J(3, 1)) / local_det_J
+            local_inv_J(2, 2) = (local_J(1, 1) * local_J(3, 3) - local_J(1, 3) * local_J(3, 1)) / local_det_J
+            local_inv_J(2, 3) = -(local_J(1, 1) * local_J(2, 3) - local_J(1, 3) * local_J(2, 1)) / local_det_J
+            local_inv_J(3, 1) = (local_J(2, 1) * local_J(3, 2) - local_J(2, 2) * local_J(3, 1)) / local_det_J
+            local_inv_J(3, 2) = -(local_J(1, 1) * local_J(3, 2) - local_J(1, 2) * local_J(3, 1)) / local_det_J
+            local_inv_J(3, 3) = (local_J(1, 1) * local_J(2, 2) - local_J(1, 2) * local_J(2, 1)) / local_det_J
+        end if
 
         if (present(inverse_jacobian)) then
             inverse_jacobian(1:dim, 1:dim) = local_inv_J(1:dim, 1:dim)

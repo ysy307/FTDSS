@@ -183,16 +183,27 @@ contains
         if (.not. associated(porosity_history)) return
         n_hist = min(size(bdf_coeffs), size(temperature_history), size(pressure_history), size(porosity_history))
 
-        do j = 1, n_hist
-            call local_state%copy(state)
-            call local_state%temperature%set(temperature_history(j))
-            call local_state%pressure%set(pressure_history(j))
-            call local_state%porosity%set(porosity_history(j))
-            call self%update_water_phases(material_id, local_state)
-            call self%calc_enthalpy_density(material_id, local_state, Uj)
+        ! Copy once: only T/P/porosity vary over the BDF history; the other state
+        ! fields (e.g. clay fraction) are constant, so the deep copy is hoisted
+        ! out of the history loop.
+        ! j = 1 is the current state: phases were already computed during set_state,
+        ! so reuse them directly and skip the redundant update_water_phases.
+        call self%calc_enthalpy_density(material_id, state, Uj)
+        dU_dt = dU_dt + bdf_coeffs(1) * Uj
 
-            dU_dt = dU_dt + bdf_coeffs(j) * Uj
-        end do
+        ! j >= 2 are previous-step states: recompute phases at the historical T/P.
+        if (n_hist >= 2) then
+            call local_state%copy(state)
+            do j = 2, n_hist
+                call local_state%temperature%set(temperature_history(j))
+                call local_state%pressure%set(pressure_history(j))
+                call local_state%porosity%set(porosity_history(j))
+                call self%update_water_phases(material_id, local_state)
+                call self%calc_enthalpy_density(material_id, local_state, Uj)
+
+                dU_dt = dU_dt + bdf_coeffs(j) * Uj
+            end do
+        end if
 
     end subroutine compute_transient_term_thermal
 

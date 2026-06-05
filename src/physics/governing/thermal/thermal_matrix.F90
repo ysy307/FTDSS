@@ -1,5 +1,4 @@
 submodule(physics_governing_thermal) thermal_matrix
-    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
 contains
 
@@ -33,11 +32,13 @@ contains
         real(real64), pointer :: K_TH_val(:, :)
         real(real64), pointer :: F_T_val(:)
 
-        real(real64), allocatable :: local_vec_diff_flux(:)
-        real(real64), allocatable :: local_vec_adv_flux(:)
-        real(real64), allocatable :: work_C_TH(:)
-        real(real64), allocatable :: work_Q_seg(:)
-        real(real64), allocatable :: C_TH_nodes(:)
+        ! Automatic (stack) arrays — bounds taken from the dummy workspace at entry,
+        ! so no per-element heap allocate/deallocate in the assembly hot path.
+        real(real64) :: local_vec_diff_flux(workspace%num_fe_nodes)
+        real(real64) :: local_vec_adv_flux(workspace%num_fe_nodes)
+        real(real64) :: work_C_TH(workspace%num_fe_gauss)
+        real(real64) :: work_Q_seg(workspace%num_fe_gauss)
+        real(real64) :: C_TH_nodes(workspace%num_fe_nodes)
         real(real64) :: S_seg, Lf, rho_w, grad_T_mag
         type(type_coordinate_dp), pointer :: grad_T_ptr
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp_coords_th
@@ -45,8 +46,6 @@ contains
         logical :: has_advection
 
         n_nodes = workspace%num_fe_nodes
-        allocate (local_vec_diff_flux(n_nodes))
-        allocate (local_vec_adv_flux(n_nodes))
 
         workspace%work_C(:) = 0.0d0
         workspace%work_D(:, :, :) = 0.0d0
@@ -71,8 +70,6 @@ contains
         if (present(F_T)) F_T_val => F_T%get_data()
 
         if (present(K_TH)) then
-            allocate (work_C_TH(workspace%num_fe_gauss))
-            allocate (C_TH_nodes(n_nodes))
             work_C_TH(:) = 0.0d0
             ! Lerp C_TH from node states to capture non-zero coupling at freezing-front elements
             call workspace%fe%get_gauss(gp_coords_th)
@@ -81,7 +78,6 @@ contains
             end do
         end if
 
-        allocate (work_Q_seg(workspace%num_fe_gauss))
         work_Q_seg(:) = 0.0d0
 
         ! Gauss Loop
@@ -177,12 +173,6 @@ contains
                 F_T_val(i) = F_T_val(i) - workspace%work_vec(i)
             end do
         end if
-
-        if (allocated(local_vec_diff_flux)) deallocate (local_vec_diff_flux)
-        if (allocated(local_vec_adv_flux)) deallocate (local_vec_adv_flux)
-        if (allocated(work_C_TH)) deallocate (work_C_TH)
-        if (allocated(work_Q_seg)) deallocate (work_Q_seg)
-        if (allocated(C_TH_nodes)) deallocate (C_TH_nodes)
 
     end subroutine assemble_local_picard_thermal
 

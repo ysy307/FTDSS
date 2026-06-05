@@ -53,7 +53,7 @@ contains
             implicit none
             type(error_type), allocatable, intent(out) :: error
 
-            type(type_vector_${VTYPE}$) :: vec, src, alpha_vec
+            type(type_vector_${VTYPE}$) :: vec, src, alpha_vec, xv, yv
             type(type_constant_id) :: cur_status
             integer(int32) :: vsize
 
@@ -200,6 +200,24 @@ contains
                 call check(error, vp(N) == 4); if (allocated(error)) return
             #:endif
             call src%destroy()
+
+            ! ---- vector_axpy / vector_xpay (dp only): y <- alpha*x + y via MKL DAXPY ----
+            #:if VTYPE == 'dp'
+                call xv%initialize(N)
+                call yv%initialize(N)
+                call xv%set(VECTOR_OPS%INS, 2.0d0)   ! x = [2,2,2,2]
+                call yv%set(VECTOR_OPS%INS, 1.0d0)   ! y = [1,1,1,1]
+                call vector_axpy(3.0d0, xv, yv)      ! y = 3*2 + 1 = 7
+                vp => yv%get_data()
+                call check(error, abs(vp(1) - 7.0d0) < ${TOL}$); if (allocated(error)) return
+                call check(error, abs(vp(N) - 7.0d0) < ${TOL}$); if (allocated(error)) return
+                call vector_xpay(2.0d0, xv, yv)      ! y = 2*2 + 7 = 11
+                vp => yv%get_data()
+                call check(error, abs(vp(1) - 11.0d0) < ${TOL}$); if (allocated(error)) return
+                call check(error, abs(vp(N) - 11.0d0) < ${TOL}$); if (allocated(error)) return
+                call xv%destroy()
+                call yv%destroy()
+            #:endif
 
             ! ---- check + display ----
             call vec%check()
