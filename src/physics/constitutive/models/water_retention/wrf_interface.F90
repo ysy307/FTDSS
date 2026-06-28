@@ -50,6 +50,7 @@ module models_wrf
         procedure, pass(self), public :: initialize => initialize_abst_wrf
         procedure(abst_calc_wrf), pass(self), public, deferred :: calc
         procedure(abst_calc_wrf_derivative), pass(self), public, deferred :: deriv
+        procedure, pass(self), public :: calc_lscheme_capacity => calc_lscheme_capacity_wrf
         procedure, pass(self), public :: is_initialized => is_initialized_wrf
     end type abst_wrf
 
@@ -89,6 +90,12 @@ module models_wrf
             class(abst_wrf), intent(in) :: self
             logical :: initialized
         end function is_initialized_wrf
+
+        module subroutine calc_lscheme_capacity_wrf(self, capacity)
+            implicit none
+            class(abst_wrf), intent(in) :: self
+            real(real64), intent(inout) :: capacity
+        end subroutine calc_lscheme_capacity_wrf
     end interface
 
     !> Brooks-Corey model implementation.

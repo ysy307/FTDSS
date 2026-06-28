@@ -8,6 +8,7 @@
 submodule(app_ftcms) ftcms_compute
     use :: core_types_topology_system_topology, only:type_system_topology
     use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    use :: module_core, only:type_matrix_bsr, type_matrix_info
     implicit none
 contains
 
@@ -100,6 +101,10 @@ contains
         logical :: linear_failed
         character(len=16) :: solve_phase
 
+        ! Symmetric Jacobi equilibration locals (A~ = D A D, b~ = D b, du = D y)
+        real(real64), allocatable :: equil_scale(:)
+        real(real64), pointer :: dudat(:)
+
         call self%control%profiler_start(PROFILER_TYPES%SOLVE)
 
         if (self%control%is_staggered()) then
@@ -156,6 +161,12 @@ contains
 
         call du_ptr%zero()
 
+        ! Symmetric Jacobi equilibration of the (ill-conditioned) coupled system.
+        ! The T/p column-scale disparity (dH/dT ~ 1e6 vs dH/dp ~ 1e-3, cond ~ 1e13)
+        ! otherwise makes even the direct solver return O(0.1) relative residuals.
+        ! Solve (D A D)(D^-1 du) = D b; du is unscaled (du = D y) after the solve.
+        call jacobi_equilibrate_bsr(K_ptr, F_ptr, equil_scale)
+
         linear_failed = .false.
         if (self%control%is_staggered()) then
             if (active_physics%ID == PHYSICS_TYPES%THERMAL%ID .and. allocated(self%solver_thermal)) then
@@ -178,8 +189,84 @@ contains
                 ': solver did not converge'
         end if
 
+        ! Unscale the equilibrated solution: the solver returned y = D^-1 du, so the
+        ! physical increment is du = D y.
+        if (allocated(equil_scale)) then
+            nullify (dudat)
+            dudat => du_ptr%get_data()
+            if (associated(dudat)) then
+                if (size(dudat) == size(equil_scale)) dudat(:) = dudat(:) * equil_scale(:)
+            end if
+        end if
+
         call self%control%profiler_stop(PROFILER_TYPES%SOLVE)
     end subroutine solve_ftcms
+
+    !> Symmetric Jacobi (diagonal) equilibration of a BSR linear system in place:
+    !> with D_i = 1/sqrt(|A_ii|), form A <- D A D and b <- D b, returning D so the
+    !> solution can be unscaled as x = D y. This restores conditioning of the strongly
+    !> unit-disparate coupled (T, p_w) system (cond ~ 1e13 -> O(1)) so that even a
+    !> direct solver returns an accurate increment. No-op for non-BSR matrices.
+    subroutine jacobi_equilibrate_bsr(K, F, D)
+        implicit none
+        class(abst_matrix), intent(inout) :: K
+        class(type_vector_dp), intent(inout) :: F
+        real(real64), allocatable, intent(inout) :: D(:)
+
+        integer(int32), pointer :: ptr(:), ind(:)
+        real(real64), pointer :: val(:, :, :)
+        real(real64), pointer :: fdat(:)
+        type(type_matrix_info) :: info
+        integer(int32) :: nb, n_brows, n, i, kb, r, c, bc, g
+
+        if (allocated(D)) deallocate (D)
+
+        select type (K)
+        type is (type_matrix_bsr)
+            ptr => K%get_ptr()
+            ind => K%get_ind()
+            val => K%get_val()
+            call K%get_info(info)
+            if (.not. (associated(ptr) .and. associated(ind) .and. associated(val))) return
+            nb = info%num_block_rows
+            n_brows = size(ptr) - 1
+            n = n_brows * nb
+            if (n <= 0) return
+            allocate (D(n))
+            D = 1.0d0
+
+            ! D_i = 1 / sqrt(|A_ii|) from the diagonal blocks
+            do i = 1, n_brows
+                do kb = ptr(i), ptr(i + 1) - 1
+                    if (ind(kb) == i) then
+                        do r = 1, nb
+                            g = (i - 1) * nb + r
+                            if (abs(val(r, r, kb)) > 0.0d0) D(g) = 1.0d0 / sqrt(abs(val(r, r, kb)))
+                        end do
+                    end if
+                end do
+            end do
+
+            ! A <- D A D (scale every stored block entry)
+            do i = 1, n_brows
+                do kb = ptr(i), ptr(i + 1) - 1
+                    bc = ind(kb)
+                    do c = 1, nb
+                        do r = 1, nb
+                            val(r, c, kb) = val(r, c, kb) * D((i - 1) * nb + r) * D((bc - 1) * nb + c)
+                        end do
+                    end do
+                end do
+            end do
+
+            ! b <- D b
+            nullify (fdat)
+            fdat => F%get_data()
+            if (associated(fdat)) then
+                if (size(fdat) == n) fdat(:) = fdat(:) * D(:)
+            end if
+        end select
+    end subroutine jacobi_equilibrate_bsr
 
     !> Calculate nodal gradient of a scalar field
     module subroutine calc_gradient_ftcms(self, values_vec, grad)

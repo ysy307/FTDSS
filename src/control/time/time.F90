@@ -187,11 +187,15 @@ contains
             return
         end if
 
-        ! 1. Calculate relative time differences tau
-        ! tau(j) = t_n - t_{n-j}
+        ! 1. Calculate relative time differences tau(j) = t_{n+1} - t_{n+1-j}.
+        ! The CURRENT step uses the active dt (self%dt); older steps use the
+        ! committed history. Using self%dt for tau(1) makes ATS dt changes and
+        ! retried (reduced) steps take immediate effect in the BDF storage term,
+        ! instead of lagging one step behind via dt_history(1).
         tau(0) = 0.0d0
-        do j = 1, k
-            tau(j) = tau(j - 1) + self%dt_history(j)
+        tau(1) = self%dt
+        do j = 2, k
+            tau(j) = tau(j - 1) + self%dt_history(j - 1)
         end do
 
         self%coeffs = 0.0d0
@@ -380,19 +384,35 @@ contains
     end subroutine display_status
 
     !> Perform all time-related updates after a nonlinear solve attempt
-    subroutine update_type_time(self, success, iter_count, next_output_time)
+    subroutine update_type_time(self, success, iter_count, next_output_time, error_estimate)
         implicit none
         class(type_time), intent(inout) :: self
         logical, intent(in) :: success
         integer(int32), intent(in) :: iter_count
         real(real64), intent(in) :: next_output_time
-        real(real64) :: next_dt
+        real(real64), intent(in), optional :: error_estimate
+        real(real64) :: next_dt, dt_iter, dt_err
 
         if (success) then
             ! Step converged: advance time and predict next step
             call self%shift()
 
-            call self%ats%predict_next_dt(self%dt, iter_count, next_dt)
+            if (self%ats%active .and. self%ats%use_error_control .and. present(error_estimate)) then
+                ! Error-controlled stepping: accuracy (PI controller on the local
+                ! truncation error) is the primary driver of dt; the iteration count
+                ! acts only as a robustness brake that caps growth when the nonlinear
+                ! solve is hard (iter >= iter_max), via the unified minimum (PDF 6.3.8).
+                call self%ats%pi_controller_dt(self%dt, error_estimate, dt_err)
+                next_dt = dt_err
+                if (iter_count >= self%ats%iter_max) then
+                    next_dt = min(next_dt, self%dt * self%ats%scale_down)
+                end if
+                next_dt = max(self%ats%dt_min, min(next_dt, self%ats%dt_max))
+            else
+                ! Iteration-count prediction.
+                call self%ats%predict_next_dt(self%dt, iter_count, dt_iter)
+                next_dt = dt_iter
+            end if
             self%dt = next_dt
 
             ! Sync with output time (modifies dt_s if necessary)

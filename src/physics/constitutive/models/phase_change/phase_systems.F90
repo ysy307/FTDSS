@@ -134,45 +134,27 @@ contains
         end if
 
         ! 4. Physical projection to avoid negative/oversaturated phase fractions.
-        ! Values are hard-clamped for physical consistency; derivatives are smoothly
-        ! tapered near boundaries (C1 cubic Hermite) to avoid Newton-step divergence.
+        ! Keep the thermodynamic one-sided derivatives while a phase is active. The
+        ! freezing front needs dQi/dT and dQi/dP immediately after ice appears;
+        ! tapering them to zero near Qi=0 removes the latent/apparent capacity and
+        ! makes the Picard map jump across the front.
         block
-            real(real64), parameter :: delta_frac = 0.01d0
-            real(real64) :: delta, w
-
-            delta = delta_frac * max(porosity, 1.0d-6)
-
             if (ice_content < 0.0d0) then
                 ice_content = 0.0d0
                 dQi_dP = 0.0d0
                 dQi_dT = 0.0d0
-            else
-                ! Smooth taper as ice_content approaches 0 from above
-                w = smooth_weight(delta - ice_content, delta)
-                dQi_dP = w * dQi_dP
-                dQi_dT = w * dQi_dT
             end if
 
             if (ice_content > porosity) then
                 ice_content = porosity
                 dQi_dP = 0.0d0
                 dQi_dT = 0.0d0
-            else
-                ! Smooth taper as ice_content approaches porosity from below
-                w = smooth_weight(ice_content - (porosity - delta), delta)
-                dQi_dP = w * dQi_dP
-                dQi_dT = w * dQi_dT
             end if
 
             if (water_content < 0.0d0) then
                 water_content = 0.0d0
                 dQw_dP = 0.0d0
                 dQw_dT = 0.0d0
-            else
-                ! Smooth taper as water_content approaches 0 from above
-                w = smooth_weight(delta - water_content, delta)
-                dQw_dP = w * dQw_dP
-                dQw_dT = w * dQw_dT
             end if
 
             if (water_content > porosity - ice_content) then

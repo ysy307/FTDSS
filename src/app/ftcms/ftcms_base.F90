@@ -1,5 +1,6 @@
 submodule(app_ftcms) ftcms_base
     use :: core_types_topology_system_topology, only:type_system_topology
+    use :: module_linalg, only:vector_norm2
     implicit none
 contains
 
@@ -927,11 +928,14 @@ contains
 
         real(real64) :: relaxation_factor
         logical :: is_none
+        logical :: is_conserved_mode
 
         real(real64) :: max_du, alpha
         real(real64), parameter :: PICARD_MAX_DT_STEP = 2.0d1
         real(real64), parameter :: PICARD_MAX_DT_STEP_PHASE = 0.5d0   ! K near T_melt
         real(real64), parameter :: PICARD_PHASE_ZONE = 2.0d0           ! °C half-width
+        ! Legacy step caps (used only by the non-conserved convergence modes; the
+        ! universal conserved mode below uses adaptive under-relaxation instead).
         real(real64), parameter :: PICARD_MAX_DP_STEP = 5.0d3
         real(real64), parameter :: TEMP_MIN_C = -80.0d0
         real(real64), parameter :: TEMP_MAX_C = 80.0d0
@@ -948,6 +952,7 @@ contains
         call self%control%get_bdf_coeffs(bdf_order, bdf_coeffs)
 
         is_none = self%control%is_none()
+        is_conserved_mode = self%control%is_conserved()
 
         if (self%is_active_thermal()) then
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
@@ -957,60 +962,71 @@ contains
                 current_prev(:) = current(:)
 
                 if (allocated(du) .and. size(du) > 0) then
-                    max_du = maxval(abs(du))
-                    ! Step limiter: tighter limit near T_melt to prevent C-C amplification
-                    block
-                        real(real64) :: local_max_step
-                        if (minval(abs(current)) < PICARD_PHASE_ZONE) then
-                            local_max_step = PICARD_MAX_DT_STEP_PHASE
-                        else
-                            local_max_step = PICARD_MAX_DT_STEP
-                        end if
-                        if (max_du > local_max_step) then
-                            alpha = local_max_step / max_du
-                        else
-                            alpha = 1.0d0
-                        end if
-                    end block
-                    ! Backtracking line search: halve alpha until T stays within bounds
-                    block
-                        real(real64) :: alpha_ls
-                        real(real64), parameter :: LS_FACTOR = 0.5d0
-                        real(real64), parameter :: LS_MIN = 1.0d-4
-                        integer(int32) :: ls_iter
-                        alpha_ls = alpha
-                        do ls_iter = 1, 20
-                            if (minval(current + alpha_ls * du) >= TEMP_MIN_C .and. &
-                                maxval(current + alpha_ls * du) <= TEMP_MAX_C) exit
-                            alpha_ls = alpha_ls * LS_FACTOR
-                            if (alpha_ls < LS_MIN) then
-                                alpha_ls = LS_MIN
-                                exit
-                            end if
-                        end do
-                        alpha = alpha_ls
-                    end block
-                    if (.not. is_none) then
-                        call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, alpha * du, current)
-                        call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
+                    if (is_conserved_mode) then
+                        ! Globalized modified-Picard step via Irons-Tuck dynamic
+                        ! Aitken (per-block delta-squared). The freezing front is an
+                        ! oscillatory fixed point that scalar under-relaxation cannot
+                        ! contract (it would need omega < 2/(1+a) with a ~ apparent
+                        ! heat capacity -> 0); Aitken estimates the optimal omega
+                        ! from the increment history and breaks the limit cycle. No
+                        ! ad-hoc per-variable clamps; updates current(:) in place.
+                        call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, du, current)
                     else
-                        relaxation_factor = alpha
-                        current(:) = current(:) + alpha * du(:)
+                        max_du = maxval(abs(du))
+                        ! Step limiter: tighter limit near T_melt to prevent C-C amplification
+                        block
+                            real(real64) :: local_max_step
+                            if (minval(abs(current)) < PICARD_PHASE_ZONE) then
+                                local_max_step = PICARD_MAX_DT_STEP_PHASE
+                            else
+                                local_max_step = PICARD_MAX_DT_STEP
+                            end if
+                            if (max_du > local_max_step) then
+                                alpha = local_max_step / max_du
+                            else
+                                alpha = 1.0d0
+                            end if
+                        end block
+                        ! Backtracking line search: halve alpha until T stays within bounds
+                        block
+                            real(real64) :: alpha_ls
+                            real(real64), parameter :: LS_FACTOR = 0.5d0
+                            real(real64), parameter :: LS_MIN = 1.0d-4
+                            integer(int32) :: ls_iter
+                            alpha_ls = alpha
+                            do ls_iter = 1, 20
+                                if (minval(current + alpha_ls * du) >= TEMP_MIN_C .and. &
+                                    maxval(current + alpha_ls * du) <= TEMP_MAX_C) exit
+                                alpha_ls = alpha_ls * LS_FACTOR
+                                if (alpha_ls < LS_MIN) then
+                                    alpha_ls = LS_MIN
+                                    exit
+                                end if
+                            end do
+                            alpha = alpha_ls
+                        end block
+                        if (.not. is_none) then
+                            call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, alpha * du, current)
+                            call self%control%get_current_relaxation(PHYSICS_TYPES%THERMAL, relaxation_factor)
+                        else
+                            relaxation_factor = alpha
+                            current(:) = current(:) + alpha * du(:)
+                        end if
                     end if
                 end if
 
-                ! Available-energy phase-change correction (Flerchinger-type):
-                ! for nodes that crossed T_melt in this Picard step, find T_r
-                ! satisfying H(T_r) = H_sensible(T_new), preventing latent-heat overshoot.
-                block
-                    real(real64), pointer, contiguous, dimension(:) :: t_prev
-                    nullify (t_prev)
-                    call self%temperature%get_previous(t_prev)
-                    if (associated(t_prev)) then
-                        call self%apply_phase_change_temperature_correction(t_prev, current)
-                    end if
-                end block
-                ! call self%apply_phase_change_temperature_correction(current_prev, current)
+                ! Phase-change (Flerchinger available-energy) temperature correction.
+                ! A node that the Picard step moves across the freezing point T_f=0
+                ! would otherwise overshoot into the sensible-heat branch, then swing
+                ! back on the next iterate: the discrete phase toggles and the
+                ! conserved quantity (theta_ice -> rho_eff, H) jumps a finite amount
+                ! regardless of step size, so the iteration chatters (independent of
+                ! dt or relaxation magnitude). The correction re-maps a crossing node
+                ! to the energy-equivalent temperature in [T_new, T_f] that holds it
+                ! at the front while the latent heat is absorbed, removing the toggle.
+                if (is_conserved_mode) then
+                    call self%apply_phase_change_temperature_correction(current_prev, current)
+                end if
 
                 current(:) = min(max(current(:), TEMP_MIN_C), TEMP_MAX_C)
                 call self%temperature%set_delta(current(:) - current_prev(:))
@@ -1041,37 +1057,43 @@ contains
                 current_prev(:) = current(:)
 
                 if (allocated(du) .and. size(du) > 0) then
-                    max_du = maxval(abs(du))
-                    ! Step limiter: prevent large pressure updates regardless of solver mode
-                    if (max_du > PICARD_MAX_DP_STEP) then
-                        alpha = PICARD_MAX_DP_STEP / max_du
+                    if (is_conserved_mode) then
+                        ! Globalized modified-Picard step (see thermal branch above):
+                        ! per-block Irons-Tuck dynamic Aitken, no pressure step clamp.
+                        call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, du, current)
                     else
-                        alpha = 1.0d0
-                    end if
-                    ! Backtracking line search: halve alpha until P stays within bounds
-                    block
-                        real(real64) :: alpha_ls
-                        real(real64), parameter :: LS_FACTOR = 0.5d0
-                        real(real64), parameter :: LS_MIN = 1.0d-4
-                        integer(int32) :: ls_iter
-                        alpha_ls = alpha
-                        do ls_iter = 1, 20
-                            if (minval(current + alpha_ls * du) >= PRESS_MIN_PA .and. &
-                                maxval(current + alpha_ls * du) <= PRESS_MAX_PA) exit
-                            alpha_ls = alpha_ls * LS_FACTOR
-                            if (alpha_ls < LS_MIN) then
-                                alpha_ls = LS_MIN
-                                exit
-                            end if
-                        end do
-                        alpha = alpha_ls
-                    end block
-                    if (.not. is_none) then
-                        call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, alpha * du, current)
-                        call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
-                    else
-                        relaxation_factor = alpha
-                        current(:) = current(:) + alpha * du(:)
+                        max_du = maxval(abs(du))
+                        ! Step limiter: prevent large pressure updates regardless of solver mode
+                        if (max_du > PICARD_MAX_DP_STEP) then
+                            alpha = PICARD_MAX_DP_STEP / max_du
+                        else
+                            alpha = 1.0d0
+                        end if
+                        ! Backtracking line search: halve alpha until P stays within bounds
+                        block
+                            real(real64) :: alpha_ls
+                            real(real64), parameter :: LS_FACTOR = 0.5d0
+                            real(real64), parameter :: LS_MIN = 1.0d-4
+                            integer(int32) :: ls_iter
+                            alpha_ls = alpha
+                            do ls_iter = 1, 20
+                                if (minval(current + alpha_ls * du) >= PRESS_MIN_PA .and. &
+                                    maxval(current + alpha_ls * du) <= PRESS_MAX_PA) exit
+                                alpha_ls = alpha_ls * LS_FACTOR
+                                if (alpha_ls < LS_MIN) then
+                                    alpha_ls = LS_MIN
+                                    exit
+                                end if
+                            end do
+                            alpha = alpha_ls
+                        end block
+                        if (.not. is_none) then
+                            call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, alpha * du, current)
+                            call self%control%get_current_relaxation(PHYSICS_TYPES%HYDRAULIC, relaxation_factor)
+                        else
+                            relaxation_factor = alpha
+                            current(:) = current(:) + alpha * du(:)
+                        end if
                     end if
                 end if
 
@@ -1116,6 +1138,15 @@ contains
         real(real64), parameter :: DT_FD = 0.5d0
         integer(int32), parameter :: MAX_SECANT = 15
         real(real64), parameter :: SECANT_RTOL = 1.0d-4
+        ! Lower bound of the secant search. update_water_phases requires a positive
+        ! absolute temperature (T_K = T + 273.15 > 0); a diverging Picard iterate can
+        ! push T_new far below physical range, which would make the root finder probe
+        ! update_water_phases at T_K <= 0 (fatal). Confine the search to the same
+        ! physical floor used by the solution update (reflect_variables TEMP_MIN_C),
+        ! so a diverging step fails the convergence test cleanly and the ATS reduces
+        ! dt, instead of aborting the run inside this root finder.
+        real(real64), parameter :: T_PHYS_MIN = -80.0d0
+        real(real64) :: T_lo
 
         integer(int32) :: i_elem, num_elem, i_local, node_id, material_id, n_nodes, iter_s
         integer(int32), pointer, contiguous :: connectivity(:)
@@ -1180,10 +1211,13 @@ contains
 
                 ! Secant: G(T_r) = H(T_r) - H_target = 0
                 ! G(T_f) = H(T_f) - H_target = -C_unf*(T_new_i - T_f) > 0
+                ! Confine the search to [max(T_new_i, T_PHYS_MIN), T_F] so probes stay
+                ! in the valid domain of update_water_phases (T_K > 0).
+                T_lo = max(T_new_i, T_PHYS_MIN)
                 T_r0 = T_F
                 G0 = -C_unf * (T_new_i - T_F)
 
-                T_r1 = max(T_new_i, T_F - 2.0d0 * DT_FD)
+                T_r1 = max(T_lo, T_F - 2.0d0 * DT_FD)
 
                 do iter_s = 1, MAX_SECANT
                     call ev%reset()
@@ -1201,10 +1235,10 @@ contains
                     T_r0 = T_r1
                     G0 = G1
                     T_r1 = min(T_r_new, T_F)
-                    T_r1 = max(T_r1, T_new_i)
+                    T_r1 = max(T_r1, T_lo)
                 end do
 
-                T_new(node_id) = min(max(T_r1, T_new_i), T_F)
+                T_new(node_id) = min(max(T_r1, T_lo), T_F)
             end do
         end do
 
@@ -1246,6 +1280,163 @@ contains
         end do
 
     end subroutine update_nodal_phases_ftcms
+
+    !> Evaluate per-node conserved quantities at the current iterate.
+    !>
+    !> Mathematical definition:
+    !> - enthalpy(j)  = volumetric enthalpy density H_j(T_j, p_{w,j}) [J/m3]
+    !> - density(j)   = pore-water effective density rho_eff,j         [kg/m3]
+    !>
+    !> Each node is visited once (processed mask). The nodal state is rebuilt with
+    !> set_state(calc_physics=.true.) so the phase contents are consistent with the
+    !> current (T, p_w) before evaluating H and rho_eff. Inactive physics yields a
+    !> zero field (contributes nothing to the weighted norm). Cost: O(N_nd).
+    module subroutine compute_nodal_conserved_ftcms(self, enthalpy, density)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        real(real64), allocatable, intent(inout) :: enthalpy(:)
+        real(real64), allocatable, intent(inout) :: density(:)
+
+        integer(int32) :: i_elem, num_elem, i_local, node_id, material_id, n_nodes
+        integer(int32), pointer, contiguous :: connectivity(:)
+        type(type_state) :: state
+        logical, allocatable :: processed(:)
+        logical :: active_thermal, active_hydraulic
+        real(real64) :: H_j, rho_j
+
+        nullify (connectivity)
+        call self%domain%get_num_nodes(n_nodes)
+        call self%domain%get_num_fe(num_elem)
+
+        if (allocated(enthalpy)) deallocate (enthalpy)
+        if (allocated(density)) deallocate (density)
+        allocate (enthalpy(max(n_nodes, 1)))
+        allocate (density(max(n_nodes, 1)))
+        enthalpy = 0.0d0
+        density = 0.0d0
+        if (n_nodes <= 0) return
+
+        active_thermal = self%is_active_thermal()
+        active_hydraulic = self%is_active_hydraulic()
+
+        allocate (processed(n_nodes))
+        processed = .false.
+
+        do i_elem = 1, num_elem
+            call self%domain%get_fe_connectivity(i_elem, connectivity)
+            call self%domain%get_material_id(i_elem, material_id)
+
+            do i_local = 1, size(connectivity)
+                node_id = connectivity(i_local)
+                if (node_id < 1 .or. node_id > n_nodes) cycle
+                if (processed(node_id)) cycle
+                processed(node_id) = .true.
+
+                call self%set_state(node_id, i_elem, state, calc_physics=.true.)
+
+                H_j = 0.0d0
+                rho_j = 0.0d0
+                if (active_thermal) call self%thermal%calc_enthalpy_density(material_id, state, H_j)
+                if (active_hydraulic) call self%hydraulic%calc_effective_density_value(state, rho_j)
+
+                enthalpy(node_id) = H_j
+                density(node_id) = rho_j
+            end do
+            nullify (connectivity)
+        end do
+
+        deallocate (processed)
+    end subroutine compute_nodal_conserved_ftcms
+
+    !> See the interface for the mathematical definition. Cost: O(N_dof) per step.
+    module function compute_lte_error_ftcms(self) result(error_rel)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        real(real64) :: error_rel
+
+        real(real64) :: dt_n, e_thermal, e_hydraulic
+
+        error_rel = -1.0d0
+        call self%control%get_dt(dt_n)
+        if (dt_n <= 0.0d0) return
+
+        e_thermal = -1.0d0
+        e_hydraulic = -1.0d0
+
+        if (self%is_active_thermal()) call physics_lte(self%temperature, self%lte_ydot_prev_thermal, e_thermal)
+        if (self%is_active_hydraulic()) call physics_lte(self%pressure, self%lte_ydot_prev_hydraulic, e_hydraulic)
+
+        ! Combine the per-physics relative errors by a maximum (most restrictive).
+        if (self%lte_has_prev) error_rel = max(e_thermal, e_hydraulic)
+
+        self%lte_prev_dt = dt_n
+        self%lte_has_prev = .true.
+
+    contains
+
+        subroutine physics_lte(var, ydot_prev, e_rel)
+            implicit none
+            type(type_variable), intent(inout) :: var
+            real(real64), allocatable, intent(inout) :: ydot_prev(:)
+            real(real64), intent(inout) :: e_rel
+
+            real(real64), pointer, contiguous :: ydot(:), y(:)
+            real(real64), allocatable :: dydot(:)
+            real(real64) :: lte, ynorm, dt_factor
+
+            e_rel = -1.0d0
+            nullify (ydot); nullify (y)
+            call var%get_diff(ydot)     ! ydot_n = (y_n - y_{n-1})/dt_n for BDF1
+            call var%get_current(y)
+            if (.not. (associated(ydot) .and. associated(y))) return
+
+            if (self%lte_has_prev .and. allocated(ydot_prev)) then
+                if (size(ydot_prev) == size(ydot) .and. (dt_n + self%lte_prev_dt) > 0.0d0) then
+                    allocate (dydot(size(ydot)))
+                    dydot(:) = ydot(:) - ydot_prev(:)
+                    dt_factor = dt_n * dt_n / (dt_n + self%lte_prev_dt)
+                    lte = vector_norm2(dydot) * dt_factor
+                    ynorm = vector_norm2(y)
+                    e_rel = lte / max(ynorm, tiny(1.0d0))
+                    deallocate (dydot)
+                end if
+            end if
+
+            ! Store the current derivative as the previous for the next step.
+            if (allocated(ydot_prev)) then
+                if (size(ydot_prev) /= size(ydot)) deallocate (ydot_prev)
+            end if
+            if (.not. allocated(ydot_prev)) allocate (ydot_prev(size(ydot)))
+            ydot_prev(:) = ydot(:)
+        end subroutine physics_lte
+
+    end function compute_lte_error_ftcms
+
+    !> See the interface. Cost: O(N_dof). Combines the energy and water residual
+    !> blocks by Euclidean norm; used only as a monotone merit for the line search.
+    module function nonlinear_residual_norm_ftcms(self) result(rnorm)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        real(real64) :: rnorm
+
+        real(real64), allocatable :: res(:)
+        real(real64) :: sumsq
+
+        sumsq = 0.0d0
+        if (self%is_active_thermal()) then
+            call self%get_variable_residual(PHYSICS_TYPES%THERMAL, res)
+            if (allocated(res)) then
+                if (size(res) > 0) sumsq = sumsq + vector_norm2(res)**2
+            end if
+        end if
+        if (self%is_active_hydraulic()) then
+            call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, res)
+            if (allocated(res)) then
+                if (size(res) > 0) sumsq = sumsq + vector_norm2(res)**2
+            end if
+        end if
+        rnorm = sqrt(sumsq)
+    end function nonlinear_residual_norm_ftcms
 
     module subroutine reset_ftcms(self)
         implicit none

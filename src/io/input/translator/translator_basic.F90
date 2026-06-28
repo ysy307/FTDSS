@@ -140,7 +140,13 @@ contains
         class(type_config_wrf), intent(inout) :: config
 
         type(type_constant_id) :: L_unit
-        real(real64) :: scale_pressure
+        ! WRF models operate on pressure head in METERS (fusion converts pore
+        ! pressure p [Pa] to head via p/(rho_w g) before every WRF call). The
+        ! input WRF parameters are therefore length-based and must be converted
+        ! from the declared input length unit to meters: inverse-length params
+        ! (van Genuchten alpha) are divided, length params (air-entry head) are
+        ! multiplied. scale_length is meters per input unit.
+        real(real64) :: scale_length
 
         associate (material => input%basic%materials(material_id)%water_characteristic_curve)
 
@@ -186,30 +192,30 @@ contains
 
             select case (L_unit%ID)
             case (PHYSICS_UNITS%M%ID)
-                scale_pressure = 1000.0d0 * 9.80655d0
+                scale_length = 1.0d0
             case (PHYSICS_UNITS%CM%ID)
-                scale_pressure = 1000.0d0 * 9.80655d0 * 1.0d-2
+                scale_length = 1.0d-2
             case default
-                scale_pressure = 1.0d0
+                scale_length = 1.0d0
             end select
 
             select case (config%swcc_model%ID)
 
             case (SWCC_MODELS%BC%ID, SWCC_MODELS%KO%ID)
-                config%alpha1 = config%alpha1 * scale_pressure
-                config%h_crit = config%h_crit * scale_pressure
-                config%alpha2 = config%alpha2 * scale_pressure
+                config%alpha1 = config%alpha1 * scale_length
+                config%h_crit = config%h_crit * scale_length
+                config%alpha2 = config%alpha2 * scale_length
 
             case (SWCC_MODELS%VG%ID, SWCC_MODELS%DVGCH%ID)
-                config%alpha1 = config%alpha1 / scale_pressure
+                config%alpha1 = config%alpha1 / scale_length
 
             case (SWCC_MODELS%MVG%ID)
-                config%alpha1 = config%alpha1 / scale_pressure
-                config%h_crit = config%h_crit * scale_pressure
+                config%alpha1 = config%alpha1 / scale_length
+                config%h_crit = config%h_crit * scale_length
 
             case (SWCC_MODELS%DURNER%ID)
-                config%alpha1 = config%alpha1 / scale_pressure
-                config%alpha2 = config%alpha2 / scale_pressure
+                config%alpha1 = config%alpha1 / scale_length
+                config%alpha2 = config%alpha2 / scale_length
 
             end select
 
@@ -283,6 +289,13 @@ contains
             config%norm_type = NORM_TYPES%to_object(nls%convergence%norm_type)
             config%combination_logic = NONLINEAR_LOGIC%to_object(nls%convergence%use_logic)
             config%convergence_norm_type = NONLINEAR_NORM_CRITERIA%to_object(nls%convergence%use_criteria)
+
+            ! Conserved-quantity convergence tolerances (PDF 6.2.4). Defaulted in the
+            ! reader struct, so harmless for non-conserved modes.
+            config%atol_enthalpy = nls%convergence%atol_enthalpy
+            config%atol_density = nls%convergence%atol_density
+            config%rtol_conserved = nls%convergence%rtol_conserved
+            config%residual_eps = nls%convergence%residual_eps
 
             do i = 1, PHYSICS_TYPES%NUM_ID
                 call execute_basic_iteration_criterion(input, NONLINEAR_NORM_CRITERIA%RESIDUAL, config%residual(i))

@@ -358,7 +358,13 @@ contains
         ! are always (1, 1) regardless of coupling mode; only the target matrix
         ! differs, which the helper resolves.
         call self%resolve_block_target(row_physics_id, col_physics_id, mat, row_blk, col_blk)
-        if (associated(mat)) call mat%set(MATRIX_OPS%ADD, n_local, indices, 1, 1, dense_val)
+        ! Scatter into the (row_blk, col_blk) sub-block of each 2x2 node block. In
+        ! monolithic coupling these are the physics offsets (e.g. hydraulic->(2,2)),
+        ! so the off-diagonal coupling and the pressure self-block are assembled
+        ! correctly; in staggered coupling resolve returns (1,1) into a per-physics
+        ! matrix. Passing the literal (1,1) here left the entire pressure block (and
+        ! T-p coupling) unassembled -> singular pressure rows -> non-physical solve.
+        if (associated(mat)) call mat%set(MATRIX_OPS%ADD, n_local, indices, row_blk, col_blk, dense_val)
     end subroutine add_local_jacobian_matrix
 
     subroutine zero_all_jacobian_matrix(self)

@@ -32,6 +32,8 @@ module constitutive_models_manager
         procedure, public :: calc_latent_heat_vaporization
         procedure, public :: calc_pressure_ice_water_derivative
         procedure, public :: calc_cryo_suction_deriv_T
+        procedure, public :: calc_lscheme_capacity
+        procedure, public :: calc_suction_weights
         procedure, public :: calc_segregation_sink
         procedure, public :: is_segregation_active
         procedure, public :: has_cryo_transport
@@ -150,6 +152,41 @@ contains
 
         call self%gcc%deriv_temperature(state, deriv)
     end subroutine calc_cryo_suction_deriv_T
+
+    subroutine calc_lscheme_capacity(self, capacity)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        real(real64), intent(inout) :: capacity
+
+        capacity = 0.0d0
+        if (allocated(self%wrf%p)) call self%wrf%p%calc_lscheme_capacity(capacity)
+    end subroutine calc_lscheme_capacity
+
+    !> Weights of the generalized suction p_c* = max(P_aw, P_iw) with respect to its
+    !> two contributions: w_cap = d(p_c*)/d(P_aw), w_cryo = d(p_c*)/d(P_iw). These are
+    !> the fractions with which the capillary (grad p_w) and cryogenic (grad T) terms
+    !> enter the Darcy flux driven by grad(p_c*) = grad(mu_w) (the chemical potential).
+    !> Uses the same smooth max as the water-retention evaluation. With no cryogenic
+    !> model (psi_cryo = 0) it returns w_cap = 1, w_cryo = 0 (ordinary unfrozen flow).
+    subroutine calc_suction_weights(self, state, w_cap, w_cryo)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: w_cap, w_cryo
+
+        real(real64) :: pressure, psi_cap, psi_cryo, delta, denom
+        real(real64), parameter :: SUCTION_BLEND_EPS = 1.0d2
+
+        call state%pressure%get(pressure)
+        psi_cap = max(0.0d0, -pressure)
+        psi_cryo = 0.0d0
+        call self%gcc%calc(state, psi_cryo)
+
+        delta = psi_cap - psi_cryo
+        denom = sqrt(delta*delta + SUCTION_BLEND_EPS*SUCTION_BLEND_EPS)
+        w_cap = 0.5d0*(1.0d0 + delta/denom)
+        w_cryo = 0.5d0*(1.0d0 - delta/denom)
+    end subroutine calc_suction_weights
 
     subroutine calc_segregation_sink(self, state, grad_T_magnitude, S_seg)
         implicit none

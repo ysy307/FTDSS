@@ -54,6 +54,8 @@ module physics_constitutive_manager
         procedure, public :: calc_Kvh
         procedure, public :: calc_KvT
         procedure, public :: calc_cryo_suction_deriv_T
+        procedure, public :: calc_lscheme_capacity
+        procedure, public :: calc_suction_weights
         procedure, public :: calc_segregation_sink
         procedure, public :: is_segregation_active
         procedure, public :: has_cryo_transport
@@ -458,6 +460,25 @@ contains
 
         call self%models(self%materials_id_map(material_id))%calc_cryo_suction_deriv_T(state, deriv)
     end subroutine calc_cryo_suction_deriv_T
+
+    subroutine calc_lscheme_capacity(self, material_id, capacity)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        real(real64), intent(inout) :: capacity
+
+        call self%models(self%materials_id_map(material_id))%calc_lscheme_capacity(capacity)
+    end subroutine calc_lscheme_capacity
+
+    subroutine calc_suction_weights(self, material_id, state, w_cap, w_cryo)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: w_cap, w_cryo
+
+        call self%models(self%materials_id_map(material_id))%calc_suction_weights(state, w_cap, w_cryo)
+    end subroutine calc_suction_weights
 
     subroutine calc_segregation_sink(self, material_id, state, grad_T_magnitude, S_seg)
         implicit none

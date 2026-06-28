@@ -1,4 +1,5 @@
 submodule(models_wrf) calculate_wrf_base
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
 contains
     ! module subroutine reset_config_wrf(self)
@@ -138,5 +139,92 @@ contains
         initialized = self%initialized
 
     end function is_initialized_wrf
+
+    module subroutine calc_lscheme_capacity_wrf(self, capacity)
+        implicit none
+        class(abst_wrf), intent(in) :: self
+        real(real64), intent(inout) :: capacity
+
+        integer(int32), parameter :: num_scan = 96
+        real(real64) :: h_abs_min, h_abs_max, h_abs, fraction
+        real(real64) :: max_dtheta_dh
+        integer(int32) :: i
+
+        capacity = 0.0d0
+        if (.not. self%initialized) return
+
+        h_abs_min = huge(1.0d0)
+        h_abs_max = 0.0d0
+        max_dtheta_dh = 0.0d0
+
+        call include_scale(abs(self%config%h_crit))
+        if (self%config%alpha1 > 0.0d0) then
+            call include_scale(1.0d0 / self%config%alpha1)
+        else
+            call include_scale(abs(self%config%alpha1))
+        end if
+        if (self%config%alpha2 > 0.0d0) then
+            call include_scale(1.0d0 / self%config%alpha2)
+        else
+            call include_scale(abs(self%config%alpha2))
+        end if
+
+        if (h_abs_max <= 0.0d0) return
+
+        ! Evaluate the WRF capacity over the material's own characteristic suction
+        ! heads. This gives the L-scheme a material-derived diagonal scale instead
+        ! of a case-specific numerical damping factor.
+        h_abs_min = max(h_abs_min * 1.0d-4, sqrt(tiny(1.0d0)))
+        h_abs_max = max(h_abs_max * 1.0d4, 10.0d0 * h_abs_min)
+        do i = 0, num_scan
+            fraction = real(i, real64) / real(num_scan, real64)
+            h_abs = exp(log(h_abs_min) + fraction * (log(h_abs_max) - log(h_abs_min)))
+            call sample_head(h_abs)
+        end do
+
+        call sample_vg_peak(self%config%alpha1, self%config%n1, self%config%m1)
+        call sample_vg_peak(self%config%alpha2, self%config%n2, self%config%m2)
+        if (self%config%swcc_model == SWCC_MODELS%DVGCH) then
+            call sample_vg_peak(self%config%alpha1, self%config%n2, self%config%m2)
+        end if
+        if (self%config%h_crit < 0.0d0) call sample_head(abs(self%config%h_crit) * (1.0d0 + 1.0d-8))
+        if (self%config%alpha1 < 0.0d0) call sample_head(abs(self%config%alpha1) * (1.0d0 + 1.0d-8))
+
+        capacity = max_dtheta_dh / (rho_std * g)
+
+    contains
+        subroutine include_scale(scale)
+            implicit none
+            real(real64), intent(in) :: scale
+
+            if (scale <= 0.0d0) return
+            if (.not. ieee_is_finite(scale)) return
+            h_abs_min = min(h_abs_min, scale)
+            h_abs_max = max(h_abs_max, scale)
+        end subroutine include_scale
+
+        subroutine sample_head(h_abs_value)
+            implicit none
+            real(real64), intent(in) :: h_abs_value
+            real(real64) :: dtheta_dh
+
+            if (h_abs_value <= 0.0d0) return
+            if (.not. ieee_is_finite(h_abs_value)) return
+
+            dtheta_dh = 0.0d0
+            call self%deriv(-h_abs_value, dtheta_dh)
+            if (ieee_is_finite(dtheta_dh)) max_dtheta_dh = max(max_dtheta_dh, dtheta_dh)
+        end subroutine sample_head
+
+        subroutine sample_vg_peak(alpha, n, m)
+            implicit none
+            real(real64), intent(in) :: alpha, n, m
+            real(real64) :: x_peak
+
+            if (alpha <= 0.0d0 .or. n <= 1.0d0 .or. m <= 0.0d0) return
+            x_peak = ((n - 1.0d0) / (m * n + 1.0d0))**(1.0d0 / n)
+            call sample_head(x_peak / alpha)
+        end subroutine sample_vg_peak
+    end subroutine calc_lscheme_capacity_wrf
 
 end submodule calculate_wrf_Base

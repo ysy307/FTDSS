@@ -52,6 +52,8 @@ module control_control_manager
         procedure, public, pass(self) :: profiler_record => profiler_record_control
         ! - iteration
         procedure, public, pass(self) :: check_convergence => check_convergence_control
+        procedure, public, pass(self) :: check_convergence_conserved => check_convergence_conserved_control
+        procedure, public, pass(self) :: compute_error_norm => compute_error_norm_control
         ! - acceleration
         procedure, public, pass(self) :: compute_relaxation => compute_relaxation_control
 
@@ -71,6 +73,8 @@ module control_control_manager
         procedure, public, pass(self) :: is_newton => is_newton_control
         procedure, public, pass(self) :: is_picard => is_picard_control
         procedure, public, pass(self) :: is_none => is_none_control
+        procedure, public, pass(self) :: is_conserved => is_conserved_control
+        procedure, public, pass(self) :: get_conserved_relaxation => get_conserved_relaxation_control
         procedure, public, pass(self) :: should_continue => should_continue_control
         ! - acceleration
         procedure, public, pass(self) :: reach_minimum_relaxation => reach_minimum_relaxation_control
@@ -146,7 +150,15 @@ contains
             case (ACCELERATION_METHODS%AITKEN%ID)
                 allocate (type_acceleration_aitken :: self%acceleration)
             case (ACCELERATION_METHODS%NONE%ID)
-                ! No acceleration object is needed for NONE mode.
+                ! No acceleration object is needed for NONE mode, EXCEPT the
+                ! conserved-quantity modified-Picard mode: the freezing front is an
+                ! oscillatory fixed point (effective g' < 0 from the latent-heat
+                ! spike) that scalar under-relaxation cannot contract. Default to
+                ! Irons-Tuck dynamic Aitken (code default, no input tuning) so the
+                ! coupled (T,p) iteration is globalized universally.
+                if (self%iteration%is_conserved()) then
+                    allocate (type_acceleration_aitken :: self%acceleration)
+                end if
             case (ACCELERATION_METHODS%ANDERSON%ID)
                 error stop "Anderson acceleration is not implemented yet."
             case default
@@ -379,10 +391,11 @@ contains
         is_end_time = self%time%is_end_time()
     end function is_end_time_control
 
-    subroutine update_controls(self, success)
+    subroutine update_controls(self, success, error_estimate)
         implicit none
         class(type_control), intent(inout) :: self
         logical, intent(in) :: success
+        real(real64), intent(in), optional :: error_estimate
         integer(int32) :: iter_count
         real(real64) :: t_target
         real(real64) :: t_arrival ! Time that will be reached after this step
@@ -412,7 +425,7 @@ contains
         end if
 
         ! 4. Execute update (dt is limited to not exceed t_target)
-        call self%time%update(success, iter_count, t_target)
+        call self%time%update(success, iter_count, t_target, error_estimate)
 
     end subroutine update_controls
 
@@ -587,6 +600,55 @@ contains
         call self%iteration%check_convergence(physics_type, residual_vector, update_vector)
 
     end subroutine check_convergence_control
+
+    !> Conserved-quantity convergence check (PDF 6.2.4): a single coupled indicator
+    !> from the nodal enthalpy/effective-density increments and per-block residuals.
+    subroutine check_convergence_conserved_control(self, enthalpy, density, &
+                                                   residual_thermal, residual_hydraulic, &
+                                                   check_thermal, check_hydraulic)
+        implicit none
+        class(type_control), intent(inout) :: self
+        real(real64), intent(in) :: enthalpy(:)
+        real(real64), intent(in) :: density(:)
+        real(real64), intent(in), optional :: residual_thermal(:)
+        real(real64), intent(in), optional :: residual_hydraulic(:)
+        logical, intent(in) :: check_thermal
+        logical, intent(in) :: check_hydraulic
+
+        call self%iteration%check_convergence_conserved(enthalpy, density, residual_thermal, residual_hydraulic, &
+                                                        check_thermal, check_hydraulic)
+    end subroutine check_convergence_conserved_control
+
+    !> Returns true when the conserved-quantity convergence mode is selected.
+    pure function is_conserved_control(self) result(is_conserved)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: is_conserved
+
+        is_conserved = self%iteration%is_conserved()
+    end function is_conserved_control
+
+    !> Current adaptive under-relaxation factor for the globalized modified Picard.
+    pure function get_conserved_relaxation_control(self) result(omega)
+        implicit none
+        class(type_control), intent(in) :: self
+        real(real64) :: omega
+
+        omega = self%iteration%get_conserved_relaxation()
+    end function get_conserved_relaxation_control
+
+    !> Weighted-RMS conserved-quantity error norm for the Richardson estimate.
+    subroutine compute_error_norm_control(self, enthalpy_a, density_a, enthalpy_b, density_b, eps)
+        implicit none
+        class(type_control), intent(in) :: self
+        real(real64), intent(in) :: enthalpy_a(:)
+        real(real64), intent(in) :: density_a(:)
+        real(real64), intent(in) :: enthalpy_b(:)
+        real(real64), intent(in) :: density_b(:)
+        real(real64), intent(inout) :: eps
+
+        call self%iteration%compute_error_norm(enthalpy_a, density_a, enthalpy_b, density_b, eps)
+    end subroutine compute_error_norm_control
 
     subroutine get_nonlinear_solver_control(self, nonlinear_solver_type)
         implicit none

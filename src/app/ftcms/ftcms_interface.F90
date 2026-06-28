@@ -63,6 +63,14 @@ module app_ftcms
         real(real64), allocatable :: col_scale(:)
         real(real64), allocatable :: col_scale_inv(:)
 
+        ! Local-truncation-error estimate state for error-controlled ATS. Stores the
+        ! previous-step time derivative (ydot) per physics and the previous dt, used
+        ! by compute_lte_error to form the divided-difference (curvature) estimate.
+        real(real64), allocatable :: lte_ydot_prev_thermal(:)
+        real(real64), allocatable :: lte_ydot_prev_hydraulic(:)
+        real(real64) :: lte_prev_dt = 0.0d0
+        logical :: lte_has_prev = .false.
+
         type(type_control) :: control
         type(type_output_manager) :: output
 
@@ -121,7 +129,9 @@ module app_ftcms
         procedure, private, pass(self) :: apply_phase_change_temperature_correction => &
             apply_phase_change_temperature_correction_ftcms
         procedure, private, pass(self) :: update_nodal_phases => update_nodal_phases_ftcms
-
+        procedure, private, pass(self) :: compute_nodal_conserved => compute_nodal_conserved_ftcms
+        procedure, public, pass(self) :: compute_lte_error => compute_lte_error_ftcms
+        procedure, public, pass(self) :: nonlinear_residual_norm => nonlinear_residual_norm_ftcms
         procedure, public, pass(self) :: update_variables => update_variables_ftcms
         procedure, public, pass(self) :: update_segregation_ice => update_segregation_ice_ftcms
         procedure, public, pass(self) :: assemble_local => assemble_local_ftcms
@@ -140,6 +150,8 @@ module app_ftcms
         procedure, private, pass(self) :: solve_time_step_initial_setup => solve_time_step_initial_setup_ftcms
         procedure, private, pass(self) :: solve_time_step_setup => solve_time_step_setup_ftcms
         procedure, private, pass(self) :: solve_time_step_check_convergence => solve_time_step_check_convergence_ftcms
+        procedure, private, pass(self) :: solve_time_step_check_convergence_conserved => &
+            solve_time_step_check_convergence_conserved_ftcms
 
         procedure, public, pass(self) :: output_fields => output_fields_ftcms
         procedure, public, pass(self) :: output_history => output_history_ftcms
@@ -280,6 +292,41 @@ module app_ftcms
             class(type_ftcms), intent(inout) :: self
         end subroutine update_nodal_phases_ftcms
 
+        !> Evaluate the per-node conserved quantities (volumetric enthalpy density
+        !> and pore-water effective density) at the current iterate, for the
+        !> conserved-quantity convergence norm and the Richardson error estimate.
+        module subroutine compute_nodal_conserved_ftcms(self, enthalpy, density)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            real(real64), allocatable, intent(inout) :: enthalpy(:)
+            real(real64), allocatable, intent(inout) :: density(:)
+        end subroutine compute_nodal_conserved_ftcms
+
+        !> Relative local-truncation-error estimate of the just-converged step, for
+        !> the error-controlled (PI) adaptive time stepping.
+        !>
+        !> Uses the divided-difference (curvature) estimate of the implicit-Euler
+        !> LTE: \( \text{LTE} \approx \lVert \dot y_n - \dot y_{n-1}\rVert\,
+        !> \Delta t_n^2/(\Delta t_n+\Delta t_{n-1}) \), normalized by \(\lVert y_n\rVert\)
+        !> to be dimensionless and self-scaling (no per-case absolute tolerances).
+        !> The temperature and pressure estimates are combined by a maximum.
+        !> Returns -1 on the first step (no previous derivative yet) so the caller
+        !> skips error control. Advances the stored previous derivative and dt.
+        module function compute_lte_error_ftcms(self) result(error_rel)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            real(real64) :: error_rel
+        end function compute_lte_error_ftcms
+
+        !> Euclidean norm of the assembled nonlinear conservation residual (energy
+        !> and water blocks combined), used as the merit function for the
+        !> backtracking line search that globalizes the modified-Picard step.
+        module function nonlinear_residual_norm_ftcms(self) result(rnorm)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            real(real64) :: rnorm
+        end function nonlinear_residual_norm_ftcms
+
         module subroutine calc_gradient_ftcms(self, values_vec, grad)
             implicit none
             class(type_ftcms), intent(inout) :: self
@@ -400,6 +447,14 @@ module app_ftcms
             type(type_constant_id), intent(in), optional :: target_physics
 
         end subroutine solve_time_step_check_convergence_ftcms
+
+        !> Conserved-quantity convergence check (PDF 6.2.4), evaluated on the updated
+        !> state: computes the nodal enthalpy/effective-density and per-block residual
+        !> norms and delegates the coupled decision to the control manager.
+        module subroutine solve_time_step_check_convergence_conserved_ftcms(self)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+        end subroutine solve_time_step_check_convergence_conserved_ftcms
 
         module subroutine solve_time_step_ftcms(self, is_step_converged)
             implicit none

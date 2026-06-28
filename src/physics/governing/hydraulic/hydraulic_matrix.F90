@@ -43,8 +43,6 @@ contains
         real(real64) :: D_HT_tmp(workspace%num_fe_dimension, workspace%num_fe_dimension)
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp_coords
         real(real64) :: C_HT_gp, D_HT_gp_scalar
-        real(real64) :: temp_node_val
-        logical :: has_unfrozen
 
         n_nodes = workspace%num_fe_nodes
         n_gauss = workspace%num_fe_gauss
@@ -74,18 +72,14 @@ contains
                 call self%compute_coupling_diffusion_term(workspace%material_id, workspace%state(i), D_HT_tmp)
                 D_HT_scalar_nodes(i) = D_HT_tmp(1, 1)
             end do
-            ! D_HT lerp is physically valid only at ice-water transition elements.
-            ! In fully-frozen elements (all nodes T < 0), K_flh -> 0 prevents Darcy
-            ! transport, so D_HT flux inside the frozen zone causes pressure blowup.
-            has_unfrozen = .false.
-            do i = 1, n_nodes
-                call workspace%state(i)%temperature%get(temp_node_val)
-                if (temp_node_val >= 0.0d0) then
-                    has_unfrozen = .true.
-                    exit
-                end if
-            end do
-            if (.not. has_unfrozen) D_HT_scalar_nodes(:) = 0.0d0
+            ! D_HT = K_flh/g * |dpsi_cryo/dT| is the cryosuction-driven moisture
+            ! migration coupling: it must be active throughout the frozen fringe
+            ! (0 > T > ~T_fringe, where liquid still flows) for water to migrate to
+            ! the freezing front (otherwise the result is unphysical in-situ
+            ! freezing). It self-limits in fully-frozen soil because the impedance
+            ! collapses K_flh -> 0. The pressure-block near-singularity that a former
+            ! transition-element-only guard worked around is now handled directly by
+            ! the no-flow storage pin in compute_mass_term_hydraulic.
         end if
 
         ! 1. Gauss Loop

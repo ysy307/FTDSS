@@ -13,9 +13,10 @@ module models_phase_change_fusion
 
     public :: type_fusion
 
-    ! Smooth blending scale [Pa] for effective suction max(psi_cap, psi_cryo).
-    ! A small positive epsilon avoids non-differentiable switching at psi_cap=psi_cryo.
+    ! Smooth blending scale [Pa] for the generalized suction p_c* = max(P_aw, P_iw).
+    ! A small positive epsilon keeps the max differentiable near P_aw = P_iw.
     real(real64), parameter :: SUCTION_BLEND_EPS = 1.0d2
+
     !
 
     !>
@@ -43,6 +44,15 @@ contains
         real(real64), intent(inout) :: psi_eff
         real(real64), intent(inout), optional :: dpsi_eff_dpsi_cap, dpsi_eff_dpsi_cryo
 
+        ! Generalized suction p_c* = max(P_aw, P_iw): the water-retention function
+        ! responds to whichever interface (air-water capillary P_aw or ice-water
+        ! cryogenic P_iw) holds the liquid more strongly. The liquid saturation is
+        ! the single relation S_w = F_WRF(p_c*) for both unfrozen and frozen states.
+        ! Thermodynamically p_c* is the chemical-potential lowering of soil water,
+        ! mu_w = mu_w^sat - v_w * p_c*. A smooth max keeps the derivatives well
+        ! defined; dpsi_eff_dpsi_cap and dpsi_eff_dpsi_cryo are the weights with which
+        ! the capillary (grad p_w) and cryogenic (grad T) contributions enter the
+        ! Darcy flux driven by grad(p_c*).
         real(real64) :: delta_psi, blend_denom
 
         delta_psi = psi_cap - psi_cryo
@@ -50,12 +60,8 @@ contains
 
         psi_eff = 0.5d0*(psi_cap + psi_cryo + blend_denom)
 
-        if (present(dpsi_eff_dpsi_cap)) then
-            dpsi_eff_dpsi_cap = 0.5d0*(1.0d0 + delta_psi/blend_denom)
-        end if
-        if (present(dpsi_eff_dpsi_cryo)) then
-            dpsi_eff_dpsi_cryo = 0.5d0*(1.0d0 - delta_psi/blend_denom)
-        end if
+        if (present(dpsi_eff_dpsi_cap)) dpsi_eff_dpsi_cap = 0.5d0*(1.0d0 + delta_psi/blend_denom)
+        if (present(dpsi_eff_dpsi_cryo)) dpsi_eff_dpsi_cryo = 0.5d0*(1.0d0 - delta_psi/blend_denom)
     end subroutine compute_effective_suction
 
     !>

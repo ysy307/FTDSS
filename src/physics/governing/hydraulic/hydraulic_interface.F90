@@ -45,6 +45,7 @@ module physics_governing_hydraulic
 
         procedure, pass(self), public :: update_water_phases => update_water_phases_hydraulic
         procedure, pass(self), public :: calc_effective_density => calc_effective_density_hydraulic
+        procedure, pass(self), public :: calc_effective_density_value => calc_effective_density_value_hydraulic
 
         procedure, pass(self), private :: compute_C_eq => compute_C_eq_hydraulic
         procedure, pass(self), private :: compute_transient_term_mixed => compute_transient_term_mixed_hydraulic
@@ -210,6 +211,17 @@ module physics_governing_hydraulic
             real(real64), intent(in) :: bdf_coeffs(:)
             real(real64), intent(inout) :: drho_dt
         end subroutine calc_effective_density_hydraulic
+
+        !> Evaluate the pore-water effective density at the supplied state.
+        !> \( \rho_{eff} = \rho_w \theta_w + \rho_{ice} \theta_{ice} + \rho_w \theta_v^{\star} \) [kg/m3].
+        !> Plain (non-time-derivative) conserved storage quantity of the water-mass
+        !> balance; phase contents must already be consistent with (T, p_w).
+        module subroutine calc_effective_density_value_hydraulic(self, state, rho_eff)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: rho_eff
+        end subroutine calc_effective_density_value_hydraulic
 
         !> Compute equivalent specific moisture capacity C_eq = dTheta/dP [1/Pa].
         !> \[ C_{eq} = \frac{\partial\theta_l}{\partial P}

@@ -21,6 +21,10 @@ submodule(io_input_basic) input_basic_solver_settings
     character(*), parameter :: logic = "logic"
     character(*), parameter :: absolute_tolerance = "absolute_tolerance"
     character(*), parameter :: relative_tolerance = "relative_tolerance"
+    character(*), parameter :: key_atol_enthalpy = "atol_enthalpy"
+    character(*), parameter :: key_atol_density = "atol_density"
+    character(*), parameter :: key_rtol = "rtol"
+    character(*), parameter :: key_residual_eps = "residual_eps"
     character(*), parameter :: linear_solver = "linear_solver"
     character(*), parameter :: iterative_solver = "iterative_solver"
     character(*), parameter :: solver_type = "type"
@@ -58,7 +62,8 @@ submodule(io_input_basic) input_basic_solver_settings
     character(len=16), parameter :: valid_nonlinear_solver_methods_str(5) = &
                                     [character(len=16) :: "none", "newton", "modified_newton", "picard", "modified_picard"]
     character(len=16), parameter :: valid_norm_types_str(3) = [character(len=4) :: "l1", "l2", "linf"]
-    character(len=16), parameter :: valid_criteria_types_str(4) = [character(len=16) :: "none", "residual", "update", "both"]
+    character(len=16), parameter :: valid_criteria_types_str(5) = &
+                                    [character(len=16) :: "none", "residual", "update", "both", "conserved"]
     character(len=16), parameter :: valid_logic_types_str(2) = [character(len=16) :: "and", "or"]
     character(len=16), parameter :: valid_local_criteria_types_str(3) = [character(len=16) :: "absolute", "relative", "both"]
 
@@ -143,6 +148,29 @@ contains
                 buffer(4) = update
                 call read_solver_settings_nonlinear_convergence( &
                     self%solver_settings%nonlinear_solver%convergence%update, json, buffer, 4)
+            end if
+
+            ! Conserved-quantity convergence (PDF 6.2.4): weighted-RMS norm of the
+            ! nodal enthalpy and effective-density increments plus a per-block
+            ! residual ratio. All keys are optional with universal defaults.
+            if (self%solver_settings%nonlinear_solver%convergence%use_criteria == &
+                NONLINEAR_NORM_CRITERIA%CONSERVED%ID) then
+                buffer(4) = key_atol_enthalpy
+                call get_json_value(json, join(buffer), &
+                                    self%solver_settings%nonlinear_solver%convergence%atol_enthalpy, &
+                                    is_required=.false., default_value=1.0d2, valid_range=[0.0d0, huge(0.0d0)])
+                buffer(4) = key_atol_density
+                call get_json_value(json, join(buffer), &
+                                    self%solver_settings%nonlinear_solver%convergence%atol_density, &
+                                    is_required=.false., default_value=1.0d-3, valid_range=[0.0d0, huge(0.0d0)])
+                buffer(4) = key_rtol
+                call get_json_value(json, join(buffer), &
+                                    self%solver_settings%nonlinear_solver%convergence%rtol_conserved, &
+                                    is_required=.false., default_value=1.0d-3, valid_range=[0.0d0, huge(0.0d0)])
+                buffer(4) = key_residual_eps
+                call get_json_value(json, join(buffer), &
+                                    self%solver_settings%nonlinear_solver%convergence%residual_eps, &
+                                    is_required=.false., default_value=1.0d-1, valid_range=[0.0d0, huge(0.0d0)])
             end if
         end if
 

@@ -232,6 +232,11 @@ module io_input_basic
         integer(int32) :: use_logic
         type(type_convergence_criteria) :: residual
         type(type_convergence_criteria) :: update
+        !> Conserved-quantity convergence tolerances (used when use_criteria == CONSERVED)
+        real(real64) :: atol_enthalpy = 1.0d2
+        real(real64) :: atol_density = 1.0d-3
+        real(real64) :: rtol_conserved = 1.0d-3
+        real(real64) :: residual_eps = 1.0d-1
     end type type_convergence
 
     type :: type_nonlinear_solver

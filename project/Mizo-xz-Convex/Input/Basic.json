@@ -35,26 +35,29 @@
             "calculate_thermal": true,
             "calculate_hydraulic": true,
             "calculate_mechanical": false,
-            "phase": 3,
+            "phase": 4,
             "density": {
                 "value": [
                     2800.0,
                     1000.0,
-                    917.0
+                    917.0,
+                    0.6
                 ]
             },
             "specific_heat": {
                 "value": [
                     912.0,
                     4180.0,
-                    2100.0
+                    2100.0,
+                    2098.0
                 ]
             },
             "volumetric_heat_capacity": {
                 "value": [
-                    2553600.0,
-                    4180000.0,
-                    1925700.0
+                    2.5536e6,
+                    4.18e6,
+                    1.9257e6,
+                    1.259e6
                 ],
                 "params": [
                     1.0,
@@ -67,7 +70,8 @@
                 "value": [
                     3.78,
                     0.6,
-                    2.2
+                    2.2,
+                    0.0241
                 ],
                 "dispersivity": [
                     1.0,
@@ -75,7 +79,7 @@
                 ],
                 "params": [
                     0.55,
-                    0.8,
+                    0.80,
                     3.07,
                     0.13,
                     13.05,
@@ -85,10 +89,7 @@
             "phase_change": {
                 "equilibrium_model": {
                     "segregation": false
-                },
-                "segregation_potential": 0.0,
-                "T_fringe_low": -1.0,
-                "T_fringe_high": 0.0
+                }
             },
             "water_characteristic_curve": {
                 "model": "VG",
@@ -102,7 +103,7 @@
             },
             "hydraulic_conductivity_model": {
                 "model_number": 4,
-                "saturated_conductivity": 3.2e-06,
+                "saturated_conductivity": 3.2e-6,
                 "impedance_factor": 7,
                 "water_viscosity_model": 1,
                 "gain_factor": 1.0
@@ -112,12 +113,16 @@
     "solver_settings": {
         "bdf_order": 1,
         "nonlinear_solver": {
-            "method": "none",
+            "method": "picard",
             "update_frequency": 1,
-            "max_iterations": 100,
+            "max_iterations": 20,
             "convergence": {
-                "use_criteria": "both",
+                "use_criteria": "conserved",
                 "norm_type": "linf",
+                "atol_enthalpy": 1e2,
+                "atol_density": 1e-3,
+                "rtol": 1e-3,
+                "residual_eps": 1e-1,
                 "logic_between_criteria": "and",
                 "residual": {
                     "criteria": "relative",

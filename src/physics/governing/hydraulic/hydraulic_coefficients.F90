@@ -16,7 +16,21 @@ contains
         real(real64) :: dP_ice_dP_water
         real(real64) :: dQw_dP, dQi_dP, dQv_dP
         real(real64) :: phi, theta_tot
+        real(real64) :: cap_ref
         real(real64), parameter :: S_s = 1.0d-8
+        ! L-scheme capacity floor for the freezing-front runaway (Pop/Radu L-scheme).
+        ! As cryosuction migration drives p_w down, the capillary suction P_aw = -p_w
+        ! climbs the dry tail of the water-retention curve where the moisture capacity
+        ! d(theta)/dp collapses (C_HH falls from ~1e-3 to ~3e-5). The pressure update
+        ! dp = R / C_HH then amplifies as C_HH shrinks: a positive feedback that
+        ! overshoots the cryosuction equilibrium and diverges (du_p ~ 1e11 Pa). The
+        ! L-scheme replaces the strongly varying capacity on the LHS by a constant
+        ! L >= sup C_HH (here the near-saturation peak capacity), so the iteration
+        ! matrix diagonal cannot collapse and the feedback is removed. It enters ONLY
+        ! the LHS capacity (the residual recomputes the true Theta), so the converged
+        ! solution is unchanged: p_w still drops to the cryosuction equilibrium and
+        ! water migrates. L is the soil's own peak moisture capacity (a material
+        ! property), evaluated at zero capillary suction, not a tuned constant.
 
         dQw_dP = 0.0d0
         dQi_dP = 0.0d0
@@ -48,9 +62,18 @@ contains
                + rho_i * dQi_dP + Qi * drho_ice_dP * dP_ice_dP_water &
              + rho_w * dQv_dP + Qv * drho_w_dP
 
-        ! Specific storage term to prevent zero diagonal under full saturation
+        ! Physical specific storage (full-saturation / general non-zero diagonal).
         theta_tot = Qw + (rho_i / rho_w) * Qi + Qv
         C_HH = C_HH + rho_w * S_s * theta_tot / max(phi, 1.0d-12)
+
+        ! L-scheme capacity floor (see declarations). The reference capacity is
+        ! computed from the material WRF, converted to dtheta/dP, and applied only
+        ! to the Picard LHS. The residual still recomputes the true storage, so the
+        ! converged water migration is preserved while the dry-tail diagonal collapse
+        ! at the freezing front is removed.
+        cap_ref = 0.0d0
+        call self%physics%calc_lscheme_capacity(material_id, cap_ref)
+        C_HH = max(C_HH, rho_w * cap_ref)
 
     end subroutine compute_mass_term_hydraulic
 
@@ -69,6 +92,7 @@ contains
 
         real(real64) :: K_flh, K_vP
         real(real64) :: coeff_D
+
         integer(int32) :: i
 
         ! K_flh: Liquid Hydraulic Conductivity [m/s]
@@ -76,9 +100,18 @@ contains
         call self%physics%calc_Kflh(material_id, state, K_flh)
         call self%calc_K_vP(material_id, state, K_vP)
 
-        ! D_HH = (K_liquid + K_vapor) / g
-        ! Unit: [m/s] / [m/s^2] = [s]
-        ! Flux J = - D * grad P [s * Pa/m] = [s * N/m^3] = [s * kg m/s^2 / m^3] = [kg/m^2 s] (Mass Flux)
+        ! D_HH = (K_liquid + K_vapor) / g. The liquid Darcy term retains the full
+        ! grad(p_w) Laplacian; the frozen-zone reduction of liquid flow is carried
+        ! by the impedance factor inside K_flh (K_s * 10^(-Omega*theta_ice)), which
+        ! decreases smoothly with the ice content. A capillary weight w_cap =
+        ! d(p_c*)/d(P_aw) was previously applied here, but the cryogenic suction P_iw
+        ! rises near-vertically just below 0 C (generalized Clausius-Clapeyron), so
+        ! w_cap collapses to 0 within ~0.1 C and removes the pressure Laplacian at the
+        ! front, leaving only the tiny specific-storage diagonal. The pressure block
+        ! then becomes catastrophically ill-conditioned (du_p ~ 1e9 Pa from the linear
+        ! solve) and no relaxation/dt can recover it. The cryosuction-driven migration
+        ! is provided by the grad T coupling D_HT; p_w drops toward the front as a
+        ! computed result of the mass balance, not by weighting this Laplacian away.
         coeff_D = (K_flh + K_vP) / g
 
         D_HH(:, :) = 0.0d0
@@ -152,6 +185,10 @@ contains
 
         real(real64) :: rho_w, rho_i
         real(real64) :: dQw_dT, dQi_dT, dQv_dT
+        real(real64), pointer, contiguous, dimension(:) :: temperature_history
+        real(real64) :: temperature, dT, rho_eff_cur, rho_eff_old
+        type(type_state) :: temp_state
+        real(real64), parameter :: DT_SECANT_FLOOR = 1.0d-3
 
         dQw_dT = 0.0d0
         dQi_dT = 0.0d0
@@ -166,9 +203,32 @@ contains
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_density_ice(state, rho_i)
 
-        ! C_HT = d(rho_eff)/dT
+        ! C_HT = d(rho_eff)/dT  (analytical tangent)
         ! rho_eff = rho_w*Qw + rho_i*Qi + rho_w*Qv (vapor term only when enabled)
         C_HT = rho_w * dQw_dT + rho_i * dQi_dT + rho_w * dQv_dT
+
+        ! Phase-change stabilization (mirrors the thermal C_TT chord): across the
+        ! freezing front d(rho_eff)/dT spikes (ice forms, liquid water vanishes), so
+        ! the instantaneous tangent overshoots the water-mass response to a
+        ! temperature change and the coupled iteration chatters. Replace it by the
+        ! chord C_HT = (rho_eff(T^m,p^m) - rho_eff(T^n,p^m)) / (T^m - T^n), which
+        ! averages the actual storage change over the step (consistent with the
+        ! conservative residual). Evaluated only for |dT| above a floor so it stays
+        ! bounded; below that the tangent is the correct slope.
+        call state%get(temperature=temperature, temperature_history=temperature_history)
+        if (associated(temperature_history)) then
+            if (size(temperature_history) >= 2) then
+                dT = temperature - temperature_history(2)
+                if (abs(dT) > DT_SECANT_FLOOR) then
+                    call self%calc_effective_density_value(state, rho_eff_cur)
+                    call temp_state%copy(state)
+                    call temp_state%temperature%set(temperature_history(2))
+                    call self%update_water_phases(material_id, temp_state)
+                    call self%calc_effective_density_value(temp_state, rho_eff_old)
+                    C_HT = (rho_eff_cur - rho_eff_old) / dT
+                end if
+            end if
+        end if
 
     end subroutine compute_coupling_mass_term_hydraulic
 
@@ -192,9 +252,12 @@ contains
         call self%calc_K_vT(material_id, state, K_vT)
         call state%temperature%get(temperature_local)
 
-        ! D_HT = K_flh/g * |dpsi_cryo/dT|  (active for any T < T_f0)
-        ! The transition-element-only guard in hydraulic_matrix prevents runaway
-        ! in fully-frozen zones where K_HH ~ K_min.
+        ! Cryosuction-driven moisture migration: the grad T contribution to the
+        ! liquid Darcy flux, D_HT = K_flh/g * |d(psi_cryo)/dT| (active for T < T_f0).
+        ! K_flh carries the impedance factor, so this self-limits smoothly as the
+        ! soil freezes. This is the coupling that pulls water toward the freezing
+        ! front; p_w then drops toward the front as a computed result of the water
+        ! mass balance. (The minus sign is correct: d(psi_cryo)/dT < 0.)
         if (self%physics%has_cryo_transport(material_id) .and. temperature_local < 0.0d0) then
             call self%physics%calc_Kflh(material_id, state, K_flh)
             call self%physics%calc_cryo_suction_deriv_T(material_id, state, dpsi_cryo_dT)
@@ -318,6 +381,35 @@ contains
 
     end subroutine calc_effective_density_hydraulic
 
+    !> Evaluate the pore-water effective density rho_eff at the supplied state.
+    !>
+    !> Mathematical definition:
+    !> \( \rho_{eff} = \rho_w \theta_w + \rho_{ice} \theta_{ice} + \rho_w \theta_v^{\star} \) [kg/m3]
+    !>
+    !> This is the conserved storage quantity of the water-mass balance and the plain
+    !> counterpart of calc_effective_density (which returns its BDF time-derivative).
+    !> Assumptions: the phase contents Qw, Qi, Qv stored in state are already
+    !> consistent with (T, p_w) (call update_water_phases beforehand). Used by the
+    !> conserved-quantity convergence norm (PDF 6.2.4). Cost: O(1).
+    module subroutine calc_effective_density_value_hydraulic(self, state, rho_eff)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: rho_eff
+
+        real(real64) :: Qw, Qi, Qv
+        real(real64) :: rho_w, rho_i
+
+        call state%water_content%get(Qw)
+        call state%ice_content%get(Qi)
+        call state%vapor_content%get(Qv)
+
+        call self%physics%calc_density_water(state, rho_w)
+        call self%physics%calc_density_ice(state, rho_i)
+
+        rho_eff = rho_w * Qw + rho_i * Qi + rho_w * Qv
+    end subroutine calc_effective_density_value_hydraulic
+
     !> @brief Compute equivalent specific moisture capacity C_eq = dTheta/dP.
     module subroutine compute_C_eq_hydraulic(self, material_id, state, C_eq)
         implicit none
@@ -328,6 +420,7 @@ contains
 
         real(real64) :: rho_w, rho_i
         real(real64) :: dQw_dP, dQi_dP, dQv_dP
+        real(real64) :: cap_ref
 
         dQw_dP = 0.0d0
         dQi_dP = 0.0d0
@@ -346,6 +439,9 @@ contains
         ! but phase_systems compensation (dQw_dP = -dQi_dP) can cause numerical
         ! sign reversal near the freezing front.
         C_eq = max(0.0d0, dQw_dP + (rho_i / rho_w) * dQi_dP + dQv_dP)
+        cap_ref = 0.0d0
+        call self%physics%calc_lscheme_capacity(material_id, cap_ref)
+        C_eq = max(C_eq, cap_ref)
 
     end subroutine compute_C_eq_hydraulic
 

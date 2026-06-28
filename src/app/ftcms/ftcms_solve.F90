@@ -86,6 +86,10 @@ contains
 
         nullify (current_value)
 
+        ! Conserved-quantity mode runs its (post-update) check separately; the
+        ! residual/update per-physics check below does not apply to it.
+        if (self%control%is_conserved()) return
+
         check_thermal = self%control%is_physics_active(PHYSICS_TYPES%THERMAL)
         check_hydraulic = self%control%is_physics_active(PHYSICS_TYPES%HYDRAULIC)
 
@@ -151,6 +155,40 @@ contains
 
     end subroutine solve_time_step_check_convergence_ftcms
 
+    !> Conserved-quantity convergence check (PDF 6.2.4), evaluated on the updated
+    !> state. Builds the nodal enthalpy/effective-density fields and the per-block
+    !> residual vectors, then delegates the coupled decision to the control manager.
+    module subroutine solve_time_step_check_convergence_conserved_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        real(real64), allocatable :: enthalpy(:)
+        real(real64), allocatable :: density(:)
+        real(real64), allocatable :: residual_thermal(:)
+        real(real64), allocatable :: residual_hydraulic(:)
+        logical :: check_thermal, check_hydraulic
+
+        check_thermal = self%is_active_thermal()
+        check_hydraulic = self%is_active_hydraulic()
+
+        ! Nodal conserved quantities at the updated iterate
+        call self%compute_nodal_conserved(enthalpy, density)
+
+        ! Per-block residuals from the current assembly (still held in F)
+        if (check_thermal) call self%get_variable_residual(PHYSICS_TYPES%THERMAL, residual_thermal)
+        if (check_hydraulic) call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, residual_hydraulic)
+
+        ! Unallocated residual arrays propagate as absent optional arguments.
+        call self%control%check_convergence_conserved(enthalpy, density, &
+                                                      residual_thermal, residual_hydraulic, &
+                                                      check_thermal, check_hydraulic)
+
+        if (allocated(enthalpy)) deallocate (enthalpy)
+        if (allocated(density)) deallocate (density)
+        if (allocated(residual_thermal)) deallocate (residual_thermal)
+        if (allocated(residual_hydraulic)) deallocate (residual_hydraulic)
+    end subroutine solve_time_step_check_convergence_conserved_ftcms
+
     module subroutine solve_time_step_ftcms(self, is_step_converged)
         implicit none
         class(type_ftcms), intent(inout) :: self
@@ -173,6 +211,7 @@ contains
         real(real64) :: T_scale, P_scale, mean_pressure
         integer(int32) :: num_nodes
         logical :: linear_failed
+
 
         is_step_converged = .false.
 
@@ -261,8 +300,12 @@ contains
                 ! Convergence check; always converged when config is NONE
                 call self%solve_time_step_check_convergence()
 
-                ! Update solution with relaxation (Aitken for Picard, damped for Newton)
+                ! Update solution with relaxation (adaptive omega for conserved mode,
+                ! Aitken for legacy Picard, damped for Newton).
                 call self%reflect_variables()
+
+                ! Conserved-quantity convergence (PDF 6.2.4) on the updated state.
+                if (self%control%is_conserved()) call self%solve_time_step_check_convergence_conserved()
 
                 ! Force exit after one iteration when config is NONE (linear solve)
                 if (self%control%is_none()) exit nonlinear
@@ -658,6 +701,7 @@ contains
         integer(int32) :: step_counter
         integer(int32) :: nl_iter
         real(real64) :: time_s, dt_s
+        real(real64) :: lte_error
         integer(int32), parameter :: MAX_CONSECUTIVE_FAILURES = 50
 
         consecutive_failures = 0
@@ -669,8 +713,13 @@ contains
             call self%run_assimilation(time_s, 1.0d0 + time_s / 86400.0d0)
             call self%solve_time_step(is_step_converged)
 
+            ! Local-truncation-error estimate for error-controlled ATS, evaluated
+            ! before the time/variable history is shifted (needs ydot_n and dt_n).
+            lte_error = -1.0d0
+            if (is_step_converged) lte_error = self%compute_lte_error()
+
             ! Update time and adaptive time stepping
-            call self%control%update(is_step_converged)
+            call self%control%update(is_step_converged, error_estimate=lte_error)
 
             if (is_step_converged) then
                 consecutive_failures = 0
