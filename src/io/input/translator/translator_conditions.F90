@@ -98,10 +98,10 @@ contains
                         configs(num_active)%time_points(i) = physics_data%values(i)%time
 
                         if (.not. allocated(physics_data%values(i)%values)) then
-                            error stop 'Seepage BC requires three values [q_pot, Pmin, Pmax].'
+                            error stop 'Seepage BC requires three values [q_pot m/s, Pmin Pa, Pmax Pa].'
                         end if
                         if (size(physics_data%values(i)%values) < 3) then
-                            error stop 'Seepage BC requires at least three values [q_pot, Pmin, Pmax].'
+                            error stop 'Seepage BC requires at least three values [q_pot m/s, Pmin Pa, Pmax Pa].'
                         end if
 
                         configs(num_active)%values(1, i) = physics_data%values(i)%values(1)

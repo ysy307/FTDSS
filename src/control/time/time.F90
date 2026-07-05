@@ -29,6 +29,9 @@ module control_time
         real(real64), private :: time_old = 0.0d0
         !> Current time step size [s]
         real(real64), private :: dt = 0.0d0
+        !> Unclipped controller step [s]. Output synchronization may shorten dt
+        !> for one step, but it must not permanently throttle ATS/fixed stepping.
+        real(real64), private :: dt_controller = 0.0d0
         !> History of time steps
         real(real64), private, allocatable :: dt_history(:)
 
@@ -100,6 +103,7 @@ contains
         self%current_bdf_order = 1
 
         self%dt = self%config%initial_step
+        self%dt_controller = self%dt
 
         ! --- Allocate History ---
         call allocate_array(self%dt_history, self%config%target_bdf_order)
@@ -301,6 +305,7 @@ contains
         else
             self%dt = dt
         end if
+        self%dt_controller = self%dt
 
         call self%compute_bdf_coefficients()
     end subroutine set_dt
@@ -391,20 +396,34 @@ contains
         integer(int32), intent(in) :: iter_count
         real(real64), intent(in) :: next_output_time
         real(real64), intent(in), optional :: error_estimate
-        real(real64) :: next_dt, dt_iter, dt_err
+        real(real64) :: next_dt, dt_iter, dt_err, dt_tol
+        logical :: output_limited_step
 
         if (success) then
+            dt_tol = max(EPS_TIME, 100.0d0 * epsilon(1.0d0) * max(1.0d0, self%dt_controller))
+            output_limited_step = self%dt_controller > 0.0d0 .and. &
+                                  self%dt < self%dt_controller - dt_tol
+
             ! Step converged: advance time and predict next step
             call self%shift()
 
-            if (self%ats%active .and. self%ats%use_error_control .and. present(error_estimate)) then
+            if (output_limited_step) then
+                ! The accepted step was shortened only to hit an output time.
+                ! Keep the controller state from that artificial event step; a
+                ! genuinely hard clipped step can still reduce the controller.
+                next_dt = self%dt_controller
+                if (self%ats%active .and. iter_count >= self%ats%iter_max) then
+                    next_dt = self%dt_controller * self%ats%scale_down
+                end if
+                next_dt = max(self%ats%dt_min, min(next_dt, self%ats%dt_max))
+            else if (self%ats%active .and. self%ats%use_error_control .and. present(error_estimate)) then
                 ! Error-controlled stepping: accuracy (PI controller on the local
                 ! truncation error) is the primary driver of dt; the iteration count
                 ! acts only as a robustness brake that caps growth when the nonlinear
                 ! solve is hard (iter >= iter_max), via the unified minimum (PDF 6.3.8).
                 call self%ats%pi_controller_dt(self%dt, error_estimate, dt_err)
                 next_dt = dt_err
-                if (iter_count >= self%ats%iter_max) then
+                if (iter_count >= self%ats%iter_max .and. self%dt > self%ats%dt_min + dt_tol) then
                     next_dt = min(next_dt, self%dt * self%ats%scale_down)
                 end if
                 next_dt = max(self%ats%dt_min, min(next_dt, self%ats%dt_max))
@@ -413,13 +432,15 @@ contains
                 call self%ats%predict_next_dt(self%dt, iter_count, dt_iter)
                 next_dt = dt_iter
             end if
+            self%dt_controller = next_dt
             self%dt = next_dt
 
-            ! Sync with output time (modifies dt_s if necessary)
+            ! Sync with output time (modifies only the active dt if necessary).
             call self%sync_with_output(next_output_time)
         else
             ! Step failed: shrink dt and reset BDF order to 1 for stability
             call self%ats%calc_retry_dt(self%dt, next_dt)
+            self%dt_controller = next_dt
             self%dt = next_dt
             self%current_bdf_order = 1
         end if

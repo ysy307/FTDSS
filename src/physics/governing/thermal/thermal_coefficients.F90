@@ -57,7 +57,7 @@ contains
         end if
 
         ! Ice phase (Include Latent Heat of Fusion)
-        ! Pore ice only: segregated ice latent heat is handled by explicit source term
+        ! Additional segregation-sink latent heat is handled by an explicit source term.
         if (Qi > 0.0d0) then
             call self%physics%calc_density_ice(state, rho_i)
             call self%physics%calc_specific_heat_ice(state, c_i)
@@ -292,7 +292,7 @@ contains
         end if
 
         ! Ice (including latent heat derivative).
-        ! Pore ice only: segregated ice latent heat is handled by an explicit source.
+        ! Additional segregation-sink latent heat is handled by an explicit source.
         call state%dQi_dT%get(dQi_dT)
         if (Qi > 0.0d0 .or. dQi_dT /= 0.0d0) then
             call self%physics%calc_density_ice(state, rho_i)

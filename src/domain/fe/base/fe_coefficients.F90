@@ -55,10 +55,10 @@ contains
                           - local_J(1, 2) * (local_J(2, 1) * local_J(3, 3) - local_J(2, 3) * local_J(3, 1)) &
                           + local_J(1, 3) * (local_J(2, 1) * local_J(3, 2) - local_J(2, 2) * local_J(3, 1))
         end if
-        if (local_det_J == 0.0_real64) then
-            error stop "Zero Jacobian determinant: degenerate element"
+        if (local_det_J <= 0.0_real64) then
+            error stop "Non-positive Jacobian determinant: degenerate or inverted element"
         end if
-        if (present(determinant_jacobian)) determinant_jacobian = abs(local_det_J)
+        if (present(determinant_jacobian)) determinant_jacobian = local_det_J
 
         ! Determine whether the inverse Jacobian is needed (also required for dpsi_dx)
         need_inverse = present(inverse_jacobian) .or. present(dpsi_dx)
@@ -170,6 +170,9 @@ contains
 
         call self%calc_jacobian(r, node_coords, jacobian)
         call matrix_determinant(jacobian, determinant_jacobian, ierr)
+        if (determinant_jacobian <= 0.0d0) then
+            error stop "Non-positive Jacobian determinant: invalid element orientation"
+        end if
 
     end subroutine calc_jacobian_determinant_abst_fe
 

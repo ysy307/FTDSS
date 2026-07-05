@@ -144,6 +144,10 @@ module control_iteration_convergence
         real(real64), allocatable, private :: enthalpy_prev(:)
         real(real64), allocatable, private :: density_prev(:)
         logical, private :: has_prev_conserved = .false.
+        !> Previous conserved-quantity increment for coupled Aitken globalization
+        real(real64), allocatable, private :: dH_prev(:)
+        real(real64), allocatable, private :: drho_prev(:)
+        logical, private :: has_prev_conserved_increment = .false.
         !> Reference block residual norms ||R^0|| (set on first evaluation)
         real(real64), private :: residual0_thermal = -1.0d0
         real(real64), private :: residual0_hydraulic = -1.0d0

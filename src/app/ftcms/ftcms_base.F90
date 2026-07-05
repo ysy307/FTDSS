@@ -139,7 +139,6 @@ contains
 
         call self%Qw%initialize(num_nodes, max_bdf_order)
         call self%Qi%initialize(num_nodes, max_bdf_order)
-        call self%Qi_seg%initialize(num_nodes, max_bdf_order)
         call self%Qa%initialize(num_nodes, max_bdf_order)
         call self%Qv%initialize(num_nodes, max_bdf_order)
 
@@ -151,39 +150,6 @@ contains
 
         ! Apply initial Dirichlet boundary conditions to field variables
         call self%apply_bc()
-
-        ! Explicit scan: switching BCs (e.g. seepage) may provide conditional Dirichlet.
-        ! Evaluate each boundary node at its actual IC pressure value to detect initial Dirichlet state.
-        if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc)) then
-            block
-                integer(int32) :: n_pat_scan, i_pat_scan, bc_id_scan, i_node_scan, glob_id_scan
-                real(real64) :: val_scan
-                type(type_boundary_patch), pointer :: patch_scan => null()
-                type(type_bc_result) :: bc_res_scan
-                logical :: found_dirichlet
-
-                found_dirichlet = .false.
-                call self%domain%get_num_bc_patches(n_pat_scan)
-                outer: do i_pat_scan = 1, n_pat_scan
-                    call self%domain%get_bc_patch(i_pat_scan, patch_scan)
-                    call self%bc(PHYSICS_TYPES%HYDRAULIC%ID)%get_bc_index(patch_scan%entity_id, bc_id_scan)
-                    if (bc_id_scan < 0) cycle
-                    if (.not. allocated(patch_scan%connectivity%col_ind)) cycle
-                    do i_node_scan = 1, size(patch_scan%connectivity%col_ind)
-                        glob_id_scan = patch_scan%connectivity%col_ind(i_node_scan)
-                        call self%pressure%get_current(glob_id_scan, val_scan)
-                        call self%bc(PHYSICS_TYPES%HYDRAULIC%ID)%evaluate(bc_id_scan, 0.0d0, val_scan, bc_res_scan)
-                        if (bc_res_scan%is_dirichlet) then
-                            found_dirichlet = .true.
-                            write (*, '(A,I0,A)') 'Notice: Hydraulic Dirichlet detected from switching BC on entity ', &
-                                patch_scan%entity_id, '. Disabling nullspace projection.'
-                            exit outer
-                        end if
-                    end do
-                end do outer
-                self%hydraulic_has_dirichlet_bc = found_dirichlet
-            end block
-        end if
 
         ! Initialize solver strictly from input settings.
         associate (linear_solver_settings => input%basic%solver_settings%linear_solver)
@@ -197,15 +163,11 @@ contains
             write (*, '(A,I0,A,I0)') 'Notice: linear solver type=', solver_type_selected, &
                 ', preconditioner type=', preconditioner_type_selected
 
-            ! Near saturation, C_HH = rho_w * d(theta_w)/dP -> 0, so the BDF mass term does not
-            ! regularize the all-Neumann system. Nullspace projection is required regardless of BDF order.
-            if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc)) then
-                projection_enabled_selected = .true.
-                projection_offset_selected = self%hydraulic_start_dof
-                call self%K%get_num_dofs_per_node(projection_stride_selected)
-                write (*, '(A)') 'Notice: Enabling mean-zero nullspace projection for all-Neumann hydraulic component.'
-            end if
-
+            ! Mean-zero nullspace projection is never enabled automatically: the
+            ! transient hydraulic block is nonsingular (BDF storage term with
+            ! C_eq >= L-scheme capacity > 0), and projecting a nonsingular
+            ! system discards the global water-mass balance (the mean residual
+            ! component) every Krylov iteration, biasing the solution.
             block
                 integer(int32) :: solver_size
                 if (self%control%is_staggered()) then
@@ -398,8 +360,6 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: pressure
         real(real64), pointer, contiguous, dimension(:) :: water_content
         real(real64), pointer, contiguous, dimension(:) :: ice_pore
-        real(real64), pointer, contiguous, dimension(:) :: ice_seg
-        real(real64), allocatable, target :: ice_content(:)
         real(real64), pointer, contiguous, dimension(:) :: vapor_content
 
         type(type_coordinate_array_dp) :: water_flux_arr
@@ -414,7 +374,6 @@ contains
         nullify (temperature)
         nullify (pressure)
         nullify (ice_pore)
-        nullify (ice_seg)
         nullify (vapor_content)
         nullify (water_content)
 
@@ -423,17 +382,14 @@ contains
         if (self%control%is_output_triggered(OUTPUT_TYPES%FIELD, current_time)) then
             call self%control%get_output_step(OUTPUT_TYPES%FIELD, iter)
             if (self%is_active_thermal()) then
-                call self%temperature%get_previous(temperature)
+                call self%temperature%get_current(temperature)
             end if
             if (self%is_active_hydraulic()) then
-                call self%pressure%get_previous(pressure)
+                call self%pressure%get_current(pressure)
             end if
-            call self%Qw%get_previous(water_content)
-            call self%Qi%get_previous(ice_pore)
-            call self%Qi_seg%get_previous(ice_seg)
-            call self%Qv%get_previous(vapor_content)
-            allocate (ice_content(size(ice_pore)))
-            ice_content(:) = ice_pore(:) + ice_seg(:)
+            call self%Qw%get_current(water_content)
+            call self%Qi%get_current(ice_pore)
+            call self%Qv%get_current(vapor_content)
 
             has_water_flux = .false.
             if (self%is_active_hydraulic()) then
@@ -465,7 +421,7 @@ contains
                 call self%output%output_fields(file_counts=iter, &
                                                temperature=temperature, &
                                                water_content=water_content, &
-                                               ice_content=ice_content, &
+                                               ice_content=ice_pore, &
                                                vapor_content=vapor_content, &
                                                pressure=pressure, &
                                                water_flux=water_flux_arr)
@@ -473,19 +429,17 @@ contains
                 call self%output%output_fields(file_counts=iter, &
                                                temperature=temperature, &
                                                water_content=water_content, &
-                                               ice_content=ice_content, &
+                                               ice_content=ice_pore, &
                                                vapor_content=vapor_content, &
                                                pressure=pressure)
             end if
 
             call self%control%update_output(OUTPUT_TYPES%FIELD, current_time)
 
-            deallocate (ice_content)
             call water_flux_arr%destroy()
             nullify (temperature)
             nullify (pressure)
             nullify (ice_pore)
-            nullify (ice_seg)
             nullify (water_content)
             nullify (vapor_content)
         end if
@@ -503,8 +457,6 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: water_content
         real(real64), pointer, contiguous, dimension(:) :: ice_pore
         real(real64), pointer, contiguous, dimension(:) :: vapor_content
-        real(real64), pointer, contiguous, dimension(:) :: ice_seg
-        real(real64), allocatable, target :: ice_content(:)
         type(type_coordinate_array_dp) :: liq_flux_arr, vap_flux_arr
         integer(int32) :: num_nodes_hf, i_obs_fe, i_local_hf, node_id_hf
         integer(int32), pointer, contiguous :: conn_hf(:)
@@ -520,23 +472,19 @@ contains
         nullify (water_content)
         nullify (ice_pore)
         nullify (vapor_content)
-        nullify (ice_seg)
 
         call self%control%get_time(current_time)
 
         if (self%control%is_output_triggered(OUTPUT_TYPES%HISTORY, current_time)) then
             if (self%is_active_thermal()) then
-                call self%temperature%get_previous(temperature)
+                call self%temperature%get_current(temperature)
             end if
             if (self%is_active_hydraulic()) then
-                call self%pressure%get_previous(pressure)
+                call self%pressure%get_current(pressure)
             end if
-            call self%Qw%get_previous(water_content)
-            call self%Qi%get_previous(ice_pore)
-            call self%Qv%get_previous(vapor_content)
-            call self%Qi_seg%get_previous(ice_seg)
-            allocate (ice_content(size(ice_pore)))
-            ice_content(:) = ice_pore(:) + ice_seg(:)
+            call self%Qw%get_current(water_content)
+            call self%Qi%get_current(ice_pore)
+            call self%Qv%get_current(vapor_content)
 
             ! Compute per-node liquid and vapor fluxes for observation elements only
             has_flux = .false.
@@ -578,7 +526,7 @@ contains
                 call self%output%output_history(time=current_time_converted, &
                                                 temperature=temperature, &
                                                 water_content=water_content, &
-                                                ice_content=ice_content, &
+                                                ice_content=ice_pore, &
                                                 vapor_content=vapor_content, &
                                                 pressure=pressure, &
                                                 water_flux=liq_flux_arr, &
@@ -587,7 +535,7 @@ contains
                 call self%output%output_history(time=current_time_converted, &
                                                 temperature=temperature, &
                                                 water_content=water_content, &
-                                                ice_content=ice_content, &
+                                                ice_content=ice_pore, &
                                                 vapor_content=vapor_content, &
                                                 pressure=pressure)
             end if
@@ -597,11 +545,9 @@ contains
                 call liq_flux_arr%destroy()
                 call vap_flux_arr%destroy()
             end if
-            deallocate (ice_content)
             nullify (water_content)
             nullify (ice_pore)
             nullify (vapor_content)
-            nullify (ice_seg)
             nullify (temperature)
             nullify (pressure)
         end if
@@ -739,7 +685,6 @@ contains
         start_dof_thermal = self%thermal_start_dof
         if (start_dof_thermal > 0) then
             call self%temperature%get_current(node_id, temperature)
-            temperature = min(max(temperature, -80.0d0), 80.0d0)
             call self%temperature%get_current_gradient(node_id, grad_T)
             call self%temperature%get_history(node_id, temperature_history)
         else
@@ -754,7 +699,6 @@ contains
         start_dof_hydraulic = self%hydraulic_start_dof
         if (start_dof_hydraulic > 0) then
             call self%pressure%get_current(node_id, pressure)
-            pressure = min(max(pressure, -1.0d7), 1.0d7)
             call self%pressure%get_current_gradient(node_id, grad_P)
             call self%pressure%get_history(node_id, pressure_history)
         else
@@ -781,12 +725,6 @@ contains
             call state%ice_content%set(qi_val)
             call state%air_content%set(qa_val)
             call state%vapor_content%set(qv_val)
-        end block
-
-        block
-            real(real64) :: qi_seg_val
-            call self%Qi_seg%get_current(node_id, qi_seg_val)
-            call state%ice_content_seg%set(qi_seg_val)
         end block
 
         call state%temperature%get(temperature, temperature_set)
@@ -907,7 +845,6 @@ contains
         call self%porosity%advance()
         call self%Qw%advance()
         call self%Qi%advance()
-        call self%Qi_seg%advance()
         call self%Qa%advance()
         call self%Qv%advance()
 
@@ -937,10 +874,10 @@ contains
         ! Legacy step caps (used only by the non-conserved convergence modes; the
         ! universal conserved mode below uses adaptive under-relaxation instead).
         real(real64), parameter :: PICARD_MAX_DP_STEP = 5.0d3
-        real(real64), parameter :: TEMP_MIN_C = -80.0d0
-        real(real64), parameter :: TEMP_MAX_C = 80.0d0
-        real(real64), parameter :: PRESS_MIN_PA = -1.0d7
-        real(real64), parameter :: PRESS_MAX_PA = 1.0d7
+        real(real64), parameter :: TEMP_MIN_C = WALL_TEMP_MIN_C
+        real(real64), parameter :: TEMP_MAX_C = WALL_TEMP_MAX_C
+        real(real64), parameter :: PRESS_MIN_PA = WALL_PRESS_MIN_PA
+        real(real64), parameter :: PRESS_MAX_PA = WALL_PRESS_MAX_PA
 
         call self%control%profiler_start(PROFILER_TYPES%SETUP)
 
@@ -963,14 +900,13 @@ contains
 
                 if (allocated(du) .and. size(du) > 0) then
                     if (is_conserved_mode) then
-                        ! Globalized modified-Picard step via Irons-Tuck dynamic
-                        ! Aitken (per-block delta-squared). The freezing front is an
-                        ! oscillatory fixed point that scalar under-relaxation cannot
-                        ! contract (it would need omega < 2/(1+a) with a ~ apparent
-                        ! heat capacity -> 0); Aitken estimates the optimal omega
-                        ! from the increment history and breaks the limit cycle. No
-                        ! ad-hoc per-variable clamps; updates current(:) in place.
-                        call self%control%compute_relaxation(PHYSICS_TYPES%THERMAL, iter, du, current)
+                        ! Conserved mode uses one coupled Picard damping factor for
+                        ! T and p. The factor is adapted from the conserved-quantity
+                        ! contraction rate after each accepted nonlinear iterate.
+                        relaxation_factor = self%control%get_conserved_relaxation()
+                        if (present(step_scale)) relaxation_factor = relaxation_factor * step_scale
+                        alpha = min(relaxation_factor, bounded_step_factor(current, du, TEMP_MIN_C, TEMP_MAX_C))
+                        current(:) = current(:) + alpha * du(:)
                     else
                         max_du = maxval(abs(du))
                         ! Step limiter: tighter limit near T_melt to prevent C-C amplification
@@ -1015,20 +951,13 @@ contains
                     end if
                 end if
 
-                ! Phase-change (Flerchinger available-energy) temperature correction.
-                ! A node that the Picard step moves across the freezing point T_f=0
-                ! would otherwise overshoot into the sensible-heat branch, then swing
-                ! back on the next iterate: the discrete phase toggles and the
-                ! conserved quantity (theta_ice -> rho_eff, H) jumps a finite amount
-                ! regardless of step size, so the iteration chatters (independent of
-                ! dt or relaxation magnitude). The correction re-maps a crossing node
-                ! to the energy-equivalent temperature in [T_new, T_f] that holds it
-                ! at the front while the latent heat is absorbed, removing the toggle.
-                if (is_conserved_mode) then
-                    call self%apply_phase_change_temperature_correction(current_prev, current)
+                if (minval(current(:)) < TEMP_MIN_C .or. maxval(current(:)) > TEMP_MAX_C) then
+                    current(:) = current_prev(:)
+                    if (allocated(du) .and. size(du) > 0) then
+                        alpha = bounded_step_factor(current, du, TEMP_MIN_C, TEMP_MAX_C)
+                        current(:) = current(:) + alpha * du(:)
+                    end if
                 end if
-
-                current(:) = min(max(current(:), TEMP_MIN_C), TEMP_MAX_C)
                 call self%temperature%set_delta(current(:) - current_prev(:))
 
                 call deallocate_array(current_prev)
@@ -1058,9 +987,11 @@ contains
 
                 if (allocated(du) .and. size(du) > 0) then
                     if (is_conserved_mode) then
-                        ! Globalized modified-Picard step (see thermal branch above):
-                        ! per-block Irons-Tuck dynamic Aitken, no pressure step clamp.
-                        call self%control%compute_relaxation(PHYSICS_TYPES%HYDRAULIC, iter, du, current)
+                        ! Same coupled Picard damping factor as the thermal branch.
+                        relaxation_factor = self%control%get_conserved_relaxation()
+                        if (present(step_scale)) relaxation_factor = relaxation_factor * step_scale
+                        alpha = min(relaxation_factor, bounded_step_factor(current, du, PRESS_MIN_PA, PRESS_MAX_PA))
+                        current(:) = current(:) + alpha * du(:)
                     else
                         max_du = maxval(abs(du))
                         ! Step limiter: prevent large pressure updates regardless of solver mode
@@ -1097,7 +1028,13 @@ contains
                     end if
                 end if
 
-                current(:) = min(max(current(:), PRESS_MIN_PA), PRESS_MAX_PA)
+                if (minval(current(:)) < PRESS_MIN_PA .or. maxval(current(:)) > PRESS_MAX_PA) then
+                    current(:) = current_prev(:)
+                    if (allocated(du) .and. size(du) > 0) then
+                        alpha = bounded_step_factor(current, du, PRESS_MIN_PA, PRESS_MAX_PA)
+                        current(:) = current(:) + alpha * du(:)
+                    end if
+                end if
                 call self%pressure%set_delta(current(:) - current_prev(:))
 
                 call deallocate_array(current_prev)
@@ -1121,6 +1058,30 @@ contains
         call self%update_nodal_phases()
 
         call self%control%profiler_stop(PROFILER_TYPES%SETUP)
+
+    contains
+        pure function bounded_step_factor(vec, step, lower, upper) result(factor)
+            implicit none
+            real(real64), intent(in) :: vec(:)
+            real(real64), intent(in) :: step(:)
+            real(real64), intent(in) :: lower, upper
+            real(real64) :: factor
+            real(real64) :: candidate
+            integer(int32) :: i, n
+
+            factor = 1.0d0
+            n = min(size(vec), size(step))
+            do i = 1, n
+                if (step(i) > 0.0d0) then
+                    candidate = (upper - vec(i)) / step(i)
+                    factor = min(factor, candidate)
+                else if (step(i) < 0.0d0) then
+                    candidate = (lower - vec(i)) / step(i)
+                    factor = min(factor, candidate)
+                end if
+            end do
+            factor = max(0.0d0, min(1.0d0, factor))
+        end function bounded_step_factor
 
     end subroutine reflect_variables_ftcms
 
@@ -1252,8 +1213,8 @@ contains
         integer(int32) :: i_elem, num_elem, i_local, node_id
         integer(int32), pointer, contiguous :: connectivity(:)
         type(type_state) :: state
-        real(real64) :: qw_val, qi_val, qa_val, qv_val, qi_seg_val
-        logical :: qi_set, qw_set, qa_set, qv_set, qi_seg_set
+        real(real64) :: qw_val, qi_val, qa_val, qv_val
+        logical :: qi_set, qw_set, qa_set, qv_set
 
         nullify (connectivity)
         call self%domain%get_num_fe(num_elem)
@@ -1264,17 +1225,15 @@ contains
                 if (node_id < 1) cycle
                 call self%set_state(node_id, i_elem, state, calc_physics=.true.)
                 qi_set = .false.; qw_set = .false.; qa_set = .false.
-                qv_set = .false.; qi_seg_set = .false.
+                qv_set = .false.
                 call state%ice_content%get(qi_val, qi_set)
                 call state%water_content%get(qw_val, qw_set)
                 call state%air_content%get(qa_val, qa_set)
                 call state%vapor_content%get(qv_val, qv_set)
-                call state%ice_content_seg%get(qi_seg_val, qi_seg_set)
                 if (qi_set) call self%Qi%set_current(node_id, qi_val)
                 if (qw_set) call self%Qw%set_current(node_id, qw_val)
                 if (qa_set) call self%Qa%set_current(node_id, qa_val)
                 if (qv_set) call self%Qv%set_current(node_id, qv_val)
-                if (qi_seg_set) call self%Qi_seg%set_current(node_id, qi_seg_val)
             end do
             nullify (connectivity)
         end do
@@ -1469,10 +1428,6 @@ contains
         class(type_ftcms), intent(inout) :: self
 
         integer(int32) :: log_io_unit
-#ifdef _MPI
-        integer(int32) :: ierr
-#endif
-
         ! --- Stop and Record Profiler ---
         call self%control%profiler_stop(PROFILER_TYPES%TOTAL)
         call self%control%profiler_record(TIME_RECORDS%END)
@@ -1480,10 +1435,6 @@ contains
         call self%output%output_system_log()
         call self%output%get_log_io_unit(log_io_unit)
         call self%control%display_profiler(log_io_unit)
-
-#ifdef _MPI
-        call MPI_Finalize(ierr)
-#endif
 
     end subroutine destroy_type_ftcms
 end submodule ftcms_base

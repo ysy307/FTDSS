@@ -4,7 +4,8 @@ module models_phase_change_fusion
     use :: module_core, only:type_state
     use :: constitutive_constants, only: &
         Tf0 => water_freezing_point_at_standard_atmospheric_pressure, &
-        g => gravity_acceleration, rho_std => reference_water_density
+        g => gravity_acceleration, rho_std => reference_water_density, &
+        SUCTION_BLEND_EPS => suction_blend_epsilon
     use :: physics_constitutive_base, only:abst_constitutive
     use :: models_wrf, only:abst_wrf
     use :: models_phase_change_gcc, only:abst_gcc
@@ -12,12 +13,6 @@ module models_phase_change_fusion
     private
 
     public :: type_fusion
-
-    ! Smooth blending scale [Pa] for the generalized suction p_c* = max(P_aw, P_iw).
-    ! A small positive epsilon keeps the max differentiable near P_aw = P_iw.
-    real(real64), parameter :: SUCTION_BLEND_EPS = 1.0d2
-
-    !
 
     !>
     !> @brief Model for fusion (melting/freezing) physics.
@@ -32,6 +27,7 @@ module models_phase_change_fusion
         procedure, pass(self), public :: calc_ice_content_derivatives
         procedure, pass(self), public :: calc_water_content
         procedure, pass(self), public :: calc_water_content_derivatives
+        procedure, pass(self), public :: calc_effective_suction
         procedure, pass(self), public :: deriv_pressure_ice_water
 
     end type type_fusion
@@ -322,6 +318,27 @@ contains
         dwater_dT = d_theta_liquid_dPress * (-d_psi_eff_dT) / (rho_std * g)
 
     end subroutine calc_water_content_derivatives
+
+    !>
+    !> @brief Generalized suction \(p_c^* = \max(\psi_{cap}, \psi_{cryo})\) [Pa].
+    !>
+    !> The liquid-phase potential is \(-p_c^*\); water retention AND relative
+    !> permeability must be evaluated at this suction for thermodynamic
+    !> consistency of the single-potential freezing model.
+    subroutine calc_effective_suction(self, state, psi_eff)
+        implicit none
+        class(type_fusion), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: psi_eff
+
+        real(real64) :: pressure, psi_cap, psi_cryo
+
+        call state%pressure%get(pressure)
+        psi_cap = max(0.0d0, -pressure)
+        psi_cryo = 0.0d0
+        call self%gcc%calc(state, psi_cryo)
+        call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
+    end subroutine calc_effective_suction
 
     !>
     !> @brief Calculate derivative of ice pressure w.r.t water pressure.

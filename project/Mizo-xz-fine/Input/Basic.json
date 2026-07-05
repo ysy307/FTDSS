@@ -12,7 +12,7 @@
         "partitioning": true
     },
     "geometry_settings": {
-        "mesh_file_name": "Mizoguchi_unsaturated_v_v2_@RANK@.vtu",
+        "mesh_file_name": "Mizo_fine_@RANK@.vtu",
         "global_node_id_key": "global_node_id",
         "node_type_key": "node_type",
         "num_sharing_ranks_key": "num_sharing_ranks",
@@ -54,10 +54,10 @@
             },
             "volumetric_heat_capacity": {
                 "value": [
-                    2.5536e6,
-                    4.18e6,
-                    1.9257e6,
-                    1.259e6
+                    2553600.0,
+                    4180000.0,
+                    1925700.0,
+                    1259000.0
                 ],
                 "params": [
                     1.0,
@@ -79,7 +79,7 @@
                 ],
                 "params": [
                     0.55,
-                    0.80,
+                    0.8,
                     3.07,
                     0.13,
                     13.05,
@@ -103,7 +103,7 @@
             },
             "hydraulic_conductivity_model": {
                 "model_number": 4,
-                "saturated_conductivity": 3.2e-6,
+                "saturated_conductivity": 3.2e-06,
                 "impedance_factor": 7,
                 "water_viscosity_model": 1,
                 "gain_factor": 1.0
@@ -119,10 +119,10 @@
             "convergence": {
                 "use_criteria": "conserved",
                 "norm_type": "linf",
-                "atol_enthalpy": 1e2,
-                "atol_density": 1e-3,
-                "rtol": 1e-3,
-                "residual_eps": 1e-1,
+                "atol_enthalpy": 100.0,
+                "atol_density": 0.001,
+                "rtol": 0.001,
+                "residual_eps": 0.1,
                 "logic_between_criteria": "and",
                 "residual": {
                     "criteria": "relative",
@@ -157,7 +157,7 @@
     "parallel_settings": {
         "threads": {
             "is_parallel": true,
-            "num_threads": 8,
+            "num_threads": 4,
             "schedule": "static",
             "max_active_levels": 1
         }

@@ -57,6 +57,7 @@ module physics_constitutive_manager
         procedure, public :: calc_lscheme_capacity
         procedure, public :: calc_suction_weights
         procedure, public :: calc_segregation_sink
+        procedure, public :: calc_effective_segregation_sink
         procedure, public :: is_segregation_active
         procedure, public :: has_cryo_transport
 
@@ -490,6 +491,50 @@ contains
 
         call self%models(self%materials_id_map(material_id))%calc_segregation_sink(state, grad_T_magnitude, S_seg)
     end subroutine calc_segregation_sink
+
+    subroutine calc_effective_segregation_sink(self, material_id, state, grad_T_magnitude, dt, S_seg)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(in) :: grad_T_magnitude
+        real(real64), intent(in) :: dt
+        real(real64), intent(inout) :: S_seg
+
+        real(real64) :: S_seg_raw
+        real(real64) :: Qw, Qi_pore, porosity_val
+        real(real64) :: rho_w, rho_i, density_ratio
+        real(real64) :: delta_liquid_raw, delta_liquid_clamped, pore_space_left
+
+        S_seg = 0.0d0
+        if (grad_T_magnitude <= 0.0d0 .or. dt <= 0.0d0) return
+
+        S_seg_raw = 0.0d0
+        call self%calc_segregation_sink(material_id, state, grad_T_magnitude, S_seg_raw)
+        if (S_seg_raw <= 0.0d0) return
+
+        call state%water_content%get(Qw)
+        call state%ice_content%get(Qi_pore)
+        call state%porosity%get(porosity_val)
+        call self%calc_density_water(state, rho_w)
+        call self%calc_density_ice(state, rho_i)
+        if (rho_w <= tiny(1.0d0)) return
+        if (rho_i <= tiny(1.0d0)) return
+
+        density_ratio = rho_w / rho_i
+
+        ! Clamp the liquid-water intake consistently for all equations. S_seg is
+        ! a liquid-water-equivalent volumetric removal rate [1/s]; it cannot
+        ! consume more liquid than is present, and its ice-volume equivalent
+        ! cannot exceed the currently open pore space during this step.
+        delta_liquid_raw = S_seg_raw * dt
+        delta_liquid_clamped = min(delta_liquid_raw, max(Qw, 0.0d0))
+        pore_space_left = max(porosity_val - Qi_pore - max(Qw, 0.0d0), 0.0d0)
+        delta_liquid_clamped = min(delta_liquid_clamped, pore_space_left / density_ratio)
+        delta_liquid_clamped = max(delta_liquid_clamped, 0.0d0)
+
+        S_seg = delta_liquid_clamped / dt
+    end subroutine calc_effective_segregation_sink
 
     function is_segregation_active(self, material_id) result(active)
         implicit none

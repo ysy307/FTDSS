@@ -1,6 +1,7 @@
 module constitutive_models_manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
+    use :: constitutive_constants, only: SUCTION_BLEND_EPS => suction_blend_epsilon
     use :: module_core
     use :: models_wrf
     use :: models_hcf
@@ -175,7 +176,6 @@ contains
         real(real64), intent(inout) :: w_cap, w_cryo
 
         real(real64) :: pressure, psi_cap, psi_cryo, delta, denom
-        real(real64), parameter :: SUCTION_BLEND_EPS = 1.0d2
 
         call state%pressure%get(pressure)
         psi_cap = max(0.0d0, -pressure)

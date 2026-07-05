@@ -244,7 +244,7 @@ contains
             call config%reset()
 
             config%material_id = material_id
-            if (material%segregation) then
+            if (material%segregation .or. phase%segregation_potential > 0.0d0) then
                 config%gcc_model = GCC_TYPES%SEGREGATION
             else
                 config%gcc_model = GCC_TYPES%NON_SEGREGATION
@@ -365,8 +365,8 @@ contains
             stop 1
         end if
 
-        num_unique_regions = size(config%unique_material_ids)
         max_region_id = maxval(config%unique_material_ids)
+        num_unique_regions = size(config%unique_material_ids)
 
         ! -------------------------
         ! Physics active flags
@@ -376,7 +376,7 @@ contains
         ! -------------------------
         ! Per-material flag configuration
         ! -------------------------
-        call allocate_array(config%physics_active, PHYSICS_TYPES%NUM_ID, num_unique_regions)
+        call allocate_array(config%physics_active, PHYSICS_TYPES%NUM_ID, max_region_id)
         config%physics_active(:, :) = .false.
 
         do i = 1, num_unique_regions
@@ -386,7 +386,8 @@ contains
 
             do pid = 1, PHYSICS_TYPES%NUM_ID
                 if (config%compute_active(pid)) then
-                    config%physics_active(pid, current_material_id) = config%compute_active(pid)
+                    config%physics_active(pid, current_material_id) = &
+                        input%basic%materials(current_material_id)%is_active(pid)
                 end if
             end do
         end do

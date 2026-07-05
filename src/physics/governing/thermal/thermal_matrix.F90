@@ -16,6 +16,17 @@ contains
     end subroutine assemble_local_thermal
 
     !> @brief Assemble Picard local components (backward Euler, no BDF history)
+    !>
+    !> ### Linearization of the latent-heat pressure coupling
+    !> The residual F_T carries the exact T-P coupling through the enthalpy
+    !> BDF term (U(T,p) history), so the K_TH block is intentionally left
+    !> zero (block Gauss-Seidel lagging).  Filling it with bdf0*M*C_TH
+    !> creates, together with the cryosuction flux of the hydraulic block, a
+    !> dt-independent off-diagonal product > 1 at freezing-interface nodes,
+    !> which makes the coupled linear solve amplify (T and p diverge to the
+    !> validity walls at any dt).  The lagged coupling is handled by the
+    !> adaptive under-relaxation of the conserved Picard loop and leaves the
+    !> converged solution unchanged.
     module subroutine assemble_local_picard_thermal(self, control, workspace, K_TT, K_TH, F_T)
         implicit none
         class(type_thermal), intent(in) :: self
@@ -27,23 +38,19 @@ contains
 
         integer(int32) :: i, j
         integer(int32) :: ierr
-        real(real64) :: val_T, bdf0, C_TH_gp
+        real(real64) :: val_T, bdf0, dt_local
         real(real64), pointer :: K_TT_val(:, :)
-        real(real64), pointer :: K_TH_val(:, :)
         real(real64), pointer :: F_T_val(:)
 
         ! Automatic (stack) arrays — bounds taken from the dummy workspace at entry,
         ! so no per-element heap allocate/deallocate in the assembly hot path.
         real(real64) :: local_vec_diff_flux(workspace%num_fe_nodes)
         real(real64) :: local_vec_adv_flux(workspace%num_fe_nodes)
-        real(real64) :: work_C_TH(workspace%num_fe_gauss)
         real(real64) :: work_Q_seg(workspace%num_fe_gauss)
-        real(real64) :: C_TH_nodes(workspace%num_fe_nodes)
         real(real64) :: S_seg, Lf, rho_w, grad_T_mag
         type(type_coordinate_dp), pointer :: grad_T_ptr
-        type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp_coords_th
         integer(int32) :: n_nodes
-        logical :: has_advection
+        logical :: has_advection, hydraulic_target
 
         n_nodes = workspace%num_fe_nodes
 
@@ -56,27 +63,18 @@ contains
         local_vec_adv_flux(:) = 0.0d0
 
         has_advection = .false.
+        hydraulic_target = control%is_target(PHYSICS_TYPES%HYDRAULIC, workspace%material_id)
 
         bdf0 = workspace%bdf_coeffs(1)
+        dt_local = 0.0d0
+        call control%get_dt(dt_local)
 
         nullify (K_TT_val)
-        nullify (K_TH_val)
         nullify (F_T_val)
         nullify (grad_T_ptr)
-        nullify (gp_coords_th)
 
         if (present(K_TT)) K_TT_val => K_TT%get_val()
-        if (present(K_TH)) K_TH_val => K_TH%get_val()
         if (present(F_T)) F_T_val => F_T%get_data()
-
-        if (present(K_TH)) then
-            work_C_TH(:) = 0.0d0
-            ! Lerp C_TH from node states to capture non-zero coupling at freezing-front elements
-            call workspace%fe%get_gauss(gp_coords_th)
-            do i = 1, n_nodes
-                call self%compute_coupling_mass_term(workspace%material_id, workspace%state(i), C_TH_nodes(i))
-            end do
-        end if
 
         work_Q_seg(:) = 0.0d0
 
@@ -93,27 +91,24 @@ contains
             call self%compute_transient_term(workspace%material_id, workspace%state_gp(i), &
                                              workspace%bdf_coeffs, workspace%work_d_dt(i))
 
-            if (present(K_TH)) then
-                call workspace%fe%lerp(gp_coords_th(i), C_TH_nodes(1:n_nodes), C_TH_gp)
-                work_C_TH(i) = C_TH_gp
-            end if
-
-            ! Segregation latent heat source term
-            nullify (grad_T_ptr)
-            call workspace%state_gp(i)%grad_T%get(grad_T_ptr)
-            if (associated(grad_T_ptr)) then
-                grad_T_mag = sqrt(grad_T_ptr%x**2 + grad_T_ptr%y**2 + grad_T_ptr%z**2)
-                if (grad_T_mag > 0.0d0) then
-                    S_seg = 0.0d0
-                    call self%physics%calc_segregation_sink( &
-                        workspace%material_id, workspace%state_gp(i), grad_T_mag, S_seg)
-                    if (S_seg > 0.0d0) then
-                        Lf = 0.0d0
-                        rho_w = 0.0d0
-                        call self%physics%calc_latent_heat_fusion( &
-                            workspace%material_id, workspace%state_gp(i), Lf)
-                        call self%calc_density_water(workspace%state_gp(i), rho_w)
-                        work_Q_seg(i) = Lf * rho_w * S_seg
+            ! Segregation latent heat is paired with the hydraulic water sink.
+            if (hydraulic_target) then
+                nullify (grad_T_ptr)
+                call workspace%state_gp(i)%grad_T%get(grad_T_ptr)
+                if (associated(grad_T_ptr)) then
+                    grad_T_mag = sqrt(grad_T_ptr%x**2 + grad_T_ptr%y**2 + grad_T_ptr%z**2)
+                    if (grad_T_mag > 0.0d0) then
+                        S_seg = 0.0d0
+                        call self%physics%calc_effective_segregation_sink( &
+                            workspace%material_id, workspace%state_gp(i), grad_T_mag, dt_local, S_seg)
+                        if (S_seg > 0.0d0) then
+                            Lf = 0.0d0
+                            rho_w = 0.0d0
+                            call self%physics%calc_latent_heat_fusion( &
+                                workspace%material_id, workspace%state_gp(i), Lf)
+                            call self%calc_density_water(workspace%state_gp(i), rho_w)
+                            work_Q_seg(i) = Lf * rho_w * S_seg
+                        end if
                     end if
                 end if
             end if
@@ -149,13 +144,8 @@ contains
             call matvec(workspace%work_matrix, workspace%T_node, local_vec_adv_flux, ierr)
         end if
 
-        ! Coupling K_TH (K1, factor bdf0, lerped C_TH)
-        if (associated(K_TH_val)) then
-            call workspace%compute_K1(work_C_TH, workspace%work_matrix)
-            K_TH_val(1:n_nodes, 1:n_nodes) = &
-                K_TH_val(1:n_nodes, 1:n_nodes) + &
-                bdf0 * workspace%work_matrix(1:n_nodes, 1:n_nodes)
-        end if
+        ! K_TH stays zero: the T-p coupling is carried exactly by the enthalpy
+        ! BDF term in the residual (see the subroutine header).
 
         ! Residual vector
         if (associated(F_T_val)) then

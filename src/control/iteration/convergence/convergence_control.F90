@@ -4,6 +4,11 @@ submodule(control_iteration_convergence) convergence_control
     !> Floor for the adaptive under-relaxation factor of the globalized modified
     !> Picard step. Below this the step is considered un-saveable by damping and
     !> the step is declared diverged so the ATS reduces dt instead.
+    real(real64), parameter :: CONSERVED_OMEGA_MIN = 1.0d-4
+    real(real64), parameter :: CONSERVED_OMEGA_INITIAL = 5.0d-1
+    real(real64), parameter :: CONSERVED_OMEGA_GROW_MAX = 2.0d0
+    real(real64), parameter :: CONSERVED_KAPPA_RECOVER = 5.0d-1
+    logical, parameter :: CONSERVED_VERBOSE = .false.
 contains
 
     module subroutine initialize_convergence_control(self, config, max_iterations, reference_values)
@@ -264,9 +269,14 @@ contains
         logical, intent(inout) :: is_ok
         logical, intent(inout) :: is_diverged
 
-        real(real64) :: dq_norm, kappa
+        real(real64) :: dq_norm, kappa, lambda_est
+        real(real64) :: aitken_omega, numerator, denominator
+        real(real64) :: wH, wR, z, z_prev, dz
         real(real64) :: rT, rH, ratioT, ratioH
         logical :: dq_ok
+        logical :: omega_updated
+        integer(int32) :: j, n_cons
+        real(real64), allocatable :: dH(:), drho(:)
 
         is_ok = .false.
         is_diverged = .false.
@@ -285,8 +295,12 @@ contains
 
         ! Weighted-RMS norm of the inter-iteration conserved-quantity change
         if (self%has_prev_conserved) then
-            dq_norm = weighted_rms_conserved(self, enthalpy - self%enthalpy_prev, &
-                                             density - self%density_prev, enthalpy, density)
+            n_cons = min(size(enthalpy), size(density), size(self%enthalpy_prev), size(self%density_prev))
+            allocate (dH(n_cons))
+            allocate (drho(n_cons))
+            dH(:) = enthalpy(1:n_cons) - self%enthalpy_prev(1:n_cons)
+            drho(:) = density(1:n_cons) - self%density_prev(1:n_cons)
+            dq_norm = weighted_rms_conserved(self, dH, drho, enthalpy, density)
         end if
 
         ! Per-block residual ratios; reference ||R^0|| captured on first evaluation
@@ -310,27 +324,19 @@ contains
         end if
 
         ! Convergence is the complete weighted-RMS criterion ||dQ||_W <= 1 over the
-        ! conserved quantities (energy and water mass, PDF 6.2.3-6.2.4). The step is
-        ! relaxed by Irons-Tuck dynamic Aitken (in reflect_variables), which provides
-        ! the optimal per-block omega rather than an artificially throttled one, so a
-        ! converged ||dQ||_W reflects a genuine fixed point (the earlier omega-tied
-        ! threshold created a catch-22: any transient kappa>=1 ratcheted omega down,
-        ! tightening the gate below what the contracting iteration could ever meet).
+        ! conserved quantities (energy and water mass, PDF 6.2.3-6.2.4). The Picard
+        ! step itself is relaxed by a single coupled omega (applied to T and p in
+        ! reflect_variables), so a converged ||dQ||_W reflects a genuine coupled
+        ! fixed point rather than separate per-field contraction.
         dq_ok = self%has_prev_conserved .and. (dq_norm <= 1.0d0)
         is_ok = dq_ok
 
-        ! Convergence-rate monitoring (PDF 6.2.4.3) with adaptive globalization.
-        ! kappa >= 1 means the iteration grows/oscillates (e.g. strong cryogenic
-        ! coupling or ice-impedance lag): damp the step via under-relaxation rather
-        ! than capping increments, and declare divergence only once damping is
-        ! exhausted (omega at its floor). kappa < 0.5 means healthy contraction:
-        ! relax back toward the full step. This is a principled, condition-agnostic
-        ! globalization that replaces the previous ad-hoc per-variable step clamps.
-        ! Convergence-rate monitoring (PDF 6.2.4.3). With Aitken globalizing the step,
-        ! a healthy iteration contracts (kappa < 1). Persistent growth (kappa >= 1 for
-        ! many consecutive iterations) signals a step Aitken cannot contract at the
-        ! current dt; declare divergence so the ATS cuts dt and retries. The counter
-        ! resets on any contraction, so transient front crossings are tolerated.
+        ! Convergence-rate monitoring (PDF 6.2.4.3) with coupled globalization.
+        ! The next Picard update uses the same omega for T and p, so freezing-front
+        ! growth in the conserved variables cannot be hidden by independent block
+        ! relaxation. For a growing fixed-point map, reducing omega by 1/(1+kappa)
+        ! is a scale-free way to move the relaxed map back toward contraction; when
+        ! the conserved change contracts strongly, omega is released back toward 1.
         if (self%has_prev_conserved .and. self%dq_norm_prev > 0.0d0) then
             kappa = dq_norm / self%dq_norm_prev
             if (kappa >= 1.0d0) then
@@ -338,13 +344,87 @@ contains
             else
                 self%diverge_count = 0
             end if
-            if (self%diverge_count >= 15) is_diverged = .true.
+
+            omega_updated = .false.
+            if (self%has_prev_conserved_increment .and. allocated(dH) .and. allocated(drho) .and. &
+                allocated(self%dH_prev) .and. allocated(self%drho_prev)) then
+                if (size(self%dH_prev) == size(dH) .and. size(self%drho_prev) == size(drho)) then
+                    numerator = 0.0d0
+                    denominator = 0.0d0
+                    do j = 1, size(dH)
+                        wH = self%atol_enthalpy + self%rtol_conserved * abs(enthalpy(j))
+                        wR = self%atol_density + self%rtol_conserved * abs(density(j))
+
+                        if (wH > 0.0d0) then
+                            z = dH(j) / wH
+                            z_prev = self%dH_prev(j) / wH
+                            dz = z - z_prev
+                            numerator = numerator + dz * z_prev
+                            denominator = denominator + dz * dz
+                        end if
+
+                        if (wR > 0.0d0) then
+                            z = drho(j) / wR
+                            z_prev = self%drho_prev(j) / wR
+                            dz = z - z_prev
+                            numerator = numerator + dz * z_prev
+                            denominator = denominator + dz * dz
+                        end if
+                    end do
+
+                    if (denominator > epsilon(1.0d0)) then
+                        aitken_omega = -self%relaxation_omega * (numerator / denominator)
+                        if (aitken_omega == aitken_omega .and. aitken_omega > 0.0d0 .and. &
+                            abs(aitken_omega) < huge(1.0d0)) then
+                            self%relaxation_omega = max(CONSERVED_OMEGA_MIN, min(1.0d0, aitken_omega))
+                            omega_updated = .true.
+                        end if
+                    end if
+                end if
+            end if
+
+            if (.not. omega_updated) then
+                if (kappa >= 1.0d0) then
+                    self%relaxation_omega = max(CONSERVED_OMEGA_MIN, &
+                                                self%relaxation_omega / (1.0d0 + kappa))
+                else
+                    ! Fallback rate estimate for the first two increments or
+                    ! degenerate Aitken denominators.
+                    lambda_est = 1.0d0 - (1.0d0 - kappa) / max(self%relaxation_omega, tiny(1.0d0))
+                    if (lambda_est >= 0.0d0 .and. lambda_est < 1.0d0) then
+                        ! The relaxed map is behaving like a monotone contraction:
+                        ! kappa ~= 1 - omega*(1-lambda). In that regime the unrelaxed
+                        ! step has contraction factor lambda < kappa, so holding omega
+                        ! at 0.5 only slows convergence without adding stability.
+                        self%relaxation_omega = 1.0d0
+                    else if (lambda_est < 0.0d0) then
+                        ! A negative inferred fixed-point factor means the relaxed map
+                        ! is alternating across the front. Treat that as oscillatory
+                        ! contraction, not as permission to release omega to 1; otherwise
+                        ! a small kappa is followed by a full-step overshoot and omega
+                        ! ratchets down to its floor.
+                        self%relaxation_omega = max(CONSERVED_OMEGA_MIN, &
+                                                    self%relaxation_omega / (1.0d0 + kappa))
+                    else if (kappa < CONSERVED_KAPPA_RECOVER) then
+                        self%relaxation_omega = min(1.0d0, &
+                                                    self%relaxation_omega * &
+                                                    min(CONSERVED_OMEGA_GROW_MAX, &
+                                                        CONSERVED_KAPPA_RECOVER / max(kappa, tiny(1.0d0))))
+                    end if
+                end if
+            end if
+            if (self%diverge_count >= 15 .and. &
+                self%relaxation_omega <= CONSERVED_OMEGA_MIN * (1.0d0 + epsilon(1.0d0))) then
+                is_diverged = .true.
+            end if
         end if
 
-        write (*, '(A,I4,A,ES12.5,A,F6.4,A,ES10.3,A,ES10.3,A,ES10.3)') &
-            '    [Conserved] iter:', nonlinear_iter, '  ||dQ||_W:', dq_norm, &
-            '  omega:', self%relaxation_omega, '  kappa:', kappa, &
-            '  resT/0:', ratioT, '  resH/0:', ratioH
+        if (CONSERVED_VERBOSE) then
+            write (*, '(A,I4,A,ES12.5,A,F6.4,A,ES10.3,A,ES10.3,A,ES10.3)') &
+                '    [Conserved] iter:', nonlinear_iter, '  ||dQ||_W:', dq_norm, &
+                '  omega:', self%relaxation_omega, '  kappa:', kappa, &
+                '  resT/0:', ratioT, '  resH/0:', ratioH
+        end if
 
         ! Store current iterate as previous for the next check
         if (allocated(self%enthalpy_prev)) deallocate (self%enthalpy_prev)
@@ -355,6 +435,20 @@ contains
         self%density_prev = density
         self%has_prev_conserved = .true.
         if (dq_norm < huge(0.0d0)) self%dq_norm_prev = dq_norm
+
+        if (allocated(dH) .and. allocated(drho)) then
+            if (allocated(self%dH_prev)) then
+                if (size(self%dH_prev) /= size(dH)) deallocate (self%dH_prev)
+            end if
+            if (allocated(self%drho_prev)) then
+                if (size(self%drho_prev) /= size(drho)) deallocate (self%drho_prev)
+            end if
+            if (.not. allocated(self%dH_prev)) allocate (self%dH_prev(size(dH)))
+            if (.not. allocated(self%drho_prev)) allocate (self%drho_prev(size(drho)))
+            self%dH_prev(:) = dH(:)
+            self%drho_prev(:) = drho(:)
+            self%has_prev_conserved_increment = .true.
+        end if
     end subroutine check_conserved_convergence_control
 
     !> Weighted-RMS norm of (Q_b - Q_a) for the Richardson local-error estimate.
@@ -384,12 +478,15 @@ contains
 
         if (allocated(self%enthalpy_prev)) deallocate (self%enthalpy_prev)
         if (allocated(self%density_prev)) deallocate (self%density_prev)
+        if (allocated(self%dH_prev)) deallocate (self%dH_prev)
+        if (allocated(self%drho_prev)) deallocate (self%drho_prev)
         self%has_prev_conserved = .false.
+        self%has_prev_conserved_increment = .false.
         self%residual0_thermal = -1.0d0
         self%residual0_hydraulic = -1.0d0
         self%dq_norm_prev = -1.0d0
         self%diverge_count = 0
-        self%relaxation_omega = 1.0d0
+        self%relaxation_omega = CONSERVED_OMEGA_INITIAL
     end subroutine reset_conserved_state
 
     !> L2 norm of a block residual with the constant (nullspace) mode removed.

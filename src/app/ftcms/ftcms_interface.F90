@@ -22,6 +22,15 @@ module app_ftcms
     use :: module_solver
     implicit none
 
+    !> Physical-validity walls shared by the bounded solution update
+    !> (reflect_variables) and the acceptance guard of the nonlinear loop.
+    !> An iterate pinned at a wall is outside the model's validity and must
+    !> never be accepted as a converged step.
+    real(real64), parameter :: WALL_TEMP_MIN_C = -80.0d0
+    real(real64), parameter :: WALL_TEMP_MAX_C = 80.0d0
+    real(real64), parameter :: WALL_PRESS_MIN_PA = -1.0d7
+    real(real64), parameter :: WALL_PRESS_MAX_PA = 1.0d7
+
     type :: type_ftcms
         type(type_domain) :: domain
 
@@ -31,7 +40,6 @@ module app_ftcms
 
         type(type_variable) :: Qw
         type(type_variable) :: Qi
-        type(type_variable) :: Qi_seg
         type(type_variable) :: Qa
         type(type_variable) :: Qv
 
@@ -133,7 +141,6 @@ module app_ftcms
         procedure, public, pass(self) :: compute_lte_error => compute_lte_error_ftcms
         procedure, public, pass(self) :: nonlinear_residual_norm => nonlinear_residual_norm_ftcms
         procedure, public, pass(self) :: update_variables => update_variables_ftcms
-        procedure, public, pass(self) :: update_segregation_ice => update_segregation_ice_ftcms
         procedure, public, pass(self) :: assemble_local => assemble_local_ftcms
         procedure, public, pass(self) :: assemble => assemble_ftcms
         procedure, private, pass(self) :: assemble_initialize => assemble_initialize_ftcms
@@ -274,11 +281,6 @@ module app_ftcms
             class(type_ftcms), intent(inout) :: self
 
         end subroutine update_variables_ftcms
-
-        module subroutine update_segregation_ice_ftcms(self)
-            implicit none
-            class(type_ftcms), intent(inout) :: self
-        end subroutine update_segregation_ice_ftcms
 
         module subroutine reflect_variables_ftcms(self, step_scale)
             implicit none

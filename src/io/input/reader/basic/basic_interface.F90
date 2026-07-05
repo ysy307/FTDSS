@@ -40,6 +40,9 @@ module io_input_basic
     type :: type_analysis_controls
         logical :: is_active(IC_TARGETS%NUM_ID)
         logical :: enable_vapor_transport = .true.
+        !> Interface-split subcell quadrature for elements cut by the freezing
+        !> interface (parameter-free; disable only for A/B comparison runs).
+        logical :: enable_fringe_subcell_quadrature = .true.
         character(:), allocatable :: coupling_mode
         logical :: partitioning
     contains

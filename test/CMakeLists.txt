@@ -102,6 +102,14 @@ add_solver_test(field
         SOLVER::SYSTEM
 )
 
+# test_fe_subcell: freezing-fringe subcell quadrature and chemical potential utilities
+add_solver_test(fe_subcell
+    LIBS
+        SOLVER::CORE
+        SOLVER::CONSTITUTIVE
+        SOLVER::DOMAIN
+)
+
 # test_main requires all solver libraries
 add_solver_test(main
     LIBS

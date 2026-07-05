@@ -16,6 +16,7 @@ module physics_governing_hydraulic
         integer(int32) :: computation_type
         integer(int32) :: computation_dimension
         logical :: enable_vapor_transport = .true.
+        logical :: enable_fringe_subcell_quadrature = .true.
         type(type_constitutive_manager) :: physics
     contains
         procedure, pass(self), public :: initialize => initialize_type_hydraulic
@@ -24,13 +25,10 @@ module physics_governing_hydraulic
         ! --- Assembly Procedures ---
         procedure, pass(self), public :: assemble_local => assemble_local_hydraulic
         procedure, pass(self), private :: assemble_local_picard => assemble_local_picard_hydraulic
-        procedure, pass(self), private :: assemble_element => assemble_element_hydraulic
 
         ! --- Coefficient Computation Procedures ---
-        procedure, pass(self), private :: compute_mass_term => compute_mass_term_hydraulic
         procedure, pass(self), public :: compute_diffusion_term => compute_diffusion_term_hydraulic
         procedure, pass(self), private :: compute_advective_term => compute_advective_term_hydraulic
-        procedure, pass(self), private :: compute_transient_term => compute_transient_term_hydraulic
 
         ! --- Coupling Coefficient Procedures ---
         procedure, pass(self), private :: compute_coupling_mass_term => compute_coupling_mass_term_hydraulic
@@ -86,35 +84,7 @@ module physics_governing_hydraulic
             type(type_vector_dp), intent(inout), optional :: F_H
         end subroutine assemble_local_picard_hydraulic
 
-        !> @brief Assemble element Jacobian \(J^e\) and residual \(R^e\) for Mixed-form Newton-Raphson.
-        !> Explicit Gauss integration loop with per-GP physics evaluation via type_state.
-        !> Applies diagonal min cutoff to \(C_{eq}\) and \(D_{HH}\), then row equilibration.
-        !>
-        !> \[ R_i^e = \int N_i \frac{d\Theta}{dt}\,d\Omega
-        !>          + \int \nabla N_i \cdot (D_{HH}\nabla P + D_{HT}\nabla T + V_H)\,d\Omega \]
-        !> \[ J^e_{ii} = \int N_i\,\alpha_0 C_{eq}\,d\Omega
-        !>            + \int \nabla N_i \cdot D_{HH}\nabla N_i\,d\Omega \]
-        !> \[ J^e_{ij} = \int \nabla N_i \cdot D_{HH}\nabla N_j\,d\Omega \quad (i \neq j) \]
-        module subroutine assemble_element_hydraulic(self, material_id, bdf_coeffs, dt, workspace, J_elem, R_elem)
-            implicit none
-            class(type_hydraulic), intent(in) :: self
-            integer(int32), intent(in) :: material_id
-            real(real64), intent(in) :: bdf_coeffs(:)
-            real(real64), intent(in) :: dt
-            type(type_assemble_workspace), intent(inout) :: workspace
-            real(real64), intent(inout) :: J_elem(:, :)
-            real(real64), intent(inout) :: R_elem(:)
-        end subroutine assemble_element_hydraulic
-
         ! --- Physics Term Interfaces ---
-        module subroutine compute_mass_term_hydraulic(self, material_id, state, C_HH)
-            implicit none
-            class(type_hydraulic), intent(in) :: self
-            integer(int32), intent(in) :: material_id
-            type(type_state), intent(in) :: state
-            real(real64), intent(inout) :: C_HH
-        end subroutine compute_mass_term_hydraulic
-
         module subroutine compute_diffusion_term_hydraulic(self, material_id, state, D_HH)
             implicit none
             class(type_hydraulic), intent(in) :: self
@@ -130,15 +100,6 @@ module physics_governing_hydraulic
             type(type_state), intent(inout) :: state
             real(real64), intent(inout) :: V_H(:)
         end subroutine compute_advective_term_hydraulic
-
-        module subroutine compute_transient_term_hydraulic(self, material_id, state, bdf_coeffs, drho_dt)
-            implicit none
-            class(type_hydraulic), intent(in) :: self
-            integer(int32), intent(in) :: material_id
-            type(type_state), intent(in) :: state
-            real(real64), intent(in) :: bdf_coeffs(:)
-            real(real64), intent(inout) :: drho_dt
-        end subroutine compute_transient_term_hydraulic
 
         ! --- Coupling Coefficient Interfaces ---
         module subroutine compute_coupling_mass_term_hydraulic(self, material_id, state, C_HT)

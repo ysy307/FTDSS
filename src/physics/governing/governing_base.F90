@@ -272,8 +272,6 @@ contains
 
         logical :: is_set
         integer(int32) :: history_len
-        real(real64) :: qi_seg_node(self%num_fe_nodes), qi_seg_gp_val
-
         nullify (gp)
         nullify (work_history_ptr)
 
@@ -384,21 +382,6 @@ contains
                 call self%fe%lerp(gp(j), self%work_node(k, 1:self%num_fe_nodes), self%work_bdf_buffer(k))
             end do
             call self%state_gp(j)%porosity_history%set(self%work_bdf_buffer)
-        end do
-
-        ! 4. Segregated ice content (scalar, no history needed)
-        do i = 1, self%num_fe_nodes
-            is_set = .false.
-            call self%state(i)%ice_content_seg%get(work_value, is_set=is_set)
-            if (is_set) then
-                qi_seg_node(i) = work_value
-            else
-                qi_seg_node(i) = 0.0d0
-            end if
-        end do
-        do i = 1, self%num_fe_gauss
-            call self%fe%lerp(gp(i), qi_seg_node(1:self%num_fe_nodes), qi_seg_gp_val)
-            call self%state_gp(i)%ice_content_seg%set(qi_seg_gp_val)
         end do
 
         nullify (gp)

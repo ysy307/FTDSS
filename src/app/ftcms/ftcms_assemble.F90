@@ -22,6 +22,7 @@ contains
         integer(int32), pointer, contiguous, dimension(:) :: elements_list
 
         logical :: use_scatter, do_thermal, do_hydraulic
+        logical :: do_thermal_elem, do_hydraulic_elem
 
         call self%control%profiler_start(PROFILER_TYPES%ASSEMBLE)
 
@@ -50,7 +51,8 @@ contains
         !$OMP        thermal_dof, hydraulic_dof, use_scatter, do_thermal, do_hydraulic) &
         !$OMP PRIVATE(i_color, i_elem, elem_id, p_connectivity, workspace, &
         !$OMP         local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
-        !$OMP         local_F_T, local_F_H, elem_coords, num_nodes_local)
+        !$OMP         local_F_T, local_F_H, elem_coords, num_nodes_local, &
+        !$OMP         do_thermal_elem, do_hydraulic_elem)
 
         do i_color = 1, num_colors
 
@@ -70,23 +72,26 @@ contains
                                                   local_F_T=local_F_T, local_F_H=local_F_H, &
                                                   coordinates=elem_coords, connectivity=p_connectivity)
 
+                    do_thermal_elem = self%control%is_target(PHYSICS_TYPES%THERMAL, workspace%material_id)
+                    do_hydraulic_elem = self%control%is_target(PHYSICS_TYPES%HYDRAULIC, workspace%material_id)
+
                     call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
                                              local_F_T, local_F_H)
 
                     num_nodes_local = workspace%num_fe_nodes
 
                     ! $OMP CRITICAL(ftcms_global_assembly)
-                    if (do_thermal) then
+                    if (do_thermal_elem) then
                         call self%K%add(PHYSICS_TYPES%THERMAL%ID, PHYSICS_TYPES%THERMAL%ID, elem_id, num_nodes_local, local_K_TT)
                         call self%F%add(PHYSICS_TYPES%THERMAL%ID, p_connectivity, local_F_T)
                     end if
 
-                    if (do_hydraulic) then
+                    if (do_hydraulic_elem) then
                         call self%K%add(PHYSICS_TYPES%HYDRAULIC%ID, PHYSICS_TYPES%HYDRAULIC%ID, elem_id, num_nodes_local, local_K_HH)
                         call self%F%add(PHYSICS_TYPES%HYDRAULIC%ID, p_connectivity, local_F_H)
                     end if
 
-                    if (do_thermal .and. do_hydraulic) then
+                    if (do_thermal_elem .and. do_hydraulic_elem) then
                         call self%K%add(PHYSICS_TYPES%THERMAL%ID, PHYSICS_TYPES%HYDRAULIC%ID, elem_id, num_nodes_local, local_K_TH)
                         call self%K%add(PHYSICS_TYPES%HYDRAULIC%ID, PHYSICS_TYPES%THERMAL%ID, elem_id, num_nodes_local, local_K_HT)
                     end if
@@ -211,15 +216,29 @@ contains
         type(type_assemble_workspace), intent(inout) :: workspace
         type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
         type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
+        logical :: do_thermal, do_hydraulic
 
-        if (self%is_active_thermal()) then
-            call self%thermal%assemble_local(control=self%control, workspace=workspace, &
-                                             K_TT=local_K_TT, K_TH=local_K_TH, F_T=local_F_T)
+        do_thermal = self%control%is_target(PHYSICS_TYPES%THERMAL, workspace%material_id)
+        do_hydraulic = self%control%is_target(PHYSICS_TYPES%HYDRAULIC, workspace%material_id)
+
+        if (do_thermal) then
+            if (do_hydraulic .and. present(local_K_TH)) then
+                call self%thermal%assemble_local(control=self%control, workspace=workspace, &
+                                                 K_TT=local_K_TT, K_TH=local_K_TH, F_T=local_F_T)
+            else
+                call self%thermal%assemble_local(control=self%control, workspace=workspace, &
+                                                 K_TT=local_K_TT, F_T=local_F_T)
+            end if
         end if
 
-        if (self%is_active_hydraulic()) then
-            call self%hydraulic%assemble_local(control=self%control, workspace=workspace, &
-                                               K_HH=local_K_HH, K_HT=local_K_HT, F_H=local_F_H)
+        if (do_hydraulic) then
+            if (do_thermal .and. present(local_K_HT)) then
+                call self%hydraulic%assemble_local(control=self%control, workspace=workspace, &
+                                                   K_HH=local_K_HH, K_HT=local_K_HT, F_H=local_F_H)
+            else
+                call self%hydraulic%assemble_local(control=self%control, workspace=workspace, &
+                                                   K_HH=local_K_HH, F_H=local_F_H)
+            end if
         end if
 
     end subroutine assemble_local_ftcms

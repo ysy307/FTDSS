@@ -71,6 +71,13 @@ contains
         real(real64) :: dQi_dP, dQi_dT
         real(real64) :: dQa_dP, dQa_dT
         real(real64) :: dQv_dP, dQv_dT
+        real(real64) :: psi_eff
+
+        ! 0. Generalized suction of the liquid phase: retention-based
+        !    properties (theta_w, relative permeability) are evaluated at it.
+        psi_eff = 0.0d0
+        call self%fusion%calc_effective_suction(state, psi_eff)
+        call state%effective_suction%set(psi_eff)
 
         ! 1. Get porosity
         call state%porosity%get(porosity)

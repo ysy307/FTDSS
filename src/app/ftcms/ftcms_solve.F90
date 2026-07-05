@@ -47,6 +47,33 @@ contains
             end if
         end if
 
+        ! Restore derived phase fields too. A failed nonlinear attempt may leave
+        ! Qw/Qi/Qa/Qv at the rejected iterate; retrying a step must start from the
+        ! last accepted thermodynamic state, just like T and p.
+        call self%Qw%get_previous(u)
+        if (associated(u)) then
+            call self%Qw%set_current(u)
+            nullify (u)
+        end if
+
+        call self%Qi%get_previous(u)
+        if (associated(u)) then
+            call self%Qi%set_current(u)
+            nullify (u)
+        end if
+
+        call self%Qa%get_previous(u)
+        if (associated(u)) then
+            call self%Qa%set_current(u)
+            nullify (u)
+        end if
+
+        call self%Qv%get_previous(u)
+        if (associated(u)) then
+            call self%Qv%set_current(u)
+            nullify (u)
+        end if
+
     end subroutine solve_time_step_initial_setup_ftcms
 
     module subroutine solve_time_step_setup_ftcms(self, prescribe_bc)
@@ -167,9 +194,68 @@ contains
         real(real64), allocatable :: residual_thermal(:)
         real(real64), allocatable :: residual_hydraulic(:)
         logical :: check_thermal, check_hydraulic
+        real(real64), pointer, contiguous, dimension(:) :: field
+        ! Wall-contact tolerances: the bounded update lands exactly ON the wall
+        ! when it binds, so a small absolute buffer is sufficient to detect it.
+        real(real64), parameter :: TEMP_WALL_TOL = 1.0d-6
+        real(real64), parameter :: PRESS_WALL_TOL = 1.0d-1
 
         check_thermal = self%is_active_thermal()
         check_hydraulic = self%is_active_hydraulic()
+
+        ! Physical-validity guard: an iterate pinned at the sanity walls by the
+        ! bounded update (reflect_variables) is outside the model's validity.
+        ! Such a state must never be accepted as converged; declare divergence
+        ! so the step fails and the ATS retries with a smaller dt.
+        nullify (field)
+        if (check_thermal) then
+            call self%temperature%get_current(field)
+            if (associated(field)) then
+                if (minval(field) <= WALL_TEMP_MIN_C + TEMP_WALL_TOL .or. &
+                    maxval(field) >= WALL_TEMP_MAX_C - TEMP_WALL_TOL) then
+                    write (*, '(A,2(ES11.3,1X))') '   [GUARD] temperature pinned at validity wall; T min/max = ', &
+                        minval(field), maxval(field)
+                    call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
+                    call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
+                    nullify (field)
+                    return
+                end if
+            end if
+            nullify (field)
+        end if
+        if (check_hydraulic) then
+            call self%pressure%get_current(field)
+            if (associated(field)) then
+                if (minval(field) <= WALL_PRESS_MIN_PA + PRESS_WALL_TOL .or. &
+                    maxval(field) >= WALL_PRESS_MAX_PA - PRESS_WALL_TOL) then
+                    block
+                        integer(int32) :: node_lo, node_hi
+                        real(real64), pointer, contiguous, dimension(:) :: T_dbg
+                        real(real64) :: T_lo, T_hi
+                        node_lo = minloc(field, dim=1)
+                        node_hi = maxloc(field, dim=1)
+                        T_lo = 0.0d0
+                        T_hi = 0.0d0
+                        nullify (T_dbg)
+                        call self%temperature%get_current(T_dbg)
+                        if (associated(T_dbg)) then
+                            T_lo = T_dbg(node_lo)
+                            T_hi = T_dbg(node_hi)
+                            nullify (T_dbg)
+                        end if
+                        write (*, '(A,2(ES11.3,1X),A,I0,A,ES11.3,A,I0,A,ES11.3)') &
+                            '   [GUARD] pressure pinned at validity wall; P min/max = ', &
+                            minval(field), maxval(field), ' node_min=', node_lo, ' T=', T_lo, &
+                            ' node_max=', node_hi, ' T=', T_hi
+                    end block
+                    call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
+                    call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
+                    nullify (field)
+                    return
+                end if
+            end if
+            nullify (field)
+        end if
 
         ! Nodal conserved quantities at the updated iterate
         call self%compute_nodal_conserved(enthalpy, density)
@@ -211,6 +297,9 @@ contains
         real(real64) :: T_scale, P_scale, mean_pressure
         integer(int32) :: num_nodes
         logical :: linear_failed
+        logical :: min_dt_extension_announced
+        integer(int32) :: max_iter_config, min_dt_iter_limit
+        integer(int32), parameter :: MIN_DT_ITER_FACTOR = 5
 
 
         is_step_converged = .false.
@@ -255,8 +344,29 @@ contains
                 call self%control%reset_acceleration()
             end if
 
+            call self%control%get_max_iterations(max_iter_config)
+            min_dt_iter_limit = max_iter_config
+            if (self%control%is_min_dt() .and. self%control%is_conserved()) then
+                min_dt_iter_limit = max(max_iter_config, MIN_DT_ITER_FACTOR * max_iter_config)
+            end if
+            min_dt_extension_announced = .false.
+
             ! Nonlinear iteration loop
-            nonlinear: do while (self%control%should_continue())
+            nonlinear: do
+                if (.not. self%control%should_continue()) then
+                    call self%control%get_nonlinear_iter(iter_nl)
+                    if (self%control%is_min_dt() .and. self%control%is_conserved() .and. &
+                        (.not. self%control%is_converged()) .and. (.not. self%control%is_diverged()) .and. &
+                        iter_nl < min_dt_iter_limit) then
+                        if (.not. min_dt_extension_announced) then
+                            write (*, '(A,I0,A,I0,A)') '   [NONLINEAR] minimum-dt continuation: iter limit ', &
+                                max_iter_config, ' -> ', min_dt_iter_limit, ' while conserved iteration is still contracting.'
+                            min_dt_extension_announced = .true.
+                        end if
+                    else
+                        exit nonlinear
+                    end if
+                end if
 
                 ! Setup (update iteration counter)
                 call self%solve_time_step_setup(prescribe_bc)
@@ -718,10 +828,10 @@ contains
             lte_error = -1.0d0
             if (is_step_converged) lte_error = self%compute_lte_error()
 
-            ! Update time and adaptive time stepping
-            call self%control%update(is_step_converged, error_estimate=lte_error)
-
             if (is_step_converged) then
+                ! Update time and adaptive time stepping
+                call self%control%update(is_step_converged, error_estimate=lte_error)
+
                 consecutive_failures = 0
                 step_counter = step_counter + 1
                 call self%control%get_nonlinear_iter(nl_iter)
@@ -730,8 +840,6 @@ contains
                     write (*, '(A,I0,A,ES13.5,A,I0)') '   [STEP] converged: n=', step_counter, &
                         ', t[s]=', time_s, ', nonlinear_iter=', nl_iter
                 end if
-                ! Update segregated ice content (explicit forward Euler)
-                call self%update_segregation_ice()
 
                 ! Shift variable history on convergence
                 call self%shift()
@@ -740,6 +848,9 @@ contains
                 call self%output_fields()
                 call self%output_history()
             else
+                ! Update time and adaptive time stepping
+                call self%control%update(is_step_converged, error_estimate=lte_error)
+
                 ! Retry with smaller dt
                 consecutive_failures = consecutive_failures + 1
 

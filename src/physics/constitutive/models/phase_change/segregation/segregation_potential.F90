@@ -52,12 +52,11 @@ contains
         real(real64), intent(in) :: grad_T_magnitude
         real(real64), intent(inout) :: S_seg
 
-        real(real64) :: temperature, Qw, Qi, Qi_seg, porosity_val, gas_space
+        real(real64) :: temperature, Qw, Qi, porosity_val, gas_space
         real(real64) :: f_fringe
         real(real64) :: T_half_width, dT_fringe, arg_low, arg_high
-        real(real64) :: gas_frac, gas_gate, gas_eps_abs
+        real(real64) :: gas_frac, gas_gate, pore_volume_open
         real(real64), parameter :: sharpness = 4.0d0
-        real(real64), parameter :: gas_eps_rel = 0.005d0
 
         S_seg = 0.0d0
         if (self%SP0 <= 0.0d0) return
@@ -68,16 +67,14 @@ contains
 
         if (Qw <= 0.0d0) return
 
-        ! Gas-phase saturation gate: C1-smooth ramp on available pore space.
-        ! The hard cutoff (gas_space <= 0 => S_seg = 0) is retained as the lower
-        ! end of a cubic smoothstep to preserve Jacobian-Residual consistency.
+        ! Gas-phase saturation gate for unsaturated freezing. The sink capacity
+        ! declines smoothly with currently available pore space, without carrying
+        ! an additional ice-state variable.
         call state%ice_content%get(Qi)
-        call state%ice_content_seg%get(Qi_seg)
         call state%porosity%get(porosity_val)
-        gas_space = porosity_val - Qi - Qi_seg - Qw
-        gas_eps_abs = gas_eps_rel * max(porosity_val, 1.0d-6)
-        if (gas_eps_abs <= 0.0d0) return
-        gas_frac = max(0.0d0, min(1.0d0, gas_space / gas_eps_abs))
+        gas_space = porosity_val - Qi - Qw
+        pore_volume_open = max(porosity_val - Qi, 1.0d-12)
+        gas_frac = max(0.0d0, min(1.0d0, gas_space / pore_volume_open))
         gas_gate = gas_frac * gas_frac * (3.0d0 - 2.0d0 * gas_frac)
         if (gas_gate <= 0.0d0) return
 

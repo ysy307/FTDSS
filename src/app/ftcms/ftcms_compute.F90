@@ -21,10 +21,10 @@ contains
         integer(int32) :: num_nodes, num_neighbors, material_id
         integer(int32), pointer, contiguous :: element_list(:)
         type(type_state), allocatable :: states(:)
-        real(real64) :: elem_qw, elem_qi, elem_qi_seg, elem_qa, elem_qv
+        real(real64) :: elem_qw, elem_qi, elem_qa, elem_qv
         real(real64) :: elem_vol
         real(real64) :: sum_vol
-        real(real64) :: sum_qw_vol, sum_qi_vol, sum_qi_seg_vol, sum_qa_vol, sum_qv_vol
+        real(real64) :: sum_qw_vol, sum_qi_vol, sum_qa_vol, sum_qv_vol
         integer(int32) :: num_threads, tid
 
         call self%control%profiler_start(PROFILER_TYPES%SETUP)
@@ -35,8 +35,8 @@ contains
         !$OMP PARALLEL DEFAULT(NONE) &
         !$OMP SHARED(self, num_nodes, states) &
         !$OMP PRIVATE(i_node, element_list, num_neighbors, j, i_elem, &
-        !$OMP         elem_vol, material_id, elem_qw, elem_qi, elem_qi_seg, elem_qa, elem_qv, &
-        !$OMP         sum_vol, sum_qw_vol, sum_qi_vol, sum_qi_seg_vol, sum_qa_vol, sum_qv_vol, &
+        !$OMP         elem_vol, material_id, elem_qw, elem_qi, elem_qa, elem_qv, &
+        !$OMP         sum_vol, sum_qw_vol, sum_qi_vol, sum_qa_vol, sum_qv_vol, &
         !$OMP         tid)
         tid = omp_get_thread_num() + 1
         nullify (element_list)
@@ -46,7 +46,6 @@ contains
             sum_vol = 0.0d0
             sum_qw_vol = 0.0d0
             sum_qi_vol = 0.0d0
-            sum_qi_seg_vol = 0.0d0
             sum_qa_vol = 0.0d0
             sum_qv_vol = 0.0d0
             if (associated(element_list)) then
@@ -57,12 +56,10 @@ contains
                     call self%domain%get_material_id(i_elem, material_id)
                     call self%set_state(i_node, i_elem, states(tid))
                     call states(tid)%get(water_content=elem_qw, ice_content=elem_qi, &
-                                         air_content=elem_qa, vapor_content=elem_qv, &
-                                         ice_content_seg=elem_qi_seg)
+                                         air_content=elem_qa, vapor_content=elem_qv)
                     sum_vol = sum_vol + elem_vol
                     sum_qw_vol = sum_qw_vol + (elem_qw * elem_vol)
                     sum_qi_vol = sum_qi_vol + (elem_qi * elem_vol)
-                    sum_qi_seg_vol = sum_qi_seg_vol + (elem_qi_seg * elem_vol)
                     sum_qa_vol = sum_qa_vol + (elem_qa * elem_vol)
                     sum_qv_vol = sum_qv_vol + (elem_qv * elem_vol)
                 end do
@@ -70,13 +67,11 @@ contains
             if (abs(sum_vol) > epsilon(1.0d0)) then
                 call self%Qw%set_current(i_node, sum_qw_vol / sum_vol)
                 call self%Qi%set_current(i_node, sum_qi_vol / sum_vol)
-                call self%Qi_seg%set_current(i_node, sum_qi_seg_vol / sum_vol)
                 call self%Qa%set_current(i_node, sum_qa_vol / sum_vol)
                 call self%Qv%set_current(i_node, sum_qv_vol / sum_vol)
             else
                 call self%Qw%set_current(i_node, 0.0d0)
                 call self%Qi%set_current(i_node, 0.0d0)
-                call self%Qi_seg%set_current(i_node, 0.0d0)
                 call self%Qa%set_current(i_node, 0.0d0)
                 call self%Qv%set_current(i_node, 0.0d0)
             end if
@@ -411,14 +406,16 @@ contains
         type(type_coordinate_dp), intent(in) :: grad_T, grad_P
         type(type_coordinate_dp), intent(inout) :: water_flux
         type(type_constant_id), pointer :: computation_type => null()
-        real(real64) :: K_vT, K_vP
+        real(real64) :: K_vT, K_vP_raw, K_vP, rho_w
         call self%domain%get_computation_type(computation_type)
         if (.not. self%hydraulic%is_vapor_transport_enabled()) then
             call water_flux%set(0.0d0, 0.0d0, 0.0d0)
             return
         end if
         call self%hydraulic%calc_K_vT(material_id, state, K_vT)
-        call self%hydraulic%calc_K_vP(material_id, state, K_vP)
+        call self%hydraulic%calc_K_vP(material_id, state, K_vP_raw)
+        call self%thermal%calc_density_water(state, rho_w)
+        K_vP = merge(K_vP_raw / (rho_w * g), 0.0d0, rho_w > tiny(1.0d0))
         select case (computation_type%ID)
         case (COMP_TYPES%XY_2D%ID)
             water_flux%x = -K_vT * grad_T%x - K_vP * grad_P%x
@@ -434,32 +431,5 @@ contains
             water_flux%z = -K_vT * grad_T%z - K_vP * grad_P%z
         end select
     end subroutine calc_vapor_flux_ftcms
-
-    !> Update segregated ice content after convergence via forward Euler.
-    module subroutine update_segregation_ice_ftcms(self)
-        implicit none
-        class(type_ftcms), intent(inout) :: self
-        integer(int32) :: i_node, num_nodes, material_id
-        integer(int32), pointer, contiguous :: element_list(:)
-        real(real64) :: qi_seg_old, qi_seg_new, S_seg, dt_s
-        type(type_state) :: local_state
-        real(real64), parameter :: density_ratio = 999.8d0 / 917.0d0
-        call self%control%get_dt(dt_s)
-        if (dt_s <= 0.0d0) return
-        call self%domain%get_num_nodes(num_nodes)
-        do i_node = 1, num_nodes
-            nullify (element_list)
-            call self%domain%element_adjacency%get_list(i_node, element_list)
-            if (.not. associated(element_list) .or. size(element_list) < 1) cycle
-            call self%domain%get_material_id(element_list(1), material_id)
-            call self%set_state(i_node, element_list(1), local_state)
-            S_seg = 0.0d0
-            call self%hydraulic%calc_segregation_sink(material_id, local_state, dt_s, S_seg)
-            if (abs(S_seg) <= 0.0d0) cycle
-            call self%Qi_seg%get_current(i_node, qi_seg_old)
-            qi_seg_new = max(qi_seg_old + density_ratio * S_seg * dt_s, 0.0d0)
-            call self%Qi_seg%set_current(i_node, qi_seg_new)
-        end do
-    end subroutine update_segregation_ice_ftcms
 
 end submodule ftcms_compute

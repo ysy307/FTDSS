@@ -61,8 +61,8 @@ contains
         type(type_bc_result), intent(inout) :: result
 
         ! values(1) = q_potential [m/s]: positive=evaporation, negative=infiltration
-        ! values(2) = Pmin [m]: drying pressure limit
-        ! values(3) = Pmax [m]: saturation pressure limit
+        ! values(2) = Pmin [Pa]: drying pressure limit
+        ! values(3) = Pmax [Pa]: saturation pressure limit
         real(real64) :: values(3)
         real(real64) :: q_pot, Pmin_v, Pmax_v
 

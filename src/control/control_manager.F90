@@ -150,15 +150,9 @@ contains
             case (ACCELERATION_METHODS%AITKEN%ID)
                 allocate (type_acceleration_aitken :: self%acceleration)
             case (ACCELERATION_METHODS%NONE%ID)
-                ! No acceleration object is needed for NONE mode, EXCEPT the
-                ! conserved-quantity modified-Picard mode: the freezing front is an
-                ! oscillatory fixed point (effective g' < 0 from the latent-heat
-                ! spike) that scalar under-relaxation cannot contract. Default to
-                ! Irons-Tuck dynamic Aitken (code default, no input tuning) so the
-                ! coupled (T,p) iteration is globalized universally.
-                if (self%iteration%is_conserved()) then
-                    allocate (type_acceleration_aitken :: self%acceleration)
-                end if
+                ! No acceleration object is needed for NONE mode. Conserved
+                ! modified-Picard steps are globalized by a coupled omega managed by
+                ! the convergence controller.
             case (ACCELERATION_METHODS%ANDERSON%ID)
                 error stop "Anderson acceleration is not implemented yet."
             case default

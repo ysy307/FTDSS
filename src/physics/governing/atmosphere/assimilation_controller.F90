@@ -65,7 +65,7 @@ module physics_governing_atmosphere_controller
         integer(int32) :: n_upper_bc = 0
         ! Surface state updated externally before each cycle
         real(real64) :: Ts_ast       = 0.0d0   ! surface temperature [C]
-        real(real64) :: Pwater_curr  = 0.0d0   ! surface water pressure [m]
+        real(real64) :: Pwater_curr  = 0.0d0   ! surface water pressure [Pa]
         ! Surface parameters
         real(real64) :: z0           = 0.01d0
         real(real64) :: z_ref_U      = 9.2d0
@@ -305,7 +305,7 @@ contains
         ! Moisture BC
         call self%compute_moisture_bc(qa, Ua, q_potential)
 
-        ! Hydraulic: values(1)=q_potential, values(2)=Pmin, values(3)=Pmax (seepage BC)
+        ! Hydraulic: values(1)=q_potential [m/s], values(2)=Pmin [Pa], values(3)=Pmax [Pa]
         bc_vals_hyd(1) = q_potential
         bc_vals_hyd(2) = self%Pmin
         bc_vals_hyd(3) = self%Pmax

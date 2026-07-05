@@ -216,7 +216,6 @@ contains
 
                     if (bc_result%is_dirichlet) then
                         call variable%set_current(glob_node_id, bc_result%prescribed_value)
-                        call variable%set_previous(glob_node_id, bc_result%prescribed_value)
                     end if
                 end do
             end if
@@ -266,9 +265,6 @@ contains
             call self%bc(physics_type%ID)%get_bc_index(entity_id, bc_idx)
             if (bc_idx < 0) cycle
 
-            call self%bc(physics_type%ID)%evaluate(bc_idx, current_time, 0.0d0, bc_result)
-            if (bc_result%is_dirichlet) cycle
-
             if (bc_patch%num_fe > 0) then
                 do i_elem = 1, bc_patch%num_fe
                     ! Get the FE object for this boundary element
@@ -307,14 +303,9 @@ contains
                         end do
 
                         call self%bc(physics_type%ID)%evaluate(bc_idx, current_time, u_curr, bc_result)
+                        if (bc_result%is_dirichlet) cycle
                         q_flux = bc_result%flux_value
                         dq_du = bc_result%flux_derivative
-                        ! Element assembly uses mass flux [kg/(m^2 s)] but BC provides Darcy velocity [m/s].
-                        ! Convert: multiply by rho_w = 1000 kg/m^3.
-                        if (physics_type%ID == PHYSICS_TYPES%HYDRAULIC%ID) then
-                            q_flux = q_flux * 1000.0d0
-                            dq_du = dq_du * 1000.0d0
-                        end if
 
                         do i = 1, num_nodes_loc
                             call self%F%add(physics_type%ID, connectivity(i), psi(i) * q_flux * w_vol)
