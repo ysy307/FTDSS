@@ -227,6 +227,14 @@ contains
                 config%scale_up = time_control%adaptive_stepping%scale_up
                 config%scale_down = time_control%adaptive_stepping%scale_down
                 config%scale_retry = time_control%adaptive_stepping%scale_retry
+                config%use_error_control = time_control%adaptive_stepping%use_error_control
+                config%error_rtol = time_control%adaptive_stepping%error_relative_tolerance
+                config%pi_k_p = time_control%adaptive_stepping%proportional_gain
+                config%pi_k_i = time_control%adaptive_stepping%integral_gain
+                config%safety_factor = time_control%adaptive_stepping%safety_factor
+                config%max_growth_rate = time_control%adaptive_stepping%max_growth_rate
+                config%max_dT_per_step = time_control%adaptive_stepping%max_temperature_change_per_step
+                config%max_relative_change_per_step = time_control%adaptive_stepping%max_relative_change_per_step
 
                 time_unit = TIME_UNITS%to_object(time_control%time_stepping%unit)
                 time_conv_coeff = time_unit%value

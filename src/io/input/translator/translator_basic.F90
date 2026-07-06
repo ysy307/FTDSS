@@ -264,14 +264,9 @@ contains
         class(type_input), intent(in) :: input
         type(type_config_iteration), intent(inout) :: config
 
-        associate (nls => input%basic%solver_settings%nonlinear_solver)
-            config%nonlinear_solver_type = NONLINEAR_SOLVER%to_object(nls%method)
-            if (config%nonlinear_solver_type == NONLINEAR_SOLVER%NONE) then
-                return
-            end if
-
-            call execute_basic_iteration_nonlinear(input, config%nonlinear)
-        end associate
+        ! Nonlinear strategy is fixed to Picard for this project profile.
+        config%nonlinear_solver_type = NONLINEAR_SOLVER%PICARD
+        call execute_basic_iteration_nonlinear(input, config%nonlinear)
 
     end subroutine execute_basic_iteration
 

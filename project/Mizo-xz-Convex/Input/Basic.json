@@ -113,28 +113,19 @@
     "solver_settings": {
         "bdf_order": 1,
         "nonlinear_solver": {
-            "method": "picard",
-            "update_frequency": 1,
             "max_iterations": 30,
             "convergence": {
                 "use_criteria": "conserved",
                 "norm_type": "linf",
-                "atol_enthalpy": 1e2,
-                "atol_density": 1e-3,
-                "rtol": 1e-3,
-                "residual_eps": 1e-1,
-                "logic_between_criteria": "and",
-                "residual": {
-                    "criteria": "relative",
-                    "logic": "or",
-                    "absolute_tolerance": 1e-06,
-                    "relative_tolerance": 0.001
-                },
-                "update": {
-                    "criteria": "relative",
-                    "logic": "or",
-                    "absolute_tolerance": 0.01,
-                    "relative_tolerance": 0.001
+                "conserved": {
+                    "thermal": {
+                        "absolute_tolerance": 100.0
+                    },
+                    "hydraulic": {
+                        "absolute_tolerance": 0.001
+                    },
+                    "relative_tolerance": 0.001,
+                    "residual_ratio_tolerance": 0.1
                 }
             }
         }

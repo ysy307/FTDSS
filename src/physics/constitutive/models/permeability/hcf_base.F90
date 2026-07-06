@@ -15,8 +15,9 @@ contains
     !> cryosuction pumping, which removes the self-limiting of the pumping
     !> flux and drives a physical runaway at the freezing interface.
     !> Falls back to the pressure head when the phase update has not run.
-    subroutine calc_kr_head(state, head)
+    module subroutine calc_head_hcf(self, state, head)
         implicit none
+        class(abst_hcf), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: head
 
@@ -32,10 +33,10 @@ contains
             call state%pressure%get(pressure)
             head = pressure / (rho_std * g)
         end if
-    end subroutine calc_kr_head
+    end subroutine calc_head_hcf
 
-    !> Impedance argument of Hansson et al. (2004):
-    !> \( Q = \theta_i / (\theta_T - \theta_r) \), the ice fraction of the
+    !> Impedance factor of Hansson et al. (2004):
+    !> \( Q = \theta_\mathrm{ice} / (\theta_\mathrm{T} - \theta_\mathrm{r}) \), the ice fraction of the
     !> total (minus residual) water content.  The impedance \(10^{-\Omega Q}\)
     !> with \(\Omega = 7\) was calibrated against the Mizoguchi columns using
     !> THIS definition; passing the raw volumetric ice content instead changes
@@ -178,7 +179,7 @@ contains
         real(real64) :: kr_base
         real(real64) :: head
 
-        call calc_kr_head(state, head)
+        call self%calc_head(state, head)
 
         call self%base%calc_kr(head, kr_base)
         kflh = self%config%k_sat * kr_base

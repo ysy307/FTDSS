@@ -13,11 +13,25 @@
         },
         "adaptive_stepping": {
             "is_active": true,
-            "iter_min": 5,
-            "iter_max": 16,
-            "scale_up": 1.25,
-            "scale_down": 0.8,
-            "scale_retry": 0.5
+            "iteration_control": {
+                "iteration_count_min": 5,
+                "iteration_count_max": 16,
+                "time_step_scale_up": 1.25,
+                "time_step_scale_down": 0.8,
+                "time_step_scale_retry": 0.5
+            },
+            "error_control": {
+                "is_active": true,
+                "error_relative_tolerance": 0.01,
+                "proportional_gain": 0.10,
+                "integral_gain": 0.15,
+                "safety_factor": 0.9,
+                "max_growth_rate": 2.0
+            },
+            "solution_change_control": {
+                "max_temperature_change_per_step": 5.0,
+                "max_relative_change_per_step": 0.3
+            }
         }
     },
     "boundary_conditions": [

@@ -37,6 +37,14 @@ module io_input_conditions
         real(real64) :: scale_up
         real(real64) :: scale_down
         real(real64) :: scale_retry
+        logical :: use_error_control = .true.
+        real(real64) :: error_relative_tolerance = 1.0d-2
+        real(real64) :: proportional_gain = 0.10d0
+        real(real64) :: integral_gain = 0.15d0
+        real(real64) :: safety_factor = 0.9d0
+        real(real64) :: max_growth_rate = 2.0d0
+        real(real64) :: max_temperature_change_per_step = 5.0d0
+        real(real64) :: max_relative_change_per_step = 0.3d0
     end type type_time_controls_ats
 
     type :: type_time_controls

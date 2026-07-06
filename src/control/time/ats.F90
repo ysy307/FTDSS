@@ -70,6 +70,8 @@ contains
         self%pi_k_i = config_time_ats%pi_k_i
         self%pi_k_p = config_time_ats%pi_k_p
         self%error_rtol = config_time_ats%error_rtol
+        self%max_dT_per_step = config_time_ats%max_dT_per_step
+        self%max_relative_change = config_time_ats%max_relative_change_per_step
         self%error_prev = 1.0d0
 
         ! Echo the loaded ATS configuration so it is verifiable at runtime that the

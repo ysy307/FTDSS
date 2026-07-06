@@ -105,6 +105,7 @@ module models_hcf
         procedure, pass(self), public :: calc_KlT => calc_KlT_hcf
         procedure, pass(self), public :: calc_Kvh => calc_Kvh_hcf
         procedure, pass(self), public :: calc_KvT => calc_KvT_hcf
+        procedure, pass(self), public :: calc_head => calc_head_hcf
         procedure, pass(self), public :: is_initialized => is_initialized_hcf
     end type abst_hcf
 
@@ -141,6 +142,14 @@ module models_hcf
             real(real64), intent(inout) :: KvT
 
         end subroutine calc_KvT_hcf
+
+        module subroutine calc_head_hcf(self, state, head)
+            implicit none
+            class(abst_hcf), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: head
+
+        end subroutine calc_head_hcf
 
         module pure function is_initialized_hcf(self) result(initialized)
             implicit none
