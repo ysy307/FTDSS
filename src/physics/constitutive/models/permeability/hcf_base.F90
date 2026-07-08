@@ -227,7 +227,7 @@ contains
         real(real64) :: kr_base, kr_impedance
         real(real64) :: head, Q_ratio
 
-        call calc_kr_head(state, head)
+        call self%calc_head(state, head)
         call calc_impedance_ratio(state, self%config%theta_r, Q_ratio)
 
         call self%base%calc_kr(head, kr_base)
@@ -246,7 +246,7 @@ contains
         real(real64) :: temperature, head
 
         call state%temperature%get(temperature)
-        call calc_kr_head(state, head)
+        call self%calc_head(state, head)
 
         call self%base%calc_kr(head, kr_base)
         call self%viscosity%calc_viscosity(temperature, kr_viscosity)
@@ -283,7 +283,7 @@ contains
 
         call state%temperature%get(temperature)
         call calc_impedance_ratio(state, self%config%theta_r, Q_ratio)
-        call calc_kr_head(state, head)
+        call self%calc_head(state, head)
 
         call self%base%calc_kr(head, kr_base)
         call self%impedance%calc_impedance(Q_ratio, kr_impedance)
@@ -306,7 +306,7 @@ contains
 
         ! Head of the liquid potential (effective suction), consistent with
         ! the retention scaling this thermo-osmotic term derives from.
-        call calc_kr_head(state, head)
+        call self%calc_head(state, head)
 
         if (allocated(self%base)) then
             call self%base%calc_kr(head, Klh_r)

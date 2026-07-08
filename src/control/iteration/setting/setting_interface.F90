@@ -30,6 +30,7 @@ module control_iteration_setting
         procedure, public, pass(self) :: is_conserved => is_conserved_setting
         ! ---- Getter ----
         procedure, public, pass(self) :: get_conserved_relaxation => get_conserved_relaxation_setting
+        procedure, public, pass(self) :: get_conserved_dq_norm => get_conserved_dq_norm_setting
         procedure, public, pass(self) :: get_max_iterations => get_max_iterations_iteration_setting
         procedure, public, pass(self) :: get_update_frequency => get_update_frequency_iteration_setting
         procedure, public, pass(self) :: get_current_norm => get_current_norm_iteration_setting
@@ -89,6 +90,15 @@ contains
 
         omega = self%convergence_control%get_conserved_relaxation()
     end function get_conserved_relaxation_setting
+
+    !> Last weighted-RMS conserved-quantity change ||dQ||_W (diagnostics).
+    pure function get_conserved_dq_norm_setting(self) result(dq_norm)
+        implicit none
+        class(type_iteration_setting), intent(in) :: self
+        real(real64) :: dq_norm
+
+        dq_norm = self%convergence_control%get_conserved_dq_norm()
+    end function get_conserved_dq_norm_setting
 
     subroutine check_conserved_setting(self, enthalpy, density, residual_thermal, residual_hydraulic, &
                                        nonlinear_iter, check_thermal, check_hydraulic, is_ok, is_diverged)

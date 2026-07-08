@@ -5,9 +5,19 @@ submodule(control_iteration_convergence) convergence_control
     !> Picard step. Below this the step is considered un-saveable by damping and
     !> the step is declared diverged so the ATS reduces dt instead.
     real(real64), parameter :: CONSERVED_OMEGA_MIN = 1.0d-4
-    real(real64), parameter :: CONSERVED_OMEGA_INITIAL = 5.0d-1
     real(real64), parameter :: CONSERVED_OMEGA_GROW_MAX = 2.0d0
     real(real64), parameter :: CONSERVED_KAPPA_RECOVER = 5.0d-1
+    ! Warm start of the under-relaxation across nonlinear loops: the spectrum
+    ! of the coupled Picard map changes little between consecutive time steps
+    ! (and between a failed attempt and its retry), so re-exploring omega from
+    ! a fixed initial value every loop wastes 2-3 iterations rediscovering the
+    ! same optimum. Each loop starts from the previous final omega with a mild
+    ! release toward the full step. The floor is deliberately high: carrying a
+    ! floored-out omega across steps traps the run in a no-progress state where
+    ! the per-iteration change is tiny, the change-norm criterion is satisfied
+    ! vacuously, and steps are accepted while the physics stalls.
+    real(real64), parameter :: CONSERVED_OMEGA_WARM_RELEASE = 1.25d0
+    real(real64), parameter :: CONSERVED_OMEGA_WARM_FLOOR = 2.5d-1
     logical, parameter :: CONSERVED_VERBOSE = .false.
 contains
 
@@ -243,6 +253,14 @@ contains
     end function is_conserved_convergence_control
 
     !> Current adaptive under-relaxation factor for the globalized modified Picard.
+    module pure function get_conserved_dq_norm_convergence_control(self) result(dq_norm)
+        implicit none
+        class(type_convergence_control), intent(in) :: self
+        real(real64) :: dq_norm
+
+        dq_norm = self%dq_norm_prev
+    end function get_conserved_dq_norm_convergence_control
+
     module pure function get_conserved_relaxation_convergence_control(self) result(omega)
         implicit none
         class(type_convergence_control), intent(in) :: self
@@ -323,12 +341,27 @@ contains
             ratioH = rH / self%residual0_hydraulic
         end if
 
-        ! Convergence is the complete weighted-RMS criterion ||dQ||_W <= 1 over the
-        ! conserved quantities (energy and water mass, PDF 6.2.3-6.2.4). The Picard
-        ! step itself is relaxed by a single coupled omega (applied to T and p in
-        ! reflect_variables), so a converged ||dQ||_W reflects a genuine coupled
-        ! fixed point rather than separate per-field contraction.
+        ! Convergence is the complete weighted-RMS criterion over the conserved
+        ! quantities (energy and water mass, PDF 6.2.3-6.2.4), CORRECTED for the
+        ! contraction rate: for a fixed-point iteration the true error obeys
+        ! ||e_k|| <= ||dQ_k|| * kappa/(1 - kappa), so the raw change ||dQ||_W <= 1
+        ! alone is vacuous when the step is strongly under-relaxed (small change
+        ! per iteration says nothing about distance to the fixed point). Requiring
+        ! the kappa-corrected bound as well makes acceptance omega-independent and
+        ! prevents "converged" steps in which the physics has silently stalled.
         dq_ok = self%has_prev_conserved .and. (dq_norm <= 1.0d0)
+        if (dq_ok .and. self%dq_norm_prev > 0.0d0) then
+            kappa = dq_norm / self%dq_norm_prev
+            if (kappa >= 1.0d0) then
+                dq_ok = .false.
+            else if (kappa > 0.0d0) then
+                dq_ok = dq_norm * kappa / (1.0d0 - kappa) <= 1.0d0
+            end if
+        else if (dq_ok) then
+            ! No contraction estimate yet (first measurable change): do not accept
+            ! on the raw change alone.
+            dq_ok = .false.
+        end if
         is_ok = dq_ok
 
         ! Convergence-rate monitoring (PDF 6.2.4.3) with coupled globalization.
@@ -486,7 +519,8 @@ contains
         self%residual0_hydraulic = -1.0d0
         self%dq_norm_prev = -1.0d0
         self%diverge_count = 0
-        self%relaxation_omega = CONSERVED_OMEGA_INITIAL
+        self%relaxation_omega = min(1.0d0, max(CONSERVED_OMEGA_WARM_FLOOR, &
+                                               CONSERVED_OMEGA_WARM_RELEASE * self%relaxation_omega))
     end subroutine reset_conserved_state
 
     !> L2 norm of a block residual with the constant (nullspace) mode removed.

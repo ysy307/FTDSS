@@ -281,7 +281,41 @@ contains
 
         call initialize_assimilation_ftcms(self, input%input_path)
 
+        call open_solver_history_log(self)
+
     end subroutine initialize_type_ftcms
+
+    !> Open Output/solver_history.log (rank 0 only): one record per time-step
+    !> attempt with the nonlinear-convergence diagnostics that are otherwise
+    !> invisible from outside (iterations, acceptance, omega, ||dQ||_W, LTE).
+    subroutine open_solver_history_log(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        character(:), allocatable :: project_path_env
+        character(*), parameter :: PROJECT_ENV = "FTCMS_PROJECT_PATH"
+        integer(int32) :: myrank, ierr, ios
+
+        self%solver_history_unit = -1
+        call MPI_Comm_rank(MPI_COMM_WORLD, myrank, ierr)
+        if (myrank /= 0) return
+
+        call get_env_string(PROJECT_ENV, project_path_env)
+        call modify_path_format(project_path_env)
+
+        open (newunit=self%solver_history_unit, &
+              file=trim(project_path_env)//"Output/solver_history.log", &
+              status="replace", action="write", iostat=ios)
+        if (ios /= 0) then
+            self%solver_history_unit = -1
+            return
+        end if
+        write (self%solver_history_unit, '(A)') &
+            "# FTCMS solver history: one record per time-step attempt"
+        write (self%solver_history_unit, '(A)') &
+            "# step_attempt  time_end[s]      dt[s]        nl_iter  accepted  omega     dq_norm_W    lte_rel"
+        flush (self%solver_history_unit)
+    end subroutine open_solver_history_log
 
     subroutine initialize_assimilation_ftcms(self, input_path)
         use :: json_module, only: json_file
@@ -862,10 +896,29 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: current
         real(real64), allocatable :: du(:)
         real(real64), allocatable :: current_prev(:)
+        real(real64), allocatable :: du_eff(:)
 
         real(real64) :: relaxation_factor
         logical :: is_none
         logical :: is_conserved_mode
+
+        ! --- Anderson(1) mixing of the conserved coupled update ---
+        ! x_{k+1} = x_k + w*g_k - gamma*[(x_k - x_{k-1}) + w*(g_k - g_{k-1})],
+        ! gamma = <g_k, g_k - g_{k-1}>_W / ||g_k - g_{k-1}||_W^2 (Walker & Ni, 2011),
+        ! evaluated jointly over (T, p) with head-equivalent weighting of p so both
+        ! blocks are mixed consistently. Pure fixed-point acceleration: no Jacobian,
+        ! the modified-Picard structure and the adaptive damping w are unchanged.
+        logical :: aa_active
+        real(real64) :: aa_gamma
+        ! Safeguarded: the mixing is applied only while the weighted norm of the
+        ! fixed-point increment ||g_k||_W is non-increasing; on growth the
+        ! iteration falls back to plain relaxed Picard for that iterate (gamma=0),
+        ! which lets the adaptive omega re-establish contraction before mixing
+        ! resumes. Together with the kappa-corrected acceptance this closes the
+        ! omega-floor stall observed at the freezing onset.
+        logical, parameter :: AA_ENABLED = .true.
+        real(real64), parameter :: AA_GAMMA_MAX = 2.0d0
+        real(real64), parameter :: AA_WEIGHT_P = 1.0d0 / 9.81d3  ! [K/Pa] head-equivalent
 
         real(real64) :: max_du, alpha
         real(real64), parameter :: PICARD_MAX_DT_STEP = 2.0d1
@@ -891,6 +944,14 @@ contains
         is_none = self%control%is_none()
         is_conserved_mode = self%control%is_conserved()
 
+        ! Anderson(1): compute the joint mixing coefficient from this iterate's
+        ! (T, p) increments and the stored previous pair, BEFORE any update.
+        aa_gamma = 0.0d0
+        aa_active = AA_ENABLED .and. is_conserved_mode .and. (.not. is_none) .and. &
+                    (.not. self%control%is_staggered()) .and. &
+                    self%is_active_thermal() .and. self%is_active_hydraulic()
+        if (aa_active) call compute_aa_gamma(self, aa_gamma, aa_active)
+
         if (self%is_active_thermal()) then
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
             call self%temperature%get_current(current)
@@ -905,8 +966,23 @@ contains
                         ! contraction rate after each accepted nonlinear iterate.
                         relaxation_factor = self%control%get_conserved_relaxation()
                         if (present(step_scale)) relaxation_factor = relaxation_factor * step_scale
-                        alpha = min(relaxation_factor, bounded_step_factor(current, du, TEMP_MIN_C, TEMP_MAX_C))
-                        current(:) = current(:) + alpha * du(:)
+                        call allocate_array(du_eff, size(du))
+                        du_eff(:) = relaxation_factor * du(:)
+                        if (aa_active .and. self%aa_has_prev .and. &
+                            allocated(self%aa_T_prev) .and. allocated(self%aa_duT_prev)) then
+                            if (size(self%aa_T_prev) == size(current) .and. &
+                                size(self%aa_duT_prev) == size(du)) then
+                                du_eff(:) = du_eff(:) - aa_gamma * (current(:) - self%aa_T_prev(:) + &
+                                                                    relaxation_factor * (du(:) - self%aa_duT_prev(:)))
+                            end if
+                        end if
+                        ! Store this iterate (pre-update) for the next AA mixing.
+                        if (aa_active) then
+                            call copy_into(self%aa_T_prev, current)
+                            call copy_into(self%aa_duT_prev, du)
+                        end if
+                        alpha = min(1.0d0, bounded_step_factor(current, du_eff, TEMP_MIN_C, TEMP_MAX_C))
+                        current(:) = current(:) + alpha * du_eff(:)
                     else
                         max_du = maxval(abs(du))
                         ! Step limiter: tighter limit near T_melt to prevent C-C amplification
@@ -990,8 +1066,23 @@ contains
                         ! Same coupled Picard damping factor as the thermal branch.
                         relaxation_factor = self%control%get_conserved_relaxation()
                         if (present(step_scale)) relaxation_factor = relaxation_factor * step_scale
-                        alpha = min(relaxation_factor, bounded_step_factor(current, du, PRESS_MIN_PA, PRESS_MAX_PA))
-                        current(:) = current(:) + alpha * du(:)
+                        call allocate_array(du_eff, size(du))
+                        du_eff(:) = relaxation_factor * du(:)
+                        if (aa_active .and. self%aa_has_prev .and. &
+                            allocated(self%aa_P_prev) .and. allocated(self%aa_duP_prev)) then
+                            if (size(self%aa_P_prev) == size(current) .and. &
+                                size(self%aa_duP_prev) == size(du)) then
+                                du_eff(:) = du_eff(:) - aa_gamma * (current(:) - self%aa_P_prev(:) + &
+                                                                    relaxation_factor * (du(:) - self%aa_duP_prev(:)))
+                            end if
+                        end if
+                        if (aa_active) then
+                            call copy_into(self%aa_P_prev, current)
+                            call copy_into(self%aa_duP_prev, du)
+                            self%aa_has_prev = .true.
+                        end if
+                        alpha = min(1.0d0, bounded_step_factor(current, du_eff, PRESS_MIN_PA, PRESS_MAX_PA))
+                        current(:) = current(:) + alpha * du_eff(:)
                     else
                         max_du = maxval(abs(du))
                         ! Step limiter: prevent large pressure updates regardless of solver mode
@@ -1082,6 +1173,88 @@ contains
             end do
             factor = max(0.0d0, min(1.0d0, factor))
         end function bounded_step_factor
+
+        !> Joint Anderson(1) mixing coefficient over the (T, p) increments.
+        !> \( \gamma = \langle g_k, g_k - g_{k-1}\rangle_W / \|g_k - g_{k-1}\|_W^2 \)
+        !> with W scaling p to head-equivalent units. gamma = 0 (plain relaxed
+        !> Picard) when no previous pair is stored, sizes changed, the
+        !> difference is degenerate, the result is non-finite, or the
+        !> monotonicity safeguard trips: mixing requires \( \|g_k\|_W \le
+        !> \|g_{k-1}\|_W \), so a diverging fixed-point sequence is never
+        !> extrapolated. |gamma| is clipped to AA_GAMMA_MAX as the standard
+        !> safeguard.
+        subroutine compute_aa_gamma(self, gamma, active)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            real(real64), intent(inout) :: gamma
+            logical, intent(inout) :: active
+
+            real(real64), allocatable :: g_T(:), g_P(:)
+            real(real64) :: numer, denom, dg, gnorm, gnorm_prev
+            integer(int32) :: i
+
+            gamma = 0.0d0
+            call self%get_variable_increment(PHYSICS_TYPES%THERMAL, g_T)
+            call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, g_P)
+            if (.not. (allocated(g_T) .and. allocated(g_P))) then
+                active = .false.
+                return
+            end if
+
+            gnorm = 0.0d0
+            do i = 1, size(g_T)
+                gnorm = gnorm + g_T(i) * g_T(i)
+            end do
+            do i = 1, size(g_P)
+                gnorm = gnorm + (g_P(i) * AA_WEIGHT_P)**2
+            end do
+            gnorm = sqrt(gnorm)
+            gnorm_prev = self%aa_gnorm_prev
+            self%aa_gnorm_prev = gnorm
+
+            if (.not. self%aa_has_prev) return
+            if (.not. (allocated(self%aa_duT_prev) .and. allocated(self%aa_duP_prev))) return
+            if (size(self%aa_duT_prev) /= size(g_T) .or. size(self%aa_duP_prev) /= size(g_P)) then
+                self%aa_has_prev = .false.
+                return
+            end if
+            ! Monotonicity safeguard: mix only while the increment sequence
+            ! contracts; otherwise fall back to plain relaxed Picard and let
+            ! the adaptive omega restore contraction first.
+            if (gnorm_prev >= 0.0d0 .and. gnorm > gnorm_prev) return
+
+            numer = 0.0d0
+            denom = 0.0d0
+            do i = 1, size(g_T)
+                dg = g_T(i) - self%aa_duT_prev(i)
+                numer = numer + g_T(i) * dg
+                denom = denom + dg * dg
+            end do
+            do i = 1, size(g_P)
+                dg = (g_P(i) - self%aa_duP_prev(i)) * AA_WEIGHT_P
+                numer = numer + (g_P(i) * AA_WEIGHT_P) * dg
+                denom = denom + dg * dg
+            end do
+
+            if (denom > tiny(1.0d0)) then
+                gamma = numer / denom
+                if (.not. (gamma == gamma .and. abs(gamma) < huge(1.0d0))) gamma = 0.0d0
+                gamma = max(-AA_GAMMA_MAX, min(AA_GAMMA_MAX, gamma))
+            end if
+        end subroutine compute_aa_gamma
+
+        !> (Re)allocate dst to the shape of src and copy.
+        subroutine copy_into(dst, src)
+            implicit none
+            real(real64), allocatable, intent(inout) :: dst(:)
+            real(real64), intent(in) :: src(:)
+
+            if (allocated(dst)) then
+                if (size(dst) /= size(src)) deallocate (dst)
+            end if
+            if (.not. allocated(dst)) allocate (dst(size(src)))
+            dst(:) = src(:)
+        end subroutine copy_into
 
     end subroutine reflect_variables_ftcms
 
@@ -1435,6 +1608,11 @@ contains
         call self%output%output_system_log()
         call self%output%get_log_io_unit(log_io_unit)
         call self%control%display_profiler(log_io_unit)
+
+        if (self%solver_history_unit /= -1) then
+            close (self%solver_history_unit)
+            self%solver_history_unit = -1
+        end if
 
     end subroutine destroy_type_ftcms
 end submodule ftcms_base

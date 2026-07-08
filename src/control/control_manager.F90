@@ -75,6 +75,7 @@ module control_control_manager
         procedure, public, pass(self) :: is_none => is_none_control
         procedure, public, pass(self) :: is_conserved => is_conserved_control
         procedure, public, pass(self) :: get_conserved_relaxation => get_conserved_relaxation_control
+        procedure, public, pass(self) :: get_conserved_dq_norm => get_conserved_dq_norm_control
         procedure, public, pass(self) :: should_continue => should_continue_control
         ! - acceleration
         procedure, public, pass(self) :: reach_minimum_relaxation => reach_minimum_relaxation_control
@@ -630,6 +631,15 @@ contains
 
         omega = self%iteration%get_conserved_relaxation()
     end function get_conserved_relaxation_control
+
+    !> Last weighted-RMS conserved-quantity change ||dQ||_W (diagnostics).
+    pure function get_conserved_dq_norm_control(self) result(dq_norm)
+        implicit none
+        class(type_control), intent(in) :: self
+        real(real64) :: dq_norm
+
+        dq_norm = self%iteration%get_conserved_dq_norm()
+    end function get_conserved_dq_norm_control
 
     !> Weighted-RMS conserved-quantity error norm for the Richardson estimate.
     subroutine compute_error_norm_control(self, enthalpy_a, density_a, enthalpy_b, density_b, eps)

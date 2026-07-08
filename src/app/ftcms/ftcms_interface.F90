@@ -79,6 +79,25 @@ module app_ftcms
         real(real64) :: lte_prev_dt = 0.0d0
         logical :: lte_has_prev = .false.
 
+        ! Anderson(1) acceleration state of the conserved coupled Picard loop:
+        ! the previous iterate and previous fixed-point increment of (T, p),
+        ! used by reflect_variables to form the depth-1 Anderson mixing.
+        ! Cleared at the start of every nonlinear loop.
+        real(real64), allocatable :: aa_T_prev(:)
+        real(real64), allocatable :: aa_P_prev(:)
+        real(real64), allocatable :: aa_duT_prev(:)
+        real(real64), allocatable :: aa_duP_prev(:)
+        logical :: aa_has_prev = .false.
+        ! Weighted norm of the previous fixed-point increment ||g_{k-1}||_W;
+        ! negative when unset. Safeguard: Anderson mixing is applied only while
+        ! this sequence is non-increasing (contracting fixed-point iteration).
+        real(real64) :: aa_gnorm_prev = -1.0d0
+
+        ! Unit of Output/solver_history.log: one record per time-step attempt
+        ! (step, time, dt, nonlinear iterations, accepted flag, omega, ||dQ||_W,
+        ! LTE estimate). -1 when the log is not open (non-root ranks).
+        integer(int32) :: solver_history_unit = -1
+
         type(type_control) :: control
         type(type_output_manager) :: output
 

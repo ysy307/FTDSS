@@ -14,6 +14,10 @@ contains
         ! reset() may set the compute solver to NONE when config is NONE.
         call self%control%reset_iteration()
 
+        ! Anderson(1) history is only meaningful within one nonlinear loop.
+        self%aa_has_prev = .false.
+        self%aa_gnorm_prev = -1.0d0
+
         ! [Important] Compute solver must always be PICARD or NEWTON if not NONE.
         ! Even for linear config (where iter=1 is forced), Picard discretization 
         ! is often the base, but if explicitly NONE, we should respect it.
@@ -809,6 +813,7 @@ contains
         logical :: is_step_converged
         integer(int32) :: consecutive_failures
         integer(int32) :: step_counter
+        integer(int32) :: attempt_counter
         integer(int32) :: nl_iter
         real(real64) :: time_s, dt_s
         real(real64) :: lte_error
@@ -816,6 +821,7 @@ contains
 
         consecutive_failures = 0
         step_counter = 0
+        attempt_counter = 0
 
         ! Loop until end time
         time_loop: do while (.not. self%control%is_end_time())
@@ -827,6 +833,25 @@ contains
             ! before the time/variable history is shifted (needs ydot_n and dt_n).
             lte_error = -1.0d0
             if (is_step_converged) lte_error = self%compute_lte_error()
+
+            ! Solver-history record of this attempt, captured before control%update
+            ! rescales dt / advances time.
+            attempt_counter = attempt_counter + 1
+            if (self%solver_history_unit /= -1) then
+                block
+                    real(real64) :: dt_used, omega_used, dq_norm_used
+                    integer(int32) :: iter_used
+                    call self%control%get_dt(dt_used)
+                    call self%control%get_nonlinear_iter(iter_used)
+                    omega_used = self%control%get_conserved_relaxation()
+                    dq_norm_used = self%control%get_conserved_dq_norm()
+                    write (self%solver_history_unit, &
+                           '(I13,1X,ES15.7,1X,ES12.5,1X,I8,1X,I9,1X,F9.5,1X,ES12.5,1X,ES12.5)') &
+                        attempt_counter, time_s + dt_used, dt_used, iter_used, &
+                        merge(1, 0, is_step_converged), omega_used, dq_norm_used, lte_error
+                    flush (self%solver_history_unit)
+                end block
+            end if
 
             if (is_step_converged) then
                 ! Update time and adaptive time stepping

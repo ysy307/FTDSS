@@ -182,6 +182,7 @@ module control_iteration_convergence
         procedure, public, pass(self) :: check_conserved => check_conserved_convergence_control
         procedure, public, pass(self) :: compute_error_norm => compute_error_norm_convergence_control
         procedure, public, pass(self) :: get_conserved_relaxation => get_conserved_relaxation_convergence_control
+        procedure, public, pass(self) :: get_conserved_dq_norm => get_conserved_dq_norm_convergence_control
         ! ---- Meta / Utility ----
     end type type_convergence_control
 
@@ -334,6 +335,13 @@ module control_iteration_convergence
             class(type_convergence_control), intent(in) :: self
             real(real64) :: omega
         end function get_conserved_relaxation_convergence_control
+
+        !> Last weighted-RMS conserved-quantity change ||dQ||_W (diagnostics).
+        module pure function get_conserved_dq_norm_convergence_control(self) result(dq_norm)
+            implicit none
+            class(type_convergence_control), intent(in) :: self
+            real(real64) :: dq_norm
+        end function get_conserved_dq_norm_convergence_control
 
     end interface
 

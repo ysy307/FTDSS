@@ -49,7 +49,7 @@ module types_config_control_time
         !> PI gains. For a first-order method (BDF1) the standard choices are
         !> k_I ~ 0.3/(p+1) and k_P ~ 0.4/(p+1) with p=1.
         real(real64) :: pi_k_i = 0.15d0
-        real(real64) :: pi_k_p = 0.10d0
+        real(real64) :: pi_k_p = 0.20d0
         !> Relative tolerance for the normalized LTE estimate (E<=1 is on target).
         real(real64) :: error_rtol = 1.0d-2
         !> Maximum absolute temperature change per step used by ATS limiter [K or C].
@@ -142,7 +142,7 @@ contains
         self%dt_max = 1.0d+2
         self%use_error_control = .true.
         self%pi_k_i = 0.15d0
-        self%pi_k_p = 0.10d0
+        self%pi_k_p = 0.20d0
         self%error_rtol = 1.0d-2
         self%max_dT_per_step = 5.0d0
         self%max_relative_change_per_step = 0.3d0

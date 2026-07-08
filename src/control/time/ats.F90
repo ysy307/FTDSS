@@ -33,7 +33,7 @@ module control_time_ats
         !> Error-controlled (PI) adaptive stepping. See type_config_time_ats.
         logical :: use_error_control = .false.
         real(real64) :: pi_k_i = 0.15d0
-        real(real64) :: pi_k_p = 0.10d0
+        real(real64) :: pi_k_p = 0.20d0
         real(real64) :: error_rtol = 1.0d-2
         !> Previous normalized error (state for the PI controller); 1.0 = on target.
         real(real64) :: error_prev = 1.0d0
@@ -133,11 +133,14 @@ contains
     !> PI-controlled time step from a normalized local-truncation-error estimate.
     !>
     !> Given the dimensionless error E (E<=1 means the step met the accuracy target)
-    !> and the previous error, the next step follows the standard PI controller
-    !> \( \Delta t_{new} = \kappa_{safe}\,\Delta t\; E^{-k_I}\, E_{prev}^{\,k_P} \)
-    !> (PDF 6.3.5). The growth/shrink ratio is capped by max_growth_rate for BDF
-    !> stability and the result is clamped to [dt_min, dt_max]. error_prev is
-    !> advanced as controller state. A non-positive E (no estimate yet) is a no-op.
+    !> and the previous error, the next step follows the Gustafsson PI controller
+    !> \( \Delta t_{new} = \kappa_{safe}\,\Delta t\; E^{-k_I}\,(E_{prev}/E)^{k_P} \)
+    !> (Hairer & Wanner II, PI.4.2). At steady state (E_prev = E) the gain is
+    !> \( \kappa_{safe} E^{-k_I} \), neutral at \( E = \kappa_{safe}^{1/k_I} \approx 0.5 \),
+    !> so dt grows whenever the error is below about half the target and shrinks above.
+    !> The growth/shrink ratio is capped by max_growth_rate for BDF stability and the
+    !> result is clamped to [dt_min, dt_max]. error_prev is advanced as controller
+    !> state. A non-positive E (no estimate yet) is a no-op.
     subroutine pi_controller_dt(self, current_dt, error_norm, next_dt)
         implicit none
         class(type_ats), intent(inout) :: self
@@ -155,7 +158,7 @@ contains
         e_cur = max(error_norm / self%error_rtol, 1.0d-12)
         e_prev = max(self%error_prev, 1.0d-12)
 
-        ratio = self%safety_factor * e_cur**(-self%pi_k_i) * e_prev**(self%pi_k_p)
+        ratio = self%safety_factor * e_cur**(-(self%pi_k_i + self%pi_k_p)) * e_prev**(self%pi_k_p)
         ratio = min(max(ratio, 1.0d0 / self%max_growth_rate), self%max_growth_rate)
 
         next_dt = max(self%dt_min, min(current_dt * ratio, self%dt_max))
