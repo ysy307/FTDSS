@@ -32,6 +32,7 @@ module constitutive_models_manager
         procedure, public :: calc_latent_heat_fusion
         procedure, public :: calc_latent_heat_vaporization
         procedure, public :: calc_pressure_ice_water_derivative
+        procedure, public :: calc_cryo_suction
         procedure, public :: calc_cryo_suction_deriv_T
         procedure, public :: calc_lscheme_capacity
         procedure, public :: calc_suction_weights
@@ -144,6 +145,18 @@ contains
 
         call self%phase_manager%deriv_pressure_ice_water(state, deriv)
     end subroutine calc_pressure_ice_water_derivative
+
+    !> Cryogenic suction psi_cryo(T) [Pa] (Clapeyron equilibrium potential of the
+    !> ice-water interface); 0 when no GCC model is configured. Used by the A1
+    !> Clapeyron-pressure-constraint closure to evaluate P_eq(T) = -psi_cryo(T).
+    subroutine calc_cryo_suction(self, state, psi_cryo)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: psi_cryo
+
+        call self%gcc%calc(state, psi_cryo)
+    end subroutine calc_cryo_suction
 
     subroutine calc_cryo_suction_deriv_T(self, state, deriv)
         implicit none

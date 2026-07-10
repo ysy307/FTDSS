@@ -25,6 +25,8 @@ submodule(io_input_basic) input_basic_solver_settings
     character(*), parameter :: key_atol_density = "atol_density"
     character(*), parameter :: key_rtol = "rtol"
     character(*), parameter :: key_residual_eps = "residual_eps"
+    character(*), parameter :: key_mass_bias_tolerance = "mass_bias_tolerance"
+    character(*), parameter :: key_enable_mass_bias_gate = "enable_mass_bias_gate"
     character(*), parameter :: linear_solver = "linear_solver"
     character(*), parameter :: iterative_solver = "iterative_solver"
     character(*), parameter :: solver_type = "type"
@@ -197,6 +199,21 @@ contains
                                 is_required=.false., &
                                 default_value=self%solver_settings%nonlinear_solver%convergence%residual_eps, &
                                 valid_range=[0.0d0, huge(0.0d0)])
+
+            ! Global mass-bias acceptance gate (default: off, 1e-6 per-step budget).
+            ! 1.0d-6 is chosen so a ~50h/1600-step run (Mizoguchi-type freezing
+            ! column) accumulates at most ~1600*1e-6 = 0.16% spurious mass, an
+            ! order of magnitude below the observed uncontrolled +2.4-2.9% drift.
+            buffer(5) = key_mass_bias_tolerance
+            call get_json_value(json, join(buffer(1:5)), &
+                                self%solver_settings%nonlinear_solver%convergence%mass_bias_tolerance, &
+                                is_required=.false., default_value=1.0d-6, &
+                                valid_range=[0.0d0, huge(0.0d0)])
+
+            buffer(5) = key_enable_mass_bias_gate
+            call get_json_value(json, join(buffer(1:5)), &
+                                self%solver_settings%nonlinear_solver%convergence%enable_mass_bias_gate, &
+                                is_required=.false., default_value=.false.)
         end if
 
         if (allocated(temp_string)) deallocate (temp_string)

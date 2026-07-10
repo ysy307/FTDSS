@@ -64,6 +64,17 @@ contains
         end if
 
         ! ----------------------------------------------------------------------
+        ! Step 1.5: A1 Clapeyron pressure constraint (interior "Dirichlet-like"
+        ! rows at frozen nodes). Runs before Step 2 so a domain-boundary
+        ! essential BC (if it happens to coincide with a frozen interior node)
+        ! always takes precedence over this internal constraint.
+        ! ----------------------------------------------------------------------
+        if (self%enable_clapeyron_pressure_constraint .and. &
+            self%is_active_thermal() .and. self%is_active_hydraulic()) then
+            call self%apply_clapeyron_pressure_constraint()
+        end if
+
+        ! ----------------------------------------------------------------------
         ! Step 2: Apply Essential BCs (Dirichlet Constraints)
         ! ----------------------------------------------------------------------
         if (self%is_active_thermal()) then
@@ -178,6 +189,94 @@ contains
         nullify (du)
 
     end subroutine zero_frozen_increment_ftcms
+
+    !> A1 prototype closure. See the interface (ftcms_interface.F90) for the
+    !> full description; monolithic coupling only (mirrors freeze_physics_dofs).
+    module subroutine apply_clapeyron_pressure_constraint_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        integer(int32) :: i_elem, num_elem, i_local, node_id, material_id, num_nodes
+        integer(int32), pointer, contiguous :: connectivity(:)
+        type(type_state) :: probe_state
+        real(real64) :: T_node, P_node, qi_node, psi_cryo, psi_cap, P_eq
+        real(real64) :: diag_val
+        integer(int32) :: num_dofs_per_node, dof_idx
+        real(real64), pointer, dimension(:) :: F_raw
+        logical :: is_frozen
+
+        ! Staggered coupling owns per-physics sub-matrices; the row-zeroing /
+        ! raw-F indexing below assumes the interleaved monolithic vector layout
+        ! (same restriction as freeze_physics_dofs_ftcms / zero_frozen_increment_ftcms).
+        if (self%control%is_staggered()) return
+
+        call self%domain%get_num_nodes(num_nodes)
+        if (.not. allocated(self%clapeyron_frozen_mask)) return
+        if (size(self%clapeyron_frozen_mask) /= num_nodes) return
+
+        call self%domain%get_num_dof_per_node(num_dofs_per_node)
+        nullify (F_raw)
+        F_raw => self%F%get_data()
+
+        nullify (connectivity)
+        call self%domain%get_num_fe(num_elem)
+
+        do i_elem = 1, num_elem
+            call self%domain%get_fe_connectivity(i_elem, connectivity)
+            call self%domain%get_material_id(i_elem, material_id)
+
+            do i_local = 1, size(connectivity)
+                node_id = connectivity(i_local)
+                if (node_id < 1 .or. node_id > num_nodes) cycle
+
+                ! Build a probe state at the node's current (T, P, porosity, Qw/Qi/
+                ! Qa/Qv) without paying for a fresh equilibrium recomputation.
+                call self%set_state(node_id, i_elem, probe_state, calc_physics=.false.)
+                call probe_state%temperature%get(T_node)
+                call probe_state%pressure%get(P_node)
+                call self%Qi%get_current(node_id, qi_node)
+
+                psi_cryo = 0.0d0
+                call self%hydraulic%calc_cryo_suction(material_id, probe_state, psi_cryo)
+                psi_cap = max(0.0d0, -P_node)
+
+                ! Active-set classification (see design memo): a node is frozen
+                ! (pressure-constrained) when the cryogenic suction exceeds the
+                ! capillary suction, or it already carries prognostic ice; it is
+                ! released as soon as both conditions fail (De Morgan's law of the
+                ! activation OR, so no separate hysteresis state is needed).
+                is_frozen = (psi_cryo > psi_cap) .or. (qi_node > 0.0d0)
+                self%clapeyron_frozen_mask(node_id) = is_frozen
+
+                if (.not. is_frozen) cycle
+
+                ! Save the raw (pre-constraint) hydraulic residual for this node
+                ! before the row below overwrites it, for apply_prognostic_ice_update.
+                if (associated(F_raw)) then
+                    dof_idx = self%hydraulic_start_dof + (node_id - 1) * num_dofs_per_node
+                    if (dof_idx >= 1 .and. dof_idx <= size(F_raw)) then
+                        self%clapeyron_R_H_raw(node_id) = F_raw(dof_idx)
+                    end if
+                end if
+
+                ! Prescribe P = P_eq(T) = -psi_cryo(T) directly into the field...
+                P_eq = -psi_cryo
+                call self%pressure%set_current(node_id, P_eq)
+
+                ! ...and pin the linear system row like a Dirichlet BC, so the
+                ! solve returns du=0 for this DOF and reflect_variables leaves
+                ! the just-prescribed P_eq(T) unchanged.
+                call self%K%zero(node_id, PHYSICS_TYPES%HYDRAULIC%ID)
+                diag_val = 1.0d0
+                call self%K%set(PHYSICS_TYPES%HYDRAULIC%ID, PHYSICS_TYPES%HYDRAULIC%ID, node_id, node_id, diag_val)
+                call self%F%set(PHYSICS_TYPES%HYDRAULIC%ID, node_id, 0.0d0)
+            end do
+            nullify (connectivity)
+        end do
+
+        nullify (F_raw)
+
+    end subroutine apply_clapeyron_pressure_constraint_ftcms
 
     !>
     !> Enforces Dirichlet values directly into the solution vector.

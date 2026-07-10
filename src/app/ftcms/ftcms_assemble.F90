@@ -155,6 +155,24 @@ contains
         call self%update_physical_properties_bulk(material_id, workspace%state_gp)
 
         call workspace%lerp_dqi_dt()
+
+        ! A1 prototype closure: for elements incident to a pressure-constrained
+        ! node, overwrite the pointwise-equilibrium Gauss-point ice_content
+        ! (just computed above) with the nodal-Qi interpolant, so the prognostic
+        ! ice (already installed into workspace%state via
+        ! override_prognostic_ice_ftcms, called from set_states_from_connectivity
+        ! above) actually reaches the assembled thermal/hydraulic coefficients
+        ! instead of being discarded by the GP-level equilibrium recomputation.
+        ! Gated per-element (not global) to keep elements away from the freezing
+        ! front bit-identical to the unconstrained closure.
+        if (self%enable_clapeyron_pressure_constraint) then
+            if (allocated(self%clapeyron_frozen_mask)) then
+                if (any(self%clapeyron_frozen_mask(pack(connectivity_local, connectivity_local >= 1)))) then
+                    call workspace%lerp_ice()
+                end if
+            end if
+        end if
+
         call fe%get_num_nodes(num_nodes)
 
         if (present(local_K_TT)) call check_initialize_matrix(local_K_TT, num_nodes)

@@ -111,6 +111,12 @@ contains
         call self%domain%get_total_dofs(num_total_dofs)
         call self%domain%get_num_nodes(num_nodes)
 
+        ! A1 prototype closure flag (see ftcms_interface.F90 field doc). Read
+        ! directly here (usage site), same pattern as enable_fringe_K_averaging
+        ! but propagated to type_ftcms instead of type_hydraulic since the
+        ! constraint/prognostic-update logic lives entirely at the app level.
+        self%enable_clapeyron_pressure_constraint = input%basic%analysis_controls%enable_clapeyron_pressure_constraint
+
         block
             ! Domain-independent carrier injected into the system layer, so the
             ! Jacobian / residual no longer depend on type_domain directly.
@@ -141,6 +147,21 @@ contains
         call self%Qi%initialize(num_nodes, max_bdf_order)
         call self%Qa%initialize(num_nodes, max_bdf_order)
         call self%Qv%initialize(num_nodes, max_bdf_order)
+
+        ! A1 prototype closure state (see enable_clapeyron_pressure_constraint).
+        ! Allocated unconditionally (cheap, num_nodes-sized) so downstream code
+        ! can rely on these arrays being allocated whenever the flag might later
+        ! be toggled by a call site; the lumped node volume is only worth its
+        ! O(N_elements) cost when the closure is actually active.
+        if (allocated(self%clapeyron_frozen_mask)) deallocate (self%clapeyron_frozen_mask)
+        if (allocated(self%clapeyron_R_H_raw)) deallocate (self%clapeyron_R_H_raw)
+        if (allocated(self%clapeyron_node_volume)) deallocate (self%clapeyron_node_volume)
+        allocate (self%clapeyron_frozen_mask(num_nodes), source=.false.)
+        allocate (self%clapeyron_R_H_raw(num_nodes), source=0.0d0)
+        allocate (self%clapeyron_node_volume(num_nodes), source=0.0d0)
+        if (self%enable_clapeyron_pressure_constraint) then
+            call compute_clapeyron_node_volume(self)
+        end if
 
         call self%domain%get_computation_dimension(computation_dimension)
         call input%geometry%vtk%get_active_region_info(active_region_ids, target_dim=computation_dimension)
@@ -263,6 +284,22 @@ contains
         if (associated(phase_values)) call self%Qv%set_previous(phase_values)
         nullify (phase_values)
 
+        ! Global mass-bias acceptance gate settings (conserved-mode nonlinear loop).
+        ! Read directly from solver_settings.nonlinear_solver.convergence.conserved
+        ! and kept as plain type_ftcms components: the gate is evaluated in
+        ! ftcms_solve.F90, where the residual vector, dt, and mesh integration are
+        ! already available, so threading these two scalars through the control /
+        ! iteration_manager layers would add indirection without benefit.
+        self%mass_bias_tolerance = input%basic%solver_settings%nonlinear_solver%convergence%mass_bias_tolerance
+        self%enable_mass_bias_gate = input%basic%solver_settings%nonlinear_solver%convergence%enable_mass_bias_gate
+        self%mass_ref = 0.0d0
+        if (self%is_active_hydraulic()) then
+            ! M_ref is evaluated once from the initial state (Qw/Qi/Qv above are
+            ! already consistent with the IC). A stale M_ref through the run is
+            ! intentional: it is a fixed reference scale, not a moving target.
+            self%mass_ref = self%compute_mass_reference()
+        end if
+
         call input_translator%execute(input, config_output)
         call input_translator%execute(input, config_observation)
         call input_translator%execute(input, config_overall)
@@ -313,7 +350,8 @@ contains
         write (self%solver_history_unit, '(A)') &
             "# FTCMS solver history: one record per time-step attempt"
         write (self%solver_history_unit, '(A)') &
-            "# step_attempt  time_end[s]      dt[s]        nl_iter  accepted  omega     dq_norm_W    lte_rel"
+            "# step_attempt  time_end[s]      dt[s]        nl_iter  accepted  omega     dq_norm_W    lte_rel"// &
+            "      mass_bias_ratio"
         flush (self%solver_history_unit)
     end subroutine open_solver_history_log
 
@@ -382,6 +420,53 @@ contains
             write (*, '(A)') '[DA] Data assimilation enabled from DataAssimilation.json.'
         end if
     end subroutine initialize_assimilation_ftcms
+
+    !> Lumped nodal control volume V_i = sum over incident elements of
+    !> (element measure / n_local_nodes), i.e. an equal partition of each
+    !> element's measure among its local nodes. Same lumping pattern as
+    !> compute_mass_reference_ftcms's elem_vol/n_local average, computed once
+    !> here (rather than per-element) since it is a purely geometric, time-
+    !> invariant quantity. Used by apply_prognostic_ice_update as the volume
+    !> normalizing the nodal mass residual R_H,i into a rate.
+    subroutine compute_clapeyron_node_volume(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        integer(int32) :: i_elem, num_elem, i_local, node_id, n_local, num_nodes
+        integer(int32), pointer, contiguous :: connectivity(:)
+        real(real64) :: elem_vol, share
+
+        call self%domain%get_num_nodes(num_nodes)
+        if (.not. allocated(self%clapeyron_node_volume)) return
+        if (size(self%clapeyron_node_volume) /= num_nodes) return
+        self%clapeyron_node_volume(:) = 0.0d0
+
+        nullify (connectivity)
+        call self%domain%get_num_fe(num_elem)
+
+        do i_elem = 1, num_elem
+            call self%domain%get_fe_connectivity(i_elem, connectivity)
+            call self%domain%calc_measure(i_elem, elem_vol)
+
+            n_local = 0
+            do i_local = 1, size(connectivity)
+                if (connectivity(i_local) >= 1) n_local = n_local + 1
+            end do
+            if (n_local <= 0) then
+                nullify (connectivity)
+                cycle
+            end if
+            share = elem_vol / real(n_local, real64)
+
+            do i_local = 1, size(connectivity)
+                node_id = connectivity(i_local)
+                if (node_id < 1 .or. node_id > num_nodes) cycle
+                self%clapeyron_node_volume(node_id) = self%clapeyron_node_volume(node_id) + share
+            end do
+            nullify (connectivity)
+        end do
+
+    end subroutine compute_clapeyron_node_volume
 
     module subroutine output_fields_ftcms(self)
         implicit none
@@ -776,9 +861,36 @@ contains
         if (do_calc) then
             call self%domain%get_material_id(element_id, material_id)
             call self%update_physical_properties(material_id, state)
+            call override_prognostic_ice_ftcms(self, node_id, state)
         end if
 
     end subroutine set_state_ftcms
+
+    !> A1 prototype closure (see enable_clapeyron_pressure_constraint): replace
+    !> the equilibrium ice_content that update_physical_properties just computed
+    !> with the prognostic value held in self%Qi, at pressure-constrained nodes
+    !> only. Without this, state%ice_content would always be re-derived from
+    !> Theta(psi_cap) every call, which collapses to ~0 once P is pinned at
+    !> P_eq(T) (psi_cap = psi_cryo there) - exactly the equilibrium-closure bias
+    !> this prototype replaces. No-op when the flag is off, the node is not
+    !> frozen, or the mask is not yet allocated/sized (defensive, e.g. during
+    !> IC application before self%Qi holds a meaningful value).
+    subroutine override_prognostic_ice_ftcms(self, node_id, state)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(in) :: node_id
+        type(type_state), intent(inout) :: state
+
+        real(real64) :: qi_prognostic
+
+        if (.not. self%enable_clapeyron_pressure_constraint) return
+        if (.not. allocated(self%clapeyron_frozen_mask)) return
+        if (node_id < 1 .or. node_id > size(self%clapeyron_frozen_mask)) return
+        if (.not. self%clapeyron_frozen_mask(node_id)) return
+
+        call self%Qi%get_current(node_id, qi_prognostic)
+        call state%ice_content%set(qi_prognostic)
+    end subroutine override_prognostic_ice_ftcms
 
     module subroutine set_states_from_connectivity_ftcms(self, connectivity, element_id, states, calc_physics)
         implicit none
@@ -811,6 +923,9 @@ contains
         if (do_calc) then
             call self%domain%get_material_id(element_id, material_id)
             call self%update_physical_properties_bulk(material_id, states)
+            do i = 1, size(connectivity)
+                call override_prognostic_ice_ftcms(self, connectivity(i), states(i))
+            end do
         end if
     end subroutine set_states_from_connectivity_ftcms
 
@@ -1413,6 +1528,146 @@ contains
 
     end subroutine update_nodal_phases_ftcms
 
+    !> A1 prototype closure (see enable_clapeyron_pressure_constraint). Advance
+    !> the prognostic ice content at every pressure-constrained node from the
+    !> mass residual that the constraint excluded from the hydraulic solve, then
+    !> clip to the physical bounds. Called once per ACCEPTED step, before shift().
+    !>
+    !> Sign derivation (required by design memo, verified against
+    !> hydraulic_matrix.F90:assemble_local_picard_hydraulic):
+    !>   local_vec_res(i) = R1(dTheta/dt) + K2(D_HH)*P + K2(D_HT)*T - R2(V) + R1(sink)
+    !>   F_H(i) = -local_vec_res(i)                                   [F_H%set(ADD,i,-local_vec_res(i))]
+    !> local_vec_res(i) is the (Galerkin) mass-conservation residual: it is < 0
+    !> at a node with net flux CONVERGENCE (inflow), e.g. for a 2-node 1D
+    !> diffusion element with P1 > P2 (flow 1->2, node 2 gains mass):
+    !> (K*P)_2 = -(D/L)(P1-P2) < 0 - confirmed by direct construction of the
+    !> element stiffness matrix. At a constrained node, Qi is held fixed
+    !> throughout the nonlinear loop, so the assembled dTheta/dt already
+    !> excludes any true ice growth; the complete mass balance requires
+    !>   (rho_i/rho_w) * dQi_true/dt = -local_vec_res(i) / V_i
+    !> i.e. net inflow (local_vec_res < 0) must increase Qi. Substituting
+    !> local_vec_res(i) = -F_H(i) = -clapeyron_R_H_raw(node_id):
+    !>   dQi_true/dt = (rho_w/rho_i) * clapeyron_R_H_raw(node_id) / V_i
+    !>   Delta Qi_i  = (rho_w/rho_i) * clapeyron_R_H_raw(node_id) * dt / V_i
+    !> (equivalently Delta Qi_i = -(rho_w/rho_i)*R_H,i*dt/V_i with the design
+    !> memo's R_H,i = local_vec_res(i) = -clapeyron_R_H_raw(node_id)).
+    module subroutine apply_prognostic_ice_update_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        logical, parameter :: CLAPEYRON_VERBOSE = .true.
+
+        integer(int32) :: i_elem, num_elem, i_local, node_id, material_id, num_nodes
+        integer(int32), pointer, contiguous :: connectivity(:)
+        logical, allocatable :: processed(:)
+        type(type_state) :: probe_state
+        real(real64) :: dt_current, T_node, P_node, phi_node, theta_w, theta_s_cap
+        real(real64) :: rho_w, rho_i, R_raw, dQi, Qi_old, Qi_new, Qi_new_raw, Qi_cap
+        integer(int32) :: num_constrained, num_clipped
+        real(real64) :: max_abs_dQi, max_P_unconstrained_frozen
+        logical :: any_unconstrained_frozen
+
+        if (.not. self%enable_clapeyron_pressure_constraint) return
+        if (self%control%is_staggered()) return
+        if (.not. allocated(self%clapeyron_frozen_mask)) return
+
+        call self%domain%get_num_nodes(num_nodes)
+        if (size(self%clapeyron_frozen_mask) /= num_nodes) return
+
+        call self%control%get_dt(dt_current)
+
+        num_constrained = 0
+        num_clipped = 0
+        max_abs_dQi = 0.0d0
+        max_P_unconstrained_frozen = -huge(1.0d0)
+        any_unconstrained_frozen = .false.
+
+        allocate (processed(num_nodes))
+        processed = .false.
+
+        nullify (connectivity)
+        call self%domain%get_num_fe(num_elem)
+
+        do i_elem = 1, num_elem
+            call self%domain%get_fe_connectivity(i_elem, connectivity)
+            call self%domain%get_material_id(i_elem, material_id)
+
+            do i_local = 1, size(connectivity)
+                node_id = connectivity(i_local)
+                if (node_id < 1 .or. node_id > num_nodes) cycle
+                if (processed(node_id)) cycle
+                processed(node_id) = .true.
+
+                call self%set_state(node_id, i_elem, probe_state, calc_physics=.false.)
+                call probe_state%temperature%get(T_node)
+                call probe_state%pressure%get(P_node)
+
+                ! Diagnostic only: an unconstrained node with T<0 should not
+                ! occur once the active-set classification is self-consistent;
+                ! its presence signals a stale/lagged classification worth
+                ! reporting (see design memo item 5).
+                if (T_node < 0.0d0 .and. .not. self%clapeyron_frozen_mask(node_id)) then
+                    any_unconstrained_frozen = .true.
+                    max_P_unconstrained_frozen = max(max_P_unconstrained_frozen, P_node)
+                end if
+
+                if (.not. self%clapeyron_frozen_mask(node_id)) cycle
+                num_constrained = num_constrained + 1
+
+                R_raw = self%clapeyron_R_H_raw(node_id)
+
+                call self%thermal%calc_density_water(probe_state, rho_w)
+                call self%thermal%calc_density_ice(probe_state, rho_i)
+                if (rho_i <= tiny(1.0d0)) cycle
+
+                dQi = (rho_w / rho_i) * R_raw * dt_current
+                if (self%clapeyron_node_volume(node_id) > tiny(1.0d0)) then
+                    dQi = dQi / self%clapeyron_node_volume(node_id)
+                else
+                    dQi = 0.0d0
+                end if
+
+                call self%Qi%get_current(node_id, Qi_old)
+                Qi_new_raw = Qi_old + dQi
+
+                ! Clip to [0, cap], cap from theta_w + Qi*(rho_i/rho_w) <= theta_s
+                ! (theta_s = porosity, the same liquid-equivalent Theta convention
+                ! used to derive Delta Qi above). Clipping discards the excess
+                ! mass rather than redistributing it (accepted prototype
+                ! simplification, see design memo item 4); occurrences are
+                ! counted below rather than silently dropped.
+                call self%porosity%get_current(node_id, phi_node)
+                call self%Qw%get_current(node_id, theta_w)
+                theta_s_cap = phi_node
+                Qi_cap = max(0.0d0, (theta_s_cap - theta_w) * (rho_w / rho_i))
+
+                Qi_new = min(max(Qi_new_raw, 0.0d0), Qi_cap)
+                if (abs(Qi_new - Qi_new_raw) > 1.0d-15 * max(1.0d0, abs(Qi_new_raw))) then
+                    num_clipped = num_clipped + 1
+                end if
+
+                call self%Qi%set_current(node_id, Qi_new)
+                max_abs_dQi = max(max_abs_dQi, abs(Qi_new - Qi_old))
+            end do
+            nullify (connectivity)
+        end do
+
+        deallocate (processed)
+
+        if (CLAPEYRON_VERBOSE) then
+            if (any_unconstrained_frozen) then
+                write (*, '(A,I0,A,ES11.3,A,I0,A,ES11.3)') &
+                    '   [CLAPEYRON] constrained=', num_constrained, ', max|dQi|=', max_abs_dQi, &
+                    ', clipped=', num_clipped, ', max(P|T<0,unconstrained)=', max_P_unconstrained_frozen
+            else
+                write (*, '(A,I0,A,ES11.3,A,I0,A)') &
+                    '   [CLAPEYRON] constrained=', num_constrained, ', max|dQi|=', max_abs_dQi, &
+                    ', clipped=', num_clipped, ', max(P|T<0,unconstrained)=n/a'
+            end if
+        end if
+
+    end subroutine apply_prognostic_ice_update_ftcms
+
     !> Evaluate per-node conserved quantities at the current iterate.
     !>
     !> Mathematical definition:
@@ -1479,6 +1734,53 @@ contains
 
         deallocate (processed)
     end subroutine compute_nodal_conserved_ftcms
+
+    !> Implementation: one-time domain integral of Theta = Qw + (rho_i/rho_w)*Qi + Qv,
+    !> the exact mixed storage variable whose BDF derivative is assembled into the
+    !> hydraulic residual (compute_transient_term_mixed_hydraulic). Per element, Theta
+    !> is evaluated at every local node (set_state + calc_theta_value) and the element's
+    !> contribution to the integral is approximated as (element measure) times the
+    !> arithmetic mean of the local nodal values - a first-order lumped quadrature built
+    !> from the existing element-measure machinery (domain%calc_measure), matching the
+    !> pattern already used by update_variables_ftcms. This need not match the
+    !> consistent-Gauss residual assembly to machine precision: M_ref only sets the
+    !> scale of the mass_bias_tolerance ratio in the acceptance gate (ftcms_solve.F90),
+    !> so an O(1%) lumping error is immaterial. Cost: O(N_elements).
+    module function compute_mass_reference_ftcms(self) result(m_ref)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        real(real64) :: m_ref
+
+        integer(int32) :: i_elem, num_elem, i_local, node_id, n_local
+        integer(int32), pointer, contiguous :: connectivity(:)
+        type(type_state) :: state
+        real(real64) :: elem_vol, theta_j, theta_sum
+
+        m_ref = 0.0d0
+        if (.not. self%is_active_hydraulic()) return
+
+        nullify (connectivity)
+        call self%domain%get_num_fe(num_elem)
+
+        do i_elem = 1, num_elem
+            call self%domain%get_fe_connectivity(i_elem, connectivity)
+            call self%domain%calc_measure(i_elem, elem_vol)
+
+            theta_sum = 0.0d0
+            n_local = 0
+            do i_local = 1, size(connectivity)
+                node_id = connectivity(i_local)
+                if (node_id < 1) cycle
+                call self%set_state(node_id, i_elem, state, calc_physics=.true.)
+                call self%hydraulic%calc_theta_value(state, theta_j)
+                theta_sum = theta_sum + theta_j
+                n_local = n_local + 1
+            end do
+            if (n_local > 0) m_ref = m_ref + elem_vol * (theta_sum / real(n_local, real64))
+            nullify (connectivity)
+        end do
+
+    end function compute_mass_reference_ftcms
 
     !> See the interface for the mathematical definition. Cost: O(N_dof) per step.
     module function compute_lte_error_ftcms(self) result(error_rel)

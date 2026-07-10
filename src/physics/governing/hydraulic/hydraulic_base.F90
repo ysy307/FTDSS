@@ -64,6 +64,7 @@ contains
         self%computation_dimension = input%basic%simulation_settings%calculate_dimension
         self%enable_vapor_transport = input%basic%analysis_controls%enable_vapor_transport
         self%enable_fringe_subcell_quadrature = input%basic%analysis_controls%enable_fringe_subcell_quadrature
+        self%enable_fringe_K_averaging = input%basic%analysis_controls%enable_fringe_K_averaging
 
     end subroutine initialize_type_hydraulic
 

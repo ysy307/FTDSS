@@ -64,6 +64,7 @@ module physics_governing_base
 
         procedure, public, pass(self) :: lerp => lerp_states
         procedure, public, pass(self) :: lerp_dqi_dt => lerp_dqi_dt_from_nodes
+        procedure, public, pass(self) :: lerp_ice => lerp_ice_from_nodes
 
         procedure, public, pass(self) :: compute_K1 => compute_K1_assemble_workspace
         procedure, public, pass(self) :: compute_K1_lumped => compute_K1_lumped_assemble_workspace
@@ -419,6 +420,46 @@ contains
         nullify (gp)
 
     end subroutine lerp_dqi_dt_from_nodes
+
+    !> Interpolate nodal ice_content (self%state) to Gauss-point ice_content
+    !> (self%state_gp), OVERWRITING the pointwise equilibrium value that
+    !> update_physical_properties_bulk already assigned to state_gp.
+    !>
+    !> Used only by the A1 Clapeyron-pressure-constraint closure (ftcms level),
+    !> and only for elements incident to a pressure-constrained node: at those
+    !> nodes workspace%state(i)%ice_content already carries the prognostic Qi
+    !> (see app/ftcms/ftcms_base.F90 override_prognostic_ice_ftcms), which the
+    !> pointwise GP equilibrium recomputation would otherwise discard (the
+    !> equilibrium Theta(psi_cap) closure collapses to ~0 ice once P is pinned
+    !> at P_eq(T), which is exactly the bias this closure replaces). Mirrors
+    !> lerp_dqi_dt_from_nodes. Clipped to [0, phi_gp] as a light safety bound.
+    subroutine lerp_ice_from_nodes(self)
+        implicit none
+        class(type_assemble_workspace), intent(inout) :: self
+
+        integer(int32) :: i
+        type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp
+        real(real64), allocatable :: ice_nodes(:)
+        real(real64) :: ice_gp
+
+        nullify (gp)
+        call self%fe%get_gauss(gp)
+        allocate (ice_nodes(self%num_fe_nodes))
+
+        do i = 1, self%num_fe_nodes
+            call self%state(i)%ice_content%get(ice_nodes(i))
+        end do
+
+        do i = 1, self%num_fe_gauss
+            call self%fe%lerp(gp(i), ice_nodes(1:self%num_fe_nodes), ice_gp)
+            ice_gp = max(0.0d0, min(ice_gp, self%phi_gp(i)))
+            call self%state_gp(i)%ice_content%set(ice_gp)
+        end do
+
+        deallocate (ice_nodes)
+        nullify (gp)
+
+    end subroutine lerp_ice_from_nodes
 
     subroutine compute_K1_assemble_workspace(self, A_gp, local_matrix)
         implicit none

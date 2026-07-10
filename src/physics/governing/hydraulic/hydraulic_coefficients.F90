@@ -186,6 +186,72 @@ contains
 
     end subroutine compute_coupling_diffusion_term_hydraulic
 
+    !> Implementation: 5-point Gauss-Legendre quadrature on [T_min, T_max], reusing
+    !> the same reference-interval abscissas/weights as domain_fe_integration's line
+    !> rule (order 5). Only T is resampled on a local copy of state_ref; every other
+    !> field (P, porosity, ...) is carried through unchanged, so the water-phase
+    !> re-equilibration at each sample isolates the T-dependence of D_HH/D_HT that
+    !> the caller wants path-averaged.
+    module subroutine compute_diffusion_term_K_averaged_hydraulic(self, material_id, state_ref, T_min, T_max, &
+                                                                   need_D_HT, D_HH_avg, D_HT_avg)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state_ref
+        real(real64), intent(in) :: T_min
+        real(real64), intent(in) :: T_max
+        logical, intent(in) :: need_D_HT
+        real(real64), intent(inout) :: D_HH_avg
+        real(real64), intent(inout) :: D_HT_avg
+
+        ! 5-point Gauss-Legendre rule on the reference interval [-1, 1]
+        ! (same constants as domain_fe_integration's get_legendre_point(5, ...)).
+        ! Not declared PARAMETER: Intel's submodule mangled-symbol name for a
+        ! module-array constant here (module@submodule + this long procedure
+        ! name + variable name) exceeds the linker's global-name length limit;
+        ! a plain local array assigned once per call avoids that without any
+        ! behavioral difference (still computed once, negligible O(1) cost).
+        integer(int32), parameter :: N_GP = 5
+        real(real64) :: gp_abscissa(N_GP), gp_weight(N_GP)
+
+        type(type_state) :: local_state
+        real(real64) :: T_mid, T_half, T_sample
+        real(real64) :: D_mat(self%computation_dimension, self%computation_dimension)
+        integer(int32) :: q
+
+        gp_abscissa = [-0.906179845938664d0, -0.538469310105683d0, 0.0d0, 0.538469310105683d0, 0.906179845938664d0]
+        gp_weight = [0.236926885056189d0, 0.478628670499366d0, 0.568888888888889d0, 0.478628670499366d0, &
+                     0.236926885056189d0]
+
+        T_mid = 0.5d0 * (T_max + T_min)
+        T_half = 0.5d0 * (T_max - T_min)
+
+        call local_state%copy(state_ref)
+
+        D_HH_avg = 0.0d0
+        D_HT_avg = 0.0d0
+
+        do q = 1, N_GP
+            T_sample = T_mid + T_half * gp_abscissa(q)
+            call local_state%temperature%set(T_sample)
+            call self%update_water_phases(material_id, local_state)
+
+            D_mat(:, :) = 0.0d0
+            call self%compute_diffusion_term(material_id, local_state, D_mat)
+            ! Average = (1/(T_max-T_min)) * integral = 0.5 * sum(w_i * f(T_i)),
+            ! independent of T_half (the reference-to-physical Jacobian cancels
+            ! against the 1/(T_max-T_min) normalization of the average).
+            D_HH_avg = D_HH_avg + 0.5d0 * gp_weight(q) * D_mat(1, 1)
+
+            if (need_D_HT) then
+                D_mat(:, :) = 0.0d0
+                call self%compute_coupling_diffusion_term(material_id, local_state, D_mat)
+                D_HT_avg = D_HT_avg + 0.5d0 * gp_weight(q) * D_mat(1, 1)
+            end if
+        end do
+
+    end subroutine compute_diffusion_term_K_averaged_hydraulic
+
     ! ==========================================================================
     ! Helper Wrappers (Existing)
     ! ==========================================================================
@@ -339,6 +405,38 @@ contains
 
         rho_eff = rho_w * Qw + rho_i * Qi + rho_w * Qv
     end subroutine calc_effective_density_value_hydraulic
+
+    !> Evaluate the mixed water-equivalent content Theta = Qw + (rho_i/rho_w)*Qi + Qv
+    !> at the supplied state. See interface for the mathematical definition.
+    module subroutine calc_theta_value_hydraulic(self, state, theta)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: theta
+
+        real(real64) :: Qw, Qi, Qv
+        real(real64) :: rho_w, rho_i
+
+        call state%water_content%get(Qw)
+        call state%ice_content%get(Qi)
+        call state%vapor_content%get(Qv)
+
+        call self%physics%calc_density_water(state, rho_w)
+        call self%physics%calc_density_ice(state, rho_i)
+
+        theta = Qw + (rho_i / rho_w) * Qi + Qv
+    end subroutine calc_theta_value_hydraulic
+
+    !> See interface for the mathematical definition.
+    module subroutine calc_cryo_suction_hydraulic(self, material_id, state, psi_cryo)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: psi_cryo
+
+        call self%physics%calc_cryo_suction(material_id, state, psi_cryo)
+    end subroutine calc_cryo_suction_hydraulic
 
     !> @brief Compute equivalent specific moisture capacity C_eq = dTheta/dP.
     module subroutine compute_C_eq_hydraulic(self, material_id, state, C_eq)
