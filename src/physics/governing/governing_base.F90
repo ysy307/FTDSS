@@ -428,8 +428,11 @@ contains
     !> Used only by the A1 Clapeyron-pressure-constraint closure (ftcms level),
     !> and only for elements incident to a pressure-constrained node: at those
     !> nodes workspace%state(i)%ice_content already carries the prognostic Qi
-    !> (see app/ftcms/ftcms_base.F90 override_prognostic_ice_ftcms), which the
-    !> pointwise GP equilibrium recomputation would otherwise discard (the
+    !> PLUS the in-step local phase change term (rho_w/rho_i)*max(0,
+    !> theta_w(T_n) - theta_w(T)) (see app/ftcms/ftcms_base.F90
+    !> override_prognostic_ice_ftcms - the T-dependence of that term is what
+    !> keeps the latent/apparent heat capacity in the assembled residual), which
+    !> the pointwise GP equilibrium recomputation would otherwise discard (the
     !> equilibrium Theta(psi_cap) closure collapses to ~0 ice once P is pinned
     !> at P_eq(T), which is exactly the bias this closure replaces). Mirrors
     !> lerp_dqi_dt_from_nodes. Clipped to [0, phi_gp] as a light safety bound.

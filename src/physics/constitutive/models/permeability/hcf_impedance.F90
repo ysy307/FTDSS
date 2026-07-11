@@ -2,16 +2,6 @@ submodule(models_hcf) hcf_impedance
     implicit none
 contains
 
-    subroutine calc_impedance_exponential(omega, Qice, impedance)
-        implicit none
-        real(real64), intent(in) :: omega
-        real(real64), intent(in) :: Qice
-        real(real64), intent(inout) :: impedance
-
-        impedance = 10.0d0**(-omega * Qice)
-
-    end subroutine calc_impedance_exponential
-
     module subroutine calc_impedance_exp(self, Qice, kr)
         implicit none
         class(type_hcf_impedance_exp), intent(in) :: self
@@ -19,7 +9,7 @@ contains
         real(real64), intent(inout) :: kr
 
         associate (params => self%parent%config)
-            call calc_impedance_exponential(params%omega, Qice, kr)
+            kr = 10.0d0**(-params%omega * Qice)
         end associate
 
     end subroutine calc_impedance_exp

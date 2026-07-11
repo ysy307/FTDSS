@@ -50,6 +50,7 @@ module physics_governing_hydraulic
         procedure, pass(self), public :: calc_cryo_suction => calc_cryo_suction_hydraulic
 
         procedure, pass(self), private :: compute_C_eq => compute_C_eq_hydraulic
+        procedure, pass(self), private :: compute_iteration_capacity => compute_iteration_capacity_hydraulic
         procedure, pass(self), private :: compute_transient_term_mixed => compute_transient_term_mixed_hydraulic
         procedure, pass(self), public :: calc_segregation_sink => calc_segregation_sink_hydraulic
     end type type_hydraulic
@@ -255,13 +256,20 @@ module physics_governing_hydraulic
         !> \[ C_{eq} = \frac{\partial\theta_l}{\partial P}
         !>           + \frac{\rho_i}{\rho_l}\frac{\partial\theta_i}{\partial P}
         !>           + \frac{\partial\theta_v}{\partial P} \]
-        module subroutine compute_C_eq_hydraulic(self, material_id, state, C_eq)
+        module subroutine compute_C_eq_hydraulic(self, state, C_eq)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: C_eq
+        end subroutine compute_C_eq_hydraulic
+
+        module subroutine compute_iteration_capacity_hydraulic(self, material_id, state, capacity)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: material_id
             type(type_state), intent(in) :: state
-            real(real64), intent(inout) :: C_eq
-        end subroutine compute_C_eq_hydraulic
+            real(real64), intent(inout) :: capacity
+        end subroutine compute_iteration_capacity_hydraulic
 
         !> Compute BDF approximation of dTheta/dt for Mixed formulation.
         !> \[ \frac{d\Theta}{dt} \approx \sum_j \alpha_j \Theta(t_{n+1-j}) \]

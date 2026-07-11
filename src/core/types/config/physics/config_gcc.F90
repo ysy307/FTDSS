@@ -11,7 +11,7 @@ module types_config_physics_gcc
     type, extends(abst_config_physics_model) :: type_config_gcc
         !> GCC model identification
         type(type_constant_id) :: gcc_model = type_constant_id("none", "none", -1)
-        !> Segregation potential SP0 [m^2/(s*K)], 0 = disabled
+        !> Segregation potential SP0 [m/(s*K)], 0 = disabled
         real(real64) :: segregation_potential = 0.0d0
         !> Lower bound of freezing fringe [deg C]
         real(real64) :: T_fringe_low = -1.0d0

@@ -110,6 +110,14 @@ add_solver_test(fe_subcell
         SOLVER::DOMAIN
 )
 
+add_solver_test(constitutive
+    LIBS
+        SOLVER::CORE
+        SOLVER::NUMERICAL_MATH
+        SOLVER::INPUT
+        SOLVER::CONSTITUTIVE
+)
+
 # test_main requires all solver libraries
 add_solver_test(main
     LIBS

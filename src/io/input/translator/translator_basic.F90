@@ -195,8 +195,10 @@ contains
                 scale_length = 1.0d0
             case (PHYSICS_UNITS%CM%ID)
                 scale_length = 1.0d-2
+            case (PHYSICS_UNITS%PA%ID)
+                scale_length = 1.0d0 / (reference_water_density * gravity_acceleration)
             case default
-                scale_length = 1.0d0
+                error stop "Input Error: unsupported SWCC parameter unit."
             end select
 
             select case (config%swcc_model%ID)

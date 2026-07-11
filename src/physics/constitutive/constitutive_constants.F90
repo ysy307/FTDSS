@@ -1,10 +1,11 @@
 module constitutive_constants
     use, intrinsic :: iso_fortran_env
+    use :: core_physical_constants, only: reference_water_density, gravity_acceleration
     implicit none
     private
 
-    !> Reference water density [kg/m^3]
-    real(real64), parameter, public :: reference_water_density = 1000.0d0
+    public :: reference_water_density
+    public :: gravity_acceleration
 
     !> Mathematical constant pi
     real(real64), parameter, public :: circle_ratio = 3.141592653589793d0
@@ -12,8 +13,6 @@ module constitutive_constants
     !> Conversion from Celsius to Kelvin [K]
     real(real64), parameter, public :: celsius_to_kelvin = 273.15d0
 
-    !> Gravitational acceleration [m/s^2]
-    real(real64), parameter, public :: gravity_acceleration = 9.80665d0
     !> Standard atmospheric pressure [Pa]
     real(real64), parameter, public :: standard_atmospheric_pressure = 101325.0d0
 

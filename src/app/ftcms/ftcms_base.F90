@@ -861,36 +861,131 @@ contains
         if (do_calc) then
             call self%domain%get_material_id(element_id, material_id)
             call self%update_physical_properties(material_id, state)
-            call override_prognostic_ice_ftcms(self, node_id, state)
+            call override_prognostic_ice_ftcms(self, node_id, material_id, state)
         end if
 
     end subroutine set_state_ftcms
 
     !> A1 prototype closure (see enable_clapeyron_pressure_constraint): replace
     !> the equilibrium ice_content that update_physical_properties just computed
-    !> with the prognostic value held in self%Qi, at pressure-constrained nodes
-    !> only. Without this, state%ice_content would always be re-derived from
-    !> Theta(psi_cap) every call, which collapses to ~0 once P is pinned at
-    !> P_eq(T) (psi_cap = psi_cryo there) - exactly the equilibrium-closure bias
-    !> this prototype replaces. No-op when the flag is off, the node is not
-    !> frozen, or the mask is not yet allocated/sized (defensive, e.g. during
-    !> IC application before self%Qi holds a meaningful value).
-    subroutine override_prognostic_ice_ftcms(self, node_id, state)
+    !> with the prognostic-plus-in-step-local-phase-change value, at
+    !> pressure-constrained nodes only:
+    !>
+    !> \[ Q_{i,state} = Q_{i,prog}^n + \frac{\rho_w}{\rho_i}
+    !>    \max\!\left(0,\; \theta_w(\psi_{cryo}(T_n)) - \theta_w(\psi_{cryo}(T))\right) \]
+    !>
+    !> where \(Q_{i,prog}^n\) and \(T_n\) are the step-START prognostic ice and
+    !> temperature (the PREVIOUS slots of self%Qi / self%temperature: previous
+    !> is only advanced by shift() after acceptance, hence stable within the
+    !> nonlinear loop, whereas the current slots move every iterate and self%Qi
+    !> current is even rewritten by update_nodal_phases), and \(T\) is the
+    !> latest temperature iterate carried by state.
+    !>
+    !> Physical justification: under the Clapeyron constraint the liquid-water
+    !> curve is pinned to T (theta_w = theta_w(psi_cryo(T)) because P = P_eq(T)),
+    !> so any in-step reduction of theta_w freezes IN PLACE - a local phase
+    !> change at constant water-equivalent mass. Consequences:
+    !> (i)  dQi_state/dT = -(rho_w/rho_i) dtheta_w/dT enters the assembled
+    !>      enthalpy residual, restoring the apparent (latent) heat capacity
+    !>      consistently with the equilibrium derivatives (dQi_dT) kept in the
+    !>      Jacobian by phase_systems. A STATIC prognostic value here degrades
+    !>      the residual to sensible-only capacity while the Jacobian keeps the
+    !>      latent term - the residual/Jacobian mismatch that blew up the
+    !>      thermal solve in the first A1 verification run (T = -15.9 degC
+    !>      below a -6 degC coolant, P at the -2.5e7 wall).
+    !> (ii) the water-equivalent content Theta = theta_w + (rho_i/rho_w)*Qi_state
+    !>      is in-step T-independent (dTheta/dT = dtheta_w/dT - dtheta_w/dT = 0),
+    !>      so the post-step residual-driven Delta Qi remains a pure flux
+    !>      transport increment - no double counting with this local term.
+    !> The max(0, .) clip pins the term at 0 in the melting direction (T rising)
+    !> and for T >= 0 (psi_cryo = 0 there); melting is deferred to the post-step
+    !> residual update (apply_prognostic_ice_update).
+    !>
+    !> No-op when the flag is off, the node is not frozen, or the mask is not
+    !> yet allocated/sized (defensive, e.g. during IC application before self%Qi
+    !> holds a meaningful value).
+    subroutine override_prognostic_ice_ftcms(self, node_id, material_id, state)
         implicit none
         class(type_ftcms), intent(inout) :: self
         integer(int32), intent(in) :: node_id
+        integer(int32), intent(in) :: material_id
         type(type_state), intent(inout) :: state
 
-        real(real64) :: qi_prognostic
+        real(real64) :: qi_prog_n, T_n, T_cur
+        real(real64) :: theta_w_n, theta_w_cur, dtheta
+        real(real64) :: rho_w, rho_i, qi_state, phi_node
 
         if (.not. self%enable_clapeyron_pressure_constraint) return
         if (.not. allocated(self%clapeyron_frozen_mask)) return
         if (node_id < 1 .or. node_id > size(self%clapeyron_frozen_mask)) return
         if (.not. self%clapeyron_frozen_mask(node_id)) return
 
-        call self%Qi%get_current(node_id, qi_prognostic)
-        call state%ice_content%set(qi_prognostic)
+        call self%Qi%get_previous(node_id, qi_prog_n)
+        call self%temperature%get_previous(node_id, T_n)
+        call state%temperature%get(T_cur)
+
+        ! theta_w(psi_cryo(T)) is monotone increasing in T on the frozen branch,
+        ! so the max(0, .)-clipped difference can be nonzero only when T dropped
+        ! within the step; skip the two equilibrium probes otherwise.
+        dtheta = 0.0d0
+        if (T_cur < T_n) then
+            theta_w_n = 0.0d0
+            theta_w_cur = 0.0d0
+            call calc_theta_w_cryo_ftcms(self, material_id, state, T_n, theta_w_n)
+            call calc_theta_w_cryo_ftcms(self, material_id, state, T_cur, theta_w_cur)
+            dtheta = max(0.0d0, theta_w_n - theta_w_cur)
+        end if
+
+        qi_state = max(qi_prog_n, 0.0d0)
+        if (dtheta > 0.0d0) then
+            call self%thermal%calc_density_water(state, rho_w)
+            call self%thermal%calc_density_ice(state, rho_i)
+            if (rho_i > tiny(1.0d0)) qi_state = qi_state + (rho_w / rho_i) * dtheta
+        end if
+
+        ! Light safety bound (the GP lerp applies the same clip): ice volume
+        ! cannot exceed the pore space.
+        call state%porosity%get(phi_node)
+        if (phi_node > 0.0d0) qi_state = min(qi_state, phi_node)
+
+        call state%ice_content%set(qi_state)
     end subroutine override_prognostic_ice_ftcms
+
+    !> Liquid water content on the Clapeyron equilibrium line at temperature
+    !> T_eval: \( \theta_w(\psi_{cryo}(T_{eval})) \), evaluated through the
+    !> existing WRF+GCC equilibrium path. The probe state carries
+    !> P = -psi_cryo(T_eval) (the constrained pressure), so the generalized
+    !> suction smooth-max reduces to the cryogenic branch (psi_cap = psi_cryo)
+    !> and update_water_phases returns exactly the pinned liquid curve; the
+    !> equilibrium ice at that probe is ~0 (theta_tot = theta_l_new there), so
+    !> the water/ice caps inside update_water_phases cannot distort theta_w.
+    !> For T_eval >= 0: psi_cryo = 0 and theta_w is the suction-free value;
+    !> callers clip the resulting difference at 0, so the melting direction
+    !> stays inert. For the segregation GCC, psi_cryo is evaluated at the
+    !> reference state's pressure (one-shot, no fixed-point iteration on
+    !> P = -psi_cryo(T, P)); exact for the non-segregation GCC (psi_cryo
+    !> independent of P).
+    subroutine calc_theta_w_cryo_ftcms(self, material_id, state_ref, T_eval, theta_w)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state_ref
+        real(real64), intent(in) :: T_eval
+        real(real64), intent(inout) :: theta_w
+
+        type(type_state) :: probe
+        real(real64) :: psi_cryo
+
+        call probe%copy(state_ref)
+        call probe%temperature%set(T_eval)
+
+        psi_cryo = 0.0d0
+        call self%hydraulic%calc_cryo_suction(material_id, probe, psi_cryo)
+        call probe%pressure%set(-psi_cryo)
+
+        call self%thermal%update_water_phases(material_id, probe)
+        call probe%water_content%get(theta_w)
+    end subroutine calc_theta_w_cryo_ftcms
 
     module subroutine set_states_from_connectivity_ftcms(self, connectivity, element_id, states, calc_physics)
         implicit none
@@ -924,7 +1019,7 @@ contains
             call self%domain%get_material_id(element_id, material_id)
             call self%update_physical_properties_bulk(material_id, states)
             do i = 1, size(connectivity)
-                call override_prognostic_ice_ftcms(self, connectivity(i), states(i))
+                call override_prognostic_ice_ftcms(self, connectivity(i), material_id, states(i))
             end do
         end if
     end subroutine set_states_from_connectivity_ftcms
@@ -1562,7 +1657,8 @@ contains
         logical, allocatable :: processed(:)
         type(type_state) :: probe_state
         real(real64) :: dt_current, T_node, P_node, phi_node, theta_w, theta_s_cap
-        real(real64) :: rho_w, rho_i, R_raw, dQi, Qi_old, Qi_new, Qi_new_raw, Qi_cap
+        real(real64) :: rho_w, rho_i, R_raw, dQi, Qi_base, Qi_new, Qi_new_raw, Qi_cap
+        real(real64) :: Qi_prog_n, T_n, theta_w_n, theta_w_conv, dtheta_local
         integer(int32) :: num_constrained, num_clipped
         real(real64) :: max_abs_dQi, max_P_unconstrained_frozen
         logical :: any_unconstrained_frozen
@@ -1627,8 +1723,34 @@ contains
                     dQi = 0.0d0
                 end if
 
-                call self%Qi%get_current(node_id, Qi_old)
-                Qi_new_raw = Qi_old + dQi
+                ! Base of the update: the accepted-iterate state ice
+                !   Qi_base = Qi_prog_n
+                !           + (rho_w/rho_i)*max(0, theta_w(psi_cryo(T_n)) - theta_w(psi_cryo(T_conv)))
+                ! i.e. the step-start prognostic value plus the in-step local
+                ! phase change CONFIRMED by the accepted temperature - the same
+                ! closure the nonlinear loop assembled with
+                ! (override_prognostic_ice_ftcms). Folding the confirmed local
+                ! phase change into the new prognostic value here (exactly once,
+                ! at acceptance) and adding the residual flux increment dQi on
+                ! top keeps the prognostic Qi consistent with the state the
+                ! solve actually used, without double counting: the local term
+                ! moves mass between phases at fixed water-equivalent Theta,
+                ! while dQi carries the pure flux transport (see the sign
+                ! derivation above). This runs BEFORE shift(), so the previous
+                ! slots of Qi / temperature still hold the step-start snapshot.
+                call self%Qi%get_previous(node_id, Qi_prog_n)
+                call self%temperature%get_previous(node_id, T_n)
+                dtheta_local = 0.0d0
+                if (T_node < T_n) then
+                    theta_w_n = 0.0d0
+                    theta_w_conv = 0.0d0
+                    call calc_theta_w_cryo_ftcms(self, material_id, probe_state, T_n, theta_w_n)
+                    call calc_theta_w_cryo_ftcms(self, material_id, probe_state, T_node, theta_w_conv)
+                    dtheta_local = max(0.0d0, theta_w_n - theta_w_conv)
+                end if
+                Qi_base = max(Qi_prog_n, 0.0d0) + (rho_w / rho_i) * dtheta_local
+
+                Qi_new_raw = Qi_base + dQi
 
                 ! Clip to [0, cap], cap from theta_w + Qi*(rho_i/rho_w) <= theta_s
                 ! (theta_s = porosity, the same liquid-equivalent Theta convention
@@ -1647,7 +1769,9 @@ contains
                 end if
 
                 call self%Qi%set_current(node_id, Qi_new)
-                max_abs_dQi = max(max_abs_dQi, abs(Qi_new - Qi_old))
+                ! Diagnostic: magnitude of the residual-flux part of the update
+                ! (the local phase change is already inside Qi_base).
+                max_abs_dQi = max(max_abs_dQi, abs(Qi_new - Qi_base))
             end do
             nullify (connectivity)
         end do

@@ -2,6 +2,25 @@ submodule(models_hcf) hcf_vg
     implicit none
 contains
 
+    !> Cache the fixed incomplete-beta normalization for this material.
+    module subroutine initialize_hcf_base_vg(self)
+        implicit none
+        class(type_hcf_base_vg), intent(inout) :: self
+
+        real(real64) :: p, q
+
+        associate (params => self%parent%config)
+            if (params%n1 > 1.0d0) then
+                p = params%m1 + 1.0d0 / params%n1
+                q = 1.0d0 - 1.0d0 / params%n1
+            else
+                p = 0.0d0
+                q = 0.0d0
+            end if
+            call self%incomplete_beta%initialize(p, q)
+        end associate
+    end subroutine initialize_hcf_base_vg
+
     !> @brief Mualem relative permeability for the van Genuchten retention model.
     !>
     !> Mathematical definition (van Genuchten et al., 1991; Hansson et al., 2004,
@@ -20,122 +39,40 @@ contains
     !> the continued fraction converges in a few dozen terms.  Failure behavior:
     !> returns the closed-form value if the beta continued fraction fails to
     !> converge (does not abort).
-    subroutine calc_kr_vg(alpha1, n1, m1, l, h, kr)
-        implicit none
-        real(real64), intent(in) :: alpha1
-        real(real64), intent(in) :: n1
-        real(real64), intent(in) :: m1
-        real(real64), intent(in) :: l
-        real(real64), intent(in) :: h
-        real(real64), intent(inout) :: kr
-
-        real(real64) :: Sw, p, q, zeta
-        real(real64), parameter :: M_CONSISTENT_TOL = 1.0d-9
-
-        if (h < 0.0d0) then
-            Sw = (1.0d0 + (-alpha1 * h)**n1)**(-m1)
-        else
-            Sw = 1.0d0
-        end if
-
-        if (abs(m1 - (1.0d0 - 1.0d0 / n1)) <= M_CONSISTENT_TOL .or. n1 <= 1.0d0) then
-            kr = Sw**l * (1.0d0 - (1.0d0 - Sw**(1.0d0 / m1))**m1)**2
-        else
-            p = m1 + 1.0d0 / n1
-            q = 1.0d0 - 1.0d0 / n1
-            zeta = Sw**(1.0d0 / m1)
-            kr = Sw**l * incomplete_beta_regularized(p, q, zeta)**2
-        end if
-
-    end subroutine calc_kr_vg
-
-    !----------------------------------------------------------------------------------------------------
-    ! Wrapper of calculating kr for van-Genuchten model bounding different derived types
-    !----------------------------------------------------------------------------------------------------
     module subroutine calc_kr_base_vg(self, h, kr)
         implicit none
         class(type_hcf_base_vg), intent(in) :: self
         real(real64), intent(in) :: h
         real(real64), intent(inout) :: kr
 
+        real(real64), parameter :: m_consistent_tolerance = 1.0d-9
+        real(real64) :: effective_saturation, zeta, beta_value
+        logical :: converged
+
         associate (params => self%parent%config)
-            call calc_kr_vg(params%alpha1, params%n1, params%m1, params%l, h, kr)
+            if (h < 0.0d0) then
+                effective_saturation = (1.0d0 + (-params%alpha1 * h)**params%n1)**(-params%m1)
+            else
+                effective_saturation = 1.0d0
+            end if
+
+            if (abs(params%m1 - (1.0d0 - 1.0d0 / params%n1)) <= m_consistent_tolerance .or. &
+                params%n1 <= 1.0d0) then
+                kr = effective_saturation**params%l * &
+                     (1.0d0 - (1.0d0 - effective_saturation**(1.0d0 / params%m1))**params%m1)**2
+            else
+                zeta = effective_saturation**(1.0d0 / params%m1)
+                beta_value = 0.0d0
+                converged = .false.
+                call self%incomplete_beta%evaluate(zeta, beta_value, converged)
+                if (converged) then
+                    kr = effective_saturation**params%l * beta_value**2
+                else
+                    kr = effective_saturation**params%l * &
+                         (1.0d0 - (1.0d0 - effective_saturation**(1.0d0 / params%m1))**params%m1)**2
+                end if
+            end if
         end associate
     end subroutine calc_kr_base_vg
-
-    !> @brief Regularized incomplete beta function \(I_x(a,b)\).
-    !>
-    !> Continued-fraction evaluation (modified Lentz), accurate to ~1e-14 for
-    !> a, b > 0 and x in [0,1].  Cost: O(1) (< 200 iterations).
-    pure function incomplete_beta_regularized(a, b, x) result(res)
-        implicit none
-        real(real64), intent(in) :: a, b, x
-        real(real64) :: res
-
-        real(real64) :: bt
-
-        if (x <= 0.0d0) then
-            res = 0.0d0
-            return
-        end if
-        if (x >= 1.0d0) then
-            res = 1.0d0
-            return
-        end if
-
-        bt = exp(log_gamma(a + b) - log_gamma(a) - log_gamma(b) &
-                 + a * log(x) + b * log(1.0d0 - x))
-
-        if (x < (a + 1.0d0) / (a + b + 2.0d0)) then
-            res = bt * beta_continued_fraction(a, b, x) / a
-        else
-            res = 1.0d0 - bt * beta_continued_fraction(b, a, 1.0d0 - x) / b
-        end if
-    end function incomplete_beta_regularized
-
-    !> Continued fraction for the incomplete beta function (modified Lentz).
-    pure function beta_continued_fraction(a, b, x) result(h)
-        implicit none
-        real(real64), intent(in) :: a, b, x
-        real(real64) :: h
-
-        integer(int32), parameter :: MAX_ITER = 200
-        real(real64), parameter :: EPS_CF = 3.0d-15
-        real(real64), parameter :: FPMIN = 1.0d-300
-
-        real(real64) :: qab, qap, qam, c, d, aa, del
-        integer(int32) :: m, m2
-
-        qab = a + b
-        qap = a + 1.0d0
-        qam = a - 1.0d0
-        c = 1.0d0
-        d = 1.0d0 - qab * x / qap
-        if (abs(d) < FPMIN) d = FPMIN
-        d = 1.0d0 / d
-        h = d
-
-        do m = 1, MAX_ITER
-            m2 = 2 * m
-            aa = real(m, real64) * (b - real(m, real64)) * x / &
-                 ((qam + real(m2, real64)) * (a + real(m2, real64)))
-            d = 1.0d0 + aa * d
-            if (abs(d) < FPMIN) d = FPMIN
-            c = 1.0d0 + aa / c
-            if (abs(c) < FPMIN) c = FPMIN
-            d = 1.0d0 / d
-            h = h * d * c
-            aa = -(a + real(m, real64)) * (qab + real(m, real64)) * x / &
-                 ((a + real(m2, real64)) * (qap + real(m2, real64)))
-            d = 1.0d0 + aa * d
-            if (abs(d) < FPMIN) d = FPMIN
-            c = 1.0d0 + aa / c
-            if (abs(c) < FPMIN) c = FPMIN
-            d = 1.0d0 / d
-            del = d * c
-            h = h * del
-            if (abs(del - 1.0d0) < EPS_CF) exit
-        end do
-    end function beta_continued_fraction
 
 end submodule hcf_vg

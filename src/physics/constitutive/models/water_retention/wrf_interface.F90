@@ -44,13 +44,16 @@ module models_wrf
 
     !> Abstract base class for all Water Retention Function models.
     type, abstract :: abst_wrf
+        private
         logical :: initialized = .false.
         type(type_config_wrf) :: config
+        real(real64) :: pressure_capacity_bound = 0.0d0
     contains
         procedure, pass(self), public :: initialize => initialize_abst_wrf
         procedure(abst_calc_wrf), pass(self), public, deferred :: calc
         procedure(abst_calc_wrf_derivative), pass(self), public, deferred :: deriv
         procedure, pass(self), public :: calc_lscheme_capacity => calc_lscheme_capacity_wrf
+        procedure, pass(self), private :: update_pressure_capacity_bound
         procedure, pass(self), public :: is_initialized => is_initialized_wrf
     end type abst_wrf
 
@@ -96,6 +99,11 @@ module models_wrf
             class(abst_wrf), intent(in) :: self
             real(real64), intent(inout) :: capacity
         end subroutine calc_lscheme_capacity_wrf
+
+        module subroutine update_pressure_capacity_bound(self)
+            implicit none
+            class(abst_wrf), intent(inout) :: self
+        end subroutine update_pressure_capacity_bound
     end interface
 
     !> Brooks-Corey model implementation.

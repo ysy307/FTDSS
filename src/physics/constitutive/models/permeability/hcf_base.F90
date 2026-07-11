@@ -41,23 +41,23 @@ contains
     !> with \(\Omega = 7\) was calibrated against the Mizoguchi columns using
     !> THIS definition; passing the raw volumetric ice content instead changes
     !> the meaning (and effective strength) of the calibrated factor.
-    subroutine calc_impedance_ratio(state, theta_r, Q)
+    module subroutine calc_impedance_ratio_hcf(self, state, ratio)
         implicit none
+        class(abst_hcf), intent(in) :: self
         type(type_state), intent(in) :: state
-        real(real64), intent(in) :: theta_r
-        real(real64), intent(inout) :: Q
+        real(real64), intent(inout) :: ratio
 
         real(real64) :: Qw, Qi, denom
 
         call state%water_content%get(Qw)
         call state%ice_content%get(Qi)
-        denom = Qw + Qi - theta_r
+        denom = Qw + Qi - self%config%theta_r
         if (denom > tiny(1.0d0) .and. Qi > 0.0d0) then
-            Q = min(Qi / denom, 1.0d0)
+            ratio = min(Qi / denom, 1.0d0)
         else
-            Q = 0.0d0
+            ratio = 0.0d0
         end if
-    end subroutine calc_impedance_ratio
+    end subroutine calc_impedance_ratio_hcf
 
     module subroutine initialize_holder_hcfs(self, config, water, ice)
         implicit none
@@ -125,6 +125,7 @@ contains
             end if
 
             self%base%parent => self
+            call self%base%initialize()
         end if
 
         if (self%config%model == HCF_MODES%IMPEDANCE .or. &
@@ -162,6 +163,12 @@ contains
         self%initialized = .true.
     end subroutine initialize_abst_hcf
 
+    !> Default initialization for base permeability models without cached coefficients.
+    module subroutine initialize_hcf_base(self)
+        implicit none
+        class(abst_hcf_base), intent(inout) :: self
+    end subroutine initialize_hcf_base
+
     module pure function is_initialized_hcf(self) result(initialized)
         implicit none
         class(abst_hcf), intent(in) :: self
@@ -195,7 +202,7 @@ contains
         real(real64) :: kr_impedance
         real(real64) :: Q_ratio
 
-        call calc_impedance_ratio(state, self%config%theta_r, Q_ratio)
+        call self%calc_impedance_ratio(state, Q_ratio)
 
         call self%impedance%calc_impedance(Q_ratio, kr_impedance)
         kflh = self%config%k_sat * kr_impedance
@@ -228,7 +235,7 @@ contains
         real(real64) :: head, Q_ratio
 
         call self%calc_head(state, head)
-        call calc_impedance_ratio(state, self%config%theta_r, Q_ratio)
+        call self%calc_impedance_ratio(state, Q_ratio)
 
         call self%base%calc_kr(head, kr_base)
         call self%impedance%calc_impedance(Q_ratio, kr_impedance)
@@ -264,7 +271,7 @@ contains
         real(real64) :: temperature, Q_ratio
 
         call state%temperature%get(temperature)
-        call calc_impedance_ratio(state, self%config%theta_r, Q_ratio)
+        call self%calc_impedance_ratio(state, Q_ratio)
 
         call self%impedance%calc_impedance(Q_ratio, kr_impedance)
         call self%viscosity%calc_viscosity(temperature, kr_viscosity)
@@ -282,7 +289,7 @@ contains
         real(real64) :: temperature, head, Q_ratio
 
         call state%temperature%get(temperature)
-        call calc_impedance_ratio(state, self%config%theta_r, Q_ratio)
+        call self%calc_impedance_ratio(state, Q_ratio)
         call self%calc_head(state, head)
 
         call self%base%calc_kr(head, kr_base)
@@ -310,35 +317,13 @@ contains
 
         if (allocated(self%base)) then
             call self%base%calc_kr(head, Klh_r)
-            call calc_derivative_surface_tension(temperature, dgamma_dT)
+            dgamma_dT = -0.1425d0 - 4.76d-4 * temperature
             klT = self%config%k_sat * Klh_r * head * self%config%gain_factor * (dgamma_dT / gamma_0)
         else
             klT = 0.0d0
         end if
 
     end subroutine calc_klT_hcf
-
-    subroutine calc_surface_tension(temperature, surface_tension)
-        implicit none
-        !> Temperature [C]
-        real(real64), intent(in) :: temperature
-        !> Surface tension [g/s^2]
-        real(real64), intent(inout) :: surface_tension
-
-        surface_tension = 75.6d0 - 0.1425d0 * temperature - 2.38d-4 * temperature**2
-
-    end subroutine calc_surface_tension
-
-    subroutine calc_derivative_surface_tension(temperature, dsurface_tension_dT)
-        implicit none
-        !> Temperature [C]
-        real(real64), intent(in) :: temperature
-        !> Derivative of surface tension with respect to temperature [g/(s^2 K)]
-        real(real64), intent(inout) :: dsurface_tension_dT
-
-        dsurface_tension_dT = -0.1425d0 - 4.76d-4 * temperature
-
-    end subroutine calc_derivative_surface_tension
 
     module subroutine calc_Kvh_hcf(self, state, Kvh)
         implicit none

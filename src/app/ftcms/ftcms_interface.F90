@@ -371,12 +371,20 @@ module app_ftcms
 
         !> A1 prototype closure (see enable_clapeyron_pressure_constraint):
         !> advance the prognostic ice content Qi at every pressure-constrained
-        !> node from the excluded mass residual saved by
-        !> apply_clapeyron_pressure_constraint, once per ACCEPTED step (called
-        !> from run_ftcms right before shift(), so the updated Qi becomes part
-        !> of the BDF history propagated into the next step). See ftcms_base.F90
-        !> for the full sign derivation of Delta Qi from R_H,i. Monolithic
-        !> coupling only (no-op when staggered).
+        !> node, once per ACCEPTED step (called from run_ftcms right before
+        !> shift(), so the updated Qi becomes part of the BDF history propagated
+        !> into the next step). The new prognostic value is
+        !>   Qi_prog^{n+1} = [Qi_prog^n
+        !>                    + (rho_w/rho_i)*max(0, theta_w(T_n) - theta_w(T_conv))]
+        !>                   + Delta Qi
+        !> where the bracket is the accepted-iterate state ice (step-start
+        !> prognostic value plus the confirmed in-step local phase change - the
+        !> same closure the nonlinear loop assembled with, see
+        !> override_prognostic_ice in ftcms_base.F90) and Delta Qi is the pure
+        !> flux-transport increment from the excluded mass residual saved by
+        !> apply_clapeyron_pressure_constraint. See ftcms_base.F90 for the full
+        !> sign derivation of Delta Qi from R_H,i. Monolithic coupling only
+        !> (no-op when staggered).
         module subroutine apply_prognostic_ice_update_ftcms(self)
             implicit none
             class(type_ftcms), intent(inout) :: self

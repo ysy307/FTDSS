@@ -2,6 +2,7 @@ module models_hcf
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
     use :: module_core
+    use :: numerical_special_functions_mkl, only: type_mkl_regularized_incomplete_beta
     use :: constitutive_constants, only:TtoK => celsius_to_kelvin, Mw => molar_mass_water, &
         Rg => universal_gas_constant, g => gravity_acceleration, rho_std => reference_water_density
     use :: physics_constitutive_base, only:abst_constitutive
@@ -106,6 +107,7 @@ module models_hcf
         procedure, pass(self), public :: calc_Kvh => calc_Kvh_hcf
         procedure, pass(self), public :: calc_KvT => calc_KvT_hcf
         procedure, pass(self), public :: calc_head => calc_head_hcf
+        procedure, pass(self), private :: calc_impedance_ratio => calc_impedance_ratio_hcf
         procedure, pass(self), public :: is_initialized => is_initialized_hcf
     end type abst_hcf
 
@@ -150,6 +152,13 @@ module models_hcf
             real(real64), intent(inout) :: head
 
         end subroutine calc_head_hcf
+
+        module subroutine calc_impedance_ratio_hcf(self, state, ratio)
+            implicit none
+            class(abst_hcf), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: ratio
+        end subroutine calc_impedance_ratio_hcf
 
         module pure function is_initialized_hcf(self) result(initialized)
             implicit none
@@ -268,6 +277,7 @@ module models_hcf
         private
         class(abst_hcf), pointer :: parent
     contains
+        procedure, pass(self), public :: initialize => initialize_hcf_base
         procedure(abst_calc_base_kr), pass(self), public, deferred :: calc_kr
     end type abst_hcf_base
 
@@ -288,7 +298,10 @@ module models_hcf
     end type type_hcf_base_bc
 
     type, extends(abst_hcf_base) :: type_hcf_base_vg
+        private
+        type(type_mkl_regularized_incomplete_beta) :: incomplete_beta
     contains
+        procedure :: initialize => initialize_hcf_base_vg
         procedure :: calc_kr => calc_kr_base_vg
     end type type_hcf_base_vg
 
@@ -313,6 +326,16 @@ module models_hcf
     end type type_hcf_base_dvgch
 
     interface
+        module subroutine initialize_hcf_base(self)
+            implicit none
+            class(abst_hcf_base), intent(inout) :: self
+        end subroutine initialize_hcf_base
+
+        module subroutine initialize_hcf_base_vg(self)
+            implicit none
+            class(type_hcf_base_vg), intent(inout) :: self
+        end subroutine initialize_hcf_base_vg
+
         module subroutine calc_kr_base_bc(self, h, kr)
             implicit none
             class(type_hcf_base_bc), intent(in) :: self

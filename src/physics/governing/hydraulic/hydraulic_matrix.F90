@@ -167,7 +167,7 @@ contains
         !    diffusion coefficients only for uncut elements.
         ! ----------------------------------------------------------------
         do i = 1, n_gauss
-            call self%compute_C_eq(workspace%material_id, workspace%state_gp(i), workspace%work_C(i))
+            call self%compute_iteration_capacity(workspace%material_id, workspace%state_gp(i), workspace%work_C(i))
             call self%compute_advective_term(workspace%material_id, workspace%state_gp(i), workspace%work_V(:, i))
             call self%compute_transient_term_mixed(workspace%material_id, workspace%state_gp(i), &
                                                    workspace%bdf_coeffs, workspace%work_d_dt(i))

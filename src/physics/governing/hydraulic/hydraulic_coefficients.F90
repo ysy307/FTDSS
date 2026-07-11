@@ -439,16 +439,14 @@ contains
     end subroutine calc_cryo_suction_hydraulic
 
     !> @brief Compute equivalent specific moisture capacity C_eq = dTheta/dP.
-    module subroutine compute_C_eq_hydraulic(self, material_id, state, C_eq)
+    module subroutine compute_C_eq_hydraulic(self, state, C_eq)
         implicit none
         class(type_hydraulic), intent(in) :: self
-        integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: C_eq
 
         real(real64) :: rho_w, rho_i
         real(real64) :: dQw_dP, dQi_dP, dQv_dP
-        real(real64) :: cap_ref
 
         dQw_dP = 0.0d0
         dQi_dP = 0.0d0
@@ -467,11 +465,25 @@ contains
         ! but phase_systems compensation (dQw_dP = -dQi_dP) can cause numerical
         ! sign reversal near the freezing front.
         C_eq = max(0.0d0, dQw_dP + (rho_i / rho_w) * dQi_dP + dQv_dP)
-        cap_ref = 0.0d0
-        call self%physics%calc_lscheme_capacity(material_id, cap_ref)
-        C_eq = max(C_eq, cap_ref)
-
     end subroutine compute_C_eq_hydraulic
+
+    !> Compute the nonlinear-iteration capacity from the physical tangent and WRF bound.
+    module subroutine compute_iteration_capacity_hydraulic(self, material_id, state, capacity)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: capacity
+
+        real(real64) :: physical_capacity
+        real(real64) :: pressure_capacity_bound
+
+        physical_capacity = 0.0d0
+        pressure_capacity_bound = 0.0d0
+        call self%compute_C_eq(state, physical_capacity)
+        call self%physics%calc_lscheme_capacity(material_id, pressure_capacity_bound)
+        capacity = max(physical_capacity, pressure_capacity_bound)
+    end subroutine compute_iteration_capacity_hydraulic
 
     !> @brief Compute BDF approximation of dTheta/dt for Mixed formulation.
     module subroutine compute_transient_term_mixed_hydraulic(self, material_id, state, bdf_coeffs, dTheta_dt)

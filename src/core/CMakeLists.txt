@@ -19,6 +19,7 @@ set(CORE_CONSTANTS_FYPP
 fypp_F90("" "${CORE_CONSTANTS_FYPP}" CORE_CONSTANTS_GENERATED)
 
 target_sources(SOLVER_CORE PRIVATE
+    constants/physical_constants.F90
     constants/constants_base.F90
     constants/constants.F90
     ${CORE_CONSTANTS_GENERATED}

@@ -126,9 +126,8 @@ contains
         type(type_config_wrf), intent(in) :: config
 
         call self%config%copy(config)
-        ! call self%config%convert(config%unit_id)
-
         self%initialized = .true.
+        call self%update_pressure_capacity_bound()
     end subroutine initialize_abst_wrf
 
     module pure function is_initialized_wrf(self) result(initialized)
@@ -145,12 +144,20 @@ contains
         class(abst_wrf), intent(in) :: self
         real(real64), intent(inout) :: capacity
 
+        capacity = self%pressure_capacity_bound
+    end subroutine calc_lscheme_capacity_wrf
+
+    !> Precompute the pressure-capacity upper bound once per material initialization.
+    module subroutine update_pressure_capacity_bound(self)
+        implicit none
+        class(abst_wrf), intent(inout) :: self
+
         integer(int32), parameter :: num_scan = 96
         real(real64) :: h_abs_min, h_abs_max, h_abs, fraction
         real(real64) :: max_dtheta_dh
         integer(int32) :: i
 
-        capacity = 0.0d0
+        self%pressure_capacity_bound = 0.0d0
         if (.not. self%initialized) return
 
         h_abs_min = huge(1.0d0)
@@ -190,7 +197,7 @@ contains
         if (self%config%h_crit < 0.0d0) call sample_head(abs(self%config%h_crit) * (1.0d0 + 1.0d-8))
         if (self%config%alpha1 < 0.0d0) call sample_head(abs(self%config%alpha1) * (1.0d0 + 1.0d-8))
 
-        capacity = max_dtheta_dh / (rho_std * g)
+        self%pressure_capacity_bound = max_dtheta_dh / (rho_std * g)
 
     contains
         subroutine include_scale(scale)
@@ -225,6 +232,6 @@ contains
             x_peak = ((n - 1.0d0) / (m * n + 1.0d0))**(1.0d0 / n)
             call sample_head(x_peak / alpha)
         end subroutine sample_vg_peak
-    end subroutine calc_lscheme_capacity_wrf
+    end subroutine update_pressure_capacity_bound
 
 end submodule calculate_wrf_Base

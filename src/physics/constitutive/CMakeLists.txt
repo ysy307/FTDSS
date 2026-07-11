@@ -89,6 +89,7 @@ target_include_directories(SOLVER_CONSTITUTIVE PUBLIC
 # ------------------------------------------------------------
 target_link_libraries(SOLVER_CONSTITUTIVE PUBLIC
     SOLVER::CORE
+    SOLVER::NUMERICAL_MATH
 )
 
 enable_build_flags(SOLVER_CONSTITUTIVE)
