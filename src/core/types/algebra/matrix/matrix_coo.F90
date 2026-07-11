@@ -87,7 +87,7 @@ contains
     module subroutine commit_to_mkl_coo(self, ierr)
         implicit none
         class(type_matrix_coo), intent(inout) :: self
-        integer(int32), intent(out), optional :: ierr
+        integer(int32), intent(inout), optional :: ierr
 #ifdef _MKL
         integer(int32) :: info
 

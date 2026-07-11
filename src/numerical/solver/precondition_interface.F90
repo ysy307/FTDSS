@@ -78,6 +78,8 @@ module numerical_solver_preconditioner
         !> Internal status code
         integer(int32) :: status
     contains
+        procedure, pass(self), public :: is_success => is_success_preconditioner
+        procedure, pass(self), public :: get_status => get_status_preconditioner
         !> Initializes the preconditioner with given info.
         procedure(abst_preconditioner_initialize), pass(self), public, deferred :: initialize
         !> Sets up the preconditioner (e.g., computes factors) for a specific matrix.
@@ -824,6 +826,20 @@ module numerical_solver_preconditioner
     end interface
 
 contains
+
+    logical function is_success_preconditioner(self)
+        implicit none
+        class(abst_preconditioner), intent(in) :: self
+
+        is_success_preconditioner = self%status == SOLVER_STATUS%SUCCESS%ID
+    end function is_success_preconditioner
+
+    integer(int32) function get_status_preconditioner(self)
+        implicit none
+        class(abst_preconditioner), intent(in) :: self
+
+        get_status_preconditioner = self%status
+    end function get_status_preconditioner
 
     !> Sets the preconditioner configuration settings.
     subroutine set_preconditioner_settings(self, id, num_nodes, block_size, ilu_fillin_level, ssor_omega, &

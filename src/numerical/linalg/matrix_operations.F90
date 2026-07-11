@@ -245,7 +245,12 @@ contains
         end if
 
         call A%scale(op, d)
-        call b%scale(op, d)
+        if (op == MATRIX_OPS%SCALE_SYMM_DIAG) then
+            call b%scale(VECTOR_OPS%SCALE_SYMM_DIAG, d)
+        else
+            call b%scale(VECTOR_OPS%SCALE_JACOBI, d)
+        end if
+        ierr = MATRIX_STATUS%SUCCESS%ID
 
     end subroutine matrix_scale
 
@@ -314,7 +319,7 @@ contains
         real(real64), dimension(:, :), pointer :: val_ptr
 
         call A%get_info(info)
-        if (info%num_rows /= size(x) .or. info%num_cols /= size(y)) then
+        if (info%num_cols /= size(x) .or. info%num_rows /= size(y)) then
             ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
             return
         end if
@@ -370,7 +375,11 @@ contains
             descr%type = SPARSE_MATRIX_TYPE_GENERAL
             mkl_info = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, alpha, &
                                        A%get_mkl_handle(), descr, x, beta, y)
-            ierr = MATRIX_STATUS%SUCCESS%ID
+            if (mkl_info == SPARSE_STATUS_SUCCESS) then
+                ierr = MATRIX_STATUS%SUCCESS%ID
+            else
+                ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
+            end if
             return
         end if
 #endif
@@ -434,7 +443,11 @@ contains
             descr%type = SPARSE_MATRIX_TYPE_GENERAL
             mkl_info = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, alpha, &
                                        A%get_mkl_handle(), descr, x, beta, y)
-            ierr = MATRIX_STATUS%SUCCESS%ID
+            if (mkl_info == SPARSE_STATUS_SUCCESS) then
+                ierr = MATRIX_STATUS%SUCCESS%ID
+            else
+                ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
+            end if
             return
         end if
 #endif
@@ -502,7 +515,11 @@ contains
             descr%type = SPARSE_MATRIX_TYPE_GENERAL
             mkl_info = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, alpha, &
                                        A%get_mkl_handle(), descr, x, beta, y)
-            ierr = MATRIX_STATUS%SUCCESS%ID
+            if (mkl_info == SPARSE_STATUS_SUCCESS) then
+                ierr = MATRIX_STATUS%SUCCESS%ID
+            else
+                ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
+            end if
             return
         end if
 #endif
@@ -569,24 +586,25 @@ contains
         !> Error status
         integer(int32), intent(inout) :: ierr
 
-#ifdef _MKL
-        integer(int32) :: m, n, k
+        integer(int32) :: i, j, l, m, n, k
+
         m = size(A, 1)
         k = size(A, 2)
         n = size(B, 2)
+        if (size(B, 1) /= k .or. size(C, 1) /= m .or. size(C, 2) /= n) then
+            ierr = MATRIX_STATUS%ILL_OPERATIONS%ID
+            return
+        end if
+
+#ifdef _MKL
         call dgemm('N', 'N', m, n, k, 1.0d0, A, m, B, k, 0.0d0, C, m)
         ierr = MATRIX_STATUS%SUCCESS%ID
 #else
-        integer(int32) :: i, j, l
-        integer(int32) :: m, n, k
-        m = size(A, 1)
-        k = size(A, 2)
-        n = size(B, 2)
+        C = 0.0d0
         !$omp parallel do private(i, j, l)
-        do i = 1, m
-            do j = 1, n
-                C(i, j) = 0.0d0
-                do l = 1, k
+        do j = 1, n
+            do l = 1, k
+                do i = 1, m
                     C(i, j) = C(i, j) + A(i, l) * B(l, j)
                 end do
             end do

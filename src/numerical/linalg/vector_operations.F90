@@ -14,7 +14,19 @@ module linalg_vector_operations
     use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     use :: mpi_f08
     use :: module_core
-    use :: linalg_mkl_backend
+#ifdef _MKL
+    use :: linalg_mkl_backend, only: norm_1_backend => norm_1_mkl, &
+                                     norm_2_backend => norm_2_mkl, &
+                                     norm_inf_backend => norm_inf_mkl, &
+                                     dot_backend => dot_mkl, &
+                                     axpy_backend => axpy_mkl
+#else
+    use :: linalg_mkl_backend, only: norm_1_backend => norm_1_native, &
+                                     norm_2_backend => norm_2_native, &
+                                     norm_inf_backend => norm_inf_native, &
+                                     dot_backend => dot_native, &
+                                     axpy_backend => axpy_native
+#endif
 
     implicit none
     private
@@ -182,56 +194,6 @@ module linalg_vector_operations
         module procedure :: shift_vector_int
     end interface
 
-    ! =========================================================================
-    ! 2. Private Helper Interfaces and Pointers
-    ! =========================================================================
-
-    abstract interface
-        function abst_real_from_one_vector_function(vector) result(res)
-            import :: real64
-            implicit none
-            real(real64), intent(in) :: vector(:)
-            real(real64) :: res
-        end function
-
-        function abst_real_from_two_vectors_function(vector_a, vector_b) result(res)
-            import :: real64
-            implicit none
-            real(real64), intent(in) :: vector_a(:)
-            real(real64), intent(in) :: vector_b(:)
-            real(real64) :: res
-        end function
-
-        function abst_real_from_vector_for_inf_norm_function(vector) result(res)
-            import :: real64
-            implicit none
-            real(real64), intent(in) :: vector(:)
-            real(real64) :: res
-        end function
-
-        subroutine abst_axpy_subroutine(alpha, x, y)
-            import :: real64
-            implicit none
-            real(real64), intent(in) :: alpha
-            real(real64), intent(in) :: x(:)
-            real(real64), intent(inout) :: y(:)
-        end subroutine
-    end interface
-
-    !> Procedure pointer for the backend implementation of the 1-norm.
-    procedure(abst_real_from_one_vector_function), pointer, private :: compute_norm_1_backend => null()
-    !> Procedure pointer for the backend implementation of the 2-norm.
-    procedure(abst_real_from_one_vector_function), pointer, private :: compute_norm_2_backend => null()
-    !> Procedure pointer for the backend implementation of the infinity-norm.
-    procedure(abst_real_from_vector_for_inf_norm_function), pointer, private :: compute_norm_inf_backend => null()
-    !> Procedure pointer for the backend implementation of the dot product.
-    procedure(abst_real_from_two_vectors_function), pointer, private :: compute_dot_product_backend => null()
-    !> Procedure pointer for the backend implementation of AXPY (y <- alpha*x + y).
-    procedure(abst_axpy_subroutine), pointer, private :: compute_axpy_backend => null()
-
-    !> Flag to ensure the backend pointers are initialized only once.
-    logical, private :: is_mkl_initialized = .false.
-
 contains
 
     ! =========================================================================
@@ -244,35 +206,7 @@ contains
     !>
     subroutine initialize_linalg()
         implicit none
-
-        if (.not. is_mkl_initialized) call initialize_mkl_backend()
     end subroutine initialize_linalg
-
-    !>
-    !> Points the backend procedure pointers to the appropriate implementation (MKL or native).
-    !> This selection is controlled by the `_MKL` preprocessor macro.
-    !>
-    subroutine initialize_mkl_backend()
-        implicit none
-
-        if (is_mkl_initialized) return
-
-#ifdef _MKL
-
-        compute_norm_1_backend => norm_1_mkl
-        compute_norm_2_backend => norm_2_mkl
-        compute_norm_inf_backend => norm_inf_mkl
-        compute_dot_product_backend => dot_mkl
-        compute_axpy_backend => axpy_mkl
-#else
-        compute_norm_1_backend => norm_1_native
-        compute_norm_2_backend => norm_2_native
-        compute_norm_inf_backend => norm_inf_native
-        compute_dot_product_backend => dot_native
-        compute_axpy_backend => axpy_native
-#endif
-        is_mkl_initialized = .true.
-    end subroutine initialize_mkl_backend
 
     ! =========================================================================
     ! 4. Public Norms and Dot Product
@@ -288,8 +222,7 @@ contains
         !> The computed 1-norm.
         real(real64) :: norm_value
 
-        if (.not. is_mkl_initialized) call initialize_mkl_backend()
-        norm_value = compute_norm_1_backend(x)
+        norm_value = norm_1_backend(x)
     end function norm_1_native
 
     !>
@@ -303,7 +236,6 @@ contains
 
         real(real64), dimension(:), pointer :: vec_data
 
-        if (.not. is_mkl_initialized) call initialize_mkl_backend()
         vec_data => x%get_data()
         norm_value = norm_1_native(vec_data)
     end function norm_1_vector_dp
@@ -318,8 +250,7 @@ contains
         !> The computed 2-norm.
         real(real64) :: norm_value
 
-        if (.not. is_mkl_initialized) call initialize_mkl_backend()
-        norm_value = compute_norm_2_backend(x)
+        norm_value = norm_2_backend(x)
     end function norm_2_native
 
     !>
@@ -333,7 +264,6 @@ contains
 
         real(real64), dimension(:), pointer :: vec_data
 
-        if (.not. is_mkl_initialized) call initialize_mkl_backend()
         vec_data => x%get_data()
         norm_value = norm_2_native(vec_data)
     end function norm_2_vector_dp
@@ -348,8 +278,7 @@ contains
         !> The computed infinity-norm.
         real(real64) :: norm_value
 
-        if (.not. is_mkl_initialized) call initialize_mkl_backend()
-        norm_value = compute_norm_inf_backend(x)
+        norm_value = norm_inf_backend(x)
     end function norm_inf_native
 
     !>
@@ -363,7 +292,6 @@ contains
 
         real(real64), dimension(:), pointer :: vec_data
 
-        if (.not. is_mkl_initialized) call initialize_mkl_backend()
         vec_data => x%get_data()
         norm_value = norm_inf_native(vec_data)
     end function norm_inf_vector_dp
@@ -383,8 +311,7 @@ contains
 #ifdef USE_DEBUG
         call check_match_length(x, y, 'dot')
 #endif
-        if (.not. is_mkl_initialized) call initialize_mkl_backend()
-        product = compute_dot_product_backend(x, y)
+        product = dot_backend(x, y)
     end function dot_native
 
     !> Computes the dot product of two vector objects, \( \sum x_i y_i \), using the initialized backend.
@@ -405,7 +332,6 @@ contains
 
         call check_match_length(vec_data_x, vec_data_y, 'dot_vector_dp')
 
-        if (.not. is_mkl_initialized) call initialize_mkl_backend()
         product = dot_native(vec_data_x, vec_data_y)
     end function dot_vector_dp
 
@@ -1700,8 +1626,7 @@ contains
 #ifdef USE_DEBUG
         call check_match_length(ptr_x, ptr_y, 'axpy_vector_dp')
 #endif
-        if (.not. is_mkl_initialized) call initialize_mkl_backend()
-        call compute_axpy_backend(alpha, ptr_x, ptr_y)
+        call axpy_backend(alpha, ptr_x, ptr_y)
     end subroutine axpy_vector_dp
 
     subroutine axpy_vector_int(alpha, x, y)
@@ -1740,8 +1665,7 @@ contains
         call check_match_length(ptr_x, ptr_y, 'xpay_vector_dp')
 #endif
         ! Current semantics: y <- alpha*x + y (identical to AXPY). Route through MKL backend.
-        if (.not. is_mkl_initialized) call initialize_mkl_backend()
-        call compute_axpy_backend(alpha, ptr_x, ptr_y)
+        call axpy_backend(alpha, ptr_x, ptr_y)
     end subroutine xpay_vector_dp
 
     subroutine xpay_vector_int(alpha, x, y)

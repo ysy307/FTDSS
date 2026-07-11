@@ -11,10 +11,6 @@ module linalg_mkl_interface
     private
 
     public :: mkl_pardiso_handle
-    public :: pdasum
-    public :: pdnrm2
-    public :: pddot
-
     public :: dasum
     public :: dnrm2
     public :: ddot
@@ -82,56 +78,6 @@ module linalg_mkl_interface
             !> Error flag.
             integer(c_int), intent(inout) :: error
         end subroutine pardiso
-
-        !>
-        !> Computes the 1-norm (sum of absolute values) of a distributed
-        !> vector in parallel.
-        !>
-        function pdasum(n, x, incx)
-            implicit none
-            !> The number of elements in the local portion of the vector.
-            integer, intent(in) :: n
-            !> The local portion of the input vector.
-            double precision, intent(in) :: x(*)
-            !> The storage spacing between elements of x.
-            integer, intent(in) :: incx
-            !> The globally summed 1-norm of the vector, \( \sum |x_i| \).
-            double precision :: pdasum
-        end function
-
-        !>
-        !> Computes the Euclidean norm (2-norm) of a distributed vector in parallel.
-        !>
-        function pdnrm2(n, x, incx)
-            implicit none
-            !> The number of elements in the local portion of the vector.
-            integer, intent(in) :: n
-            !> The local portion of the input vector.
-            double precision, intent(in) :: x(*)
-            !> The storage spacing between elements of x.
-            integer, intent(in) :: incx
-            !> The globally computed 2-norm of the vector, \( \sqrt{\sum x_i^2} \).
-            double precision :: pdnrm2
-        end function
-
-        !>
-        !> Computes the dot product of two distributed vectors in parallel.
-        !>
-        function pddot(n, x, incx, y, incy)
-            implicit none
-            !> The number of elements in the local portion of the vectors.
-            integer, intent(in) :: n
-            !> The local portion of the first input vector, x.
-            double precision, intent(in) :: x(*)
-            !> The storage spacing between elements of x.
-            integer, intent(in) :: incx
-            !> The local portion of the second input vector, y.
-            double precision, intent(in) :: y(*)
-            !> The storage spacing between elements of y.
-            integer, intent(in) :: incy
-            !> The globally summed dot product, \( \sum x_i y_i \).
-            double precision :: pddot
-        end function
 
         !>
         !> Computes the 1-norm (sum of absolute values) of a vector.

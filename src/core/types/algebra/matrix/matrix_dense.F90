@@ -18,18 +18,33 @@ contains
         integer(int32), intent(in), optional :: row_blocks
         integer(int32), intent(in), optional :: col_blocks
 
+        call self%initialize_rectangular(num_nodes, num_nodes)
+    end subroutine initialize_dense
+
+    module subroutine initialize_rectangular_dense(self, num_rows, num_cols)
+        implicit none
+        class(type_matrix_dense), intent(inout) :: self
+        integer(int32), intent(in) :: num_rows
+        integer(int32), intent(in) :: num_cols
+
         call deallocate_array(self%val)
+        if (num_rows < 0 .or. num_cols < 0) then
+            self%num_nodes = 0
+            self%num_rows = 0
+            self%num_cols = 0
+            self%is_initialized_matrix = .false.
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+            return
+        end if
 
-        self%num_nodes = num_nodes
-        self%num_rows = num_nodes
-        self%num_cols = num_nodes
-
-        call allocate_array(self%val, self%num_rows, self%num_cols)
+        self%num_nodes = num_rows
+        self%num_rows = num_rows
+        self%num_cols = num_cols
+        call allocate_array(self%val, num_rows, num_cols)
         call self%zero()
-
         self%is_initialized_matrix = .true.
         self%status = MATRIX_STATUS%SUCCESS
-    end subroutine initialize_dense
+    end subroutine initialize_rectangular_dense
 
     !>
     !> Deallocates the dense matrix internal value array.
@@ -67,7 +82,7 @@ contains
         integer(int32) :: i
 
         if (allocated(self%val)) then
-            do i = 1, self%num_rows
+            do i = 1, min(self%num_rows, self%num_cols)
                 call diagonal%set(VECTOR_OPS%INS, i, self%val(i, i))
             end do
         end if
@@ -203,7 +218,7 @@ contains
 
         alpha_data => alpha%get_data()
 
-        if (size(alpha_data) < nrows) then
+        if (size(alpha_data) < max(nrows, ncols)) then
             self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if

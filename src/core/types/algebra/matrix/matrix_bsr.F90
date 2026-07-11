@@ -178,6 +178,17 @@ contains
         val => self%val
     end function get_val_bsr
 
+    module subroutine invalidate_mkl_handle_bsr(self)
+        implicit none
+        class(type_matrix_bsr), intent(inout) :: self
+#ifdef _MKL
+        integer(int32) :: info
+
+        if (self%is_mkl_committed) info = mkl_sparse_destroy(self%mkl_handle)
+#endif
+        self%is_mkl_committed = .false.
+    end subroutine invalidate_mkl_handle_bsr
+
     module subroutine set_value_bsr(self, op, row, col, value)
         implicit none
         class(type_matrix_bsr), intent(inout) :: self
@@ -210,6 +221,7 @@ contains
         end if
 
         flat(1:n) => self%val
+        call self%invalidate_mkl_handle()
         select case (op%ID)
         case (MATRIX_OPS%INS%ID)
             flat(idx) = value
@@ -260,6 +272,7 @@ contains
             r_end = self%num_block_rows
         end if
 
+        call self%invalidate_mkl_handle()
         select case (op%ID)
         case (MATRIX_OPS%INS%ID)
             do k = is, ie
@@ -279,7 +292,6 @@ contains
             return
         end select
 
-        self%is_mkl_committed = .false.
         self%status = MATRIX_STATUS%SUCCESS
     end subroutine set_row_bsr
 
@@ -319,6 +331,7 @@ contains
             return
         end if
 
+        call self%invalidate_mkl_handle()
         select case (op%ID)
         case (MATRIX_OPS%SCALE_SYMM_DIAG%ID)
             ! A <- D^{-1/2} A D^{-1/2}
@@ -378,8 +391,6 @@ contains
             return
         end select
 
-        self%is_mkl_committed = .false.
-
     end subroutine scale_bsr
     !>
     !> Zero out the matrix.
@@ -388,8 +399,8 @@ contains
         implicit none
         class(type_matrix_bsr), intent(inout) :: self
 
+        call self%invalidate_mkl_handle()
         self%val(:, :, :) = 0.0d0
-        self%is_mkl_committed = .false.
         self%status = MATRIX_STATUS%SUCCESS
     end subroutine zero_all_bsr
 
@@ -422,13 +433,13 @@ contains
             r_end = self%num_block_rows
         end if
 
+        call self%invalidate_mkl_handle()
         do k = is, ie
             do r = r_start, r_end
                 self%val(r, :, k) = 0.0d0
             end do
         end do
 
-        self%is_mkl_committed = .false.
         self%status = MATRIX_STATUS%SUCCESS
     end subroutine zero_row_bsr
 
@@ -487,6 +498,7 @@ contains
         n_dof_row = size(local_data, 1) / n_local
         n_dof_col = size(local_data, 2) / n_local
 
+        call self%invalidate_mkl_handle()
         select case (op%ID)
         case (MATRIX_OPS%INS%ID)
             do j_node = 1, n_local
@@ -526,7 +538,6 @@ contains
             return
         end select
 
-        self%is_mkl_committed = .false.
     end subroutine set_local_matrix_bsr
 
     !>
@@ -536,7 +547,7 @@ contains
     module subroutine commit_to_mkl_bsr(self, ierr)
         implicit none
         class(type_matrix_bsr), intent(inout) :: self
-        integer(int32), intent(out), optional :: ierr
+        integer(int32), intent(inout), optional :: ierr
 #ifdef _MKL
         integer(int32) :: info
 

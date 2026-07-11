@@ -50,6 +50,8 @@ module numerical_parallel_communicator
         ! -- Send/receive buffers --
         real(real64), allocatable :: send_buf(:)
         real(real64), allocatable :: recv_buf(:)
+        type(MPI_Request), allocatable :: requests(:)
+        type(MPI_Status), allocatable :: statuses(:)
 
         ! -- GID lookup data --
         integer(int64), allocatable :: sorted_local_gids(:) !< Sorted GIDs of local border nodes
@@ -121,6 +123,8 @@ contains
         call deallocate_array(self%recv_indices)
         call deallocate_array(self%send_buf)
         call deallocate_array(self%recv_buf)
+        if (allocated(self%requests)) deallocate (self%requests)
+        if (allocated(self%statuses)) deallocate (self%statuses)
         call deallocate_array(self%send_counts_vector)
         call deallocate_array(self%send_displs_vector)
         call deallocate_array(self%recv_counts_vector)
@@ -168,8 +172,6 @@ contains
         type(type_constant_id), intent(in) :: op
         real(real64), intent(inout) :: data_array(:)
         integer(int32) :: i, ierr, total_send_nodes, total_recv_nodes
-        type(MPI_Request), allocatable :: reqs(:)
-        type(MPI_Status), allocatable :: statuses(:)
 
         if (.not. self%is_initialized .or. self%comm == MPI_COMM_NULL .or. self%num_partners == 0) return
 
@@ -181,24 +183,23 @@ contains
             self%send_buf(1:total_send_nodes) = data_array(self%send_indices(1:total_send_nodes))
         end if
 
-        allocate (reqs(self%num_partners * 2), statuses(self%num_partners * 2))
+        if (.not. allocated(self%requests)) allocate (self%requests(self%num_partners * 2))
+        if (.not. allocated(self%statuses)) allocate (self%statuses(self%num_partners * 2))
 
         do i = 1, self%num_partners
             call MPI_Irecv(self%recv_buf(self%recv_displs(i) + 1), self%recv_counts(i), MPI_DOUBLE_PRECISION, &
-                           self%partners(i), 0, self%comm, reqs(i), ierr)
+                           self%partners(i), 0, self%comm, self%requests(i), ierr)
             call handle_mpi_error(ierr, "MPI_Irecv loop")
         end do
 
         do i = 1, self%num_partners
             call MPI_Isend(self%send_buf(self%send_displs(i) + 1), self%send_counts(i), MPI_DOUBLE_PRECISION, &
-                           self%partners(i), 0, self%comm, reqs(self%num_partners + i), ierr)
+                           self%partners(i), 0, self%comm, self%requests(self%num_partners + i), ierr)
             call handle_mpi_error(ierr, "MPI_Isend loop")
         end do
 
-        call MPI_Waitall(self%num_partners * 2, reqs, statuses, ierr)
+        call MPI_Waitall(self%num_partners * 2, self%requests, self%statuses, ierr)
         call handle_mpi_error(ierr, "MPI_Waitall for scalar exchange")
-
-        deallocate (reqs, statuses)
 
         if (total_recv_nodes > 0) then
             select case (op%ID)
@@ -218,8 +219,6 @@ contains
         real(real64), intent(inout) :: data_array(:, :)
         integer(int32), intent(in) :: num_components
         integer(int32) :: i, total_send_nodes, total_recv_nodes, total_send_values, total_recv_values, ierr
-        type(MPI_Request), allocatable :: reqs(:)
-        type(MPI_Status), allocatable :: statuses(:)
 
         if (.not. self%is_initialized .or. self%comm == MPI_COMM_NULL .or. self%num_partners == 0 .or. num_components <= 0) return
 
@@ -236,24 +235,23 @@ contains
             end do
         end if
 
-        allocate (reqs(self%num_partners * 2), statuses(self%num_partners * 2))
+        if (.not. allocated(self%requests)) allocate (self%requests(self%num_partners * 2))
+        if (.not. allocated(self%statuses)) allocate (self%statuses(self%num_partners * 2))
 
         do i = 1, self%num_partners
             call MPI_Irecv(self%recv_buf(self%recv_displs_vector(i) + 1), self%recv_counts_vector(i), MPI_DOUBLE_PRECISION, &
-                           self%partners(i), 1, self%comm, reqs(i), ierr)
+                           self%partners(i), 1, self%comm, self%requests(i), ierr)
             call handle_mpi_error(ierr, "MPI_Irecv loop for vector")
         end do
 
         do i = 1, self%num_partners
             call MPI_Isend(self%send_buf(self%send_displs_vector(i) + 1), self%send_counts_vector(i), MPI_DOUBLE_PRECISION, &
-                           self%partners(i), 1, self%comm, reqs(self%num_partners + i), ierr)
+                           self%partners(i), 1, self%comm, self%requests(self%num_partners + i), ierr)
             call handle_mpi_error(ierr, "MPI_Isend loop for vector")
         end do
 
-        call MPI_Waitall(self%num_partners * 2, reqs, statuses, ierr)
+        call MPI_Waitall(self%num_partners * 2, self%requests, self%statuses, ierr)
         call handle_mpi_error(ierr, "MPI_Waitall for vector exchange")
-
-        deallocate (reqs, statuses)
 
         if (total_recv_nodes > 0) then
             select case (op%ID)
@@ -282,6 +280,7 @@ contains
         integer(int64), allocatable :: halo_gids(:)
         integer(int32), allocatable :: halo_owners(:), halo_lids(:)
         integer(int32), allocatable :: send_counts_per_proc(:), recv_counts_per_proc(:)
+        integer(int32) :: i, current_pos
 
         associate (vtk => input%geometry%vtk)
             ! 1. Extract GIDs and LIDs of border nodes owned by this process, sorted by GID
@@ -290,18 +289,15 @@ contains
             ! 2. Extract halo node info (owner, LID, GID)
             num_halo_nodes = count(vtk%node_type == COMM_NODE_TYPES%HALO%ID)
             allocate (halo_owners(num_halo_nodes), halo_lids(num_halo_nodes), halo_gids(num_halo_nodes))
-            block
-                integer(int32) :: i, current_pos
-                current_pos = 0
-                do i = 1, vtk%num_points
-                    if (vtk%node_type(i) == COMM_NODE_TYPES%HALO%ID) then
-                        current_pos = current_pos + 1
-                        halo_owners(current_pos) = vtk%owner_rank(1, i)
-                        halo_lids(current_pos) = i
-                        halo_gids(current_pos) = vtk%global_node_ids(i)
-                    end if
-                end do
-            end block
+            current_pos = 0
+            do i = 1, vtk%num_points
+                if (vtk%node_type(i) == COMM_NODE_TYPES%HALO%ID) then
+                    current_pos = current_pos + 1
+                    halo_owners(current_pos) = vtk%owner_rank(1, i)
+                    halo_lids(current_pos) = i
+                    halo_gids(current_pos) = vtk%global_node_ids(i)
+                end if
+            end do
             if (num_halo_nodes > 1) then
                 call quicksort_rank_lid_gid_triplets(halo_owners, halo_lids, halo_gids, 1, num_halo_nodes)
             end if
@@ -657,4 +653,3 @@ contains
     end subroutine swap_i64
 
 end module numerical_parallel_communicator
-

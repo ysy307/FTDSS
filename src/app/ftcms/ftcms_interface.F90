@@ -118,11 +118,16 @@ module app_ftcms
         ! constraint (see design memo referenced in basic_interface.F90). When
         ! enabled, hydraulic-frozen nodes have their pressure DOF pinned each
         ! nonlinear iteration to P_eq(T) = -psi_cryo(T) (ftcms_boundary.F90:
-        ! apply_clapeyron_pressure_constraint), and Qi is advanced once per
-        ! accepted step from the excluded mass residual (ftcms_base.F90:
-        ! apply_prognostic_ice_update) instead of being re-derived every
-        ! iteration from the equilibrium Theta(psi_cap) closure. Off by default;
-        ! bit-identical to the pre-existing behavior when .false.
+        ! apply_clapeyron_pressure_constraint), and Qi is advanced from the
+        ! excluded mass residual accumulated INSIDE the nonlinear loop
+        ! (accumulate_prognostic_ice_flux; the fringe deposition dynamics is
+        ! stiff - K impedance shuts the inflow down on a sub-dt time scale -
+        ! so the ice/flux coupling must be solved implicitly as part of the
+        ! Picard fixed point, not applied explicitly after the step), then
+        ! finalized once per accepted step (apply_prognostic_ice_update)
+        ! instead of being re-derived every iteration from the equilibrium
+        ! Theta(psi_cap) closure. Off by default; bit-identical to the
+        ! pre-existing behavior when .false.
         logical :: enable_clapeyron_pressure_constraint = .false.
         !> Per-node active-set flag (pressure-constrained "frozen" state),
         !> refreshed every nonlinear iteration. Size num_nodes.
@@ -135,6 +140,15 @@ module app_ftcms
         !> Lumped nodal control volume V_i = sum over incident elements of
         !> (element measure / n_local_nodes), computed once at initialization.
         real(real64), allocatable :: clapeyron_node_volume(:)
+        !> Within-step accumulator of the residual-driven (flux-transport) ice
+        !> increment at constrained nodes [volumetric ice fraction]. Advanced by
+        !> accumulate_prognostic_ice_flux every nonlinear iteration with the
+        !> conserved relaxation factor as damping; reset to zero at the start of
+        !> every time-step attempt. At the Picard fixed point the constrained
+        !> nodes' mass residual vanishes and the accumulator stops moving, i.e.
+        !> the frozen-node continuity equation is solved with Qi as the local
+        !> unknown. Size num_nodes.
+        real(real64), allocatable :: clapeyron_dQi_flux(:)
 
         type(type_control) :: control
         type(type_output_manager) :: output
@@ -196,6 +210,7 @@ module app_ftcms
             apply_phase_change_temperature_correction_ftcms
         procedure, private, pass(self) :: update_nodal_phases => update_nodal_phases_ftcms
         procedure, private, pass(self) :: apply_prognostic_ice_update => apply_prognostic_ice_update_ftcms
+        procedure, private, pass(self) :: accumulate_prognostic_ice_flux => accumulate_prognostic_ice_flux_ftcms
         procedure, private, pass(self) :: compute_nodal_conserved => compute_nodal_conserved_ftcms
         procedure, private, pass(self) :: compute_mass_reference => compute_mass_reference_ftcms
         procedure, public, pass(self) :: compute_lte_error => compute_lte_error_ftcms
@@ -390,6 +405,20 @@ module app_ftcms
             class(type_ftcms), intent(inout) :: self
         end subroutine apply_prognostic_ice_update_ftcms
 
+        !> Accumulate the residual-driven ice increment at constrained nodes
+        !> inside the nonlinear loop (one call per Picard iteration):
+        !> \( dQi_i \mathrel{+}= \omega\,(\rho_w/\rho_i)\, R_{H,i}\, \Delta t / V_i \)
+        !> with \(\omega\) the conserved relaxation factor. The fringe ice
+        !> deposition is stiff (impedance shuts the inflow down on a sub-dt
+        !> time scale), so the coupling is solved implicitly as part of the
+        !> Picard fixed point: the accumulator stops moving exactly when the
+        !> constrained nodes' mass residual vanishes. Monolithic coupling only
+        !> (no-op when staggered or flag off).
+        module subroutine accumulate_prognostic_ice_flux_ftcms(self)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+        end subroutine accumulate_prognostic_ice_flux_ftcms
+
         !> Evaluate the per-node conserved quantities (volumetric enthalpy density
         !> and pore-water effective density) at the current iterate, for the
         !> conserved-quantity convergence norm and the Richardson error estimate.
@@ -486,7 +515,7 @@ module app_ftcms
         end subroutine assemble_local_ftcms
         module subroutine assemble_initialize_ftcms(self, element_id, workspace, local_K_TT, local_K_TH, &
                                                     local_K_HH, local_K_HT, local_F_T, local_F_H, &
-                                                    coordinates, connectivity)
+                                                    coordinates, raw_coordinates, connectivity)
             implicit none
 
             class(type_ftcms), intent(inout) :: self
@@ -495,6 +524,7 @@ module app_ftcms
             type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
             type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
             real(real64), allocatable, intent(inout) :: coordinates(:, :)
+            real(real64), allocatable, intent(inout) :: raw_coordinates(:, :)
             integer(int32), pointer, contiguous, intent(inout), optional :: connectivity(:)
         end subroutine assemble_initialize_ftcms
 

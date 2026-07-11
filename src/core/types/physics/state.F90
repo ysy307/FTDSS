@@ -68,6 +68,16 @@ module core_types_physics_state
         type(type_field_array_dp) :: temperature_history ! Temperature history [C]
         type(type_field_array_dp) :: pressure_history ! Pressure history [Pa]
         type(type_field_array_dp) :: porosity_history ! Porosity history [-]
+        ! Prognostic ice content history [-] (A1 Clapeyron-pressure-constraint
+        ! closure only). Level 1 is the current-iterate state ice (prognostic
+        ! value plus in-step local phase change); levels j >= 2 are the stored
+        ! BDF history of the prognostic ice variable. When set, the storage
+        ! (transient) term evaluations substitute these values for the
+        ! equilibrium ice recomputed at (T_hist, P_hist) - the equilibrium
+        ! closure yields ~0 ice at nodes whose pressure is pinned at P_eq(T).
+        ! Left unset by every other code path, in which case all consumers
+        ! keep the equilibrium evaluation (bit-identical behavior).
+        type(type_field_array_dp) :: ice_content_history ! Prognostic ice history [-]
 
         ! --- Thermal Properties ---
         type(type_field_dp) :: latent_heat_fusion ! [J/kg]
@@ -103,6 +113,12 @@ module core_types_physics_state
         procedure, public, pass(self) :: get => get_all_state
         !> Reset All
         procedure, public, pass(self) :: reset => reset_all_state
+        !> Clear only the prognostic ice history (A1 Clapeyron closure):
+        !> returns the field to the unset state so storage-term evaluations
+        !> fall back to the equilibrium path. Needed because the per-field
+        !> reset is private and reused workspace Gauss-point states must not
+        !> carry the history over from a previously processed element.
+        procedure, public, pass(self) :: clear_ice_content_history => clear_ice_content_history_state
         !> Copy
         procedure, public, pass(self) :: copy => copy_state
     end type type_state
@@ -478,6 +494,7 @@ contains
         call self%temperature_history%reset()
         call self%pressure_history%reset()
         call self%porosity_history%reset()
+        call self%ice_content_history%reset()
         call self%latent_heat_fusion%reset()
         call self%latent_heat_vaporization%reset()
         call self%dQw_dT%reset()
@@ -496,6 +513,14 @@ contains
         call self%vapor_flux%reset()
     end subroutine reset_all_state
 
+    !> See the type-bound declaration for the rationale.
+    subroutine clear_ice_content_history_state(self)
+        implicit none
+        class(type_state), intent(inout) :: self
+
+        call self%ice_content_history%reset()
+    end subroutine clear_ice_content_history_state
+
     subroutine copy_state(self, source)
         implicit none
         class(type_state), intent(inout) :: self
@@ -512,6 +537,7 @@ contains
         call copy_array_field(self%temperature_history, source%temperature_history)
         call copy_array_field(self%pressure_history, source%pressure_history)
         call copy_array_field(self%porosity_history, source%porosity_history)
+        call copy_array_field(self%ice_content_history, source%ice_content_history)
         call copy_field(self%latent_heat_fusion, source%latent_heat_fusion)
         call copy_field(self%latent_heat_vaporization, source%latent_heat_vaporization)
         call copy_field(self%dQw_dT, source%dQw_dT)

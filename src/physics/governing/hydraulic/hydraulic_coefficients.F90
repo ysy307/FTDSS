@@ -476,13 +476,9 @@ contains
         real(real64), intent(inout) :: capacity
 
         real(real64) :: physical_capacity
-        real(real64) :: pressure_capacity_bound
-
         physical_capacity = 0.0d0
-        pressure_capacity_bound = 0.0d0
         call self%compute_C_eq(state, physical_capacity)
-        call self%physics%calc_lscheme_capacity(material_id, pressure_capacity_bound)
-        capacity = max(physical_capacity, pressure_capacity_bound)
+        capacity = max(physical_capacity, self%iteration_capacity_bound(material_id))
     end subroutine compute_iteration_capacity_hydraulic
 
     !> @brief Compute BDF approximation of dTheta/dt for Mixed formulation.
@@ -497,14 +493,17 @@ contains
         type(type_state) :: local_state
         real(real64), pointer, dimension(:), contiguous :: temperature_history
         real(real64), pointer, dimension(:), contiguous :: pressure_history
+        real(real64), pointer, dimension(:), contiguous :: ice_history
 
         real(real64) :: Qw, Qi, Qv
         real(real64) :: rho_w, rho_i
         real(real64) :: Theta_j
         integer(int32) :: j, n
+        logical :: use_prognostic_ice
 
         nullify (temperature_history)
         nullify (pressure_history)
+        nullify (ice_history)
 
         call state%temperature_history%get(temperature_history)
         call state%pressure_history%get(pressure_history)
@@ -512,6 +511,24 @@ contains
         dTheta_dt = 0.0d0
         if (.not. associated(temperature_history)) return
         if (.not. associated(pressure_history)) return
+
+        ! A1 Clapeyron closure: when the caller's state carries the prognostic
+        ! ice history (set only at Gauss points of elements incident to a
+        ! pressure-constrained node, see governing_base lerp_ice), the ice of
+        ! each BDF level is taken from that history instead of the equilibrium
+        ! recomputation below. The equilibrium closure collapses to ~0 ice once
+        ! P is pinned at P_eq(T) (psi_cap = psi_cryo), which would delete the
+        ! ice from the storage term and produce a mass residual orders of
+        ! magnitude beyond physical scale. Qw and Qv keep the equilibrium
+        ! evaluation: theta_w is reproduced correctly from the T history since
+        ! the constrained generalized suction falls onto the psi_cryo(T_hist)
+        ! branch. Level 1 of the history equals the current GP state ice
+        ! (prognostic + in-step local phase change) by construction, so Theta_1
+        ! is exactly consistent with the assembled current state. An unset
+        ! history (flag off, or element away from the constraint) leaves this
+        ! path bit-identical to the pure equilibrium closure.
+        call state%ice_content_history%get(ice_history)
+        use_prognostic_ice = associated(ice_history)
 
         n = min(size(bdf_coeffs), size(temperature_history), size(pressure_history))
         call local_state%copy(state)
@@ -525,6 +542,9 @@ contains
             call local_state%water_content%get(Qw)
             call local_state%ice_content%get(Qi)
             call local_state%vapor_content%get(Qv)
+            if (use_prognostic_ice) then
+                if (j <= size(ice_history)) Qi = ice_history(j)
+            end if
 
             call self%physics%calc_density_water(local_state, rho_w)
             call self%physics%calc_density_ice(local_state, rho_i)
@@ -534,6 +554,8 @@ contains
 
             dTheta_dt = dTheta_dt + bdf_coeffs(j) * Theta_j
         end do
+
+        nullify (ice_history)
 
     end subroutine compute_transient_term_mixed_hydraulic
 

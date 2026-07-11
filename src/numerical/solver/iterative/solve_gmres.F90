@@ -14,6 +14,7 @@ contains
         self%name = "GMRES"
         self%num_nodes = solver_settings%num_nodes
         self%tolerance = solver_settings%tolerance
+        self%relative_tolerance = solver_settings%relative_tolerance
         self%max_iterations = solver_settings%max_iterations
         self%m_restart = solver_settings%m_restart
         self%projection_enabled = solver_settings%projection_enabled
@@ -97,22 +98,12 @@ contains
         real(real64) :: beta, b_norm, w_norm, temp_val, h_norm_before
         real(real64) :: resid_krylov, beta0_initial, beta_pre_update
         integer(int32) :: i, k, ierr, iter_global, iter
-        integer(int32) :: bad_restart_count
+        integer(int32) :: bad_restart_count, saved_status
 
         iter_global = 0
         bad_restart_count = 0
         self%current_iteration = 0
         self%status = SOLVER_STATUS%SUCCESS%ID
-
-        block
-            real(real64), pointer :: bptr(:)
-            bptr => b%get_data()
-            ! write (*, '(A,I0,A,I0,A,I0)') &
-            !     '   [GMRES-INIT] n=', size(bptr), &
-            !     ' m_restart=', self%m_restart, ' max_iter=', self%max_iterations
-            ! flush(6)
-            nullify(bptr)
-        end block
 
         call self%residual_history%zero()
         call self%pc%setup(A)
@@ -229,13 +220,10 @@ contains
             end do arnoldi_loop
 
             ! backward_substitution resets status to SUCCESS; preserve MAXITER across it
-            block
-                integer(int32) :: saved_status
-                saved_status = self%status
-                call backward_substitution(k, self%h, self%g, self%y, self%status)
-                if (self%status /= SOLVER_STATUS%SUCCESS%ID) exit restart_loop
-                if (saved_status == SOLVER_STATUS%MAXITER%ID) self%status = SOLVER_STATUS%MAXITER%ID
-            end block
+            saved_status = self%status
+            call backward_substitution(k, self%h, self%g, self%y, self%status)
+            if (self%status /= SOLVER_STATUS%SUCCESS%ID) exit restart_loop
+            if (saved_status == SOLVER_STATUS%MAXITER%ID) self%status = SOLVER_STATUS%MAXITER%ID
 
             call self%x_update%zero()
             do i = 1, k

@@ -385,6 +385,16 @@ contains
             call self%state_gp(j)%porosity_history%set(self%work_bdf_buffer)
         end do
 
+        ! Clear any prognostic ice history left over from a previous element
+        ! processed by this (reused) workspace: the history is set only by
+        ! lerp_ice for elements incident to a Clapeyron-constrained node, and
+        ! a stale carry-over would wrongly switch the storage-term evaluation
+        ! of an unrelated element onto the prognostic-ice branch. No-op (field
+        ! already unset) in every run without the A1 closure.
+        do i = 1, self%num_fe_gauss
+            call self%state_gp(i)%clear_ice_content_history()
+        end do
+
         nullify (gp)
         nullify (work_history_ptr)
 
@@ -400,23 +410,19 @@ contains
 
         integer(int32) :: i
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp
-        real(real64), allocatable :: dqi_dt_nodes(:)
         real(real64) :: dqi_dt_gp
 
         nullify (gp)
         call self%fe%get_gauss(gp)
-        allocate (dqi_dt_nodes(self%num_fe_nodes))
-
         do i = 1, self%num_fe_nodes
-            call self%state(i)%dQi_dT%get(dqi_dt_nodes(i))
+            call self%state(i)%dQi_dT%get(self%work_vec(i))
         end do
 
         do i = 1, self%num_fe_gauss
-            call self%fe%lerp(gp(i), dqi_dt_nodes(1:self%num_fe_nodes), dqi_dt_gp)
+            call self%fe%lerp(gp(i), self%work_vec(1:self%num_fe_nodes), dqi_dt_gp)
             call self%state_gp(i)%dQi_dT%set(dqi_dt_gp)
         end do
 
-        deallocate (dqi_dt_nodes)
         nullify (gp)
 
     end subroutine lerp_dqi_dt_from_nodes
@@ -436,30 +442,93 @@ contains
     !> equilibrium Theta(psi_cap) closure collapses to ~0 ice once P is pinned
     !> at P_eq(T), which is exactly the bias this closure replaces). Mirrors
     !> lerp_dqi_dt_from_nodes. Clipped to [0, phi_gp] as a light safety bound.
+    !>
+    !> Additionally interpolates the nodal prognostic ice HISTORY (all BDF
+    !> levels of state%ice_content_history, filled by ftcms set_state) to the
+    !> Gauss points, with level 1 forced to the current GP ice for exact
+    !> consistency; the storage-term evaluations substitute these per-level
+    !> values for their internal equilibrium recomputation (see the inline
+    !> comment below for the rationale).
     subroutine lerp_ice_from_nodes(self)
         implicit none
         class(type_assemble_workspace), intent(inout) :: self
 
-        integer(int32) :: i
+        integer(int32) :: i, j, n_hist
         type(type_coordinate_dp), pointer, contiguous, dimension(:) :: gp
-        real(real64), allocatable :: ice_nodes(:)
-        real(real64) :: ice_gp
+        real(real64), pointer, contiguous, dimension(:) :: hist_ptr
+        real(real64) :: ice_gp, ice_cur
+        logical :: hist_ok, is_set
 
         nullify (gp)
+        nullify (hist_ptr)
         call self%fe%get_gauss(gp)
-        allocate (ice_nodes(self%num_fe_nodes))
-
         do i = 1, self%num_fe_nodes
-            call self%state(i)%ice_content%get(ice_nodes(i))
+            call self%state(i)%ice_content%get(self%work_vec(i))
         end do
 
         do i = 1, self%num_fe_gauss
-            call self%fe%lerp(gp(i), ice_nodes(1:self%num_fe_nodes), ice_gp)
+            call self%fe%lerp(gp(i), self%work_vec(1:self%num_fe_nodes), ice_gp)
             ice_gp = max(0.0d0, min(ice_gp, self%phi_gp(i)))
             call self%state_gp(i)%ice_content%set(ice_gp)
         end do
 
-        deallocate (ice_nodes)
+        ! ------------------------------------------------------------------
+        ! BDF-level prognostic ice history to the Gauss points.
+        !
+        ! The mixed storage dTheta/dt (hydraulic) and the enthalpy history
+        ! dU/dt (thermal) re-evaluate the water-phase EQUILIBRIUM at every
+        ! BDF level (T_hist(j), P_hist(j)) - a path that bypasses the GP
+        ! ice_content set above entirely. At Clapeyron-constrained nodes
+        ! P = P_eq(T), so that equilibrium yields ~0 ice at every level and
+        ! the ice vanishes from the storage term (the root cause of the
+        ! runaway mass residual observed in the A1b run). Interpolating the
+        ! nodal prognostic ice history here lets those evaluations substitute
+        ! ice per level j (see compute_transient_term_mixed_hydraulic and
+        ! compute_transient_term_thermal / compute_mass_term_thermal).
+        !
+        ! Level 1 is FORCED to the current GP state ice set just above
+        ! (prognostic value + in-step local phase change, clipped), not to the
+        ! interpolant of the nodal level-1 slots: this guarantees exact
+        ! consistency between Theta_1 / U_1 and the assembled current state
+        ! by construction, and preserves the T-dependence of the in-step
+        ! local phase change term that carries the apparent (latent) heat
+        ! capacity of the residual.
+        ! ------------------------------------------------------------------
+        n_hist = self%bdf_order + 1
+        hist_ok = self%associated_bdf .and. (n_hist >= 1)
+        if (hist_ok) then
+            self%work_node(:, :) = 0.0d0
+            do i = 1, self%num_fe_nodes
+                nullify (hist_ptr)
+                is_set = .false.
+                call self%state(i)%ice_content_history%get(hist_ptr, is_set=is_set)
+                if (.not. (is_set .and. associated(hist_ptr))) then
+                    hist_ok = .false.
+                    exit
+                end if
+                if (size(hist_ptr) < n_hist) then
+                    hist_ok = .false.
+                    exit
+                end if
+                self%work_node(1:n_hist, i) = hist_ptr(1:n_hist)
+            end do
+            nullify (hist_ptr)
+        end if
+
+        if (hist_ok) then
+            do i = 1, self%num_fe_gauss
+                self%work_bdf_buffer(:) = 0.0d0
+                do j = 1, n_hist
+                    call self%fe%lerp(gp(i), self%work_node(j, 1:self%num_fe_nodes), self%work_bdf_buffer(j))
+                    self%work_bdf_buffer(j) = max(0.0d0, min(self%work_bdf_buffer(j), self%phi_gp(i)))
+                end do
+                ice_cur = 0.0d0
+                call self%state_gp(i)%ice_content%get(ice_cur)
+                self%work_bdf_buffer(1) = ice_cur
+                call self%state_gp(i)%ice_content_history%set(self%work_bdf_buffer(1:n_hist))
+            end do
+        end if
+
         nullify (gp)
 
     end subroutine lerp_ice_from_nodes

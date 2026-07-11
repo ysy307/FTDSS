@@ -33,6 +33,7 @@ contains
         self%nrhs   = 1
         self%msglvl = 0
         self%last_error = 0
+        self%analysis_ready = .false.
         self%status = SOLVER_STATUS%SUCCESS%ID
         self%mtype = 11
 
@@ -88,6 +89,12 @@ contains
         real(c_double), allocatable :: b_val(:)
         real(c_double), allocatable :: x_val(:)
         logical :: fpe_halt
+        integer(int32) :: bs_row, bs_col, n_rows
+        integer(int32) :: i, j, k, r, c
+        integer(int32) :: row, col, blocks_in_row, nnz_total, idx
+        integer(int32) :: row_start, row_end
+        integer(c_int) :: tmp_col
+        real(c_double) :: tmp_val
 
         self%status = SOLVER_STATUS%SUCCESS%ID
         self%last_error = 0
@@ -136,6 +143,27 @@ contains
             x_val = 0.0d0
             perm  = 0
 
+            if (self%analysis_ready) then
+                if (.not. allocated(self%analyzed_ia) .or. .not. allocated(self%analyzed_ja)) then
+                    self%status = SOLVER_STATUS%ILL_OPTIONS%ID
+                    deallocate (ia, ja, a_val, b_val, x_val, perm)
+                    return
+                end if
+                if (size(self%analyzed_ia) /= size(ia) .or. size(self%analyzed_ja) /= size(ja)) then
+                    self%status = SOLVER_STATUS%ILL_OPTIONS%ID
+                    deallocate (ia, ja, a_val, b_val, x_val, perm)
+                    return
+                end if
+                if (any(self%analyzed_ia /= ia) .or. any(self%analyzed_ja /= ja)) then
+                    self%status = SOLVER_STATUS%ILL_OPTIONS%ID
+                    deallocate (ia, ja, a_val, b_val, x_val, perm)
+                    return
+                end if
+            else
+                self%analyzed_ia = ia
+                self%analyzed_ja = ja
+            end if
+
             if (any(.not. ieee_is_finite(a_val))) then
                 self%status = SOLVER_STATUS%BREAKDOWN%ID
                 deallocate (ia, ja, a_val, b_val, x_val, perm)
@@ -152,15 +180,18 @@ contains
             call ieee_get_halting_mode(ieee_invalid, fpe_halt)
             call ieee_set_halting_mode(ieee_invalid, .false.)
 
-            phase = 11
-            call pardiso(self%pt, maxfct, mnum, mtype, phase, n, a_val, ia, ja, perm, nrhs, &
-                         self%iparm, msglvl, b_val, x_val, error)
-            self%last_error = int(error, int32)
-            if (error /= 0) then
-                self%status = SOLVER_STATUS%BREAKDOWN%ID
-                call ieee_set_halting_mode(ieee_invalid, fpe_halt)
-                deallocate (ia, ja, a_val, b_val, x_val, perm)
-                return
+            if (.not. self%analysis_ready) then
+                phase = 11
+                call pardiso(self%pt, maxfct, mnum, mtype, phase, n, a_val, ia, ja, perm, nrhs, &
+                             self%iparm, msglvl, b_val, x_val, error)
+                self%last_error = int(error, int32)
+                if (error /= 0) then
+                    self%status = SOLVER_STATUS%BREAKDOWN%ID
+                    call ieee_set_halting_mode(ieee_invalid, fpe_halt)
+                    deallocate (ia, ja, a_val, b_val, x_val, perm)
+                    return
+                end if
+                self%analysis_ready = .true.
             end if
 
             phase = 22
@@ -189,17 +220,6 @@ contains
             deallocate (ia, ja, a_val, b_val, x_val, perm)
 
         type is (type_matrix_bsr)
-            block
-                integer(int32) :: bs_row, bs_col, n_rows
-                integer(int32) :: i, j, k, r, c
-                integer(int32) :: row, col
-                integer(int32) :: blocks_in_row
-                integer(int32) :: nnz_total
-                integer(int32) :: idx
-                integer(int32) :: row_start, row_end
-                integer(c_int) :: tmp_col
-                real(c_double) :: tmp_val
-
                 call A%get_info(info)
                 bs_row = info%num_block_rows
                 bs_col = info%num_block_cols
@@ -299,6 +319,27 @@ contains
                 x_val = 0.0d0
                 perm  = 0
 
+                if (self%analysis_ready) then
+                    if (.not. allocated(self%analyzed_ia) .or. .not. allocated(self%analyzed_ja)) then
+                        self%status = SOLVER_STATUS%ILL_OPTIONS%ID
+                        deallocate (ia, ja, a_val, b_val, x_val, perm)
+                        return
+                    end if
+                    if (size(self%analyzed_ia) /= size(ia) .or. size(self%analyzed_ja) /= size(ja)) then
+                        self%status = SOLVER_STATUS%ILL_OPTIONS%ID
+                        deallocate (ia, ja, a_val, b_val, x_val, perm)
+                        return
+                    end if
+                    if (any(self%analyzed_ia /= ia) .or. any(self%analyzed_ja /= ja)) then
+                        self%status = SOLVER_STATUS%ILL_OPTIONS%ID
+                        deallocate (ia, ja, a_val, b_val, x_val, perm)
+                        return
+                    end if
+                else
+                    self%analyzed_ia = ia
+                    self%analyzed_ja = ja
+                end if
+
                 if (any(.not. ieee_is_finite(a_val))) then
                     self%status = SOLVER_STATUS%BREAKDOWN%ID
                     deallocate (ia, ja, a_val, b_val, x_val, perm)
@@ -315,15 +356,18 @@ contains
                 call ieee_get_halting_mode(ieee_invalid, fpe_halt)
                 call ieee_set_halting_mode(ieee_invalid, .false.)
 
-                phase = 11
-                call pardiso(self%pt, maxfct, mnum, mtype, phase, n, a_val, ia, ja, perm, nrhs, &
-                             self%iparm, msglvl, b_val, x_val, error)
-                self%last_error = int(error, int32)
-                if (error /= 0) then
-                    self%status = SOLVER_STATUS%BREAKDOWN%ID
-                    call ieee_set_halting_mode(ieee_invalid, fpe_halt)
-                    deallocate (ia, ja, a_val, b_val, x_val, perm)
-                    return
+                if (.not. self%analysis_ready) then
+                    phase = 11
+                    call pardiso(self%pt, maxfct, mnum, mtype, phase, n, a_val, ia, ja, perm, nrhs, &
+                                 self%iparm, msglvl, b_val, x_val, error)
+                    self%last_error = int(error, int32)
+                    if (error /= 0) then
+                        self%status = SOLVER_STATUS%BREAKDOWN%ID
+                        call ieee_set_halting_mode(ieee_invalid, fpe_halt)
+                        deallocate (ia, ja, a_val, b_val, x_val, perm)
+                        return
+                    end if
+                    self%analysis_ready = .true.
                 end if
 
                 phase = 22
@@ -350,7 +394,6 @@ contains
 
                 call ieee_set_halting_mode(ieee_invalid, fpe_halt)
                 deallocate (ia, ja, a_val, b_val, x_val, perm)
-            end block
 
         class default
             self%status = SOLVER_STATUS%NOT_IMPLEMENTED%ID
@@ -390,6 +433,11 @@ contains
 
         call ieee_set_halting_mode(ieee_invalid, fpe_halt)
 #endif
+#ifdef _MKL
+        if (allocated(self%analyzed_ia)) deallocate (self%analyzed_ia)
+        if (allocated(self%analyzed_ja)) deallocate (self%analyzed_ja)
+#endif
+        self%analysis_ready = .false.
         if (allocated(self%name)) deallocate (self%name)
         self%ID = -1
         self%num_nodes = -1

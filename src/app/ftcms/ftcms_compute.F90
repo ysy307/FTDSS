@@ -91,8 +91,11 @@ contains
         class(abst_matrix), pointer :: K_ptr => null()
         type(type_vector_dp), pointer :: F_ptr => null()
         type(type_vector_dp), pointer :: du_ptr => null()
+        real(real64), pointer :: tmp_data_ptr(:) => null()
+        type(type_constant_id), pointer :: coupling_mode_ptr => null()
+        type(type_system_topology) :: topology
         type(type_constant_id) :: active_physics
-        integer(int32) :: sys_id, i
+        integer(int32) :: sys_id, i, matrix_ierr
         logical :: linear_failed
         character(len=16) :: solve_phase
 
@@ -132,27 +135,17 @@ contains
             return
         end if
 
-        block
-            real(real64), pointer :: tmp_data_ptr(:) => null()
-            if (associated(du_ptr)) tmp_data_ptr => du_ptr%get_data()
-            if (.not. associated(tmp_data_ptr)) then
-                block
-                    type(type_constant_id), pointer :: coupling_mode_ptr
-                    nullify (coupling_mode_ptr)
-                    call self%control%get_coupling_mode(coupling_mode_ptr)
-                    block
-                        type(type_system_topology) :: topology
-                        call self%domain%export_topology(topology)
-                        call self%du%initialize(topology, coupling_mode_ptr)
-                    end block
-                end block
-                if (self%control%is_staggered()) then
-                    du_ptr => self%du%get_vector(sys_id)
-                else
-                    du_ptr => self%du%get_vector()
-                end if
+        if (associated(du_ptr)) tmp_data_ptr => du_ptr%get_data()
+        if (.not. associated(tmp_data_ptr)) then
+            call self%control%get_coupling_mode(coupling_mode_ptr)
+            call self%domain%export_topology(topology)
+            call self%du%initialize(topology, coupling_mode_ptr)
+            if (self%control%is_staggered()) then
+                du_ptr => self%du%get_vector(sys_id)
+            else
+                du_ptr => self%du%get_vector()
             end if
-        end block
+        end if
 
         call du_ptr%zero()
 
@@ -161,6 +154,8 @@ contains
         ! otherwise makes even the direct solver return O(0.1) relative residuals.
         ! Solve (D A D)(D^-1 du) = D b; du is unscaled (du = D y) after the solve.
         call jacobi_equilibrate_bsr(K_ptr, F_ptr, equil_scale)
+        matrix_ierr = MATRIX_STATUS%SUCCESS%ID
+        call K_ptr%commit_to_mkl(matrix_ierr)
 
         linear_failed = .false.
         if (self%control%is_staggered()) then

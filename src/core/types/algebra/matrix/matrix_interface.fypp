@@ -309,11 +309,25 @@ module core_types_algebra_matrix
         real(real64), allocatable :: val(:, :)
     contains
         $:common_bindings('dense')
+        procedure, public, pass(self) :: initialize_rectangular => initialize_rectangular_dense
         procedure, pass(self) :: get_val => get_val_dense
     end type type_matrix_dense
 
     interface
         $:common_iface('dense')
+        !> Initialize a rectangular dense matrix with shape \(m \times n\).
+        !>
+        !> Assumptions: `num_rows` and `num_cols` are non-negative.
+        !> Numerical guarantee: all entries are initialized to zero.
+        !> Computational complexity: \(O(mn)\) memory and arithmetic.
+        !> Failure behavior: allocation failure follows the Fortran runtime behavior.
+        module subroutine initialize_rectangular_dense(self, num_rows, num_cols)
+            implicit none
+            class(type_matrix_dense), intent(inout) :: self
+            integer(int32), intent(in) :: num_rows
+            integer(int32), intent(in) :: num_cols
+        end subroutine initialize_rectangular_dense
+
         !> Returns a pointer to the 2-D value array.
         module function get_val_dense(self) result(val)
             implicit none
@@ -374,7 +388,7 @@ module core_types_algebra_matrix
         module subroutine commit_to_mkl_csr(self, ierr)
             implicit none
             class(type_matrix_csr), intent(inout) :: self
-            integer(int32), intent(out), optional :: ierr
+            integer(int32), intent(inout), optional :: ierr
         end subroutine commit_to_mkl_csr
 
         !> Returns .true. if the MKL handle is committed and ready for SpMV.
@@ -444,7 +458,7 @@ module core_types_algebra_matrix
         module subroutine commit_to_mkl_coo(self, ierr)
             implicit none
             class(type_matrix_coo), intent(inout) :: self
-            integer(int32), intent(out), optional :: ierr
+            integer(int32), intent(inout), optional :: ierr
         end subroutine commit_to_mkl_coo
 
         !> Returns .true. if the MKL handle is committed and ready for SpMV.
@@ -488,6 +502,7 @@ module core_types_algebra_matrix
         procedure, pass(self) :: get_ptr => get_ptr_bsr
         procedure, pass(self) :: get_ind => get_ind_bsr
         procedure, pass(self) :: get_val => get_val_bsr
+        procedure, pass(self), private :: invalidate_mkl_handle => invalidate_mkl_handle_bsr
         procedure, pass(self) :: commit_to_mkl => commit_to_mkl_bsr
         procedure, pass(self) :: is_mkl_handle_ready => is_mkl_handle_ready_bsr
 #ifdef _MKL
@@ -515,6 +530,11 @@ module core_types_algebra_matrix
             real(real64), dimension(:, :, :), pointer :: val
         end function get_val_bsr
 
+        module subroutine invalidate_mkl_handle_bsr(self)
+            implicit none
+            class(type_matrix_bsr), intent(inout) :: self
+        end subroutine invalidate_mkl_handle_bsr
+
         !> Copies the diagonal block for node target_block into diagonal_block(:,:).
         module subroutine get_diagonal_block_bsr(self, target_block, diagonal_block)
             implicit none
@@ -528,7 +548,7 @@ module core_types_algebra_matrix
         module subroutine commit_to_mkl_bsr(self, ierr)
             implicit none
             class(type_matrix_bsr), intent(inout) :: self
-            integer(int32), intent(out), optional :: ierr
+            integer(int32), intent(inout), optional :: ierr
         end subroutine commit_to_mkl_bsr
 
         !> Returns .true. if the MKL handle is committed and ready for SpMV.
@@ -586,7 +606,7 @@ contains
     subroutine commit_to_mkl_base(self, ierr)
         implicit none
         class(abst_matrix), intent(inout) :: self
-        integer(int32), intent(out), optional :: ierr
+        integer(int32), intent(inout), optional :: ierr
 
         self%status = MATRIX_STATUS%NOT_IMPLEMENTED
         if (present(ierr)) ierr = MATRIX_STATUS%NOT_IMPLEMENTED%ID

@@ -39,6 +39,7 @@ module core_types_topology_scatter_map
         procedure, public :: initialize => initialize_scatter_map
         procedure, public :: destroy => destroy_scatter_map
         procedure, public :: get_index => get_index_scatter_map
+        procedure, public :: get_matrix_indices => get_matrix_indices_scatter_map
         procedure, public :: set => set_value_scatter_map
         procedure, private :: get_flat => get_flat_index
     end type type_scatter_map
@@ -92,7 +93,7 @@ contains
         class(type_scatter_map), intent(in) :: self
         integer(int32), intent(in) :: seg
         integer(int32), intent(in) :: idx_local(:)
-        integer(int32), intent(out) :: flat
+        integer(int32), intent(inout) :: flat
 
         integer(int32) :: d
 
@@ -115,13 +116,34 @@ contains
         class(type_scatter_map), intent(in) :: self
         integer(int32), intent(in) :: seg
         integer(int32), intent(in) :: idx_local(:)
-        integer(int32), intent(out) :: index
+        integer(int32), intent(inout) :: index
 
         integer(int32) :: flat
 
         call self%get_flat(seg, idx_local, flat)
         index = self%data(flat)
     end subroutine get_index_scatter_map
+
+    subroutine get_matrix_indices_scatter_map(self, seg, indices)
+        implicit none
+        class(type_scatter_map), intent(in) :: self
+        integer(int32), intent(in) :: seg
+        integer(int32), intent(inout) :: indices(:, :)
+
+        integer(int32) :: i, j, flat
+
+        if (.not. self%ready) stop
+        if (seg < 1 .or. seg > self%n_segment) stop
+        if (self%rank /= 2) stop
+        if (size(indices, 1) /= self%shape(1, seg) .or. size(indices, 2) /= self%shape(2, seg)) stop
+
+        do j = 1, size(indices, 2)
+            do i = 1, size(indices, 1)
+                flat = self%ptr(seg) + (i - 1) * self%stride(1, seg) + (j - 1) * self%stride(2, seg)
+                indices(i, j) = self%data(flat)
+            end do
+        end do
+    end subroutine get_matrix_indices_scatter_map
 
     !> Set matrix storage index.
     subroutine set_value_scatter_map(self, seg, idx_local, value)

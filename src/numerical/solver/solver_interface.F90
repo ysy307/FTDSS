@@ -174,8 +174,11 @@ module numerical_solver_interface
         integer(int32) :: last_error = 0
 #ifdef _MKL
         type(mkl_pardiso_handle) :: pt(64)
+        integer(c_int), allocatable :: analyzed_ia(:)
+        integer(c_int), allocatable :: analyzed_ja(:)
 #endif
         integer(c_int) :: iparm(64) = 0
+        logical :: analysis_ready = .false.
     contains
         procedure :: initialize => initialize_type_solver_pardiso
         procedure :: solve => solve_type_solver_pardiso
@@ -465,4 +468,3 @@ contains
     end subroutine create_solver
 
 end module numerical_solver_interface
-

@@ -156,9 +156,11 @@ contains
         if (allocated(self%clapeyron_frozen_mask)) deallocate (self%clapeyron_frozen_mask)
         if (allocated(self%clapeyron_R_H_raw)) deallocate (self%clapeyron_R_H_raw)
         if (allocated(self%clapeyron_node_volume)) deallocate (self%clapeyron_node_volume)
+        if (allocated(self%clapeyron_dQi_flux)) deallocate (self%clapeyron_dQi_flux)
         allocate (self%clapeyron_frozen_mask(num_nodes), source=.false.)
         allocate (self%clapeyron_R_H_raw(num_nodes), source=0.0d0)
         allocate (self%clapeyron_node_volume(num_nodes), source=0.0d0)
+        allocate (self%clapeyron_dQi_flux(num_nodes), source=0.0d0)
         if (self%enable_clapeyron_pressure_constraint) then
             call compute_clapeyron_node_volume(self)
         end if
@@ -836,6 +838,7 @@ contains
 
         block
             real(real64) :: qw_val, qi_val, qa_val, qv_val
+            real(real64) :: qi_history(8)
             call self%Qw%get_current(node_id, qw_val)
             call self%Qi%get_current(node_id, qi_val)
             call self%Qa%get_current(node_id, qa_val)
@@ -844,6 +847,24 @@ contains
             call state%ice_content%set(qi_val)
             call state%air_content%set(qa_val)
             call state%vapor_content%set(qv_val)
+
+            ! A1 Clapeyron closure: carry the full BDF history of the
+            ! prognostic ice variable into the nodal state. It is the data
+            ! source for the GP interpolation (workspace%lerp_ice), whose
+            ! result the storage-term evaluations substitute for the
+            ! equilibrium ice recomputed at (T_hist, P_hist) - that
+            ! recomputation yields ~0 ice once P is pinned at P_eq(T), which
+            ! removed the ice from the mixed dTheta/dt entirely and produced
+            ! an unphysical mass residual (max|dQi| ~ 0.3/step). Level 1 is
+            ! re-synced to the overridden state ice after the constitutive
+            ! update (override_prognostic_ice_ftcms). Skipped when the flag
+            ! is off: the field stays unset and every consumer keeps the
+            ! equilibrium path (bit-identical behavior).
+            if (self%enable_clapeyron_pressure_constraint) then
+                qi_history = 0.0d0
+                call self%Qi%get_history(node_id, qi_history)
+                call state%ice_content_history%set(qi_history(1:bdf_order + 1))
+            end if
         end block
 
         call state%temperature%get(temperature, temperature_set)
@@ -871,15 +892,20 @@ contains
     !> with the prognostic-plus-in-step-local-phase-change value, at
     !> pressure-constrained nodes only:
     !>
-    !> \[ Q_{i,state} = Q_{i,prog}^n + \frac{\rho_w}{\rho_i}
-    !>    \max\!\left(0,\; \theta_w(\psi_{cryo}(T_n)) - \theta_w(\psi_{cryo}(T))\right) \]
+    !> \[ Q_{i,state} = Q_{i,prog}^n + \Delta Q_{i,flux} + \frac{\rho_w}{\rho_i}
+    !>    \max\!\left(0,\; \theta_w^n - \theta_w(\psi_{cryo}(T))\right) \]
     !>
-    !> where \(Q_{i,prog}^n\) and \(T_n\) are the step-START prognostic ice and
-    !> temperature (the PREVIOUS slots of self%Qi / self%temperature: previous
-    !> is only advanced by shift() after acceptance, hence stable within the
-    !> nonlinear loop, whereas the current slots move every iterate and self%Qi
-    !> current is even rewritten by update_nodal_phases), and \(T\) is the
-    !> latest temperature iterate carried by state.
+    !> where \(Q_{i,prog}^n\) and \(\theta_w^n\) are the step-START prognostic
+    !> ice and ACTUAL liquid content (the PREVIOUS slots of self%Qi / self%Qw:
+    !> previous is only advanced by shift() after acceptance, hence stable
+    !> within the nonlinear loop, whereas the current slots move every iterate
+    !> and self%Qi current is even rewritten by update_nodal_phases),
+    !> \(\Delta Q_{i,flux}\) is the within-step residual-driven accumulator
+    !> (accumulate_prognostic_ice_flux), and \(T\) is the latest temperature
+    !> iterate carried by state. Using the actual \(\theta_w^n\) (instead of
+    !> the cryo-branch value at the step-start temperature) makes the local
+    !> phase change start from the true resident liquid also for nodes that
+    !> enter the constrained set within the step.
     !>
     !> Physical justification: under the Clapeyron constraint the liquid-water
     !> curve is pinned to T (theta_w = theta_w(psi_cryo(T)) because P = P_eq(T)),
@@ -911,7 +937,7 @@ contains
         integer(int32), intent(in) :: material_id
         type(type_state), intent(inout) :: state
 
-        real(real64) :: qi_prog_n, T_n, T_cur
+        real(real64) :: qi_prog_n, T_cur
         real(real64) :: theta_w_n, theta_w_cur, dtheta
         real(real64) :: rho_w, rho_i, qi_state, phi_node
 
@@ -921,20 +947,22 @@ contains
         if (.not. self%clapeyron_frozen_mask(node_id)) return
 
         call self%Qi%get_previous(node_id, qi_prog_n)
-        call self%temperature%get_previous(node_id, T_n)
         call state%temperature%get(T_cur)
 
-        ! theta_w(psi_cryo(T)) is monotone increasing in T on the frozen branch,
-        ! so the max(0, .)-clipped difference can be nonzero only when T dropped
-        ! within the step; skip the two equilibrium probes otherwise.
+        ! In-step local phase change: the liquid that the falling equilibrium
+        ! curve releases within this step freezes in place. The reference is
+        ! the node's ACTUAL step-start liquid content Qw_prev (converged value
+        ! of the previous step), NOT theta_w(psi_cryo(T_n)): for a node that
+        ! entered the constrained set this step (T_n above freezing) the cryo
+        ! branch at T_n degenerates to theta_s and would inject the difference
+        ! theta_s - theta_w(T_cur) ~ 0.2 as instantaneous spurious ice (with
+        ! its latent-heat shock). For a long-constrained node Qw_prev equals
+        ! theta_w(psi_cryo(T_n)) and the two forms agree.
         dtheta = 0.0d0
-        if (T_cur < T_n) then
-            theta_w_n = 0.0d0
-            theta_w_cur = 0.0d0
-            call calc_theta_w_cryo_ftcms(self, material_id, state, T_n, theta_w_n)
-            call calc_theta_w_cryo_ftcms(self, material_id, state, T_cur, theta_w_cur)
-            dtheta = max(0.0d0, theta_w_n - theta_w_cur)
-        end if
+        call self%Qw%get_previous(node_id, theta_w_n)
+        theta_w_cur = 0.0d0
+        call calc_theta_w_cryo_ftcms(self, material_id, state, T_cur, theta_w_cur)
+        dtheta = max(0.0d0, theta_w_n - theta_w_cur)
 
         qi_state = max(qi_prog_n, 0.0d0)
         if (dtheta > 0.0d0) then
@@ -943,12 +971,28 @@ contains
             if (rho_i > tiny(1.0d0)) qi_state = qi_state + (rho_w / rho_i) * dtheta
         end if
 
+        ! Flux-transport part of the prognostic ice, accumulated inside the
+        ! nonlinear loop (accumulate_prognostic_ice_flux). Including it here
+        ! makes the assembled storage/enthalpy see the deposited ice within the
+        ! same step, which is what closes the stiff deposition-impedance
+        ! feedback implicitly (the accumulator stops moving when the
+        ! constrained node's mass residual vanishes).
+        if (allocated(self%clapeyron_dQi_flux)) then
+            qi_state = max(0.0d0, qi_state + self%clapeyron_dQi_flux(node_id))
+        end if
+
         ! Light safety bound (the GP lerp applies the same clip): ice volume
         ! cannot exceed the pore space.
         call state%porosity%get(phi_node)
         if (phi_node > 0.0d0) qi_state = min(qi_state, phi_node)
 
         call state%ice_content%set(qi_state)
+        ! Keep BDF level 1 of the nodal ice history consistent with the
+        ! overridden state ice: the storage-term substitution uses
+        ! ice_content_history(j) per BDF level, and its current level (j = 1)
+        ! must be exactly Qi_state so Theta_1 matches the assembled current
+        ! state (no-op if the history was not filled, i.e. flag off).
+        call state%ice_content_history%set(1, qi_state)
     end subroutine override_prognostic_ice_ftcms
 
     !> Liquid water content on the Clapeyron equilibrium line at temperature
@@ -1656,8 +1700,8 @@ contains
         integer(int32), pointer, contiguous :: connectivity(:)
         logical, allocatable :: processed(:)
         type(type_state) :: probe_state
-        real(real64) :: dt_current, T_node, P_node, phi_node, theta_w, theta_s_cap
-        real(real64) :: rho_w, rho_i, R_raw, dQi, Qi_base, Qi_new, Qi_new_raw, Qi_cap
+        real(real64) :: T_node, P_node, phi_node, theta_w, theta_s_cap
+        real(real64) :: rho_w, rho_i, dQi, Qi_base, Qi_new, Qi_new_raw, Qi_cap
         real(real64) :: Qi_prog_n, T_n, theta_w_n, theta_w_conv, dtheta_local
         integer(int32) :: num_constrained, num_clipped
         real(real64) :: max_abs_dQi, max_P_unconstrained_frozen
@@ -1669,8 +1713,6 @@ contains
 
         call self%domain%get_num_nodes(num_nodes)
         if (size(self%clapeyron_frozen_mask) /= num_nodes) return
-
-        call self%control%get_dt(dt_current)
 
         num_constrained = 0
         num_clipped = 0
@@ -1710,18 +1752,19 @@ contains
                 if (.not. self%clapeyron_frozen_mask(node_id)) cycle
                 num_constrained = num_constrained + 1
 
-                R_raw = self%clapeyron_R_H_raw(node_id)
-
                 call self%thermal%calc_density_water(probe_state, rho_w)
                 call self%thermal%calc_density_ice(probe_state, rho_i)
                 if (rho_i <= tiny(1.0d0)) cycle
 
-                dQi = (rho_w / rho_i) * R_raw * dt_current
-                if (self%clapeyron_node_volume(node_id) > tiny(1.0d0)) then
-                    dQi = dQi / self%clapeyron_node_volume(node_id)
-                else
-                    dQi = 0.0d0
-                end if
+                ! Flux-transport increment: the within-step accumulator advanced
+                ! every nonlinear iteration (accumulate_prognostic_ice_flux). At
+                ! acceptance the constrained node's mass residual has converged
+                ! to ~0, so the accumulated value IS the step's transported ice;
+                ! no additional one-shot residual term is added here (the old
+                ! explicit post-step update was unconditionally unstable: the
+                ! deposition-impedance feedback is stiff on a sub-dt time
+                ! scale).
+                dQi = self%clapeyron_dQi_flux(node_id)
 
                 ! Base of the update: the accepted-iterate state ice
                 !   Qi_base = Qi_prog_n
@@ -1738,16 +1781,16 @@ contains
                 ! while dQi carries the pure flux transport (see the sign
                 ! derivation above). This runs BEFORE shift(), so the previous
                 ! slots of Qi / temperature still hold the step-start snapshot.
+                ! Same closure as override_prognostic_ice: the local phase
+                ! change starts from the node's ACTUAL step-start liquid
+                ! content (Qw previous), so a node that entered the constrained
+                ! set within this step does not receive the spurious
+                ! theta_s - theta_w(T) jump of the degenerate cryo branch.
                 call self%Qi%get_previous(node_id, Qi_prog_n)
-                call self%temperature%get_previous(node_id, T_n)
-                dtheta_local = 0.0d0
-                if (T_node < T_n) then
-                    theta_w_n = 0.0d0
-                    theta_w_conv = 0.0d0
-                    call calc_theta_w_cryo_ftcms(self, material_id, probe_state, T_n, theta_w_n)
-                    call calc_theta_w_cryo_ftcms(self, material_id, probe_state, T_node, theta_w_conv)
-                    dtheta_local = max(0.0d0, theta_w_n - theta_w_conv)
-                end if
+                call self%Qw%get_previous(node_id, theta_w_n)
+                theta_w_conv = 0.0d0
+                call calc_theta_w_cryo_ftcms(self, material_id, probe_state, T_node, theta_w_conv)
+                dtheta_local = max(0.0d0, theta_w_n - theta_w_conv)
                 Qi_base = max(Qi_prog_n, 0.0d0) + (rho_w / rho_i) * dtheta_local
 
                 Qi_new_raw = Qi_base + dQi
@@ -1791,6 +1834,48 @@ contains
         end if
 
     end subroutine apply_prognostic_ice_update_ftcms
+
+    module subroutine accumulate_prognostic_ice_flux_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        ! Reference densities for the increment scaling only. The accumulator
+        ! is a damped fixed-point update whose converged value is defined by
+        ! R_H = 0, so a few-percent error in the (rho_w/rho_i) prefactor acts
+        ! like an inexact preconditioner and does not change the solution.
+        real(real64), parameter :: RHO_RATIO_W_OVER_I = 1.0d3 / 9.17d2
+
+        integer(int32) :: node_id, num_nodes
+        real(real64) :: dt_current, omega, dQi_inc
+
+        if (.not. self%enable_clapeyron_pressure_constraint) return
+        if (self%control%is_staggered()) return
+        if (.not. allocated(self%clapeyron_frozen_mask)) return
+        if (.not. allocated(self%clapeyron_dQi_flux)) return
+
+        call self%domain%get_num_nodes(num_nodes)
+        if (size(self%clapeyron_frozen_mask) /= num_nodes) return
+
+        call self%control%get_dt(dt_current)
+        omega = self%control%get_conserved_relaxation()
+
+        do node_id = 1, num_nodes
+            if (.not. self%clapeyron_frozen_mask(node_id)) cycle
+            if (self%clapeyron_node_volume(node_id) <= tiny(1.0d0)) cycle
+
+            ! Damped fixed-point absorption of the constrained node's mass
+            ! residual into the prognostic ice (sign derivation: see the
+            ! header of apply_prognostic_ice_update). At the fixed point
+            ! R_H -> 0 and the accumulator stops moving: the frozen-node
+            ! continuity equation is solved with Qi as the local unknown,
+            ! which is the implicit coupling the stiff deposition-impedance
+            ! feedback requires.
+            dQi_inc = omega * RHO_RATIO_W_OVER_I * self%clapeyron_R_H_raw(node_id) * &
+                      dt_current / self%clapeyron_node_volume(node_id)
+            self%clapeyron_dQi_flux(node_id) = self%clapeyron_dQi_flux(node_id) + dQi_inc
+        end do
+
+    end subroutine accumulate_prognostic_ice_flux_ftcms
 
     !> Evaluate per-node conserved quantities at the current iterate.
     !>

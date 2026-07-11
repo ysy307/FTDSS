@@ -145,31 +145,29 @@ contains
         ! freezing front needs dQi/dT and dQi/dP immediately after ice appears;
         ! tapering them to zero near Qi=0 removes the latent/apparent capacity and
         ! makes the Picard map jump across the front.
-        block
-            if (ice_content < 0.0d0) then
-                ice_content = 0.0d0
-                dQi_dP = 0.0d0
-                dQi_dT = 0.0d0
-            end if
+        if (ice_content < 0.0d0) then
+            ice_content = 0.0d0
+            dQi_dP = 0.0d0
+            dQi_dT = 0.0d0
+        end if
 
-            if (ice_content > porosity) then
-                ice_content = porosity
-                dQi_dP = 0.0d0
-                dQi_dT = 0.0d0
-            end if
+        if (ice_content > porosity) then
+            ice_content = porosity
+            dQi_dP = 0.0d0
+            dQi_dT = 0.0d0
+        end if
 
-            if (water_content < 0.0d0) then
-                water_content = 0.0d0
-                dQw_dP = 0.0d0
-                dQw_dT = 0.0d0
-            end if
+        if (water_content < 0.0d0) then
+            water_content = 0.0d0
+            dQw_dP = 0.0d0
+            dQw_dT = 0.0d0
+        end if
 
-            if (water_content > porosity - ice_content) then
-                water_content = max(0.0d0, porosity - ice_content)
-                dQw_dP = -1.0d0 * dQi_dP
-                dQw_dT = -1.0d0 * dQi_dT
-            end if
-        end block
+        if (water_content > porosity - ice_content) then
+            water_content = max(0.0d0, porosity - ice_content)
+            dQw_dP = -1.0d0 * dQi_dP
+            dQw_dT = -1.0d0 * dQi_dT
+        end if
 
         air_content = porosity - water_content - ice_content
         if (air_content < 0.0d0) then
@@ -233,8 +231,7 @@ contains
         !    Note: If the model depends on gas-phase volume, the logic for
         !    vapor=0 when air_content=0 should be handled inside evap,
         !    but here we call it independently.
-        call self%evap%calc_vapor_content(state, vapor_content)
-        call self%evap%calc_vapor_content_derivatives(state, dQv_dP, dQv_dT)
+        call self%evap%calc_vapor_content_with_derivatives(state, vapor_content, dQv_dP, dQv_dT)
 
         ! Guard: if air_content is zero, vapor cannot physically exist
         if (air_content <= epsilon(0.0d0)) then

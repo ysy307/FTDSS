@@ -18,6 +18,7 @@ module physics_governing_hydraulic
         logical :: enable_vapor_transport = .true.
         logical :: enable_fringe_subcell_quadrature = .true.
         logical :: enable_fringe_K_averaging = .false.
+        real(real64), allocatable :: iteration_capacity_bound(:)
         type(type_constitutive_manager) :: physics
     contains
         procedure, pass(self), public :: initialize => initialize_type_hydraulic
@@ -298,5 +299,7 @@ contains
     module subroutine destroy_type_hydraulic(self)
         implicit none
         class(type_hydraulic), intent(inout) :: self
+
+        if (allocated(self%iteration_capacity_bound)) deallocate (self%iteration_capacity_bound)
     end subroutine destroy_type_hydraulic
 end module physics_governing_hydraulic

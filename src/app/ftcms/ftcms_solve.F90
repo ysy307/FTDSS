@@ -18,6 +18,12 @@ contains
         self%aa_has_prev = .false.
         self%aa_gnorm_prev = -1.0d0
 
+        ! Prognostic-ice flux accumulator restarts from zero on every time-step
+        ! attempt (including dt-retry: Qi current is restored from previous
+        ! below, so the rejected attempt's partially accumulated ice is fully
+        ! discarded with it).
+        if (allocated(self%clapeyron_dQi_flux)) self%clapeyron_dQi_flux(:) = 0.0d0
+
         ! [Important] Compute solver must always be PICARD or NEWTON if not NONE.
         ! Even for linear config (where iter=1 is forced), Picard discretization 
         ! is often the base, but if explicitly NONE, we should respect it.
@@ -470,6 +476,13 @@ contains
                 ! Update solution with relaxation (adaptive omega for conserved mode,
                 ! Aitken for legacy Picard, damped for Newton).
                 call self%reflect_variables()
+
+                ! A1 closure: absorb the constrained nodes' mass residual into
+                ! the prognostic ice with the same omega damping, BEFORE the
+                ! conserved check so the acceptance sees the deposited ice in
+                ! the density norm (no-op unless the Clapeyron constraint is
+                ! enabled).
+                call self%accumulate_prognostic_ice_flux()
 
                 ! Conserved-quantity convergence (PDF 6.2.4) on the updated state.
                 if (self%control%is_conserved()) call self%solve_time_step_check_convergence_conserved()

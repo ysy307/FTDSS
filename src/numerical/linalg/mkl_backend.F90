@@ -48,17 +48,16 @@ contains
         !> The computed 1-norm, \( \sum |x_i| \).
         real(real64) :: norm_value
 
+        real(real64) :: local_norm
 #ifdef _MPI
-        integer(int32) :: nprocs
-        call MPI_Comm_size(MPI_COMM_WORLD, nprocs)
+        integer(int32) :: ierr
+#endif
 
-        if (nprocs == 1) then
-            norm_value = dasum(int(size(x), int32), x, 1)
-        else
-            norm_value = pdasum(int(size(x), int32), x, 1)
-        end if
+        local_norm = dasum(int(size(x), int32), x, 1)
+#ifdef _MPI
+        call MPI_Allreduce(local_norm, norm_value, 1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, ierr)
 #else
-        norm_value = dasum(int(size(x), int32), x, 1)
+        norm_value = local_norm
 #endif
     end function norm_1_mkl
 
@@ -74,24 +73,34 @@ contains
 
         logical :: halt_overflow
 
+        real(real64) :: local_scale, global_scale, local_sum, global_sum
 #ifdef _MPI
-        integer(int32) :: nprocs
-
-        call ieee_get_halting_mode(ieee_overflow, halt_overflow)
-        call ieee_set_halting_mode(ieee_overflow, .false.)
-
-        call MPI_Comm_size(MPI_COMM_WORLD, nprocs)
-        if (nprocs == 1) then
-            norm_value = dnrm2(int(size(x), int32), x, 1)
-        else
-            norm_value = pdnrm2(int(size(x), int32), x, 1)
-        end if
-#else
-        call ieee_get_halting_mode(ieee_overflow, halt_overflow)
-        call ieee_set_halting_mode(ieee_overflow, .false.)
-
-        norm_value = dnrm2(int(size(x), int32), x, 1)
+        integer(int32) :: ierr
 #endif
+
+        call ieee_get_halting_mode(ieee_overflow, halt_overflow)
+        call ieee_set_halting_mode(ieee_overflow, .false.)
+        if (size(x) > 0) then
+            local_scale = maxval(abs(x))
+        else
+            local_scale = 0.0d0
+        end if
+#ifdef _MPI
+        call MPI_Allreduce(local_scale, global_scale, 1, MPI_REAL8, MPI_MAX, MPI_COMM_WORLD, ierr)
+#else
+        global_scale = local_scale
+#endif
+        if (global_scale > 0.0d0) then
+            local_sum = sum((x / global_scale)**2)
+        else
+            local_sum = 0.0d0
+        end if
+#ifdef _MPI
+        call MPI_Allreduce(local_sum, global_sum, 1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, ierr)
+#else
+        global_sum = local_sum
+#endif
+        norm_value = global_scale * sqrt(global_sum)
         if (.not. ieee_is_finite(norm_value)) then
             norm_value = huge(1.0d0)
         end if
@@ -138,12 +147,11 @@ contains
         !> The computed dot product, \( \sum x_i y_i \).
         real(real64) :: product
 
-    real(real64) :: local_prod
-    logical :: halt_overflow, halt_invalid
+        real(real64) :: local_prod
+        logical :: halt_overflow, halt_invalid
 #ifdef _MPI
-    real(real64) :: global_prod
-    integer(int32) :: ierr
-    integer(int32) :: nprocs
+        real(real64) :: global_prod
+        integer(int32) :: ierr
 #endif
 
     ! Temporarily disable FPE halting for the dot product computation.
@@ -154,26 +162,17 @@ contains
     call ieee_set_halting_mode(ieee_overflow, .false.)
     call ieee_set_halting_mode(ieee_invalid, .false.)
 
-    if (is_contiguous(x) .and. is_contiguous(y)) then
-#ifdef _MPI
-        call MPI_Comm_size(MPI_COMM_WORLD, nprocs)
-        if (nprocs == 1) then
-        product = ddot(int(size(x), int32), x, 1, y, 1)
+        if (is_contiguous(x) .and. is_contiguous(y)) then
+            local_prod = ddot(int(size(x), int32), x, 1, y, 1)
         else
-        product = pddot(int(size(x), int32), x, 1, y, 1)
+            local_prod = sum(x * y)
         end if
-#else
-        product = ddot(int(size(x), int32), x, 1, y, 1)
-#endif
-    else
-        local_prod = sum(x * y)
 #ifdef _MPI
         call MPI_Allreduce(local_prod, global_prod, 1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, ierr)
         product = global_prod
 #else
         product = local_prod
 #endif
-    end if
 
     ! Clamp non-finite results to a large finite value preserving sign
     if (ieee_is_nan(product)) then

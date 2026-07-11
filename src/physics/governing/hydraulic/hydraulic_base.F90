@@ -60,6 +60,15 @@ contains
                                      configs_hcf=hcf_model_info, &
                                      configs_gcc=gcc_model_info)
 
+        if (allocated(self%iteration_capacity_bound)) deallocate (self%iteration_capacity_bound)
+        if (num_active_materials > 0) then
+            allocate (self%iteration_capacity_bound(maxval(active_region_ids)), source=0.0d0)
+            do i = 1, num_active_materials
+                call self%physics%calc_lscheme_capacity(active_region_ids(i), &
+                                                        self%iteration_capacity_bound(active_region_ids(i)))
+            end do
+        end if
+
         self%computation_type = input%basic%simulation_settings%calculate_type
         self%computation_dimension = input%basic%simulation_settings%calculate_dimension
         self%enable_vapor_transport = input%basic%analysis_controls%enable_vapor_transport

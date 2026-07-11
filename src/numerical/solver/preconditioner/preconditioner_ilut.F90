@@ -42,11 +42,9 @@ contains
 
         select type (A)
         type is (type_matrix_bsr)
-            if (self%is_block) then
-                call self%setup_bsr(A)
-            else
-                self%status = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-            end if
+            self%block_size = info%num_block_rows
+            self%is_block = .true.
+            call self%setup_bsr(A)
         class default
             self%status = SOLVER_STATUS%NOT_IMPLEMENTED%ID
         end select

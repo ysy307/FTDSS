@@ -186,7 +186,7 @@ contains
     subroutine get_size_jacobian_matrix(self, size)
         implicit none
         class(type_jacobian_matrix), intent(in) :: self
-        integer(int32), intent(out) :: size
+        integer(int32), intent(inout) :: size
 
         size = self%size
     end subroutine get_size_jacobian_matrix
@@ -194,7 +194,7 @@ contains
     subroutine get_num_dofs_per_node(self, num_dofs)
         implicit none
         class(type_jacobian_matrix), intent(in) :: self
-        integer(int32), intent(out) :: num_dofs
+        integer(int32), intent(inout) :: num_dofs
 
         num_dofs = self%num_dofs_per_node
     end subroutine get_num_dofs_per_node
@@ -337,7 +337,7 @@ contains
         integer(int32), intent(in) :: n_local
         type(type_matrix_dense), intent(in) :: local_data
 
-        integer(int32) :: i, j, row_blk, col_blk
+        integer(int32) :: row_blk, col_blk
         integer(int32) :: indices(n_local, n_local)
         real(real64), pointer, dimension(:, :) :: dense_val
         class(abst_matrix), pointer :: mat
@@ -348,11 +348,7 @@ contains
 
         ! Build global BSR block index array from scatter_map (O(1) per entry).
         ! indices is an automatic (stack) array — no per-element heap allocation.
-        do j = 1, n_local
-            do i = 1, n_local
-                call self%scatter_map%get_index(element_id, [i, j], indices(i, j))
-            end do
-        end do
+        call self%scatter_map%get_matrix_indices(element_id, indices)
 
         ! The dense block is already laid out via indices, so the DOF offsets
         ! are always (1, 1) regardless of coupling mode; only the target matrix

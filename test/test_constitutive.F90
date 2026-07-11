@@ -1,9 +1,10 @@
 module test_constitutive_suite
-    use, intrinsic :: iso_fortran_env, only: error_unit, int32, output_unit, real64
+    use, intrinsic :: iso_fortran_env, only: error_unit, int32, int64, output_unit, real64
     use :: iapws, only: type_iapws06, type_iapws97
     use :: module_core, only: HCF_MODES, PHYSICS_UNITS, SWCC_MODELS, type_config_hcf, type_config_wrf, type_state
     use :: module_input, only: input_translator, type_input
     use :: models_hcf, only: holder_hcfs
+    use :: models_phase_change_vaporization, only: type_evaporation
     use :: models_wrf, only: holder_wrfs
     use :: numerical_special_functions_mkl, only: type_mkl_regularized_incomplete_beta
     implicit none
@@ -20,6 +21,10 @@ module test_constitutive_suite
         procedure, private :: test_pressure_capacity_units
         procedure, private :: test_special_functions
         procedure, private :: test_hcf_vg_dispatch
+        procedure, private :: test_incomplete_beta_thread_safety
+        procedure, private :: test_vapor_combined_evaluation
+        procedure, private :: benchmark_hot_paths
+        procedure, private :: report_benchmark
         procedure, private :: configure_wrf
         procedure, private :: check_close
         procedure, private :: check_true
@@ -36,6 +41,9 @@ contains
         call self%test_pressure_capacity_units()
         call self%test_special_functions()
         call self%test_hcf_vg_dispatch()
+        call self%test_incomplete_beta_thread_safety()
+        call self%test_vapor_combined_evaluation()
+        call self%benchmark_hot_paths()
 
         if (self%failures > 0) then
             write (error_unit, '(A,I0)') "FAILED test_constitutive checks: ", self%failures
@@ -247,6 +255,266 @@ contains
         call self%check_true("HCF VG incomplete beta converged through bound model", converged)
         call self%check_close("HCF VG polymorphic calc_Kflh dispatch", conductivity, expected_conductivity, 2.0d-14)
     end subroutine test_hcf_vg_dispatch
+
+    subroutine test_incomplete_beta_thread_safety(self)
+        implicit none
+        class(type_constitutive_test_suite), intent(inout) :: self
+
+        integer(int32), parameter :: num_evaluations = 100000
+        type(type_mkl_regularized_incomplete_beta) :: incomplete_beta
+        real(real64), allocatable :: serial_values(:), parallel_values(:)
+        integer(int32) :: i
+        real(real64) :: x, value
+        logical :: converged
+
+        allocate (serial_values(num_evaluations), parallel_values(num_evaluations))
+        call incomplete_beta%initialize(0.2d0 + 1.0d0 / 1.48d0, 1.0d0 - 1.0d0 / 1.48d0)
+
+        do i = 1, num_evaluations
+            x = 0.01d0 + 0.98d0 * real(mod(i, 997), real64) / 996.0d0
+            value = 0.0d0
+            converged = .false.
+            call incomplete_beta%evaluate(x, value, converged)
+            serial_values(i) = value
+        end do
+
+        !$omp parallel do default(none) shared(incomplete_beta, parallel_values) &
+        !$omp private(x, value, converged) schedule(static)
+        do i = 1, num_evaluations
+            x = 0.01d0 + 0.98d0 * real(mod(i, 997), real64) / 996.0d0
+            value = 0.0d0
+            converged = .false.
+            call incomplete_beta%evaluate(x, value, converged)
+            parallel_values(i) = value
+        end do
+        !$omp end parallel do
+
+        call self%check_true("shared incomplete beta evaluator is thread-safe", &
+                             all(serial_values == parallel_values))
+    end subroutine test_incomplete_beta_thread_safety
+
+    subroutine test_vapor_combined_evaluation(self)
+        implicit none
+        class(type_constitutive_test_suite), intent(inout) :: self
+
+        type(type_evaporation) :: evaporation
+        type(type_iapws97), target :: water
+        type(type_state) :: state
+        real(real64) :: rh
+        real(real64) :: vapor_separate, dP_separate, dT_separate
+        real(real64) :: vapor_combined, dP_combined, dT_combined
+
+        call water%initialize()
+        call evaporation%initialize(water)
+        call state%temperature%set(-1.0d0)
+        call state%pressure%set(-10000.0d0)
+        call state%air_content%set(0.2d0)
+        call state%dQa_dP%set(-1.0d-7)
+        call state%dQa_dT%set(1.0d-3)
+        call evaporation%calc_relative_humidity(state, rh)
+        call state%relative_humidity%set(rh)
+
+        call evaporation%calc_vapor_content(state, vapor_separate)
+        call evaporation%calc_vapor_content_derivatives(state, dP_separate, dT_separate)
+        call evaporation%calc_vapor_content_with_derivatives(state, vapor_combined, dP_combined, dT_combined)
+
+        call self%check_close("combined vapor content", vapor_combined, vapor_separate, 2.0d-14)
+        call self%check_close("combined vapor pressure derivative", dP_combined, dP_separate, 2.0d-14)
+        call self%check_close("combined vapor temperature derivative", dT_combined, dT_separate, 2.0d-14)
+    end subroutine test_vapor_combined_evaluation
+
+    subroutine benchmark_hot_paths(self)
+        implicit none
+        class(type_constitutive_test_suite), intent(inout) :: self
+
+        integer(int32), parameter :: beta_evaluations = 2000000
+        integer(int32), parameter :: hcf_evaluations = 1000000
+        integer(int32), parameter :: capacity_gets = 10000000
+        integer(int32), parameter :: capacity_scans = 100000
+        integer(int32), parameter :: wrf_initializations = 2000
+        integer(int32), parameter :: vapor_evaluations = 20000
+        real(real64), parameter :: rho_g = 1000.0d0 * 9.80665d0
+        type(type_mkl_regularized_incomplete_beta) :: incomplete_beta
+        type(type_config_wrf) :: wrf_config
+        type(type_config_hcf) :: hcf_config
+        type(holder_wrfs) :: wrf
+        type(holder_hcfs) :: hcf_beta, hcf_closed
+        type(type_state) :: state
+        type(type_iapws97), target :: water
+        type(type_iapws06), target :: ice
+        type(type_evaporation) :: evaporation
+        integer(int64) :: clock_start, clock_end, clock_rate
+        integer(int32) :: i, j
+        real(real64) :: value, x, pressure, checksum, elapsed_seconds
+        real(real64) :: h_abs_min, h_abs_max, h_abs, fraction
+        real(real64) :: derivative, maximum_derivative, x_peak
+        real(real64) :: rh, dvapor_dP, dvapor_dT
+        logical :: converged
+
+        call system_clock(count_rate=clock_rate)
+        call water%initialize()
+
+        call incomplete_beta%initialize(0.2d0 + 1.0d0 / 1.48d0, 1.0d0 - 1.0d0 / 1.48d0)
+        checksum = 0.0d0
+        call system_clock(clock_start)
+        do i = 1, beta_evaluations
+            x = 0.01d0 + 0.98d0 * real(mod(i, 997), real64) / 996.0d0
+            value = 0.0d0
+            converged = .false.
+            call incomplete_beta%evaluate(x, value, converged)
+            if (converged) checksum = checksum + value
+        end do
+        call system_clock(clock_end)
+        elapsed_seconds = real(clock_end - clock_start, real64) / real(clock_rate, real64)
+        call self%report_benchmark("incomplete beta evaluate", elapsed_seconds, beta_evaluations, checksum)
+
+        call self%configure_wrf(wrf_config, SWCC_MODELS%VG%ID)
+        call wrf%initialize(wrf_config)
+        checksum = 0.0d0
+        call system_clock(clock_start)
+        do i = 1, capacity_gets
+            value = 0.0d0
+            call wrf%p%calc_lscheme_capacity(value)
+            checksum = checksum + value
+        end do
+        call system_clock(clock_end)
+        elapsed_seconds = real(clock_end - clock_start, real64) / real(clock_rate, real64)
+        call self%report_benchmark("cached capacity get", elapsed_seconds, capacity_gets, checksum)
+
+        h_abs_min = min(abs(wrf_config%h_crit), 1.0d0 / wrf_config%alpha1, 1.0d0 / wrf_config%alpha2) * 1.0d-4
+        h_abs_max = max(abs(wrf_config%h_crit), 1.0d0 / wrf_config%alpha1, 1.0d0 / wrf_config%alpha2) * 1.0d4
+        checksum = 0.0d0
+        call system_clock(clock_start)
+        do i = 1, capacity_scans
+            maximum_derivative = 0.0d0
+            do j = 0, 96
+                fraction = real(j, real64) / 96.0d0
+                h_abs = exp(log(h_abs_min) + fraction * (log(h_abs_max) - log(h_abs_min)))
+                derivative = 0.0d0
+                call wrf%p%deriv(-h_abs, derivative)
+                maximum_derivative = max(maximum_derivative, derivative)
+            end do
+            x_peak = ((wrf_config%n1 - 1.0d0) / &
+                      (wrf_config%m1 * wrf_config%n1 + 1.0d0))**(1.0d0 / wrf_config%n1)
+            derivative = 0.0d0
+            call wrf%p%deriv(-x_peak / wrf_config%alpha1, derivative)
+            maximum_derivative = max(maximum_derivative, derivative)
+            x_peak = ((wrf_config%n2 - 1.0d0) / &
+                      (wrf_config%m2 * wrf_config%n2 + 1.0d0))**(1.0d0 / wrf_config%n2)
+            derivative = 0.0d0
+            call wrf%p%deriv(-x_peak / wrf_config%alpha2, derivative)
+            maximum_derivative = max(maximum_derivative, derivative)
+            derivative = 0.0d0
+            call wrf%p%deriv(wrf_config%h_crit * (1.0d0 + 1.0d-8), derivative)
+            maximum_derivative = max(maximum_derivative, derivative)
+            checksum = checksum + maximum_derivative / rho_g
+        end do
+        call system_clock(clock_end)
+        elapsed_seconds = real(clock_end - clock_start, real64) / real(clock_rate, real64)
+        call self%report_benchmark("legacy-equivalent capacity scan", elapsed_seconds, capacity_scans, checksum)
+
+        checksum = 0.0d0
+        call system_clock(clock_start)
+        do i = 1, wrf_initializations
+            call wrf%initialize(wrf_config)
+            value = 0.0d0
+            call wrf%p%calc_lscheme_capacity(value)
+            checksum = checksum + value
+        end do
+        call system_clock(clock_end)
+        elapsed_seconds = real(clock_end - clock_start, real64) / real(clock_rate, real64)
+        call self%report_benchmark("WRF initialize and capacity scan", elapsed_seconds, wrf_initializations, checksum)
+
+        call evaporation%initialize(water)
+        call state%temperature%set(-1.0d0)
+        call state%pressure%set(-10000.0d0)
+        call state%air_content%set(0.2d0)
+        call state%dQa_dP%set(-1.0d-7)
+        call state%dQa_dT%set(1.0d-3)
+        call evaporation%calc_relative_humidity(state, rh)
+        call state%relative_humidity%set(rh)
+
+        checksum = 0.0d0
+        call system_clock(clock_start)
+        do i = 1, vapor_evaluations
+            value = 0.0d0
+            dvapor_dP = 0.0d0
+            dvapor_dT = 0.0d0
+            call evaporation%calc_vapor_content(state, value)
+            call evaporation%calc_vapor_content_derivatives(state, dvapor_dP, dvapor_dT)
+            checksum = checksum + value + dvapor_dP + dvapor_dT
+        end do
+        call system_clock(clock_end)
+        elapsed_seconds = real(clock_end - clock_start, real64) / real(clock_rate, real64)
+        call self%report_benchmark("separate vapor value and derivatives", elapsed_seconds, vapor_evaluations, checksum)
+
+        checksum = 0.0d0
+        call system_clock(clock_start)
+        do i = 1, vapor_evaluations
+            value = 0.0d0
+            dvapor_dP = 0.0d0
+            dvapor_dT = 0.0d0
+            call evaporation%calc_vapor_content_with_derivatives(state, value, dvapor_dP, dvapor_dT)
+            checksum = checksum + value + dvapor_dP + dvapor_dT
+        end do
+        call system_clock(clock_end)
+        elapsed_seconds = real(clock_end - clock_start, real64) / real(clock_rate, real64)
+        call self%report_benchmark("combined vapor value and derivatives", elapsed_seconds, vapor_evaluations, checksum)
+
+        call hcf_config%reset()
+        hcf_config%model = HCF_MODES%BASE
+        hcf_config%swcc_model = SWCC_MODELS%VG
+        hcf_config%k_sat = 1.0d0
+        hcf_config%l = 0.5d0
+        hcf_config%alpha1 = 2.0d0
+        hcf_config%n1 = 1.48d0
+        hcf_config%m1 = 0.2d0
+        call hcf_beta%initialize(hcf_config, water, ice)
+
+        hcf_config%n1 = 2.0d0
+        hcf_config%m1 = 0.5d0
+        call hcf_closed%initialize(hcf_config, water, ice)
+
+        pressure = -rho_g
+        call state%pressure%set(pressure)
+        checksum = 0.0d0
+        call system_clock(clock_start)
+        do i = 1, hcf_evaluations
+            value = 0.0d0
+            call hcf_closed%p%calc_Kflh(state, value)
+            checksum = checksum + value
+        end do
+        call system_clock(clock_end)
+        elapsed_seconds = real(clock_end - clock_start, real64) / real(clock_rate, real64)
+        call self%report_benchmark("HCF VG closed form", elapsed_seconds, hcf_evaluations, checksum)
+
+        checksum = 0.0d0
+        call system_clock(clock_start)
+        do i = 1, hcf_evaluations
+            value = 0.0d0
+            call hcf_beta%p%calc_Kflh(state, value)
+            checksum = checksum + value
+        end do
+        call system_clock(clock_end)
+        elapsed_seconds = real(clock_end - clock_start, real64) / real(clock_rate, real64)
+        call self%report_benchmark("HCF VG incomplete beta", elapsed_seconds, hcf_evaluations, checksum)
+    end subroutine benchmark_hot_paths
+
+    subroutine report_benchmark(self, name, elapsed_seconds, evaluations, checksum)
+        implicit none
+        class(type_constitutive_test_suite), intent(in) :: self
+        character(len=*), intent(in) :: name
+        real(real64), intent(in) :: elapsed_seconds
+        integer(int32), intent(in) :: evaluations
+        real(real64), intent(in) :: checksum
+
+        real(real64) :: nanoseconds_per_evaluation
+
+        nanoseconds_per_evaluation = elapsed_seconds * 1.0d9 / real(evaluations, real64)
+        write (output_unit, '(A,A,A,F10.6,A,F12.3,A,ES16.8)') &
+            "BENCH: ", trim(name), " total[s]=", elapsed_seconds, &
+            " ns/eval=", nanoseconds_per_evaluation, " checksum=", checksum
+    end subroutine report_benchmark
 
     subroutine configure_wrf(self, config, model_id)
         implicit none

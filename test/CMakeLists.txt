@@ -118,6 +118,21 @@ add_solver_test(constitutive
         SOLVER::CONSTITUTIVE
 )
 
+add_solver_test(numerical
+    LIBS
+        SOLVER::CORE
+        SOLVER::LINALG
+        SOLVER::NUMERICAL_MATH
+        SOLVER::SOLVER
+)
+
+if(ENABLE_MPI AND MPI_Fortran_FOUND)
+    add_test(NAME test_numerical_mpi_2
+        COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} 2 $<TARGET_FILE:test_numerical>)
+    add_test(NAME test_numerical_mpi_4
+        COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} 4 $<TARGET_FILE:test_numerical>)
+endif()
+
 # test_main requires all solver libraries
 add_solver_test(main
     LIBS

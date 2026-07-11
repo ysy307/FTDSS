@@ -12,6 +12,7 @@ contains
         type(type_assemble_workspace) :: workspace
 
         real(real64), allocatable :: elem_coords(:, :)
+        real(real64), allocatable :: raw_elem_coords(:, :)
 
         integer(int32) :: i_color, i_elem, elem_id
         integer(int32), pointer, contiguous, dimension(:) :: p_connectivity
@@ -51,7 +52,7 @@ contains
         !$OMP        thermal_dof, hydraulic_dof, use_scatter, do_thermal, do_hydraulic) &
         !$OMP PRIVATE(i_color, i_elem, elem_id, p_connectivity, workspace, &
         !$OMP         local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
-        !$OMP         local_F_T, local_F_H, elem_coords, num_nodes_local, &
+        !$OMP         local_F_T, local_F_H, elem_coords, raw_elem_coords, num_nodes_local, &
         !$OMP         do_thermal_elem, do_hydraulic_elem)
 
         do i_color = 1, num_colors
@@ -70,7 +71,8 @@ contains
                                                   local_K_TT=local_K_TT, local_K_TH=local_K_TH, &
                                                   local_K_HH=local_K_HH, local_K_HT=local_K_HT, &
                                                   local_F_T=local_F_T, local_F_H=local_F_H, &
-                                                  coordinates=elem_coords, connectivity=p_connectivity)
+                                                  coordinates=elem_coords, raw_coordinates=raw_elem_coords, &
+                                                  connectivity=p_connectivity)
 
                     do_thermal_elem = self%control%is_target(PHYSICS_TYPES%THERMAL, workspace%material_id)
                     do_hydraulic_elem = self%control%is_target(PHYSICS_TYPES%HYDRAULIC, workspace%material_id)
@@ -87,7 +89,8 @@ contains
                     end if
 
                     if (do_hydraulic_elem) then
-                        call self%K%add(PHYSICS_TYPES%HYDRAULIC%ID, PHYSICS_TYPES%HYDRAULIC%ID, elem_id, num_nodes_local, local_K_HH)
+                        call self%K%add(PHYSICS_TYPES%HYDRAULIC%ID, PHYSICS_TYPES%HYDRAULIC%ID, &
+                                        elem_id, num_nodes_local, local_K_HH)
                         call self%F%add(PHYSICS_TYPES%HYDRAULIC%ID, p_connectivity, local_F_H)
                     end if
 
@@ -109,6 +112,7 @@ contains
         call self%assemble_destroy(workspace, local_K_TT, local_K_TH, &
                                    local_K_HH, local_K_HT, local_F_T, local_F_H)
         if (allocated(elem_coords)) deallocate (elem_coords)
+        if (allocated(raw_elem_coords)) deallocate (raw_elem_coords)
 
         !$OMP END PARALLEL
 
@@ -118,7 +122,7 @@ contains
 
     module subroutine assemble_initialize_ftcms(self, element_id, workspace, local_K_TT, local_K_TH, &
                                                 local_K_HH, local_K_HT, local_F_T, local_F_H, &
-                                                coordinates, connectivity)
+                                                coordinates, raw_coordinates, connectivity)
         implicit none
 
         class(type_ftcms), intent(inout) :: self
@@ -127,6 +131,7 @@ contains
         type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
         type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
         real(real64), allocatable, intent(inout) :: coordinates(:, :)
+        real(real64), allocatable, intent(inout) :: raw_coordinates(:, :)
         integer(int32), pointer, contiguous, intent(inout), optional :: connectivity(:)
 
         class(abst_fe), pointer :: fe
@@ -144,7 +149,7 @@ contains
         call self%domain%get_fe_connectivity(element_id, connectivity_local)
         call self%domain%get_computation_type(computation_type)
 
-        call self%domain%get_fe_coordinate(element_id, coordinates)
+        call self%domain%get_fe_coordinate(element_id, coordinates, raw_coordinates=raw_coordinates)
 
         call workspace%initialize(fe, material_id, element_id, computation_type%ID, coordinates, self%control)
 

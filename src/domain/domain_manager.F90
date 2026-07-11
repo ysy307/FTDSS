@@ -288,16 +288,20 @@ contains
         end select
     end subroutine get_node_adjacency_domain
 
-    subroutine get_fe_coordinate_domain(self, element_id, coordinates)
+    subroutine get_fe_coordinate_domain(self, element_id, coordinates, raw_coordinates)
         implicit none
         class(type_domain), intent(in), target :: self
         integer(int32), intent(in) :: element_id
         real(real64), intent(inout), allocatable :: coordinates(:, :)
+        real(real64), intent(inout), optional, allocatable, target :: raw_coordinates(:, :)
 
         integer(int32), pointer, contiguous :: connectivity(:)
         integer(int32) :: num_nodes, n_dim, comp_dim
-        real(real64), allocatable :: raw_coords(:, :)
+        real(real64), allocatable, target :: local_raw_coordinates(:, :)
+        real(real64), pointer :: raw_coords(:, :)
         logical :: need_reallocate
+
+        nullify (raw_coords)
 
         call self%get_fe_connectivity(element_id, connectivity)
 
@@ -310,8 +314,22 @@ contains
         comp_dim = self%computation_dimension
 
         ! Read full coordinates from node storage
-        if (allocated(raw_coords)) deallocate (raw_coords)
-        allocate (raw_coords(n_dim, num_nodes))
+        if (present(raw_coordinates)) then
+            need_reallocate = .true.
+            if (allocated(raw_coordinates)) then
+                if (size(raw_coordinates, 1) == n_dim .and. size(raw_coordinates, 2) == num_nodes) then
+                    need_reallocate = .false.
+                end if
+            end if
+            if (need_reallocate) then
+                if (allocated(raw_coordinates)) deallocate (raw_coordinates)
+                allocate (raw_coordinates(n_dim, num_nodes))
+            end if
+            raw_coords => raw_coordinates
+        else
+            allocate (local_raw_coordinates(n_dim, num_nodes))
+            raw_coords => local_raw_coordinates
+        end if
         call self%nodes%get_coordinate(connectivity, raw_coords)
 
         ! Remap to computation coordinate system
@@ -342,7 +360,7 @@ contains
             coordinates = raw_coords(1:comp_dim, :)
         end select
 
-        deallocate (raw_coords)
+        nullify (raw_coords)
 
     end subroutine get_fe_coordinate_domain
 

@@ -156,7 +156,6 @@ contains
         stagnant_count = 0
         no_progress_count = 0
         call self%residual_history%set(MATRIX_OPS%INS, 1, resid)
-        write (*, '(A,ES12.4,A,ES12.4)') '   [BiCG-H] resid0=', resid, ', tol=', self%tolerance
         if (resid < self%tolerance) then
             self%current_iteration = 0
             self%status = SOLVER_STATUS%SUCCESS%ID

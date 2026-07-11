@@ -80,7 +80,7 @@ contains
     module subroutine commit_to_mkl_csr(self, ierr)
         implicit none
         class(type_matrix_csr), intent(inout) :: self
-        integer(int32), intent(out), optional :: ierr
+        integer(int32), intent(inout), optional :: ierr
 #ifdef _MKL
         integer(int32) :: info
 
