@@ -201,7 +201,7 @@ contains
         type(type_state) :: probe_state
         real(real64) :: T_node, P_node, qi_node, psi_cryo, psi_cap, P_eq
         real(real64) :: diag_val
-        integer(int32) :: num_dofs_per_node, dof_idx
+        integer(int32) :: num_dofs_per_node, dof_idx, iter_now
         real(real64), pointer, dimension(:) :: F_raw
         logical :: is_frozen
 
@@ -215,6 +215,7 @@ contains
         if (size(self%clapeyron_frozen_mask) /= num_nodes) return
 
         call self%domain%get_num_dof_per_node(num_dofs_per_node)
+        call self%control%get_nonlinear_iter(iter_now)
         nullify (F_raw)
         F_raw => self%F%get_data()
 
@@ -240,13 +241,26 @@ contains
                 call self%hydraulic%calc_cryo_suction(material_id, probe_state, psi_cryo)
                 psi_cap = max(0.0d0, -P_node)
 
-                ! Active-set classification (see design memo): a node is frozen
-                ! (pressure-constrained) when the cryogenic suction exceeds the
-                ! capillary suction, or it already carries prognostic ice; it is
-                ! released as soon as both conditions fail (De Morgan's law of the
-                ! activation OR, so no separate hysteresis state is needed).
-                is_frozen = (psi_cryo > psi_cap) .or. (qi_node > 0.0d0)
-                self%clapeyron_frozen_mask(node_id) = is_frozen
+                ! Active-set classification, FROZEN WITHIN each time-step
+                ! attempt: the set is (re)classified only on the first
+                ! nonlinear iteration, from the step-start state. Re-evaluating
+                ! it from the latest iterate makes marginal nodes near T_high
+                ! chatter between constrained and free, which swaps the
+                ! equation structure (mass-balance row <-> identity row)
+                ! between iterations and destroys the continuity of the Picard
+                ! fixed-point map (observed as onset divergence). Freezing the
+                ! set lags its update by one attempt, an O(dt) consistent
+                ! discretization that the dt-retry mechanism refines
+                ! automatically. The constraint VALUE P_eq(T) still tracks the
+                ! latest temperature iterate below - only the set membership is
+                ! frozen. A node is frozen when the cryogenic suction exceeds
+                ! the capillary suction, or it already carries prognostic ice.
+                if (iter_now <= 1) then
+                    is_frozen = (psi_cryo > psi_cap) .or. (qi_node > 0.0d0)
+                    self%clapeyron_frozen_mask(node_id) = is_frozen
+                else
+                    is_frozen = self%clapeyron_frozen_mask(node_id)
+                end if
 
                 if (.not. is_frozen) cycle
 
@@ -275,6 +289,30 @@ contains
         end do
 
         nullify (F_raw)
+
+        ! Within-iteration instrumentation: the acceptance-time [CLAPEYRON]
+        ! line only reports the mask of accepted steps, which hides transient
+        ! activations inside failing attempts. Report small active sets here
+        ! (bounded output: onset only, where the set is still tiny).
+        block
+            integer(int32) :: n_frozen, iter_now, first_node
+            real(real64) :: t_first, p_first
+            n_frozen = count(self%clapeyron_frozen_mask)
+            if (n_frozen > 0 .and. n_frozen <= 50 .and. iter_now <= 1) then
+                first_node = 0
+                do node_id = 1, num_nodes
+                    if (self%clapeyron_frozen_mask(node_id)) then
+                        first_node = node_id
+                        exit
+                    end if
+                end do
+                call self%control%get_nonlinear_iter(iter_now)
+                call self%temperature%get_current(first_node, t_first)
+                call self%pressure%get_current(first_node, p_first)
+                write (*, '(A,I0,A,I0,A,I0,A,ES11.3,A,ES11.3)') '   [CLAPEYRON-ITER] iter=', iter_now, &
+                    ' frozen=', n_frozen, ' first_node=', first_node, ' T=', t_first, ' P_set=', p_first
+            end if
+        end block
 
     end subroutine apply_clapeyron_pressure_constraint_ftcms
 

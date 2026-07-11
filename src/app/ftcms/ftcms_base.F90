@@ -861,9 +861,24 @@ contains
             ! is off: the field stays unset and every consumer keeps the
             ! equilibrium path (bit-identical behavior).
             if (self%enable_clapeyron_pressure_constraint) then
-                qi_history = 0.0d0
-                call self%Qi%get_history(node_id, qi_history)
-                call state%ice_content_history%set(qi_history(1:bdf_order + 1))
+                ! Strictly mask-gated: only pressure-constrained nodes may carry
+                ! prognostic ice history. Filling it at unconstrained nodes
+                ! substitutes a frozen-in-time Qi into the storage evaluation
+                ! there, which removes the dQi/dT part of dTheta/dT exactly in
+                ! the near-front band and reintroduces the residual
+                ! non-smoothness the subcell quadrature was built to eliminate
+                ! (observed as a pre-onset divergence with the flag on). At
+                ! unmasked nodes the field is explicitly cleared to also guard
+                ! against values inherited through state copies.
+                if (allocated(self%clapeyron_frozen_mask)) then
+                    if (self%clapeyron_frozen_mask(node_id)) then
+                        qi_history = 0.0d0
+                        call self%Qi%get_history(node_id, qi_history)
+                        call state%ice_content_history%set(qi_history(1:bdf_order + 1))
+                    else
+                        call state%clear_ice_content_history()
+                    end if
+                end if
             end if
         end block
 
