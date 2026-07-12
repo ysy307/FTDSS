@@ -149,7 +149,7 @@ contains
         type(type_vector_dp), intent(inout) :: z
 
         real(real64), pointer :: r_data(:), z_data(:)
-        integer(int32) :: n, bs, i, k, col, idx_i, idx_c, ii, jj
+        integer(int32) :: n, bs, i, k, col, idx_i, idx_c, ii, jj, ierr
 
         if (self%status /= SOLVER_STATUS%SUCCESS%ID) then
             call z%copy(r)
@@ -175,6 +175,13 @@ contains
                     end do
                 end do
             end do
+        end do
+
+        ! Apply the left diagonal inverse represented by the factored blocks.
+        do i = 1, n
+            idx_i = (i - 1) * bs + 1
+            call dgetrs('N', bs, 1, self%diag_blocks(:, :, i), bs, &
+                        self%diag_pivots(:, i), z_data(idx_i), bs, ierr)
         end do
 
     end subroutine apply_preconditioner_sainv

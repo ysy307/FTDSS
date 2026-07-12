@@ -116,6 +116,13 @@ contains
         ! but propagated to type_ftcms instead of type_hydraulic since the
         ! constraint/prognostic-update logic lives entirely at the app level.
         self%enable_clapeyron_pressure_constraint = input%basic%analysis_controls%enable_clapeyron_pressure_constraint
+        self%enable_rate_form_freezing = input%basic%analysis_controls%enable_rate_form_freezing
+        block
+            ! One-time push of the closure switch into the constitutive layer
+            ! (module switch; set before any parallel region, read-only after).
+            use :: models_phase_change_fusion, only: set_rate_form_freezing
+            call set_rate_form_freezing(self%enable_rate_form_freezing)
+        end block
 
         block
             ! Domain-independent carrier injected into the system layer, so the
@@ -860,7 +867,15 @@ contains
             ! update (override_prognostic_ice_ftcms). Skipped when the flag
             ! is off: the field stays unset and every consumer keeps the
             ! equilibrium path (bit-identical behavior).
-            if (self%enable_clapeyron_pressure_constraint) then
+            if (self%enable_rate_form_freezing) then
+                ! Rate-form closure: ice is prognostic EVERYWHERE (single
+                ! closure, no active set), so every node carries its ice
+                ! history; the constitutive rate relation (R1) reads level 2
+                ! as the step-start state.
+                qi_history = 0.0d0
+                call self%Qi%get_history(node_id, qi_history)
+                call state%ice_content_history%set(qi_history(1:bdf_order + 1))
+            else if (self%enable_clapeyron_pressure_constraint) then
                 ! Strictly mask-gated: only pressure-constrained nodes may carry
                 ! prognostic ice history. Filling it at unconstrained nodes
                 ! substitutes a frozen-in-time Qi into the storage evaluation

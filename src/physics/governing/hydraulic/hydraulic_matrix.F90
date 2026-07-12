@@ -95,6 +95,10 @@ contains
         real(real64) :: local_vec_res(workspace%num_fe_nodes)
         real(real64) :: work_sink(workspace%num_fe_gauss)
         real(real64) :: work_D_HT(workspace%num_fe_dimension, workspace%num_fe_dimension, workspace%num_fe_gauss)
+        real(real64) :: D_HH_node(workspace%num_fe_nodes), D_HT_node(workspace%num_fe_nodes)
+        real(real64) :: D_HH_elem, D_HT_elem
+        real(real64) :: D_node_tmp(workspace%num_fe_dimension, workspace%num_fe_dimension)
+        logical :: use_nodal_avg
         real(real64) :: work_matrix_coupling(workspace%num_fe_nodes, workspace%num_fe_nodes)
         real(real64) :: D_HT_tmp(workspace%num_fe_dimension, workspace%num_fe_dimension)
         logical :: thermal_target, coupling_flux_needed
@@ -163,6 +167,43 @@ contains
         end if
 
         ! ----------------------------------------------------------------
+        ! 0b. Internodal (element-arithmetic) conductivity.
+        !
+        ! D_HH and D_HT are evaluated at the element NODES and averaged over the
+        ! element, replacing the pointwise Gauss-point evaluation for the whole
+        ! element (the interface subcell split and the K(T) path average, both of
+        ! which refine the POINTWISE coefficient, are bypassed - they answer a
+        ! different question). Across a freezing fringe K drops by many orders of
+        ! magnitude within one element; the Galerkin stiffness built from
+        ! pointwise K is then dominated by the cold-side value and the element
+        ! conductance collapses, so liquid can no longer migrate into the frozen
+        ! zone once the front has passed. The arithmetic internodal average keeps
+        ! the element conductance of the order of the warm-side value, which is
+        ! the flux discretization of the finite-difference codes this freezing
+        ! model was calibrated against.
+        ! ----------------------------------------------------------------
+        use_nodal_avg = self%enable_nodal_K_averaging .and. self%physics%has_cryo_transport(workspace%material_id)
+        D_HH_elem = 0.0d0
+        D_HT_elem = 0.0d0
+        if (use_nodal_avg) then
+            do i = 1, n_nodes
+                D_node_tmp(:, :) = 0.0d0
+                call self%compute_diffusion_term(workspace%material_id, workspace%state(i), D_node_tmp)
+                D_HH_node(i) = D_node_tmp(1, 1)
+                D_HT_node(i) = 0.0d0
+                if (coupling_flux_needed) then
+                    D_node_tmp(:, :) = 0.0d0
+                    call self%compute_coupling_diffusion_term(workspace%material_id, workspace%state(i), D_node_tmp)
+                    D_HT_node(i) = D_node_tmp(1, 1)
+                end if
+            end do
+            D_HH_elem = sum(D_HH_node(1:n_nodes)) / real(n_nodes, real64)
+            if (coupling_flux_needed) D_HT_elem = sum(D_HT_node(1:n_nodes)) / real(n_nodes, real64)
+            is_cut = .false.
+            n_sub_qps = 0
+        end if
+
+        ! ----------------------------------------------------------------
         ! 1. Gauss loop: continuous-integrand terms at all Gauss points;
         !    diffusion coefficients only for uncut elements.
         ! ----------------------------------------------------------------
@@ -172,7 +213,17 @@ contains
             call self%compute_transient_term_mixed(workspace%material_id, workspace%state_gp(i), &
                                                    workspace%bdf_coeffs, workspace%work_d_dt(i))
 
-            if (.not. is_cut) then
+            if (use_nodal_avg) then
+                workspace%work_D(:, :, i) = 0.0d0
+                do d = 1, n_dim
+                    workspace%work_D(d, d, i) = D_HH_elem
+                end do
+                if (coupling_flux_needed) then
+                    do d = 1, n_dim
+                        work_D_HT(d, d, i) = D_HT_elem
+                    end do
+                end if
+            else if (.not. is_cut) then
                 fire_avg = .false.
                 if (use_K_averaging) then
                     call self%physics%calc_density_water(workspace%state_gp(i), rho_w_probe)

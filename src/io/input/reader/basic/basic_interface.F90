@@ -47,6 +47,8 @@ module io_input_basic
         !> whose T range straddles the steep Q(T) impedance transition below
         !> T_high(p_w) (parameter-free; disable only for A/B comparison runs).
         logical :: enable_fringe_K_averaging = .false.
+        logical :: enable_rate_form_freezing = .false.
+        logical :: enable_nodal_K_averaging = .false.
         !> A1 prototype closure: prescribe P = P_eq(T) = -psi_cryo(T) at hydraulic
         !> nodes whose cryogenic suction exceeds the capillary suction (or which
         !> already carry ice), and evolve ice content Qi as a prognostic variable

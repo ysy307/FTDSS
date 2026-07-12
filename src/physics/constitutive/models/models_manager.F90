@@ -190,6 +190,15 @@ contains
 
         real(real64) :: pressure, psi_cap, psi_cryo, delta, denom
 
+        ! Rate-form closure: the Darcy flux is driven by the free pressure
+        ! alone; the cryogenic coupling acts through the prognostic-ice sink,
+        ! not through a grad(T) flux term.
+        if (rate_form_freezing_enabled) then
+            w_cap = 1.0d0
+            w_cryo = 0.0d0
+            return
+        end if
+
         call state%pressure%get(pressure)
         psi_cap = max(0.0d0, -pressure)
         psi_cryo = 0.0d0

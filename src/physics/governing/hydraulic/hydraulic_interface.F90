@@ -18,6 +18,19 @@ module physics_governing_hydraulic
         logical :: enable_vapor_transport = .true.
         logical :: enable_fringe_subcell_quadrature = .true.
         logical :: enable_fringe_K_averaging = .false.
+        !> Internodal (element-arithmetic) evaluation of the hydraulic
+        !> conductivity: D_HH and D_HT are evaluated at the element NODES and
+        !> arithmetically averaged over the element, instead of being evaluated
+        !> pointwise at the Gauss points. This is the flux discretization used by
+        !> the finite-difference/lumped codes the freezing model was calibrated
+        !> against (HYDRUS-1D): across a freezing fringe, where K falls by orders
+        !> of magnitude within one element, the Gauss-point (Galerkin) stiffness
+        !> is dominated by the small value and shuts the flux off, whereas the
+        !> arithmetic internodal average keeps the element conductance of the
+        !> order of the warm-side value, so liquid keeps migrating into the
+        !> already-frozen zone. Off by default (bit-identical to the pointwise
+        !> Galerkin evaluation).
+        logical :: enable_nodal_K_averaging = .false.
         real(real64), allocatable :: iteration_capacity_bound(:)
         type(type_constitutive_manager) :: physics
     contains

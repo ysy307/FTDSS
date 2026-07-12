@@ -170,7 +170,12 @@ contains
         ! instead of being discarded by the GP-level equilibrium recomputation.
         ! Gated per-element (not global) to keep elements away from the freezing
         ! front bit-identical to the unconstrained closure.
-        if (self%enable_clapeyron_pressure_constraint) then
+        if (self%enable_rate_form_freezing) then
+            ! Rate-form closure: prognostic ice everywhere; every element's GP
+            ! states receive the nodal ice interpolant (level-1 override and
+            ! history levels alike).
+            call workspace%lerp_ice()
+        else if (self%enable_clapeyron_pressure_constraint) then
             if (allocated(self%clapeyron_frozen_mask)) then
                 if (any(self%clapeyron_frozen_mask(pack(connectivity_local, connectivity_local >= 1)))) then
                     call workspace%lerp_ice()

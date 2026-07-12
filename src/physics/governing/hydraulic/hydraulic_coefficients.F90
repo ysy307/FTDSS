@@ -1,4 +1,5 @@
 submodule(physics_governing_hydraulic) hydraulic_coefficients
+    use :: models_phase_change_fusion, only: rate_form_freezing_enabled
     implicit none
 contains
 
@@ -543,7 +544,24 @@ contains
             call local_state%ice_content%get(Qi)
             call local_state%vapor_content%get(Qv)
             if (use_prognostic_ice) then
-                if (j <= size(ice_history)) Qi = ice_history(j)
+                if (rate_form_freezing_enabled) then
+                    ! Rate-form closure: at the current BDF level the ice just
+                    ! recomputed by update_water_phases IS the prognostic value
+                    ! consistent with the current (T, h) iterate - it is the
+                    ! rate relation integrated from the step-start history.
+                    ! Substituting the nodal history there would feed the mass
+                    ! balance a one-iteration-old ice, so the storage never sees
+                    ! the ice forming within the step: h would not fall, no
+                    ! cryogenic suction would develop (no redistribution), and
+                    ! C(h) would stay at its unfrozen value so the rate relation
+                    ! would grossly over-produce ice whose latent heat then
+                    ! heats the column. Only the past levels (j >= 2), which the
+                    ! rate relation cannot reconstruct for BDF orders above 1,
+                    ! are taken from the history.
+                    if (j >= 2 .and. j <= size(ice_history)) Qi = ice_history(j)
+                else
+                    if (j <= size(ice_history)) Qi = ice_history(j)
+                end if
             end if
 
             call self%physics%calc_density_water(local_state, rho_w)

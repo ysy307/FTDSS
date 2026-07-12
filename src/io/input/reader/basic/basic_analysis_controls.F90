@@ -13,6 +13,8 @@ submodule(io_input_basic) input_basic_analysis_controls
     character(*), parameter :: partitioning = "partitioning"
     character(*), parameter :: enable_fringe_subcell_quadrature = "enable_fringe_subcell_quadrature"
     character(*), parameter :: enable_fringe_K_averaging = "enable_fringe_K_averaging"
+    character(*), parameter :: enable_rate_form_freezing = "enable_rate_form_freezing"
+    character(*), parameter :: enable_nodal_K_averaging = "enable_nodal_K_averaging"
     character(*), parameter :: enable_clapeyron_pressure_constraint = "enable_clapeyron_pressure_constraint"
     !!------------------------------------------------------------------------------------------------------------------------------
 contains
@@ -45,6 +47,14 @@ contains
 
         buffer(2) = enable_fringe_K_averaging
         call get_json_value(json, join(buffer), self%analysis_controls%enable_fringe_K_averaging, &
+                    is_required=.false., default_value=.false.)
+
+        buffer(2) = enable_rate_form_freezing
+        call get_json_value(json, join(buffer), self%analysis_controls%enable_rate_form_freezing, &
+                    is_required=.false., default_value=.false.)
+
+        buffer(2) = enable_nodal_K_averaging
+        call get_json_value(json, join(buffer), self%analysis_controls%enable_nodal_K_averaging, &
                     is_required=.false., default_value=.false.)
 
         buffer(2) = enable_clapeyron_pressure_constraint

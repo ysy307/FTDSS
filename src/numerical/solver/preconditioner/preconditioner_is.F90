@@ -90,7 +90,7 @@ contains
 
     end subroutine setup_preconditioner_is
 
-    !> Apply I+S: z = (2I - D^{-1}A) r
+    !> Apply I+S: z = D^{-1}(2I - AD^{-1}) r.
     !> Step 1: work = A*r (SpMV)
     !> Step 2: work = D^{-1} * work (block solves)
     !> Step 3: z = 2*r - work
@@ -113,7 +113,15 @@ contains
         r_data => r%get_data()
         z_data => z%get_data()
 
-        ! Step 1: work = A * r (block SpMV)
+        ! Step 1: z = D^{-1} r.
+        call z%copy(r)
+        do i = 1, n
+            idx_i = (i - 1) * bs + 1
+            call dgetrs('N', bs, 1, self%diag_blocks(:, :, i), bs, &
+                        self%diag_pivots(:, i), z_data(idx_i), bs, ierr)
+        end do
+
+        ! Step 2: work = A D^{-1} r.
         self%work(:) = 0.0d0
         do i = 1, n
             idx_i = (i - 1) * bs
@@ -123,22 +131,22 @@ contains
                 do jj = 1, bs
                     do ii = 1, bs
                         self%work(idx_i + ii) = self%work(idx_i + ii) + &
-                            self%a_val(ii, jj, k) * r_data(idx_c + jj)
+                            self%a_val(ii, jj, k) * z_data(idx_c + jj)
                     end do
                 end do
             end do
         end do
 
-        ! Step 2: work = D^{-1} * work (solve diagonal blocks)
+        ! Step 3: form the first-order Neumann correction.
+        do i = 1, n * bs
+            z_data(i) = 2.0d0 * r_data(i) - self%work(i)
+        end do
+
+        ! Step 4: restore the left diagonal scaling required by the inverse approximation.
         do i = 1, n
             idx_i = (i - 1) * bs + 1
             call dgetrs('N', bs, 1, self%diag_blocks(:, :, i), bs, &
-                        self%diag_pivots(:, i), self%work(idx_i), bs, ierr)
-        end do
-
-        ! Step 3: z = 2*r - work
-        do i = 1, n * bs
-            z_data(i) = 2.0d0 * r_data(i) - self%work(i)
+                        self%diag_pivots(:, i), z_data(idx_i), bs, ierr)
         end do
 
     end subroutine apply_preconditioner_is

@@ -110,6 +110,11 @@ module app_ftcms
         real(real64) :: mass_ref = 0.0d0
         real(real64) :: mass_bias_tolerance = 1.0d-6
         logical :: enable_mass_bias_gate = .false.
+        ! Rate-form (Harlan/Hansson) freezing closure switch; mirrors the
+        ! constitutive module switch (models_phase_change_fusion) and gates the
+        ! nodal/GP ice-history plumbing below. Prototype: see
+        ! design_rate_form_closure.md.
+        logical :: enable_rate_form_freezing = .false.
         ! Diagnostic only: last evaluated mass_bias/mass_ref ratio, logged to
         ! solver_history.log regardless of enable_mass_bias_gate.
         real(real64) :: mass_bias_ratio_last = 0.0d0
