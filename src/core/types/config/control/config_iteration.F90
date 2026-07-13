@@ -28,6 +28,12 @@ module types_config_control_iteration
         type(type_config_iteration_criterion) :: residual(PHYSICS_TYPES%NUM_ID)
         type(type_config_iteration_criterion) :: update(PHYSICS_TYPES%NUM_ID)
 
+        !> Conserved-quantity convergence tolerances (used when convergence_norm_type == CONSERVED, PDF 6.2.4)
+        real(real64) :: atol_enthalpy = 1.0d2    ! [J/m3]  absolute weight floor for enthalpy
+        real(real64) :: atol_density = 1.0d-3    ! [kg/m3] absolute weight floor for effective density
+        real(real64) :: rtol_conserved = 1.0d-3  ! [-]     relative weight for both conserved quantities
+        real(real64) :: residual_eps = 1.0d-1    ! [-]     per-block residual ratio tolerance eps_R
+
     contains
         procedure, public, pass(self) :: copy => copy_config_nonlinear
         procedure, public, pass(self) :: reset => reset_config_nonlinear
@@ -84,6 +90,11 @@ contains
             call self%set(self%combination_logic, source%combination_logic)
             call self%set(self%convergence_norm_type, source%convergence_norm_type)
 
+            call self%set(self%atol_enthalpy, source%atol_enthalpy)
+            call self%set(self%atol_density, source%atol_density)
+            call self%set(self%rtol_conserved, source%rtol_conserved)
+            call self%set(self%residual_eps, source%residual_eps)
+
             do i = 1, PHYSICS_TYPES%NUM_ID
                 call self%residual(i)%copy(source%residual(i))
                 call self%update(i)%copy(source%update(i))
@@ -102,6 +113,11 @@ contains
         self%norm_type = type_constant_id("", "", -1)
         self%combination_logic = type_constant_id("", "", -1)
         self%convergence_norm_type = type_constant_id("", "", -1)
+
+        self%atol_enthalpy = 1.0d2
+        self%atol_density = 1.0d-3
+        self%rtol_conserved = 1.0d-3
+        self%residual_eps = 1.0d-1
 
         do i = 1, PHYSICS_TYPES%NUM_ID
             call self%residual(i)%reset()

@@ -24,9 +24,12 @@ endif()
 list(PREPEND CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/third_party/.local/${COMPILER_DIR}")
 
 # 3. Find required packages
-include(FindPkgConfig REQUIRED)
-find_package(MPI REQUIRED)
-find_package(OpenMP REQUIRED)
+if(ENABLE_MPI)
+    find_package(MPI REQUIRED)
+endif()
+if(ENABLE_OPENMP)
+    find_package(OpenMP REQUIRED)
+endif()
 
 # 4. MKL Configuration
 set(MKL_LINK static)
@@ -63,6 +66,13 @@ if(NOT TARGET LAPACK::LAPACK)
     target_link_libraries(LAPACK::LAPACK INTERFACE MKL::MKL)
 endif()
 
+if(NOT TARGET SPBLAS::SPBLAS)
+    add_library(mkl_spblas_lib STATIC "${MKL_ROOT}/include/mkl_spblas.f90")
+    target_include_directories(mkl_spblas_lib PRIVATE "${MKL_ROOT}/include")
+    target_link_libraries(mkl_spblas_lib PUBLIC MKL::MKL)
+    add_library(SPBLAS::SPBLAS ALIAS mkl_spblas_lib)
+endif()
+
 if(ENABLE_MPI AND NOT TARGET SCALAPACK::SCALAPACK)
     add_library(SCALAPACK::SCALAPACK INTERFACE IMPORTED)
     target_link_libraries(SCALAPACK::SCALAPACK INTERFACE MKL::MKL_SCALAPACK MPI::MPI_Fortran)
@@ -71,9 +81,11 @@ endif()
 # 6. Find third-party libraries
 find_package(fortran_stdlib REQUIRED)
 find_package(${JSON_FORTRAN_PKG} REQUIRED)
-find_package(X11 REQUIRED)
 find_package(VTK REQUIRED COMPONENTS CommonCore CommonDataModel IOLegacy IOXML)
 find_package(IAPWS REQUIRED)
+if(BUILD_TESTING)
+    find_package(test-drive REQUIRED)
+endif()
 
 # =========================================================================
 # Function: enable_build_flags
@@ -90,15 +102,15 @@ function(enable_build_flags target)
             # Fortran: Intel / IntelLLVM
             $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:Intel,IntelLLVM>>:
             -stand f18 -fpp -fpscomp logicals -extend-source -g -traceback
-            $<$<CONFIG:Release>:-O3 -xHost>
-            $<$<CONFIG:Debug>:-O0 -check all -fpe0 -ftrapuv -init=snan -init=arrays -warn all -warn errors -implicitnone -fstack-protector-all>
+            $<$<CONFIG:Release>:-O2>
+            $<$<CONFIG:Debug>:-O0 -check all -init=snan -init=arrays -warn all -warn errors -implicitnone -fstack-protector-all>
             >
             # Fortran: GNU
             $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:GNU>>:
             -std=f2018 -cpp
             $<$<CONFIG:Release>:-O3 -march=native>
             $<$<CONFIG:Debug>:-g -fbacktrace -fcheck=all -ffpe-trap=invalid,zero,overflow -finit-real=snan -finit-integer=-9999999
-            -Wall -Wextra -Werror
+            -Wall -Wextra
             -Wno-maybe-uninitialized -Wno-uninitialized -Wno-c-binding-type -Wno-surprising
             -Wno-unused-dummy-argument -Wno-compare-reals -Wno-unused-function -Wno-unused-value>
             >
@@ -114,13 +126,15 @@ function(enable_build_flags target)
             # ---------------------------------------------------------
             # C: Intel / IntelLLVM
             $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:Intel,IntelLLVM>>:
-            $<$<CONFIG:Release>:-O3 -xHost -g -traceback>
-            $<$<CONFIG:Debug>:-O0 -g -traceback -Wall -Wextra -Werror -fstack-protector-all -ftrapv>
+            $<$<CONFIG:Release>:-O3 -g -traceback
+            $<$<NOT:$<BOOL:${FTCMS_PORTABLE_BUILD}>>:-xHost>>
+            $<$<CONFIG:Debug>:-O0 -g -traceback -Wall -Wextra -fstack-protector-all -ftrapv>
             >
             # C: GNU
             $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:GNU>>:
-            $<$<CONFIG:Release>:-O3 -march=native>
-            $<$<CONFIG:Debug>:-g -O0 -Wall -Wextra -pedantic -Werror -fstack-protector-all -ftrapv>
+            $<$<CONFIG:Release>:-O3
+            $<$<NOT:$<BOOL:${FTCMS_PORTABLE_BUILD}>>:-march=native>>
+            $<$<CONFIG:Debug>:-g -O0 -Wall -Wextra -pedantic -fstack-protector-all -ftrapv>
             >
             # C: NVHPC
             $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:NVHPC,PGI>>:
@@ -133,13 +147,15 @@ function(enable_build_flags target)
             # ---------------------------------------------------------
             # CXX: Intel / IntelLLVM
             $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:Intel,IntelLLVM>>:
-            $<$<CONFIG:Release>:-O3 -xHost -g -traceback>
-            $<$<CONFIG:Debug>:-O0 -g -traceback -Wall -Wextra -Werror -fstack-protector-all -ftrapv>
+            $<$<CONFIG:Release>:-O3 -g -traceback
+            $<$<NOT:$<BOOL:${FTCMS_PORTABLE_BUILD}>>:-xHost>>
+            $<$<CONFIG:Debug>:-O0 -g -traceback -Wall -Wextra -fstack-protector-all -ftrapv>
             >
             # CXX: GNU
             $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:GNU>>:
-            $<$<CONFIG:Release>:-O3 -march=native>
-            $<$<CONFIG:Debug>:-g -O0 -Wall -Wextra -pedantic -Werror -fstack-protector-all -ftrapv>
+            $<$<CONFIG:Release>:-O3
+            $<$<NOT:$<BOOL:${FTCMS_PORTABLE_BUILD}>>:-march=native>>
+            $<$<CONFIG:Debug>:-g -O0 -Wall -Wextra -pedantic -fstack-protector-all -ftrapv>
             >
             # CXX: NVHPC
             $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:NVHPC,PGI>>:
@@ -155,11 +171,14 @@ function(enable_build_flags target)
         $<$<OR:$<CONFIG:Debug>,$<BOOL:${ENABLE_DEBUG}>>:USE_DEBUG>
     )
 
-    target_link_libraries(${target} ${KEYWORD} OpenMP::OpenMP_Fortran)
+    if(ENABLE_OPENMP)
+        target_link_libraries(${target} ${KEYWORD} OpenMP::OpenMP_Fortran)
+    endif()
 
     if(ENABLE_MPI)
         target_compile_definitions(${target} ${KEYWORD} _MPI)
         target_link_libraries(${target} ${KEYWORD}
+            SPBLAS::SPBLAS
             MKL::MKL_SCALAPACK
             MPI::MPI_Fortran)
     else()
@@ -178,7 +197,6 @@ function(enable_thirdparty target)
     )
 
     target_link_libraries(${target} PUBLIC
-        X11::X11
         VTK::CommonCore VTK::CommonDataModel VTK::IOLegacy VTK::IOXML
         fortran_stdlib::fortran_stdlib
         ${JSON_FORTRAN_PKG}::jsonfortran-static

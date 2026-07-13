@@ -4,6 +4,61 @@ submodule(models_hcf) hcf_base
     real(real64), parameter :: gamma_0 = 71.88875d0 ! g/s^2
 contains
 
+    !> Suction head [m] controlling the retention-based relative permeability.
+    !>
+    !> \( h_{kr} = -p_c^*/(\rho_{std} g) \) with the generalized suction
+    !> \( p_c^* = \max(\psi_{cap}, \psi_{cryo}) \) from the phase update.
+    !> In unfrozen conditions this equals the pressure head, so behaviour is
+    !> unchanged there; in the freezing fringe it keeps k_r consistent with
+    !> the (Clapeyron-reduced) liquid content.  Evaluating k_r at the raw
+    !> pressure head instead lets k_r -> 1 while the pores saturate under
+    !> cryosuction pumping, which removes the self-limiting of the pumping
+    !> flux and drives a physical runaway at the freezing interface.
+    !> Falls back to the pressure head when the phase update has not run.
+    module subroutine calc_head_hcf(self, state, head)
+        implicit none
+        class(abst_hcf), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: head
+
+        real(real64) :: psi_eff, pressure
+        logical :: is_set
+
+        psi_eff = 0.0d0
+        is_set = .false.
+        call state%effective_suction%get(psi_eff, is_set)
+        if (is_set) then
+            head = -psi_eff / (rho_std * g)
+        else
+            call state%pressure%get(pressure)
+            head = pressure / (rho_std * g)
+        end if
+    end subroutine calc_head_hcf
+
+    !> Impedance factor of Hansson et al. (2004):
+    !> \( Q = \theta_\mathrm{ice} / (\theta_\mathrm{T} - \theta_\mathrm{r}) \), the ice fraction of the
+    !> total (minus residual) water content.  The impedance \(10^{-\Omega Q}\)
+    !> with \(\Omega = 7\) was calibrated against the Mizoguchi columns using
+    !> THIS definition; passing the raw volumetric ice content instead changes
+    !> the meaning (and effective strength) of the calibrated factor.
+    module subroutine calc_impedance_ratio_hcf(self, state, ratio)
+        implicit none
+        class(abst_hcf), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: ratio
+
+        real(real64) :: Qw, Qi, denom
+
+        call state%water_content%get(Qw)
+        call state%ice_content%get(Qi)
+        denom = Qw + Qi - self%config%theta_r
+        if (denom > tiny(1.0d0) .and. Qi > 0.0d0) then
+            ratio = min(Qi / denom, 1.0d0)
+        else
+            ratio = 0.0d0
+        end if
+    end subroutine calc_impedance_ratio_hcf
+
     module subroutine initialize_holder_hcfs(self, config, water, ice)
         implicit none
         class(holder_hcfs), intent(inout) :: self
@@ -70,6 +125,7 @@ contains
             end if
 
             self%base%parent => self
+            call self%base%initialize()
         end if
 
         if (self%config%model == HCF_MODES%IMPEDANCE .or. &
@@ -93,7 +149,6 @@ contains
                 write (*, *) 'Error: Unknown water viscosity model ', self%config%water_viscosity_model
                 stop
             end if
-            allocate (type_hcf_viscosity_exp :: self%viscosity)
             call self%viscosity%initialize()
             self%viscosity%parent => self
         end if
@@ -107,6 +162,12 @@ contains
 
         self%initialized = .true.
     end subroutine initialize_abst_hcf
+
+    !> Default initialization for base permeability models without cached coefficients.
+    module subroutine initialize_hcf_base(self)
+        implicit none
+        class(abst_hcf_base), intent(inout) :: self
+    end subroutine initialize_hcf_base
 
     module pure function is_initialized_hcf(self) result(initialized)
         implicit none
@@ -123,11 +184,11 @@ contains
         real(real64), intent(inout) :: kflh
 
         real(real64) :: kr_base
-        real(real64) :: pressure
+        real(real64) :: head
 
-        call state%pressure%get(pressure)
+        call self%calc_head(state, head)
 
-        call self%base%calc_kr(pressure, kr_base)
+        call self%base%calc_kr(head, kr_base)
         kflh = self%config%k_sat * kr_base
 
     end subroutine calc_kflh_base
@@ -139,11 +200,11 @@ contains
         real(real64), intent(inout) :: kflh
 
         real(real64) :: kr_impedance
-        real(real64) :: ice_content
+        real(real64) :: Q_ratio
 
-        call state%ice_content%get(ice_content)
+        call self%calc_impedance_ratio(state, Q_ratio)
 
-        call self%impedance%calc_impedance(ice_content, kr_impedance)
+        call self%impedance%calc_impedance(Q_ratio, kr_impedance)
         kflh = self%config%k_sat * kr_impedance
 
     end subroutine calc_kflh_impedance
@@ -171,13 +232,13 @@ contains
         real(real64), intent(inout) :: kflh
 
         real(real64) :: kr_base, kr_impedance
-        real(real64) :: pressure, ice_content
+        real(real64) :: head, Q_ratio
 
-        call state%pressure%get(pressure)
-        call state%ice_content%get(ice_content)
+        call self%calc_head(state, head)
+        call self%calc_impedance_ratio(state, Q_ratio)
 
-        call self%base%calc_kr(pressure, kr_base)
-        call self%impedance%calc_impedance(ice_content, kr_impedance)
+        call self%base%calc_kr(head, kr_base)
+        call self%impedance%calc_impedance(Q_ratio, kr_impedance)
         kflh = self%config%k_sat * kr_base * kr_impedance
 
     end subroutine calc_kflh_base_impedance
@@ -189,12 +250,12 @@ contains
         real(real64), intent(inout) :: kflh
 
         real(real64) :: kr_base, kr_viscosity
-        real(real64) :: temperature, pressure
+        real(real64) :: temperature, head
 
         call state%temperature%get(temperature)
-        call state%pressure%get(pressure)
+        call self%calc_head(state, head)
 
-        call self%base%calc_kr(pressure, kr_base)
+        call self%base%calc_kr(head, kr_base)
         call self%viscosity%calc_viscosity(temperature, kr_viscosity)
         kflh = self%config%k_sat * kr_base * kr_viscosity
 
@@ -207,12 +268,12 @@ contains
         real(real64), intent(inout) :: kflh
 
         real(real64) :: kr_impedance, kr_viscosity
-        real(real64) :: temperature, ice_content
+        real(real64) :: temperature, Q_ratio
 
         call state%temperature%get(temperature)
-        call state%ice_content%get(ice_content)
+        call self%calc_impedance_ratio(state, Q_ratio)
 
-        call self%impedance%calc_impedance(ice_content, kr_impedance)
+        call self%impedance%calc_impedance(Q_ratio, kr_impedance)
         call self%viscosity%calc_viscosity(temperature, kr_viscosity)
         kflh = self%config%k_sat * kr_impedance * kr_viscosity
 
@@ -225,14 +286,14 @@ contains
         real(real64), intent(inout) :: kflh
 
         real(real64) :: kr_base, kr_impedance, kr_viscosity
-        real(real64) :: temperature, pressure, ice_content
+        real(real64) :: temperature, head, Q_ratio
 
         call state%temperature%get(temperature)
-        call state%ice_content%get(ice_content)
-        call state%pressure%get(pressure)
+        call self%calc_impedance_ratio(state, Q_ratio)
+        call self%calc_head(state, head)
 
-        call self%base%calc_kr(pressure, kr_base)
-        call self%impedance%calc_impedance(ice_content, kr_impedance)
+        call self%base%calc_kr(head, kr_base)
+        call self%impedance%calc_impedance(Q_ratio, kr_impedance)
         call self%viscosity%calc_viscosity(temperature, kr_viscosity)
         kflh = self%config%k_sat * kr_base * kr_impedance * kr_viscosity
 
@@ -245,46 +306,24 @@ contains
         real(real64), intent(inout) :: klT
 
         real(real64) :: Klh_r, dgamma_dT
-        real(real64) :: temperature, pressure
-        real(real64) :: pressure_head
+        real(real64) :: temperature
+        real(real64) :: head
 
         call state%temperature%get(temperature)
-        call state%pressure%get(pressure)
 
-        ! Use pressure head scaling for thermo-osmotic coupling to avoid unit-driven blow-up.
-        pressure_head = pressure/(rho_std * g)
+        ! Head of the liquid potential (effective suction), consistent with
+        ! the retention scaling this thermo-osmotic term derives from.
+        call self%calc_head(state, head)
 
         if (allocated(self%base)) then
-            call self%base%calc_kr(pressure, Klh_r)
-            call calc_derivative_surface_tension(temperature, dgamma_dT)
-            klT = self%config%k_sat * Klh_r * pressure_head * self%config%gain_factor * (dgamma_dT / gamma_0)
+            call self%base%calc_kr(head, Klh_r)
+            dgamma_dT = -0.1425d0 - 4.76d-4 * temperature
+            klT = self%config%k_sat * Klh_r * head * self%config%gain_factor * (dgamma_dT / gamma_0)
         else
             klT = 0.0d0
         end if
 
     end subroutine calc_klT_hcf
-
-    subroutine calc_surface_tension(temperature, surface_tension)
-        implicit none
-        !> Temperature [C]
-        real(real64), intent(in) :: temperature
-        !> Surface tension [g/s^2]
-        real(real64), intent(inout) :: surface_tension
-
-        surface_tension = 75.6d0 - 0.1425d0 * temperature - 2.38d-4 * temperature**2
-
-    end subroutine calc_surface_tension
-
-    subroutine calc_derivative_surface_tension(temperature, dsurface_tension_dT)
-        implicit none
-        !> Temperature [C]
-        real(real64), intent(in) :: temperature
-        !> Derivative of surface tension with respect to temperature [g/(s^2 K)]
-        real(real64), intent(inout) :: dsurface_tension_dT
-
-        dsurface_tension_dT = -0.1425d0 - 4.76d-4 * temperature
-
-    end subroutine calc_derivative_surface_tension
 
     module subroutine calc_Kvh_hcf(self, state, Kvh)
         implicit none

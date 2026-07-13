@@ -32,6 +32,7 @@ module models_phase_change_vaporization
 
         !> Calculate derivatives of vapor content w.r.t P and T
         procedure, pass(self), public :: calc_vapor_content_derivatives
+        procedure, pass(self), public :: calc_vapor_content_with_derivatives
     end type type_evaporation
 
 contains
@@ -223,5 +224,60 @@ contains
         dvapor_dT = d_air_content_dT * ratio + air_content * dratio_dT
 
     end subroutine calc_vapor_content_derivatives
+
+    !> Compute vapor content and its pressure and temperature derivatives together.
+    !>
+    !> \[ \theta_v = \theta_g \rho_{v,sat} RH / \rho_w \]
+    !> Assumptions: relative humidity and gas-phase state derivatives are current.
+    !> Numerical guarantee: algebraically equivalent to the separate value and derivative procedures.
+    !> Computational complexity: \(O(1)\) arithmetic and memory.
+    !> Failure behavior: propagates the underlying IAPWS property behavior.
+    subroutine calc_vapor_content_with_derivatives(self, state, vapor_content, dvapor_dP, dvapor_dT)
+        implicit none
+        class(type_evaporation), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: vapor_content
+        real(real64), intent(inout) :: dvapor_dP
+        real(real64), intent(inout) :: dvapor_dT
+
+        real(real64) :: temperature, pressure, temperature_K
+        real(real64) :: air_content, d_air_content_dP, d_air_content_dT
+        real(real64) :: rh, drh_dP, drh_dT
+        real(real64) :: rho_sat, drho_sat_dT
+        real(real64) :: rho_w, drho_w_dP, drho_w_dT
+        real(real64) :: ratio, dratio_dP, dratio_dT
+
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
+        call state%air_content%get(air_content)
+        call state%dQa_dP%get(d_air_content_dP)
+        call state%dQa_dT%get(d_air_content_dT)
+        call state%relative_humidity%get(rh)
+        call self%shift_temperature_absolute(temperature, temperature_K)
+
+        if (pressure >= 0.0d0) then
+            drh_dP = 0.0d0
+            drh_dT = 0.0d0
+        else
+            drh_dP = rh * Mw / (rho_std * Rg * temperature_K)
+            drh_dT = rh * (-pressure * Mw) / (rho_std * Rg * temperature_K**2)
+        end if
+
+        call self%calc_rho_vapor_saturation(state, rho_sat)
+        call self%calc_drho_vapor_saturation_dT(state, drho_sat_dT)
+        call self%calc_rho_water(state, rho_w)
+        call self%calc_drho_water_dT(state, drho_w_dT)
+        call self%calc_drho_water_dP(state, drho_w_dP)
+
+        ratio = rho_sat * rh / rho_w
+        dratio_dP = (rho_sat / rho_w) * drh_dP - &
+                    (rho_sat * rh / rho_w**2) * drho_w_dP
+        dratio_dT = (drho_sat_dT * rh + rho_sat * drh_dT) / rho_w - &
+                    (ratio / rho_w) * drho_w_dT
+
+        vapor_content = air_content * ratio
+        dvapor_dP = d_air_content_dP * ratio + air_content * dratio_dP
+        dvapor_dT = d_air_content_dT * ratio + air_content * dratio_dT
+    end subroutine calc_vapor_content_with_derivatives
 
 end module models_phase_change_vaporization

@@ -2,55 +2,11 @@ submodule(physics_governing_hydraulic) hydraulic_coefficients
     implicit none
 contains
 
-    !> @brief Calculate Mass Term C_HH = d(rho_eff)/dP
-    module subroutine compute_mass_term_hydraulic(self, material_id, state, C_HH)
-        implicit none
-        class(type_hydraulic), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_state), intent(in) :: state
-        real(real64), intent(inout) :: C_HH
-
-        real(real64) :: Qw, Qi, Qv
-        real(real64) :: rho_w, rho_i
-        real(real64) :: drho_w_dP, drho_ice_dP
-        real(real64) :: dP_ice_dP_water
-        real(real64) :: dQw_dP, dQi_dP, dQv_dP
-
-        dQw_dP = 0.0d0
-        dQi_dP = 0.0d0
-        dQv_dP = 0.0d0
-        drho_w_dP = 0.0d0
-        drho_ice_dP = 0.0d0
-        dP_ice_dP_water = 1.0d0
-
-        call state%water_content%get(Qw)
-        call state%ice_content%get(Qi)
-        call state%vapor_content%get(Qv)
-
-        call state%dQw_dP%get(dQw_dP)
-        call state%dQi_dP%get(dQi_dP)
-        call state%dQv_dP%get(dQv_dP)
-
-        call self%physics%calc_density_water(state, rho_w)
-        call self%physics%calc_density_ice(state, rho_i)
-        call self%physics%calc_density_water_derivatives(material_id, state, dden_dP=drho_w_dP)
-        call self%physics%calc_density_ice_derivatives(material_id, state, dden_dP=drho_ice_dP)
-        call self%physics%calc_pressure_ice_water_derivative(material_id, state, dP_ice_dP_water)
-
-        ! C_HH = d(rho_eff)/dP
-        ! rho_eff = rho_w*Qw + rho_i*Qi + rho_w*Qv
-        C_HH = rho_w * dQw_dP + Qw * drho_w_dP &
-               + rho_i * dQi_dP + Qi * drho_ice_dP * dP_ice_dP_water &
-               + rho_w * dQv_dP + Qv * drho_w_dP
-
-    end subroutine compute_mass_term_hydraulic
-
     !> @brief Calculate Diffusion Term D_HH (Hydraulic Conductivity Tensor)
     !> @details
-    !>   J_m_diff = - D_HH * grad P
-    !>   From Darcy: q = -K/rho_w g * grad P ...
-    !>   J_m = rho_w * q = - K/g * grad P
-    !>   D_HH = K_eff / g
+    !>   Mixed water-content form uses volumetric Darcy flux:
+    !>   q = -K/(rho_w g) * grad P ...
+    !>   D_HH = K_eff / (rho_w g)
     module subroutine compute_diffusion_term_hydraulic(self, material_id, state, D_HH)
         implicit none
         class(type_hydraulic), intent(in) :: self
@@ -58,19 +14,22 @@ contains
         type(type_state), intent(inout) :: state
         real(real64), intent(inout) :: D_HH(:, :)
 
-        real(real64) :: K_flh, K_vP
+        real(real64) :: K_flh, K_vP, rho_w
+        real(real64) :: w_cap, w_cryo
         real(real64) :: coeff_D
+
         integer(int32) :: i
 
-        ! K_flh: Liquid Hydraulic Conductivity [m/s]
-        ! K_vP: Vapor Hydraulic Conductivity (equivalent) [m/s]
         call self%physics%calc_Kflh(material_id, state, K_flh)
-        call self%physics%calc_Kvh(material_id, state, K_vP)
+        call self%calc_K_vP(material_id, state, K_vP)
+        call self%physics%calc_density_water(state, rho_w)
+        call self%physics%calc_suction_weights(material_id, state, w_cap, w_cryo)
 
-        ! D_HH = (K_liquid + K_vapor) / g
-        ! Unit: [m/s] / [m/s^2] = [s]
-        ! Flux J = - D * grad P [s * Pa/m] = [s * N/m^3] = [s * kg m/s^2 / m^3] = [kg/m^2 s] (Mass Flux)
-        coeff_D = (K_flh + K_vP) / g
+        ! D_HH = K_flh * w_cap / (rho_w g): the effective-suction weight w_cap
+        ! ensures that in the frozen fringe the capillary and cryosuction driving
+        ! forces are not double-counted.  The impedance factor inside K_flh
+        ! independently reduces conductivity in the fully-frozen zone.
+        coeff_D = (K_flh * w_cap + K_vP) / (rho_w * g)
 
         D_HH(:, :) = 0.0d0
         do i = 1, self%computation_dimension
@@ -79,51 +38,11 @@ contains
 
     end subroutine compute_diffusion_term_hydraulic
 
-    !> @brief Calculate Temperature Coupling Term D_HT for cryogenic suction transport
-    !> @details
-    !>   J_m_cryo = D_HT * grad T
-    !>   D_HT = (K_liquid / g) * d(psi_cryo)/dT when cryogenic suction is active
-    module subroutine compute_temperature_coupling_term_hydraulic(self, material_id, state, D_HT)
-        implicit none
-        class(type_hydraulic), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_state), intent(inout) :: state
-        real(real64), intent(inout) :: D_HT(:, :)
-
-        real(real64) :: K_flh
-        real(real64) :: pressure, psi_cap, psi_cryo
-        real(real64) :: dpsi_cryo_dT
-        real(real64) :: coeff_HT
-        integer(int32) :: i
-
-        call self%physics%calc_Kflh(material_id, state, K_flh)
-        call state%pressure%get(pressure)
-        call self%physics%calc_cryogenic_suction(material_id, state, psi_cryo)
-        call self%physics%calc_cryogenic_suction_derivatives(material_id, state, deriv_dT=dpsi_cryo_dT)
-
-        if (pressure < 0.0d0) then
-            psi_cap = -pressure
-        else
-            psi_cap = 0.0d0
-        end if
-
-        coeff_HT = 0.0d0
-        if (psi_cryo > psi_cap) then
-            coeff_HT = (K_flh / g) * dpsi_cryo_dT
-        end if
-
-        D_HT(:, :) = 0.0d0
-        do i = 1, self%computation_dimension
-            D_HT(i, i) = coeff_HT
-        end do
-
-    end subroutine compute_temperature_coupling_term_hydraulic
-
     !> @brief Calculate Advective (Gravity) Term V_H
     !> @details
-    !>   J_m_grav = V_H
-    !>   J_m_grav = rho_w * (-K * grad z)
-    !>   V_H = - rho_w * K * grad z
+    !>   q_grav = V_H
+    !>   q_grav = -K * grad z
+    !>   V_H = -K * grad z
     module subroutine compute_advective_term_hydraulic(self, material_id, state, V_H)
         implicit none
         class(type_hydraulic), intent(in) :: self
@@ -131,14 +50,13 @@ contains
         type(type_state), intent(inout) :: state
         real(real64), intent(inout) :: V_H(:)
 
-        real(real64) :: rho_w, K_flh
+        real(real64) :: K_flh
         real(real64) :: grav_flux_mag
 
-        call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_Kflh(material_id, state, K_flh)
 
-        ! Gravity Mass Flux Magnitude = rho_w * K
-        grav_flux_mag = rho_w * K_flh
+        ! Gravity volumetric flux magnitude in the mixed water-content equation.
+        grav_flux_mag = K_flh
 
         V_H(:) = 0.0d0
 
@@ -155,19 +73,118 @@ contains
 
     end subroutine compute_advective_term_hydraulic
 
-    !> @brief Calculate Transient Term (drho_eff/dt)
-    module subroutine compute_transient_term_hydraulic(self, material_id, state, bdf_coeffs, drho_dt)
+    ! ==========================================================================
+    ! Coupling Coefficients
+    ! ==========================================================================
+
+    !> @brief Calculate Coupling Mass Term C_HT = dTheta/dT
+    module subroutine compute_coupling_mass_term_hydraulic(self, material_id, state, C_HT)
         implicit none
         class(type_hydraulic), intent(in) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
-        real(real64), intent(in) :: bdf_coeffs(:)
-        real(real64), intent(inout) :: drho_dt
+        real(real64), intent(inout) :: C_HT
 
-        ! Reuse existing implementation
-        call self%calc_effective_density(material_id, state, bdf_coeffs, drho_dt)
+        real(real64) :: rho_w, rho_i
+        real(real64) :: dQw_dT, dQi_dT, dQv_dT
+        real(real64), pointer, contiguous, dimension(:) :: temperature_history
+        real(real64) :: temperature, dT, theta_cur, theta_old
+        real(real64) :: Qw, Qi, Qv
+        type(type_state) :: temp_state
+        real(real64), parameter :: DT_SECANT_FLOOR = 1.0d-3
 
-    end subroutine compute_transient_term_hydraulic
+        dQw_dT = 0.0d0
+        dQi_dT = 0.0d0
+        dQv_dT = 0.0d0
+
+        call state%dQw_dT%get(dQw_dT)
+        call state%dQi_dT%get(dQi_dT)
+        if (self%enable_vapor_transport) then
+            call state%dQv_dT%get(dQv_dT)
+        end if
+
+        call self%physics%calc_density_water(state, rho_w)
+        call self%physics%calc_density_ice(state, rho_i)
+
+        ! C_HT = dTheta/dT in the mixed water-content formulation.
+        ! Theta = Qw + (rho_i/rho_w)*Qi + Qv. For pore-water freezing, the
+        ! Qw/Qi terms cancel when mass is conserved, preventing an artificial
+        ! temperature-storage spike in the hydraulic equation.
+        C_HT = dQw_dT + (rho_i / rho_w) * dQi_dT + dQv_dT
+
+        ! Phase-change stabilization (mirrors the thermal C_TT chord): use the
+        ! actual mixed storage change crossed over the step. Evaluated only for
+        ! |dT| above a floor so it stays bounded; below that the tangent is the
+        ! correct slope.
+        call state%get(temperature=temperature, temperature_history=temperature_history)
+        if (associated(temperature_history)) then
+            if (size(temperature_history) >= 2) then
+                dT = temperature - temperature_history(2)
+                if (abs(dT) > DT_SECANT_FLOOR) then
+                    call state%water_content%get(Qw)
+                    call state%ice_content%get(Qi)
+                    call state%vapor_content%get(Qv)
+                    theta_cur = Qw + (rho_i / rho_w) * Qi + Qv
+
+                    call temp_state%copy(state)
+                    call temp_state%temperature%set(temperature_history(2))
+                    call self%update_water_phases(material_id, temp_state)
+                    call temp_state%water_content%get(Qw)
+                    call temp_state%ice_content%get(Qi)
+                    call temp_state%vapor_content%get(Qv)
+                    call self%physics%calc_density_water(temp_state, rho_w)
+                    call self%physics%calc_density_ice(temp_state, rho_i)
+                    theta_old = Qw + (rho_i / rho_w) * Qi + Qv
+
+                    C_HT = (theta_cur - theta_old) / dT
+                end if
+            end if
+        end if
+
+    end subroutine compute_coupling_mass_term_hydraulic
+
+    !> @brief Calculate Coupling Diffusion Term D_HT
+    !> @details
+    !>   Total moisture flux driven by temperature gradient:
+    !>   \( q^{(T)} = -(K_{lT} + K_{vT} + K_{flh}/(\rho_w g) \cdot d\psi_{cryo}/dT) \nabla T \)
+    !>   The cryo-suction liquid flux term \( K_{flh}/(\rho_w g) \cdot d\psi_{cryo}/dT \)
+    !>   is the dominant mechanism for water transport toward the freezing front.
+    module subroutine compute_coupling_diffusion_term_hydraulic(self, material_id, state, D_HT)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(inout) :: state
+        real(real64), intent(inout) :: D_HT(:, :)
+
+        real(real64) :: K_lT, K_vT, K_flh, dpsi_cryo_dT, rho_w
+        real(real64) :: w_cap, w_cryo
+        real(real64) :: coeff_D, temperature_local
+        integer(int32) :: i
+
+        call self%physics%calc_KlT(material_id, state, K_lT)
+        call self%calc_K_vT(material_id, state, K_vT)
+        call state%temperature%get(temperature_local)
+
+        if (self%physics%has_cryo_transport(material_id) .and. temperature_local < 0.0d0) then
+            call self%physics%calc_Kflh(material_id, state, K_flh)
+            call self%physics%calc_density_water(state, rho_w)
+            call self%physics%calc_suction_weights(material_id, state, w_cap, w_cryo)
+            call self%physics%calc_cryo_suction_deriv_T(material_id, state, dpsi_cryo_dT)
+            if (rho_w > tiny(1.0d0)) then
+                coeff_D = K_lT + K_vT - K_flh * w_cryo / (rho_w * g) * dpsi_cryo_dT
+            else
+                coeff_D = K_lT + K_vT
+            end if
+        else
+            coeff_D = K_lT + K_vT
+        end if
+
+        D_HT(:, :) = 0.0d0
+        do i = 1, self%computation_dimension
+            D_HT(i, i) = coeff_D
+        end do
+
+    end subroutine compute_coupling_diffusion_term_hydraulic
 
     ! ==========================================================================
     ! Helper Wrappers (Existing)
@@ -178,7 +195,24 @@ contains
         integer(int32), intent(in) :: target_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: K_wT
+        real(real64) :: K_flh, dpsi_cryo_dT, rho_w, temperature_local
+        real(real64) :: w_cap, w_cryo
+
         call self%physics%calc_KlT(target_id, state, K_wT)
+
+        ! Keep diagnostic/output liquid flux consistent with the hydraulic
+        ! equation: a temperature gradient contributes not only through surface
+        ! tension (KlT), but also through generalized Clapeyron cryosuction.
+        call state%temperature%get(temperature_local)
+        if (self%physics%has_cryo_transport(target_id) .and. temperature_local < 0.0d0) then
+            call self%physics%calc_Kflh(target_id, state, K_flh)
+            call self%physics%calc_density_water(state, rho_w)
+            if (rho_w > tiny(1.0d0)) then
+                call self%physics%calc_suction_weights(target_id, state, w_cap, w_cryo)
+                call self%physics%calc_cryo_suction_deriv_T(target_id, state, dpsi_cryo_dT)
+                K_wT = K_wT - K_flh * w_cryo / (rho_w * g) * dpsi_cryo_dT
+            end if
+        end if
     end subroutine calc_K_wT_hydraulic
 
     module subroutine calc_K_wP_hydraulic(self, target_id, state, K_wP)
@@ -196,7 +230,11 @@ contains
         integer(int32), intent(in) :: target_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: K_vT
-        call self%physics%calc_KvT(target_id, state, K_vT)
+        if (self%enable_vapor_transport) then
+            call self%physics%calc_KvT(target_id, state, K_vT)
+        else
+            K_vT = 0.0d0
+        end if
     end subroutine calc_K_vT_hydraulic
 
     module subroutine calc_K_vP_hydraulic(self, target_id, state, K_vP)
@@ -205,7 +243,11 @@ contains
         integer(int32), intent(in) :: target_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: K_vP
-        call self%physics%calc_Kvh(target_id, state, K_vP)
+        if (self%enable_vapor_transport) then
+            call self%physics%calc_Kvh(target_id, state, K_vP)
+        else
+            K_vP = 0.0d0
+        end if
     end subroutine calc_K_vP_hydraulic
 
     module subroutine update_water_phases_hydraulic(self, material_id, state)
@@ -268,5 +310,156 @@ contains
         end do
 
     end subroutine calc_effective_density_hydraulic
+
+    !> Evaluate the pore-water effective density rho_eff at the supplied state.
+    !>
+    !> Mathematical definition:
+    !> \( \rho_{eff} = \rho_w \theta_w + \rho_{ice} \theta_{ice} + \rho_w \theta_v^{\star} \) [kg/m3]
+    !>
+    !> This is the conserved storage quantity of the water-mass balance and the plain
+    !> counterpart of calc_effective_density (which returns its BDF time-derivative).
+    !> Assumptions: the phase contents Qw, Qi, Qv stored in state are already
+    !> consistent with (T, p_w) (call update_water_phases beforehand). Used by the
+    !> conserved-quantity convergence norm (PDF 6.2.4). Cost: O(1).
+    module subroutine calc_effective_density_value_hydraulic(self, state, rho_eff)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: rho_eff
+
+        real(real64) :: Qw, Qi, Qv
+        real(real64) :: rho_w, rho_i
+
+        call state%water_content%get(Qw)
+        call state%ice_content%get(Qi)
+        call state%vapor_content%get(Qv)
+
+        call self%physics%calc_density_water(state, rho_w)
+        call self%physics%calc_density_ice(state, rho_i)
+
+        rho_eff = rho_w * Qw + rho_i * Qi + rho_w * Qv
+    end subroutine calc_effective_density_value_hydraulic
+
+    !> @brief Compute equivalent specific moisture capacity C_eq = dTheta/dP.
+    module subroutine compute_C_eq_hydraulic(self, state, C_eq)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: C_eq
+
+        real(real64) :: rho_w, rho_i
+        real(real64) :: dQw_dP, dQi_dP, dQv_dP
+
+        dQw_dP = 0.0d0
+        dQi_dP = 0.0d0
+        dQv_dP = 0.0d0
+
+        call state%dQw_dP%get(dQw_dP)
+        call state%dQi_dP%get(dQi_dP)
+        call state%dQv_dP%get(dQv_dP)
+
+        call self%physics%calc_density_water(state, rho_w)
+        call self%physics%calc_density_ice(state, rho_i)
+
+        ! C_eq = dTheta/dP = dQw_dP + (rho_i/rho_w)*dQi_dP + dQv_dP
+        ! (rho_v ~ rho_w approximation consistent with calc_effective_density)
+        ! Clamp to non-negative: thermodynamically dTheta/dP >= 0 always holds,
+        ! but phase_systems compensation (dQw_dP = -dQi_dP) can cause numerical
+        ! sign reversal near the freezing front.
+        C_eq = max(0.0d0, dQw_dP + (rho_i / rho_w) * dQi_dP + dQv_dP)
+    end subroutine compute_C_eq_hydraulic
+
+    !> Compute the nonlinear-iteration capacity from the physical tangent and WRF bound.
+    module subroutine compute_iteration_capacity_hydraulic(self, material_id, state, capacity)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: capacity
+
+        real(real64) :: physical_capacity
+        physical_capacity = 0.0d0
+        call self%compute_C_eq(state, physical_capacity)
+        capacity = max(physical_capacity, self%iteration_capacity_bound(material_id))
+    end subroutine compute_iteration_capacity_hydraulic
+
+    !> @brief Compute BDF approximation of dTheta/dt for Mixed formulation.
+    module subroutine compute_transient_term_mixed_hydraulic(self, material_id, state, bdf_coeffs, dTheta_dt)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(in) :: bdf_coeffs(:)
+        real(real64), intent(inout) :: dTheta_dt
+
+        type(type_state) :: local_state
+        real(real64), pointer, dimension(:), contiguous :: temperature_history
+        real(real64), pointer, dimension(:), contiguous :: pressure_history
+
+        real(real64) :: Qw, Qi, Qv
+        real(real64) :: rho_w, rho_i
+        real(real64) :: Theta_j
+        integer(int32) :: j, n
+
+        nullify (temperature_history)
+        nullify (pressure_history)
+
+        call state%temperature_history%get(temperature_history)
+        call state%pressure_history%get(pressure_history)
+
+        dTheta_dt = 0.0d0
+        if (.not. associated(temperature_history)) return
+        if (.not. associated(pressure_history)) return
+
+        n = min(size(bdf_coeffs), size(temperature_history), size(pressure_history))
+        call local_state%copy(state)
+
+        do j = 1, n
+            call local_state%temperature%set(temperature_history(j))
+            call local_state%pressure%set(pressure_history(j))
+
+            call self%update_water_phases(material_id, local_state)
+
+            call local_state%water_content%get(Qw)
+            call local_state%ice_content%get(Qi)
+            call local_state%vapor_content%get(Qv)
+
+            call self%physics%calc_density_water(local_state, rho_w)
+            call self%physics%calc_density_ice(local_state, rho_i)
+
+            ! Theta = Qw + (rho_i/rho_w)*Qi + Qv  (rho_v ~ rho_w)
+            Theta_j = Qw + (rho_i / rho_w) * Qi + Qv
+
+            dTheta_dt = dTheta_dt + bdf_coeffs(j) * Theta_j
+        end do
+
+    end subroutine compute_transient_term_mixed_hydraulic
+
+    !> @brief Compute segregation sink from temperature gradient magnitude.
+    !>
+    !> Returns an **effective** S_seg (volumetric liquid-water removal rate
+    !> [1/s]) with available-water and open-pore capacity folded into the rate.
+    module subroutine calc_segregation_sink_hydraulic(self, material_id, state, dt, S_seg)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(in) :: dt
+        real(real64), intent(inout) :: S_seg
+
+        type(type_coordinate_dp), pointer :: grad_T
+        real(real64) :: grad_T_mag
+
+        S_seg = 0.0d0
+        nullify (grad_T)
+        call state%grad_T%get(grad_T)
+        if (.not. associated(grad_T)) return
+
+        grad_T_mag = sqrt(grad_T%x**2 + grad_T%y**2 + grad_T%z**2)
+        if (grad_T_mag <= 0.0d0) return
+
+        call self%physics%calc_effective_segregation_sink(material_id, state, grad_T_mag, dt, S_seg)
+
+    end subroutine calc_segregation_sink_hydraulic
 
 end submodule hydraulic_coefficients

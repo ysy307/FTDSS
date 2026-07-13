@@ -7,7 +7,7 @@
         "calculate_thermal": true,
         "calculate_hydraulic": false,
         "calculate_mechanical": false,
-        "coupling_mode": "weak",
+        "coupling_mode": "staggered",
         "partitioning": true
     },
     "geometry_settings": {
@@ -134,16 +134,24 @@
         }
     },
     "linear_solver": {
-        "type": 9,
+        "type": 26,
         "preconditioner_type": 1,
         "max_iterations": 50000,
-        "tolerance": 1e-10,
-        "restart_size": 1000
+        "tolerance": 1e-6,
+        "restart_size": 1000,
+        "amg_strength_threshold": 0.25,
+        "amg_smoother_sweeps": 2,
+        "amg_max_agg_size": 8,
+        "amg_drop_tolerance": 1e-04,
+        "amg_drop_strategy": "RELATIVE",
+        "amg_smoother_type": "JACOBI",
+        "amg_rebuild_frequency": 5,
+        "amg_rebuild_threshold": 1e-02
     },
     "parallel_settings": {
         "threads": {
             "is_parallel": true,
-            "num_threads": 1,
+            "num_threads": 4,
             "schedule": "static",
             "max_active_levels": 1
         }

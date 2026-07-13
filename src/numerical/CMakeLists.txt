@@ -1,3 +1,4 @@
+add_subdirectory(math)
 add_subdirectory(linalg)
 add_subdirectory(parallel)
 add_subdirectory(solver)

@@ -140,7 +140,13 @@ contains
         class(type_config_wrf), intent(inout) :: config
 
         type(type_constant_id) :: L_unit
-        real(real64) :: scale_pressure
+        ! WRF models operate on pressure head in METERS (fusion converts pore
+        ! pressure p [Pa] to head via p/(rho_w g) before every WRF call). The
+        ! input WRF parameters are therefore length-based and must be converted
+        ! from the declared input length unit to meters: inverse-length params
+        ! (van Genuchten alpha) are divided, length params (air-entry head) are
+        ! multiplied. scale_length is meters per input unit.
+        real(real64) :: scale_length
 
         associate (material => input%basic%materials(material_id)%water_characteristic_curve)
 
@@ -186,30 +192,32 @@ contains
 
             select case (L_unit%ID)
             case (PHYSICS_UNITS%M%ID)
-                scale_pressure = 1000.0d0 * 9.80655d0
+                scale_length = 1.0d0
             case (PHYSICS_UNITS%CM%ID)
-                scale_pressure = 1000.0d0 * 9.80655d0 * 1.0d-2
+                scale_length = 1.0d-2
+            case (PHYSICS_UNITS%PA%ID)
+                scale_length = 1.0d0 / (reference_water_density * gravity_acceleration)
             case default
-                scale_pressure = 1.0d0
+                error stop "Input Error: unsupported SWCC parameter unit."
             end select
 
             select case (config%swcc_model%ID)
 
             case (SWCC_MODELS%BC%ID, SWCC_MODELS%KO%ID)
-                config%alpha1 = config%alpha1 * scale_pressure
-                config%h_crit = config%h_crit * scale_pressure
-                config%alpha2 = config%alpha2 * scale_pressure
+                config%alpha1 = config%alpha1 * scale_length
+                config%h_crit = config%h_crit * scale_length
+                config%alpha2 = config%alpha2 * scale_length
 
             case (SWCC_MODELS%VG%ID, SWCC_MODELS%DVGCH%ID)
-                config%alpha1 = config%alpha1 / scale_pressure
+                config%alpha1 = config%alpha1 / scale_length
 
             case (SWCC_MODELS%MVG%ID)
-                config%alpha1 = config%alpha1 / scale_pressure
-                config%h_crit = config%h_crit * scale_pressure
+                config%alpha1 = config%alpha1 / scale_length
+                config%h_crit = config%h_crit * scale_length
 
             case (SWCC_MODELS%DURNER%ID)
-                config%alpha1 = config%alpha1 / scale_pressure
-                config%alpha2 = config%alpha2 / scale_pressure
+                config%alpha1 = config%alpha1 / scale_length
+                config%alpha2 = config%alpha2 / scale_length
 
             end select
 
@@ -232,16 +240,21 @@ contains
         ! GCC model processing
         !==================================================
 
-        associate (material => input%basic%materials(material_id)%phase_change%equilibrium_model)
+        associate (material => input%basic%materials(material_id)%phase_change%equilibrium_model, &
+                   phase => input%basic%materials(material_id)%phase_change)
 
             call config%reset()
 
             config%material_id = material_id
-            if (material%segregation) then
+            if (material%segregation .or. phase%segregation_potential > 0.0d0) then
                 config%gcc_model = GCC_TYPES%SEGREGATION
             else
                 config%gcc_model = GCC_TYPES%NON_SEGREGATION
             end if
+
+            config%segregation_potential = phase%segregation_potential
+            config%T_fringe_low = phase%T_fringe_low
+            config%T_fringe_high = phase%T_fringe_high
 
         end associate
 
@@ -253,14 +266,9 @@ contains
         class(type_input), intent(in) :: input
         type(type_config_iteration), intent(inout) :: config
 
-        associate (nls => input%basic%solver_settings%nonlinear_solver)
-            config%nonlinear_solver_type = NONLINEAR_SOLVER%to_object(nls%method)
-            if (config%nonlinear_solver_type == NONLINEAR_SOLVER%NONE) then
-                return
-            end if
-
-            call execute_basic_iteration_nonlinear(input, config%nonlinear)
-        end associate
+        ! Nonlinear strategy is fixed to Picard for this project profile.
+        config%nonlinear_solver_type = NONLINEAR_SOLVER%PICARD
+        call execute_basic_iteration_nonlinear(input, config%nonlinear)
 
     end subroutine execute_basic_iteration
 
@@ -278,6 +286,13 @@ contains
             config%norm_type = NORM_TYPES%to_object(nls%convergence%norm_type)
             config%combination_logic = NONLINEAR_LOGIC%to_object(nls%convergence%use_logic)
             config%convergence_norm_type = NONLINEAR_NORM_CRITERIA%to_object(nls%convergence%use_criteria)
+
+            ! Conserved-quantity convergence tolerances (PDF 6.2.4). Defaulted in the
+            ! reader struct, so harmless for non-conserved modes.
+            config%atol_enthalpy = nls%convergence%atol_enthalpy
+            config%atol_density = nls%convergence%atol_density
+            config%rtol_conserved = nls%convergence%rtol_conserved
+            config%residual_eps = nls%convergence%residual_eps
 
             do i = 1, PHYSICS_TYPES%NUM_ID
                 call execute_basic_iteration_criterion(input, NONLINEAR_NORM_CRITERIA%RESIDUAL, config%residual(i))
@@ -347,8 +362,8 @@ contains
             stop 1
         end if
 
-        num_unique_regions = size(config%unique_material_ids)
         max_region_id = maxval(config%unique_material_ids)
+        num_unique_regions = size(config%unique_material_ids)
 
         ! -------------------------
         ! Physics active flags
@@ -358,7 +373,7 @@ contains
         ! -------------------------
         ! Per-material flag configuration
         ! -------------------------
-        call allocate_array(config%physics_active, PHYSICS_TYPES%NUM_ID, num_unique_regions)
+        call allocate_array(config%physics_active, PHYSICS_TYPES%NUM_ID, max_region_id)
         config%physics_active(:, :) = .false.
 
         do i = 1, num_unique_regions
@@ -368,7 +383,8 @@ contains
 
             do pid = 1, PHYSICS_TYPES%NUM_ID
                 if (config%compute_active(pid)) then
-                    config%physics_active(pid, current_material_id) = config%compute_active(pid)
+                    config%physics_active(pid, current_material_id) = &
+                        input%basic%materials(current_material_id)%is_active(pid)
                 end if
             end do
         end do

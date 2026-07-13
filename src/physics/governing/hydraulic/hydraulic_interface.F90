@@ -15,6 +15,9 @@ module physics_governing_hydraulic
         private
         integer(int32) :: computation_type
         integer(int32) :: computation_dimension
+        logical :: enable_vapor_transport = .true.
+        logical :: enable_fringe_subcell_quadrature = .true.
+        real(real64), allocatable :: iteration_capacity_bound(:)
         type(type_constitutive_manager) :: physics
     contains
         procedure, pass(self), public :: initialize => initialize_type_hydraulic
@@ -22,24 +25,31 @@ module physics_governing_hydraulic
 
         ! --- Assembly Procedures ---
         procedure, pass(self), public :: assemble_local => assemble_local_hydraulic
-        procedure, pass(self), private :: assemble_local_newton => assemble_local_newton_hydraulic
         procedure, pass(self), private :: assemble_local_picard => assemble_local_picard_hydraulic
 
         ! --- Coefficient Computation Procedures ---
-        procedure, pass(self), private :: compute_mass_term => compute_mass_term_hydraulic
-        procedure, pass(self), private :: compute_diffusion_term => compute_diffusion_term_hydraulic
-        procedure, pass(self), private :: compute_temperature_coupling_term => compute_temperature_coupling_term_hydraulic
+        procedure, pass(self), public :: compute_diffusion_term => compute_diffusion_term_hydraulic
         procedure, pass(self), private :: compute_advective_term => compute_advective_term_hydraulic
-        procedure, pass(self), private :: compute_transient_term => compute_transient_term_hydraulic
+
+        ! --- Coupling Coefficient Procedures ---
+        procedure, pass(self), private :: compute_coupling_mass_term => compute_coupling_mass_term_hydraulic
+        procedure, pass(self), public :: compute_coupling_diffusion_term => compute_coupling_diffusion_term_hydraulic
 
         ! --- Helper Procedures ---
         procedure, pass(self), public :: calc_K_wT => calc_K_wT_hydraulic
         procedure, pass(self), public :: calc_K_wP => calc_K_wP_hydraulic
         procedure, pass(self), public :: calc_K_vT => calc_K_vT_hydraulic
         procedure, pass(self), public :: calc_K_vP => calc_K_vP_hydraulic
+        procedure, pass(self), public :: is_vapor_transport_enabled => is_vapor_transport_enabled_hydraulic
 
         procedure, pass(self), public :: update_water_phases => update_water_phases_hydraulic
         procedure, pass(self), public :: calc_effective_density => calc_effective_density_hydraulic
+        procedure, pass(self), public :: calc_effective_density_value => calc_effective_density_value_hydraulic
+
+        procedure, pass(self), private :: compute_C_eq => compute_C_eq_hydraulic
+        procedure, pass(self), private :: compute_iteration_capacity => compute_iteration_capacity_hydraulic
+        procedure, pass(self), private :: compute_transient_term_mixed => compute_transient_term_mixed_hydraulic
+        procedure, pass(self), public :: calc_segregation_sink => calc_segregation_sink_hydraulic
     end type type_hydraulic
 
     interface
@@ -66,16 +76,6 @@ module physics_governing_hydraulic
             type(type_vector_dp), intent(inout), optional :: F_H
         end subroutine assemble_local_hydraulic
 
-        module subroutine assemble_local_newton_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
-            implicit none
-            class(type_hydraulic), intent(in) :: self
-            type(type_control), intent(in) :: control
-            type(type_assemble_workspace), intent(inout) :: workspace
-            type(type_matrix_dense), intent(inout), optional :: K_HH
-            type(type_matrix_dense), intent(inout), optional :: K_HT
-            type(type_vector_dp), intent(inout), optional :: F_H
-        end subroutine assemble_local_newton_hydraulic
-
         module subroutine assemble_local_picard_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
             implicit none
             class(type_hydraulic), intent(in) :: self
@@ -87,14 +87,6 @@ module physics_governing_hydraulic
         end subroutine assemble_local_picard_hydraulic
 
         ! --- Physics Term Interfaces ---
-        module subroutine compute_mass_term_hydraulic(self, material_id, state, C_HH)
-            implicit none
-            class(type_hydraulic), intent(in) :: self
-            integer(int32), intent(in) :: material_id
-            type(type_state), intent(in) :: state
-            real(real64), intent(inout) :: C_HH
-        end subroutine compute_mass_term_hydraulic
-
         module subroutine compute_diffusion_term_hydraulic(self, material_id, state, D_HH)
             implicit none
             class(type_hydraulic), intent(in) :: self
@@ -102,14 +94,6 @@ module physics_governing_hydraulic
             type(type_state), intent(inout) :: state
             real(real64), intent(inout) :: D_HH(:, :)
         end subroutine compute_diffusion_term_hydraulic
-
-        module subroutine compute_temperature_coupling_term_hydraulic(self, material_id, state, D_HT)
-            implicit none
-            class(type_hydraulic), intent(in) :: self
-            integer(int32), intent(in) :: material_id
-            type(type_state), intent(inout) :: state
-            real(real64), intent(inout) :: D_HT(:, :)
-        end subroutine compute_temperature_coupling_term_hydraulic
 
         module subroutine compute_advective_term_hydraulic(self, material_id, state, V_H)
             implicit none
@@ -119,14 +103,22 @@ module physics_governing_hydraulic
             real(real64), intent(inout) :: V_H(:)
         end subroutine compute_advective_term_hydraulic
 
-        module subroutine compute_transient_term_hydraulic(self, material_id, state, bdf_coeffs, drho_dt)
+        ! --- Coupling Coefficient Interfaces ---
+        module subroutine compute_coupling_mass_term_hydraulic(self, material_id, state, C_HT)
             implicit none
             class(type_hydraulic), intent(in) :: self
             integer(int32), intent(in) :: material_id
             type(type_state), intent(in) :: state
-            real(real64), intent(in) :: bdf_coeffs(:)
-            real(real64), intent(inout) :: drho_dt
-        end subroutine compute_transient_term_hydraulic
+            real(real64), intent(inout) :: C_HT
+        end subroutine compute_coupling_mass_term_hydraulic
+
+        module subroutine compute_coupling_diffusion_term_hydraulic(self, material_id, state, D_HT)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(inout) :: state
+            real(real64), intent(inout) :: D_HT(:, :)
+        end subroutine compute_coupling_diffusion_term_hydraulic
 
         ! --- Helper Interfaces ---
         module subroutine calc_K_wT_hydraulic(self, target_id, state, K_wT)
@@ -161,6 +153,12 @@ module physics_governing_hydraulic
             real(real64), intent(inout) :: K_vP
         end subroutine calc_K_vP_hydraulic
 
+        module pure function is_vapor_transport_enabled_hydraulic(self) result(enabled)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            logical :: enabled
+        end function is_vapor_transport_enabled_hydraulic
+
         module subroutine update_water_phases_hydraulic(self, material_id, state)
             implicit none
             class(type_hydraulic), intent(in) :: self
@@ -177,11 +175,64 @@ module physics_governing_hydraulic
             real(real64), intent(inout) :: drho_dt
         end subroutine calc_effective_density_hydraulic
 
+        !> Evaluate the pore-water effective density at the supplied state.
+        !> \( \rho_{eff} = \rho_w \theta_w + \rho_{ice} \theta_{ice} + \rho_w \theta_v^{\star} \) [kg/m3].
+        !> Plain (non-time-derivative) conserved storage quantity of the water-mass
+        !> balance; phase contents must already be consistent with (T, p_w).
+        module subroutine calc_effective_density_value_hydraulic(self, state, rho_eff)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: rho_eff
+        end subroutine calc_effective_density_value_hydraulic
+
+        !> Compute equivalent specific moisture capacity C_eq = dTheta/dP [1/Pa].
+        !> \[ C_{eq} = \frac{\partial\theta_l}{\partial P}
+        !>           + \frac{\rho_i}{\rho_l}\frac{\partial\theta_i}{\partial P}
+        !>           + \frac{\partial\theta_v}{\partial P} \]
+        module subroutine compute_C_eq_hydraulic(self, state, C_eq)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: C_eq
+        end subroutine compute_C_eq_hydraulic
+
+        module subroutine compute_iteration_capacity_hydraulic(self, material_id, state, capacity)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: capacity
+        end subroutine compute_iteration_capacity_hydraulic
+
+        !> Compute BDF approximation of dTheta/dt for Mixed formulation.
+        !> \[ \frac{d\Theta}{dt} \approx \sum_j \alpha_j \Theta(t_{n+1-j}) \]
+        !> where \(\Theta = \theta_l + (\rho_i/\rho_l)\theta_i + \theta_v\).
+        module subroutine compute_transient_term_mixed_hydraulic(self, material_id, state, bdf_coeffs, dTheta_dt)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(in) :: bdf_coeffs(:)
+            real(real64), intent(inout) :: dTheta_dt
+        end subroutine compute_transient_term_mixed_hydraulic
+
+        module subroutine calc_segregation_sink_hydraulic(self, material_id, state, dt, S_seg)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(in) :: dt
+            real(real64), intent(inout) :: S_seg
+        end subroutine calc_segregation_sink_hydraulic
+
     end interface
 
 contains
     module subroutine destroy_type_hydraulic(self)
         implicit none
         class(type_hydraulic), intent(inout) :: self
+
+        if (allocated(self%iteration_capacity_bound)) deallocate (self%iteration_capacity_bound)
     end subroutine destroy_type_hydraulic
 end module physics_governing_hydraulic

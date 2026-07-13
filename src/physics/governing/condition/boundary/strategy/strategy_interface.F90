@@ -32,6 +32,7 @@ module boundary_strategy
     contains
         procedure, public, pass(self) :: initialize => initialize_abst_bc
         procedure, public, pass(self) :: destroy => destroy_abst_bc
+        procedure, public, pass(self) :: update_provider_data => update_provider_data_abst_bc
         procedure(abst_evaluate), public, pass(self), deferred :: evaluate
     end type abst_bc
 
@@ -99,6 +100,12 @@ module boundary_strategy
             implicit none
             class(abst_bc), intent(inout) :: self
         end subroutine destroy_abst_bc
+
+        module subroutine update_provider_data_abst_bc(self, new_values)
+            implicit none
+            class(abst_bc), intent(inout) :: self
+            real(real64), intent(in) :: new_values(:)
+        end subroutine update_provider_data_abst_bc
 
         module subroutine evaluate_dirichlet_bc(self, current_time, u_curr, result)
             implicit none

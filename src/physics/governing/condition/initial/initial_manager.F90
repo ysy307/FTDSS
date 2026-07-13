@@ -7,7 +7,7 @@ module condition_initial_manager
     use :: module_core
     use :: module_domain, only:type_domain
     use :: module_input, only:type_input
-    use :: condition_initial, only:abst_ic, type_ic_uniform, holder_ics
+    use :: condition_initial, only:abst_ic, type_ic_uniform, type_ic_from_file, holder_ics
     implicit none
     private
 
@@ -40,10 +40,9 @@ contains
             select case (configs(i)%ic_kind%ID)
             case (IC_METHODS%UNIFORM%ID)
                 allocate (type_ic_uniform :: self%ic(i)%p)
-                ! case (IC_METHOD_LAPLACE)
-                !     allocate (type_ic_laplace :: self%ic(i)%p)
+            case (IC_METHODS%FROM_FILE%ID)
+                allocate (type_ic_from_file :: self%ic(i)%p)
             case default
-                ! Future: Handle IC_METHOD_FROM_FILE or others
             end select
 
             if (allocated(self%ic(i)%p)) then

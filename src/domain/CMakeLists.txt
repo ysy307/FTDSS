@@ -45,6 +45,8 @@ target_sources(SOLVER_DOMAIN PRIVATE
     fe/fe_factory.F90
     fe/fe_manager.F90
     fe/fe.F90
+    # FE subcell quadrature (freezing fringe)
+    fe/subcell/fe_subcell_quadrature.F90
     # ====================================================
     # 2. Adjacency
     # ====================================================

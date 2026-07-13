@@ -7,8 +7,8 @@
         },
         "time_stepping": {
             "unit": "second",
-            "initial_step": 1.0,
-            "min_step": 1.0,
+            "initial_step": 0.001,
+            "min_step": 0.001,
             "max_step": 300000.0
         },
         "adaptive_stepping": {
@@ -94,7 +94,7 @@
                 ]
             },
             "hydraulic": {
-                "type": "dirichlet",
+                "type": "flux",
                 "value_type": "constant",
                 "values": [
                     0.0

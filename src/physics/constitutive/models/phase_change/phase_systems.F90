@@ -71,6 +71,13 @@ contains
         real(real64) :: dQi_dP, dQi_dT
         real(real64) :: dQa_dP, dQa_dT
         real(real64) :: dQv_dP, dQv_dT
+        real(real64) :: psi_eff
+
+        ! 0. Generalized suction of the liquid phase: retention-based
+        !    properties (theta_w, relative permeability) are evaluated at it.
+        psi_eff = 0.0d0
+        call self%fusion%calc_effective_suction(state, psi_eff)
+        call state%effective_suction%set(psi_eff)
 
         ! 1. Get porosity
         call state%porosity%get(porosity)
@@ -133,12 +140,17 @@ contains
             end if
         end if
 
-        ! 4. Physical projection to avoid negative/oversaturated phase fractions
+        ! 4. Physical projection to avoid negative/oversaturated phase fractions.
+        ! Keep the thermodynamic one-sided derivatives while a phase is active. The
+        ! freezing front needs dQi/dT and dQi/dP immediately after ice appears;
+        ! tapering them to zero near Qi=0 removes the latent/apparent capacity and
+        ! makes the Picard map jump across the front.
         if (ice_content < 0.0d0) then
             ice_content = 0.0d0
             dQi_dP = 0.0d0
             dQi_dT = 0.0d0
         end if
+
         if (ice_content > porosity) then
             ice_content = porosity
             dQi_dP = 0.0d0
@@ -150,6 +162,7 @@ contains
             dQw_dP = 0.0d0
             dQw_dT = 0.0d0
         end if
+
         if (water_content > porosity - ice_content) then
             water_content = max(0.0d0, porosity - ice_content)
             dQw_dP = -1.0d0 * dQi_dP
@@ -182,9 +195,12 @@ contains
         ! 5. Update relative humidity and vapor content (theta_v)
         call state%temperature%get(temperature, temperature_set)
         call state%pressure%get(pressure, pressure_set)
-        if (.not. temperature_set .or. .not. pressure_set) then
+        if (.not. temperature_set) then
             write (*, '(A,L1,A,L1)') 'Error: phase state unset before RH. T_set=', temperature_set, ', P_set=', pressure_set
-            error stop 'update_water_phases: state unset before RH.'
+            error stop 'update_water_phases: temperature unset before RH.'
+        end if
+        if (.not. pressure_set) then
+            pressure = 0.0d0
         end if
 
         if (.not. ieee_is_finite(temperature) .or. .not. ieee_is_finite(pressure)) then
@@ -215,8 +231,7 @@ contains
         !    Note: If the model depends on gas-phase volume, the logic for
         !    vapor=0 when air_content=0 should be handled inside evap,
         !    but here we call it independently.
-        call self%evap%calc_vapor_content(state, vapor_content)
-        call self%evap%calc_vapor_content_derivatives(state, dQv_dP, dQv_dT)
+        call self%evap%calc_vapor_content_with_derivatives(state, vapor_content, dQv_dP, dQv_dT)
 
         ! Guard: if air_content is zero, vapor cannot physically exist
         if (air_content <= epsilon(0.0d0)) then
@@ -269,5 +284,21 @@ contains
         call self%fusion%deriv_pressure_ice_water(state, deriv)
 
     end subroutine deriv_pressure_ice_water
+
+    !> C1 cubic Hermite weight: 1 when x<=0, smoothly decays to 0 at x=delta.
+    pure function smooth_weight(x, delta) result(w)
+        implicit none
+        real(real64), intent(in) :: x, delta
+        real(real64) :: w, t
+
+        if (x <= 0.0d0) then
+            w = 1.0d0
+        else if (x >= delta) then
+            w = 0.0d0
+        else
+            t = x / delta
+            w = 1.0d0 - t * t * (3.0d0 - 2.0d0 * t)
+        end if
+    end function smooth_weight
 
 end module models_phase_change_manager

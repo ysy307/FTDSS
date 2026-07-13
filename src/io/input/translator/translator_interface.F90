@@ -23,6 +23,7 @@ module io_input_translator
             execute_geometry_domain_elements, &
             execute_geometry_domain_boundaries, &
             execute_output_field, &
+            execute_output_manager, &
             execute_output_base, &
             execute_output_observation, &
             execute_output_overall
@@ -41,6 +42,7 @@ module io_input_translator
         procedure, private, pass(self) :: execute_geometry_domain_elements
         procedure, private, pass(self) :: execute_geometry_domain_boundaries
         procedure, private, pass(self) :: execute_output_field
+        procedure, private, pass(self) :: execute_output_manager
         procedure, private, pass(self) :: execute_output_base
         procedure, private, pass(self) :: execute_output_observation
         procedure, private, pass(self) :: execute_output_overall
@@ -174,6 +176,15 @@ module io_input_translator
             type(type_config_output_manager), intent(inout) :: config
 
         end subroutine execute_output_field
+
+        module subroutine execute_output_manager(self, input, output_type, config)
+            implicit none
+            class(type_input_translator), intent(in) :: self
+            class(type_input), intent(in) :: input
+            type(type_constant_id), intent(in) :: output_type
+            type(type_config_output_manager), intent(inout) :: config
+
+        end subroutine execute_output_manager
 
         module subroutine execute_output_base(self, input, config)
             implicit none

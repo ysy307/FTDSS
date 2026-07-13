@@ -133,6 +133,14 @@ contains
             bc_kind = HYDRAULIC_BC_TYPES%to_object(self%bc_type)
         end select
 
+        ! Atmospheric BC: values are set dynamically by the solver; skip provider config.
+        if (bc_kind%ID == THERMAL_BC_TYPES%ATMOSPHERIC%ID .or. &
+            bc_kind%ID == HYDRAULIC_BC_TYPES%ATMOSPHERIC%ID) then
+            self%bc_value_type = 'constant'
+            self%num_time_points = 0
+            return
+        end if
+
         ! Path: ...thermal.value_type
         local_buffer(idx + 1) = value_type
         call get_json_value(json, join(local_buffer(1:idx + 1)), self%bc_value_type, is_required=.true.)

@@ -18,16 +18,18 @@ module io_input_output_conditions
     character(*), parameter :: output_interval = "output_interval"
     character(*), parameter :: valid_time_units(5) = [character(len=16) :: "second", "minute", "hour", "day", "year"]
     character(*), parameter :: variables = "variables"
-    character(*), parameter :: valid_variables_lists(9) = [character(32) :: &
-                                                           ! Keep this list in sync with OUTPUT_VARIABLE_TYPES in include/constants.fypp
-                                                           'water_content', 'ice_content', 'vapor_content', &
-                                                           'temperature', 'thermal_conductivity', 'volumetric_heat_capacity', &
-                                                           'pressure', 'water_flux', 'hydraulic_conductivity']
+    character(*), parameter :: valid_variables_lists(10) = [character(32) :: &
+                                                            ! Keep this list in sync with OUTPUT_VARIABLE_TYPES in include/constants.fypp
+                                                            'water_content', 'ice_content', 'vapor_content', &
+                                                            'temperature', 'thermal_conductivity', 'volumetric_heat_capacity', &
+                                                            'pressure', 'water_flux', 'hydraulic_conductivity', &
+                                                            'vapor_flux']
 
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_field_output
         character(:), allocatable :: file_format
         character(:), allocatable :: output_time_unit
+        real(real64) :: output_time_offset = 0.0d0
         character(:), allocatable :: output_interval_unit
         real(real64) :: output_interval_step
         character(:), allocatable :: variable_names(:)
@@ -47,6 +49,7 @@ module io_input_output_conditions
         character(:), allocatable :: file_format
         character(:), allocatable :: observation_type
         character(:), allocatable :: output_time_unit
+        real(real64) :: output_time_offset = 0.0d0
         character(:), allocatable :: output_interval_unit
         real(real64) :: output_interval_step
         character(:), allocatable :: variable_names(:)

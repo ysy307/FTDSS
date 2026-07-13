@@ -1,10 +1,11 @@
 module constitutive_constants
     use, intrinsic :: iso_fortran_env
+    use :: core_physical_constants, only: reference_water_density, gravity_acceleration
     implicit none
     private
 
-    !> Reference water density [kg/m^3]
-    real(real64), parameter, public :: reference_water_density = 1000.0d0
+    public :: reference_water_density
+    public :: gravity_acceleration
 
     !> Mathematical constant pi
     real(real64), parameter, public :: circle_ratio = 3.141592653589793d0
@@ -12,8 +13,6 @@ module constitutive_constants
     !> Conversion from Celsius to Kelvin [K]
     real(real64), parameter, public :: celsius_to_kelvin = 273.15d0
 
-    !> Gravitational acceleration [m/s^2]
-    real(real64), parameter, public :: gravity_acceleration = 9.80665d0
     !> Standard atmospheric pressure [Pa]
     real(real64), parameter, public :: standard_atmospheric_pressure = 101325.0d0
 
@@ -53,5 +52,14 @@ module constitutive_constants
     real(real64), parameter, public :: stefan_boltzmann_constant = 5.670374419d-8
 
     real(real64), parameter, public :: min_vapor_density = 1.0d-8
+
+    !> Differentiability guard [Pa] for the generalized suction
+    !> \(p_c^* = \max(\psi_{cap}, \psi_{cryo})\) and its subgradient weights.
+    !> Single source of truth for every smooth-max evaluation of the freezing
+    !> switch.  It is NOT a physical smoothing scale: elements cut by the
+    !> freezing interface are integrated with the interface-split subcell rule,
+    !> so quadrature points never straddle the switch; this epsilon only keeps
+    !> the derivative weights defined exactly at \(\psi_{cap} = \psi_{cryo}\).
+    real(real64), parameter, public :: suction_blend_epsilon = 1.0d2
 
 end module constitutive_constants

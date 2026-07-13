@@ -29,6 +29,7 @@ target_sources(SOLVER_GOVERNING PRIVATE
     # ====================================================
     condition/initial/initial_interface.F90
     condition/initial/initial_uniform.F90
+    condition/initial/initial_from_file.F90
     condition/initial/initial_manager.F90
     condition/initial/initial.F90
     # ====================================================
@@ -50,8 +51,12 @@ target_sources(SOLVER_GOVERNING PRIVATE
     hydraulic/hydraulic_matrix.F90
     hydraulic/hydraulic_coefficients.F90
     # ====================================================
-    # 6. Atmosphere
+    # 6. Atmosphere / Data Assimilation (ETKF)
     # ====================================================
+    atmosphere/ensemble_manager.F90
+    atmosphere/observation_manager.F90
+    atmosphere/etkf_solver.F90
+    atmosphere/assimilation_controller.F90
     atmosphere/atmosphere.F90
     # ====================================================
     # \

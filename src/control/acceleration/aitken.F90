@@ -88,6 +88,7 @@ contains
         else
             omega = 0.5d0
             self%relaxation_factor(pid) = omega
+            self%previous_relaxation_factor(pid) = omega
         end if
 
         vec(:) = vec(:) + omega * du(:)

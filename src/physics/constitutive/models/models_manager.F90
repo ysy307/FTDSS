@@ -1,6 +1,7 @@
 module constitutive_models_manager
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use :: iapws, only:type_iapws97, type_iapws06
+    use :: constitutive_constants, only: SUCTION_BLEND_EPS => suction_blend_epsilon
     use :: module_core
     use :: models_wrf
     use :: models_hcf
@@ -8,6 +9,7 @@ module constitutive_models_manager
     use :: models_phase_change_fusion
     use :: models_phase_change_vaporization
     use :: models_phase_change_manager
+    use :: models_segregation_potential, only: type_segregation_potential
     implicit none
     private
 
@@ -19,6 +21,7 @@ module constitutive_models_manager
         type(holder_hcfs) :: hcf
         type(holder_gccs) :: gcc
         type(type_phase_manager) :: phase_manager
+        type(type_segregation_potential) :: segregation
     contains
         procedure, public :: initialize
         procedure, public :: update_water_phases
@@ -29,8 +32,12 @@ module constitutive_models_manager
         procedure, public :: calc_latent_heat_fusion
         procedure, public :: calc_latent_heat_vaporization
         procedure, public :: calc_pressure_ice_water_derivative
-        procedure, public :: calc_cryogenic_suction
-        procedure, public :: calc_cryogenic_suction_derivatives
+        procedure, public :: calc_cryo_suction_deriv_T
+        procedure, public :: calc_lscheme_capacity
+        procedure, public :: calc_suction_weights
+        procedure, public :: calc_segregation_sink
+        procedure, public :: is_segregation_active
+        procedure, public :: has_cryo_transport
     end type type_models_manager
 
 contains
@@ -53,6 +60,11 @@ contains
         end if
         if (present(config_gcc) .and. present(water) .and. present(ice)) then
             call self%gcc%initialize(material_id, config_gcc, water, ice)
+            if (config_gcc%segregation_potential > 0.0d0) then
+                call self%segregation%initialize(config_gcc%segregation_potential, &
+                                                 T_fringe_low=config_gcc%T_fringe_low, &
+                                                 T_fringe_high=config_gcc%T_fringe_high)
+            end if
         end if
 
         if (allocated(self%wrf%p) .and. allocated(self%gcc%p)) then
@@ -76,26 +88,7 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: Kflh
 
-        real(real64) :: pressure, psi_cap, psi_cryo
-        type(type_state) :: local_state
-
-        ! When cryogenic suction (psi_cryo) exceeds the capillary suction (psi_cap),
-        ! the soil is in the frozen regime.  In that case the liquid-water pressure is
-        ! effectively -psi_cryo (Clausius-Clapeyron), which strongly reduces the
-        ! relative permeability.  Use this effective pressure for the HCF evaluation
-        ! so that the frozen zone becomes a hydraulic barrier and drives flow toward
-        ! the freezing front.
-        call state%pressure%get(pressure)
-        psi_cap = max(0.0d0, -pressure)
-        call self%gcc%calc(state, psi_cryo)
-
-        if (psi_cryo > psi_cap) then
-            call local_state%copy(state)
-            call local_state%pressure%set(-psi_cryo)
-            call self%hcf%p%calc_Kflh(local_state, Kflh)
-        else
-            call self%hcf%p%calc_Kflh(state, Kflh)
-        end if
+        call self%hcf%p%calc_Kflh(state, Kflh)
     end subroutine calc_Kflh
 
     subroutine calc_KlT(self, state, KlT)
@@ -152,28 +145,76 @@ contains
         call self%phase_manager%deriv_pressure_ice_water(state, deriv)
     end subroutine calc_pressure_ice_water_derivative
 
-    subroutine calc_cryogenic_suction(self, state, suction)
+    subroutine calc_cryo_suction_deriv_T(self, state, deriv)
         implicit none
         class(type_models_manager), intent(in) :: self
         type(type_state), intent(in) :: state
-        real(real64), intent(inout) :: suction
+        real(real64), intent(inout) :: deriv
 
-        call self%gcc%calc(state, suction)
-    end subroutine calc_cryogenic_suction
+        call self%gcc%deriv_temperature(state, deriv)
+    end subroutine calc_cryo_suction_deriv_T
 
-    subroutine calc_cryogenic_suction_derivatives(self, state, deriv_dP, deriv_dT)
+    subroutine calc_lscheme_capacity(self, capacity)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        real(real64), intent(inout) :: capacity
+
+        capacity = 0.0d0
+        if (allocated(self%wrf%p)) call self%wrf%p%calc_lscheme_capacity(capacity)
+    end subroutine calc_lscheme_capacity
+
+    !> Weights of the generalized suction p_c* = max(P_aw, P_iw) with respect to its
+    !> two contributions: w_cap = d(p_c*)/d(P_aw), w_cryo = d(p_c*)/d(P_iw). These are
+    !> the fractions with which the capillary (grad p_w) and cryogenic (grad T) terms
+    !> enter the Darcy flux driven by grad(p_c*) = grad(mu_w) (the chemical potential).
+    !> Uses the same smooth max as the water-retention evaluation. With no cryogenic
+    !> model (psi_cryo = 0) it returns w_cap = 1, w_cryo = 0 (ordinary unfrozen flow).
+    subroutine calc_suction_weights(self, state, w_cap, w_cryo)
         implicit none
         class(type_models_manager), intent(in) :: self
         type(type_state), intent(in) :: state
-        real(real64), intent(inout), optional :: deriv_dP
-        real(real64), intent(inout), optional :: deriv_dT
+        real(real64), intent(inout) :: w_cap, w_cryo
 
-        if (present(deriv_dP)) then
-            call self%gcc%deriv_pressure(state, deriv_dP)
-        end if
-        if (present(deriv_dT)) then
-            call self%gcc%deriv_temperature(state, deriv_dT)
-        end if
-    end subroutine calc_cryogenic_suction_derivatives
+        real(real64) :: pressure, psi_cap, psi_cryo, delta, denom
+
+        call state%pressure%get(pressure)
+        psi_cap = max(0.0d0, -pressure)
+        psi_cryo = 0.0d0
+        call self%gcc%calc(state, psi_cryo)
+
+        delta = psi_cap - psi_cryo
+        denom = sqrt(delta*delta + SUCTION_BLEND_EPS*SUCTION_BLEND_EPS)
+        w_cap = 0.5d0*(1.0d0 + delta/denom)
+        w_cryo = 0.5d0*(1.0d0 - delta/denom)
+    end subroutine calc_suction_weights
+
+    subroutine calc_segregation_sink(self, state, grad_T_magnitude, S_seg)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(in) :: grad_T_magnitude
+        real(real64), intent(inout) :: S_seg
+
+        call self%segregation%calc_sink(state, grad_T_magnitude, S_seg)
+    end subroutine calc_segregation_sink
+
+    pure function is_segregation_active(self) result(active)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        logical :: active
+
+        active = self%segregation%is_active()
+    end function is_segregation_active
+
+    ! Returns .true. when any GCC model is active. Cryogenic suction (dψ_cryo/dT)
+    ! drives the D_HT coupling term, which is the primary mechanism for water
+    ! redistribution in freezing soil regardless of segregation mode.
+    pure function has_cryo_transport(self) result(active)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        logical :: active
+
+        active = allocated(self%gcc%p)
+    end function has_cryo_transport
 
 end module constitutive_models_manager

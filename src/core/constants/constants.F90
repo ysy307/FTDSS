@@ -1,4 +1,5 @@
 module core_constants
+    use :: core_physical_constants
     use :: core_constants_base, only: &
         type_constant_id, &
         type_constant_value, &

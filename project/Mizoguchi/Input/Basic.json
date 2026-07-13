@@ -7,7 +7,7 @@
         "calculate_thermal": true,
         "calculate_hydraulic": true,
         "calculate_mechanical": false,
-        "coupling_mode": "weak",
+        "coupling_mode": "staggered",
         "partitioning": true
     },
     "geometry_settings": {
@@ -103,7 +103,7 @@
             "hydraulic_conductivity_model": {
                 "model_number": 4,
                 "saturated_conductivity": 3.2e-6,
-                "impedance_factor": 7,
+                "impedance_factor": 0,
                 "water_viscosity_model": 1,
                 "gain_factor": 1.0
             }
@@ -116,7 +116,7 @@
             "update_frequency": 1,
             "max_iterations": 50,
             "convergence": {
-                "use_criteria": "both",
+                "use_criteria": "update",
                 "norm_type": "linf",
                 "logic_between_criteria": "or",
                 "residual": {
@@ -128,19 +128,26 @@
                 "update": {
                     "criteria": "absolute",
                     "logic": "or",
-                    "absolute_tolerance": 1e2,
+                    "absolute_tolerance": 1e-06,
                     "relative_tolerance": 1e-02
                 }
             }
         }
     },
     "linear_solver": {
-        "type": 4,
-        "preconditioner_type": 2,
+        "type": 9,
+        "preconditioner_type": 1,
         "max_iterations": 10000,
         "tolerance": 1e-8,
-        "restart_size": 50
-
+        "restart_size": 100,
+        "amg_strength_threshold": 0.25,
+        "amg_smoother_sweeps": 2,
+        "amg_max_agg_size": 8,
+        "amg_drop_tolerance": 1e-04,
+        "amg_drop_strategy": "RELATIVE",
+        "amg_smoother_type": "JACOBI",
+        "amg_rebuild_frequency": 5,
+        "amg_rebuild_threshold": 1e-02
     },
     "parallel_settings": {
         "threads": {

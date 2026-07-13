@@ -1,0 +1,17 @@
+add_library(SOLVER_NUMERICAL_MATH STATIC)
+
+target_sources(SOLVER_NUMERICAL_MATH PRIVATE
+    special_functions_mkl.F90
+)
+
+target_include_directories(SOLVER_NUMERICAL_MATH PUBLIC
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+target_link_libraries(SOLVER_NUMERICAL_MATH PUBLIC
+    SOLVER::CORE
+)
+
+enable_build_flags(SOLVER_NUMERICAL_MATH)
+
+add_library(SOLVER::NUMERICAL_MATH ALIAS SOLVER_NUMERICAL_MATH)

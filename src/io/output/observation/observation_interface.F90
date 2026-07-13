@@ -133,6 +133,7 @@ module io_output_observation
         procedure, public, pass(self) :: write_header => write_observation_header
         procedure, public, pass(self) :: write_line => write_observation_line
         procedure, public, pass(self) :: output_history => output_history_output_observation
+        procedure, public, pass(self) :: get_obs_fe_ids => get_obs_fe_ids_observation
     end type type_output_observation
 
     interface
@@ -167,7 +168,7 @@ module io_output_observation
         end subroutine write_observation_line
 
         module subroutine output_history_output_observation(self, time, temperature, water_content, ice_content, &
-                                                            vapor_content, pressure)
+                                                            vapor_content, pressure, water_flux, vapor_flux)
             implicit none
             class(type_output_observation), intent(inout) :: self
             real(real64), intent(in) :: time
@@ -176,7 +177,15 @@ module io_output_observation
             real(real64), intent(in), optional :: ice_content(:)
             real(real64), intent(in), optional :: vapor_content(:)
             real(real64), intent(in), optional :: pressure(:)
+            type(type_coordinate_array_dp), intent(in), optional :: water_flux
+            type(type_coordinate_array_dp), intent(in), optional :: vapor_flux
         end subroutine output_history_output_observation
+
+        module subroutine get_obs_fe_ids_observation(self, fe_ids)
+            implicit none
+            class(type_output_observation), intent(in) :: self
+            integer(int32), allocatable, intent(inout) :: fe_ids(:)
+        end subroutine get_obs_fe_ids_observation
     end interface
 
 end module io_output_observation

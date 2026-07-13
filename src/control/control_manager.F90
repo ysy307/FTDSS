@@ -52,6 +52,8 @@ module control_control_manager
         procedure, public, pass(self) :: profiler_record => profiler_record_control
         ! - iteration
         procedure, public, pass(self) :: check_convergence => check_convergence_control
+        procedure, public, pass(self) :: check_convergence_conserved => check_convergence_conserved_control
+        procedure, public, pass(self) :: compute_error_norm => compute_error_norm_control
         ! - acceleration
         procedure, public, pass(self) :: compute_relaxation => compute_relaxation_control
 
@@ -71,6 +73,9 @@ module control_control_manager
         procedure, public, pass(self) :: is_newton => is_newton_control
         procedure, public, pass(self) :: is_picard => is_picard_control
         procedure, public, pass(self) :: is_none => is_none_control
+        procedure, public, pass(self) :: is_conserved => is_conserved_control
+        procedure, public, pass(self) :: get_conserved_relaxation => get_conserved_relaxation_control
+        procedure, public, pass(self) :: get_conserved_dq_norm => get_conserved_dq_norm_control
         procedure, public, pass(self) :: should_continue => should_continue_control
         ! - acceleration
         procedure, public, pass(self) :: reach_minimum_relaxation => reach_minimum_relaxation_control
@@ -91,6 +96,8 @@ module control_control_manager
         procedure, public, pass(self) :: get_tolerances => get_tolerances_control
         ! - time
         procedure, public, pass(self) :: get_time => get_time_control
+        procedure, public, pass(self) :: get_dt => get_dt_control
+        procedure, public, pass(self) :: is_min_dt => is_min_dt_control
         ! - acceleration
         procedure, public, pass(self) :: get_current_relaxation => get_current_relaxation_control
         procedure, public, pass(self) :: get_previous_relaxation => get_previous_relaxation_control
@@ -143,12 +150,18 @@ contains
             select case (config_acceleration%method%ID)
             case (ACCELERATION_METHODS%AITKEN%ID)
                 allocate (type_acceleration_aitken :: self%acceleration)
+            case (ACCELERATION_METHODS%NONE%ID)
+                ! No acceleration object is needed for NONE mode. Conserved
+                ! modified-Picard steps are globalized by a coupled omega managed by
+                ! the convergence controller.
             case (ACCELERATION_METHODS%ANDERSON%ID)
                 error stop "Anderson acceleration is not implemented yet."
             case default
                 error stop "Unknown acceleration method: "//trim(config_acceleration%method%name)
             end select
-            call self%acceleration%initialize(config_acceleration)
+            if (allocated(self%acceleration)) then
+                call self%acceleration%initialize(config_acceleration)
+            end if
         end if
 
         ! Output managers initialization with the current time
@@ -373,10 +386,11 @@ contains
         is_end_time = self%time%is_end_time()
     end function is_end_time_control
 
-    subroutine update_controls(self, success)
+    subroutine update_controls(self, success, error_estimate)
         implicit none
         class(type_control), intent(inout) :: self
         logical, intent(in) :: success
+        real(real64), intent(in), optional :: error_estimate
         integer(int32) :: iter_count
         real(real64) :: t_target
         real(real64) :: t_arrival ! Time that will be reached after this step
@@ -406,7 +420,7 @@ contains
         end if
 
         ! 4. Execute update (dt is limited to not exceed t_target)
-        call self%time%update(success, iter_count, t_target)
+        call self%time%update(success, iter_count, t_target, error_estimate)
 
     end subroutine update_controls
 
@@ -518,6 +532,23 @@ contains
 
     end subroutine get_time_control
 
+    subroutine get_dt_control(self, dt)
+        implicit none
+        class(type_control), intent(in) :: self
+        real(real64), intent(inout) :: dt
+
+        call self%time%get_dt(dt)
+
+    end subroutine get_dt_control
+
+    pure function is_min_dt_control(self) result(is_min_dt)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: is_min_dt
+
+        is_min_dt = self%time%is_min_dt()
+    end function is_min_dt_control
+
     subroutine display_profiler_control(self, unit_in)
         implicit none
         class(type_control), intent(in) :: self
@@ -564,6 +595,64 @@ contains
         call self%iteration%check_convergence(physics_type, residual_vector, update_vector)
 
     end subroutine check_convergence_control
+
+    !> Conserved-quantity convergence check (PDF 6.2.4): a single coupled indicator
+    !> from the nodal enthalpy/effective-density increments and per-block residuals.
+    subroutine check_convergence_conserved_control(self, enthalpy, density, &
+                                                   residual_thermal, residual_hydraulic, &
+                                                   check_thermal, check_hydraulic)
+        implicit none
+        class(type_control), intent(inout) :: self
+        real(real64), intent(in) :: enthalpy(:)
+        real(real64), intent(in) :: density(:)
+        real(real64), intent(in), optional :: residual_thermal(:)
+        real(real64), intent(in), optional :: residual_hydraulic(:)
+        logical, intent(in) :: check_thermal
+        logical, intent(in) :: check_hydraulic
+
+        call self%iteration%check_convergence_conserved(enthalpy, density, residual_thermal, residual_hydraulic, &
+                                                        check_thermal, check_hydraulic)
+    end subroutine check_convergence_conserved_control
+
+    !> Returns true when the conserved-quantity convergence mode is selected.
+    pure function is_conserved_control(self) result(is_conserved)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: is_conserved
+
+        is_conserved = self%iteration%is_conserved()
+    end function is_conserved_control
+
+    !> Current adaptive under-relaxation factor for the globalized modified Picard.
+    pure function get_conserved_relaxation_control(self) result(omega)
+        implicit none
+        class(type_control), intent(in) :: self
+        real(real64) :: omega
+
+        omega = self%iteration%get_conserved_relaxation()
+    end function get_conserved_relaxation_control
+
+    !> Last weighted-RMS conserved-quantity change ||dQ||_W (diagnostics).
+    pure function get_conserved_dq_norm_control(self) result(dq_norm)
+        implicit none
+        class(type_control), intent(in) :: self
+        real(real64) :: dq_norm
+
+        dq_norm = self%iteration%get_conserved_dq_norm()
+    end function get_conserved_dq_norm_control
+
+    !> Weighted-RMS conserved-quantity error norm for the Richardson estimate.
+    subroutine compute_error_norm_control(self, enthalpy_a, density_a, enthalpy_b, density_b, eps)
+        implicit none
+        class(type_control), intent(in) :: self
+        real(real64), intent(in) :: enthalpy_a(:)
+        real(real64), intent(in) :: density_a(:)
+        real(real64), intent(in) :: enthalpy_b(:)
+        real(real64), intent(in) :: density_b(:)
+        real(real64), intent(inout) :: eps
+
+        call self%iteration%compute_error_norm(enthalpy_a, density_a, enthalpy_b, density_b, eps)
+    end subroutine compute_error_norm_control
 
     subroutine get_nonlinear_solver_control(self, nonlinear_solver_type)
         implicit none
@@ -700,8 +789,12 @@ contains
         !> State vector \(u_k\) on entry
         !> Overwritten by updated vector \(u_{k+1}\) on exit
         real(real64), intent(inout) :: vec(:)
-
-        call self%acceleration%compute_relaxation(physics_type, iter, du, vec)
+        if (allocated(self%acceleration)) then
+            call self%acceleration%compute_relaxation(physics_type, iter, du, vec)
+        else
+            ! Fallback Picard update when no acceleration method is configured.
+            vec(:) = vec(:) + du(:)
+        end if
 
     end subroutine compute_relaxation_control
 
@@ -711,7 +804,11 @@ contains
         type(type_constant_id), intent(in) :: physics_type
         logical :: reached
 
-        reached = self%acceleration%reach_minimum_relaxation(physics_type)
+        if (allocated(self%acceleration)) then
+            reached = self%acceleration%reach_minimum_relaxation(physics_type)
+        else
+            reached = .false.
+        end if
     end function reach_minimum_relaxation_control
 
     pure function reach_maximum_relaxation_control(self, physics_type) result(reached)
@@ -720,7 +817,11 @@ contains
         type(type_constant_id), intent(in) :: physics_type
         logical :: reached
 
-        reached = self%acceleration%reach_maximum_relaxation(physics_type)
+        if (allocated(self%acceleration)) then
+            reached = self%acceleration%reach_maximum_relaxation(physics_type)
+        else
+            reached = .false.
+        end if
     end function reach_maximum_relaxation_control
 
     subroutine get_current_relaxation_control(self, physics_type, relaxation)
@@ -729,7 +830,11 @@ contains
         type(type_constant_id), intent(in) :: physics_type
         real(real64), intent(inout) :: relaxation
 
-        call self%acceleration%get_current_relaxation(physics_type, relaxation)
+        if (allocated(self%acceleration)) then
+            call self%acceleration%get_current_relaxation(physics_type, relaxation)
+        else
+            relaxation = 1.0d0
+        end if
     end subroutine get_current_relaxation_control
 
     subroutine get_previous_relaxation_control(self, physics_type, relaxation)
@@ -738,7 +843,11 @@ contains
         type(type_constant_id), intent(in) :: physics_type
         real(real64), intent(inout) :: relaxation
 
-        call self%acceleration%get_previous_relaxation(physics_type, relaxation)
+        if (allocated(self%acceleration)) then
+            call self%acceleration%get_previous_relaxation(physics_type, relaxation)
+        else
+            relaxation = 1.0d0
+        end if
     end subroutine get_previous_relaxation_control
 
 end module control_control_manager

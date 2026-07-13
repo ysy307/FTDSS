@@ -19,6 +19,7 @@ set(CORE_CONSTANTS_FYPP
 fypp_F90("" "${CORE_CONSTANTS_FYPP}" CORE_CONSTANTS_GENERATED)
 
 target_sources(SOLVER_CORE PRIVATE
+    constants/physical_constants.F90
     constants/constants_base.F90
     constants/constants.F90
     ${CORE_CONSTANTS_GENERATED}
@@ -79,9 +80,20 @@ set(CORE_TYPES_FYPP
 )
 fypp_F90("" "${CORE_TYPES_FYPP}" CORE_TYPES_GENERATED)
 
+set(CORE_VECTOR_FYPP
+    types/algebra/vector/vector_interface.fypp
+    types/algebra/vector/vector_impl.fypp
+)
+fypp_F90("" "${CORE_VECTOR_FYPP}" CORE_VECTOR_GENERATED)
+
+set(CORE_MATRIX_IFACE_FYPP
+    types/algebra/matrix/matrix_interface.fypp
+)
+fypp_F90("-D_MKL" "${CORE_MATRIX_IFACE_FYPP}" CORE_MATRIX_IFACE_GENERATED)
+
 target_sources(SOLVER_CORE PRIVATE
-    # Algebla
-    types/algebra/matrix/matrix_interface.F90
+    # Algebra
+    ${CORE_MATRIX_IFACE_GENERATED}
     types/algebra/matrix/matrix_dense.F90
     types/algebra/matrix/matrix_coo.F90
     types/algebra/matrix/matrix_csr.F90
@@ -89,9 +101,7 @@ target_sources(SOLVER_CORE PRIVATE
     types/algebra/matrix/matrix_dia.F90
     types/algebra/matrix/matrix_factory.F90
     types/algebra/matrix/matrix.F90
-    types/algebra/vector/vector_interface.F90
-    types/algebra/vector/vector_dp.F90
-    types/algebra/vector/vector_int.F90
+    ${CORE_VECTOR_GENERATED}
     types/algebra/vector/vector.F90
     # Config
     types/config/config_base.F90
@@ -129,6 +139,8 @@ target_sources(SOLVER_CORE PRIVATE
     # Topology
     types/topology/connectivity.F90
     types/topology/graph.F90
+    types/topology/scatter_map.F90
+    types/topology/system_topology.F90
     # Utils
     types/utils/datetime.F90
     # Core
@@ -216,6 +228,10 @@ target_link_libraries(SOLVER_CORE
     VTK::CommonDataModel
     VTK::IOLegacy
 )
+
+if(WIN32)
+    target_link_libraries(SOLVER_CORE PRIVATE Psapi)
+endif()
 
 # ============================================================
 # 6. Project-specific flags (existing functions kept)

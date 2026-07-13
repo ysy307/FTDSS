@@ -26,6 +26,7 @@ module physics_governing_boundary_manager
         procedure, public, pass(self) :: evaluate_bcs => evaluate_bcs_manager
         procedure, public, pass(self) :: get_num_boundaries => get_num_boundaries_bc_manager
         procedure, public, pass(self) :: get_bc_index => get_bc_index_bc_manager
+        procedure, public, pass(self) :: update_bc_data => update_bc_data_manager
     end type type_bc_manager
 
 contains
@@ -119,6 +120,22 @@ contains
 
         num_boundaries = self%num_boundaries
     end subroutine get_num_boundaries_bc_manager
+
+    subroutine update_bc_data_manager(self, entity_id, new_values)
+        implicit none
+        class(type_bc_manager), intent(inout) :: self
+        integer(int32), intent(in) :: entity_id
+        real(real64), intent(in) :: new_values(:)
+
+        integer(int32) :: bc_idx
+
+        call self%get_bc_index(entity_id, bc_idx)
+        if (bc_idx > 0 .and. bc_idx <= self%num_boundaries) then
+            if (allocated(self%strategies(bc_idx)%p)) then
+                call self%strategies(bc_idx)%p%update_provider_data(new_values)
+            end if
+        end if
+    end subroutine update_bc_data_manager
 
     !> Returns the positional strategy index whose boundary_id matches entity_id.
     !> Returns -1 if no match is found.

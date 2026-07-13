@@ -14,11 +14,23 @@ target_sources(SOLVER_SOLVE PRIVATE
     # --- Iterative solvers ---
     iterative/solve_bicgstab.F90
     iterative/solve_gmres.F90
+    # Keep only solvers declared in solver_interface.F90.
+
+    # --- Direct solvers ---
+    direct/solve_pardiso.F90
 
     # --- Preconditioners ---
     preconditioner/preconditioner_none.F90
     preconditioner/preconditioner_jacobi.F90
     preconditioner/preconditioner_iluk.F90
+    preconditioner/preconditioner_ssor.F90
+    preconditioner/preconditioner_ilut.F90
+    preconditioner/preconditioner_saamg.F90
+    preconditioner/preconditioner_iluc.F90
+    preconditioner/preconditioner_is.F90
+    preconditioner/preconditioner_sainv.F90
+    preconditioner/preconditioner_hybrid.F90
+    preconditioner/preconditioner_adds.F90
 
     # --- Factory / Entry ---
     solver.F90
@@ -41,6 +53,15 @@ target_link_libraries(SOLVER_SOLVE PUBLIC
 
 enable_build_flags(SOLVER_SOLVE)
 enable_thirdparty(SOLVER_SOLVE)
+
+# MKL PARDISO uses sNaN internally; override -init=snan per-file.
+if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
+    set_source_files_properties(direct/solve_pardiso.F90
+        PROPERTIES COMPILE_OPTIONS "-init=zero")
+elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
+    set_source_files_properties(direct/solve_pardiso.F90
+        PROPERTIES COMPILE_OPTIONS "-finit-real=zero")
+endif()
 
 # ------------------------------------------------------------
 # Namespaced alias
