@@ -1,0 +1,817 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>calc_effective_density_value_hydraulic &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>calc_effective_density_value_hydraulic
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">14 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/hydraulic_coefficients.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/hydraulic_coefficients.f90.html'>hydraulic_coefficients.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/hydraulic_coefficients.html'>hydraulic_coefficients</a></li>
+            <li class="breadcrumb-item active" aria-current="page">calc_effective_density_value_hydraulic</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/calc_effective_density_value_hydraulic.html#src">calc_effective_density_value_hydraulic</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine calc_effective_density_value_hydraulic(self, state, rho_eff)  
+    <a href="../interface/calc_effective_density_value_hydraulic.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>Evaluate the pore-water effective density rho_eff at the supplied state.</p>
+<p>Mathematical definition:
+<script type="math/tex"> \rho_{eff} = \rho_w \theta_w + \rho_{ice} \theta_{ice} + \rho_w \theta_v^{\star} </script> [kg/m3]</p>
+<p>This is the conserved storage quantity of the water-mass balance and the plain
+counterpart of calc_effective_density (which returns its BDF time-derivative).
+Assumptions: the phase contents Qw, Qi, Qv stored in state are already
+consistent with (T, p_w) (call update_water_phases beforehand). Used by the
+conserved-quantity convergence norm (PDF 6.2.4). Cost: O(1).</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~1237"></span>
+              class(<a href='../type/type_hydraulic.html'>type_hydraulic</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-state~121"></span>
+              type(<a href='../type/type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-rho_eff"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>rho_eff</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calc_effective_density_value_hydraulic~~CallsGraph Pages: 1 -->
+<svg id="proccalc_effective_density_value_hydraulicCallsGraph" width="641pt" height="58pt"
+ viewBox="0.00 0.00 641.00 58.16" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph" class="graph" transform="scale(0.43 0.43) rotate(0) translate(4 132)">
+<title>proc~~calc_effective_density_value_hydraulic~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-132 1495,-132 1495,4 -4,4"/>
+<!-- proc~calc_effective_density_value_hydraulic -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_node1" class="node">
+<title>proc~calc_effective_density_value_hydraulic</title>
+<polygon fill="none" stroke="black" points="219,-65 0,-65 0,-41 219,-41 219,-65"/>
+<text text-anchor="middle" x="109.5" y="-50.6" font-family="Helvetica,sans-Serif" font-size="10.50">calc_effective_density_value_hydraulic</text>
+</g>
+<!-- proc~calc_density_ice -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_node2" class="node">
+<title>proc~calc_density_ice</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CallsGraph_node2"><a xlink:href="../proc/calc_density_ice.html" xlink:title="type_constitutive_manager%calc_density_ice">
+<polygon fill="#d9534f" stroke="#d9534f" points="515,-107 262,-107 262,-83 515,-83 515,-107"/>
+<text text-anchor="middle" x="388.5" y="-92.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_constitutive_manager%calc_density_ice</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_effective_density_value_hydraulic&#45;&gt;proc~calc_density_ice -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_edge1" class="edge">
+<title>proc~calc_effective_density_value_hydraulic&#45;&gt;proc~calc_density_ice</title>
+<path fill="none" stroke="#ff0000" d="M189.88,-65.04C223.63,-70.15 263.16,-76.15 297.96,-81.42"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="297.7,-84.92 308.11,-82.96 298.75,-78 297.7,-84.92"/>
+</g>
+<!-- proc~calc_density_water -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_node3" class="node">
+<title>proc~calc_density_water</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CallsGraph_node3"><a xlink:href="../proc/calc_density_water.html" xlink:title="type_constitutive_manager%calc_density_water">
+<polygon fill="#d9534f" stroke="#d9534f" points="522,-65 255,-65 255,-41 522,-41 522,-65"/>
+<text text-anchor="middle" x="388.5" y="-50.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_constitutive_manager%calc_density_water</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_effective_density_value_hydraulic&#45;&gt;proc~calc_density_water -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_edge2" class="edge">
+<title>proc~calc_effective_density_value_hydraulic&#45;&gt;proc~calc_density_water</title>
+<path fill="none" stroke="#ff0000" d="M219.18,-53C227.57,-53 236.11,-53 244.68,-53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="244.73,-56.5 254.73,-53 244.73,-49.5 244.73,-56.5"/>
+</g>
+<!-- proc~get_field_dp -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_node4" class="node">
+<title>proc~get_field_dp</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CallsGraph_node4"><a xlink:href="../proc/get_field_dp.html" xlink:title="type_field_dp%get_field_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="1393.5,-24 1236.5,-24 1236.5,0 1393.5,0 1393.5,-24"/>
+<text text-anchor="middle" x="1315" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_field_dp%get_field_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_effective_density_value_hydraulic&#45;&gt;proc~get_field_dp -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_edge3" class="edge">
+<title>proc~calc_effective_density_value_hydraulic&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#ff0000" d="M182.35,-40.96C205.48,-37.51 231.26,-34.12 255,-32 630.51,1.49 726,-10.11 1103,-11 1143.35,-11.1 1188.04,-11.29 1225.86,-11.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1226.32,-14.99 1236.34,-11.54 1226.36,-7.99 1226.32,-14.99"/>
+</g>
+<!-- proc~calc_rho_ice_abst_constitutive -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_node5" class="node">
+<title>proc~calc_rho_ice_abst_constitutive</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CallsGraph_node5"><a xlink:href="../proc/calc_rho_ice_abst_constitutive.html" xlink:title="abst_constitutive%calc_rho_ice_abst_constitutive">
+<polygon fill="#d9534f" stroke="#d9534f" points="837,-107 565,-107 565,-83 837,-83 837,-107"/>
+<text text-anchor="middle" x="701" y="-92.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_constitutive%calc_rho_ice_abst_constitutive</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_density_ice&#45;&gt;proc~calc_rho_ice_abst_constitutive -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_edge4" class="edge">
+<title>proc~calc_density_ice&#45;&gt;proc~calc_rho_ice_abst_constitutive</title>
+<path fill="none" stroke="#ff0000" d="M515.34,-95C528.34,-95 541.62,-95 554.8,-95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="554.86,-98.5 564.86,-95 554.86,-91.5 554.86,-98.5"/>
+</g>
+<!-- proc~calc_rho_water_abst_constitutive -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_node6" class="node">
+<title>proc~calc_rho_water_abst_constitutive</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CallsGraph_node6"><a xlink:href="../proc/calc_rho_water_abst_constitutive.html" xlink:title="abst_constitutive%calc_rho_water_abst_constitutive">
+<polygon fill="#d9534f" stroke="#d9534f" points="844,-65 558,-65 558,-41 844,-41 844,-65"/>
+<text text-anchor="middle" x="701" y="-50.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_constitutive%calc_rho_water_abst_constitutive</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_density_water&#45;&gt;proc~calc_rho_water_abst_constitutive -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_edge5" class="edge">
+<title>proc~calc_density_water&#45;&gt;proc~calc_rho_water_abst_constitutive</title>
+<path fill="none" stroke="#00ff00" d="M522.08,-53C530.61,-53 539.23,-53 547.84,-53"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="547.94,-56.5 557.94,-53 547.94,-49.5 547.94,-56.5"/>
+</g>
+<!-- calc_rho -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_node7" class="node">
+<title>calc_rho</title>
+<polygon fill="#777777" stroke="#777777" points="1020.5,-128 962.5,-128 962.5,-104 1020.5,-104 1020.5,-128"/>
+<text text-anchor="middle" x="991.5" y="-113.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_rho</text>
+</g>
+<!-- proc~calc_rho_ice_abst_constitutive&#45;&gt;calc_rho -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_edge6" class="edge">
+<title>proc~calc_rho_ice_abst_constitutive&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#ff0000" d="M837.38,-104.85C879.37,-107.91 922.36,-111.04 952.05,-113.2"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="952.14,-116.72 962.37,-113.95 952.65,-109.74 952.14,-116.72"/>
+</g>
+<!-- proc~get_thermo_state_tp -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_node8" class="node">
+<title>proc~get_thermo_state_tp</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CallsGraph_node8"><a xlink:href="../proc/get_thermo_state_tp.html" xlink:title="abst_constitutive%get_thermo_state_TP">
+<polygon fill="#d9534f" stroke="#d9534f" points="1103,-86 880,-86 880,-62 1103,-62 1103,-86"/>
+<text text-anchor="middle" x="991.5" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_constitutive%get_thermo_state_TP</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_rho_ice_abst_constitutive&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_edge7" class="edge">
+<title>proc~calc_rho_ice_abst_constitutive&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#ff0000" d="M837.38,-85.15C848.14,-84.36 858.97,-83.57 869.62,-82.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="870.06,-86.28 879.77,-82.06 869.55,-79.3 870.06,-86.28"/>
+</g>
+<!-- proc~calc_rho_water_abst_constitutive&#45;&gt;calc_rho -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_edge8" class="edge">
+<title>proc~calc_rho_water_abst_constitutive&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#00ffff" d="M812.33,-65.05C823.17,-67.5 833.89,-70.45 844,-74 861.48,-80.13 862.65,-88.51 880,-95 903.11,-103.64 930.31,-108.87 951.95,-111.95"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="951.71,-115.45 962.08,-113.29 952.63,-108.51 951.71,-115.45"/>
+</g>
+<!-- proc~calc_rho_water_abst_constitutive&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_edge9" class="edge">
+<title>proc~calc_rho_water_abst_constitutive&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#00ffff" d="M844.14,-63.35C852.63,-63.96 861.13,-64.58 869.53,-65.19"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="869.48,-68.7 879.71,-65.94 869.99,-61.72 869.48,-68.7"/>
+</g>
+<!-- proc~is_valid_iapws97_liquid_state -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_node9" class="node">
+<title>proc~is_valid_iapws97_liquid_state</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CallsGraph_node9"><a xlink:href="../proc/is_valid_iapws97_liquid_state.html" xlink:title="is_valid_iapws97_liquid_state">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1074.5,-44 908.5,-44 908.5,-20 1074.5,-20 1074.5,-44"/>
+<text text-anchor="middle" x="991.5" y="-29.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">is_valid_iapws97_liquid_state</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_rho_water_abst_constitutive&#45;&gt;proc~is_valid_iapws97_liquid_state -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_edge10" class="edge">
+<title>proc~calc_rho_water_abst_constitutive&#45;&gt;proc~is_valid_iapws97_liquid_state</title>
+<path fill="none" stroke="#00ffff" d="M844.14,-42.65C862.57,-41.31 881.04,-39.97 898.36,-38.71"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="898.69,-42.19 908.41,-37.98 898.18,-35.21 898.69,-42.19"/>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_edge11" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#00ff00" d="M1060.77,-61.95C1074.78,-59.21 1089.4,-56.17 1103,-53 1119.17,-49.22 1122.81,-46.67 1139,-43 1167.41,-36.55 1198.66,-30.65 1226.8,-25.76"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1227.75,-29.14 1237.01,-24 1226.57,-22.25 1227.75,-29.14"/>
+</g>
+<!-- proc~shift_pressure_absolute_abst_constitutive -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_node10" class="node">
+<title>proc~shift_pressure_absolute_abst_constitutive</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CallsGraph_node10"><a xlink:href="../proc/shift_pressure_absolute_abst_constitutive.html" xlink:title="abst_constitutive%shift_pressure_absolute_abst_constitutive">
+<polygon fill="#d9534f" stroke="#d9534f" points="1480,-76 1150,-76 1150,-52 1480,-52 1480,-76"/>
+<text text-anchor="middle" x="1315" y="-61.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_constitutive%shift_pressure_absolute_abst_constitutive</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_constitutive -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_edge12" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_constitutive</title>
+<path fill="none" stroke="#00ff00" d="M1103.14,-70.56C1114.92,-70.19 1127.1,-69.81 1139.38,-69.43"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1139.84,-72.92 1149.72,-69.11 1139.62,-65.92 1139.84,-72.92"/>
+</g>
+<!-- proc~shift_temperature_absolute_abst_constitutive -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_node11" class="node">
+<title>proc~shift_temperature_absolute_abst_constitutive</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CallsGraph_node11"><a xlink:href="../proc/shift_temperature_absolute_abst_constitutive.html" xlink:title="abst_constitutive%shift_temperature_absolute_abst_constitutive">
+<polygon fill="#d9534f" stroke="#d9534f" points="1491,-118 1139,-118 1139,-94 1491,-94 1491,-118"/>
+<text text-anchor="middle" x="1315" y="-103.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_constitutive%shift_temperature_absolute_abst_constitutive</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_constitutive -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CallsGraph_edge13" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_constitutive</title>
+<path fill="none" stroke="#00ff00" d="M1103.14,-85.01C1128.91,-87.58 1156.59,-90.33 1183.14,-92.98"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1182.96,-96.47 1193.26,-93.98 1183.65,-89.51 1182.96,-96.47"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccalc_effective_density_value_hydraulicCallsGraph = svgPanZoom('#proccalc_effective_density_value_hydraulicCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calc_effective_density_value_hydraulic~~CalledByGraph Pages: 1 -->
+<svg id="proccalc_effective_density_value_hydraulicCalledByGraph" width="641pt" height="8pt"
+ viewBox="0.00 0.00 641.00 8.17" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph" class="graph" transform="scale(0.26 0.26) rotate(0) translate(4 28)">
+<title>proc~~calc_effective_density_value_hydraulic~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 2507,-28 2507,4 -4,4"/>
+<!-- proc~calc_effective_density_value_hydraulic -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node1" class="node">
+<title>proc~calc_effective_density_value_hydraulic</title>
+<polygon fill="none" stroke="black" points="2503,-24 2284,-24 2284,0 2503,0 2503,-24"/>
+<text text-anchor="middle" x="2393.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">calc_effective_density_value_hydraulic</text>
+</g>
+<!-- interface~calc_effective_density_value_hydraulic -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node2" class="node">
+<title>interface~calc_effective_density_value_hydraulic</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node2"><a xlink:href="../interface/calc_effective_density_value_hydraulic.html" xlink:title="type_hydraulic%calc_effective_density_value_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="2248,-24 1941,-24 1941,0 2248,0 2248,-24"/>
+<text text-anchor="middle" x="2094.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%calc_effective_density_value_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~calc_effective_density_value_hydraulic&#45;&gt;proc~calc_effective_density_value_hydraulic -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_edge1" class="edge">
+<title>interface~calc_effective_density_value_hydraulic&#45;&gt;proc~calc_effective_density_value_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2248.35,-12C2256.84,-12 2265.31,-12 2273.65,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2273.75,-15.5 2283.75,-12 2273.75,-8.5 2273.75,-15.5"/>
+</g>
+<!-- proc~compute_nodal_conserved_ftcms -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node3" class="node">
+<title>proc~compute_nodal_conserved_ftcms</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node3"><a xlink:href="../proc/compute_nodal_conserved_ftcms.html" xlink:title="compute_nodal_conserved_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1905,-24 1715,-24 1715,0 1905,0 1905,-24"/>
+<text text-anchor="middle" x="1810" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_nodal_conserved_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_nodal_conserved_ftcms&#45;&gt;interface~calc_effective_density_value_hydraulic -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_edge2" class="edge">
+<title>proc~compute_nodal_conserved_ftcms&#45;&gt;interface~calc_effective_density_value_hydraulic</title>
+<path fill="none" stroke="#ff0000" d="M1905.07,-12C1913.37,-12 1921.93,-12 1930.59,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1930.8,-15.5 1940.8,-12 1930.8,-8.5 1930.8,-15.5"/>
+</g>
+<!-- interface~compute_nodal_conserved_ftcms -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node4" class="node">
+<title>interface~compute_nodal_conserved_ftcms</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node4"><a xlink:href="../interface/compute_nodal_conserved_ftcms.html" xlink:title="type_ftcms%compute_nodal_conserved_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1679,-24 1421,-24 1421,0 1679,0 1679,-24"/>
+<text text-anchor="middle" x="1550" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%compute_nodal_conserved_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_nodal_conserved_ftcms&#45;&gt;proc~compute_nodal_conserved_ftcms -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_edge3" class="edge">
+<title>interface~compute_nodal_conserved_ftcms&#45;&gt;proc~compute_nodal_conserved_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1679.24,-12C1687.79,-12 1696.33,-12 1704.73,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1704.9,-15.5 1714.9,-12 1704.9,-8.5 1704.9,-15.5"/>
+</g>
+<!-- proc~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node5" class="node">
+<title>proc~solve_time_step_check_convergence_conserved_ftcms</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node5"><a xlink:href="../proc/solve_time_step_check_convergence_conserved_ftcms.html" xlink:title="solve_time_step_check_convergence_conserved_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1385,-24 1081,-24 1081,0 1385,0 1385,-24"/>
+<text text-anchor="middle" x="1233" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_check_convergence_conserved_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;interface~compute_nodal_conserved_ftcms -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_edge4" class="edge">
+<title>proc~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;interface~compute_nodal_conserved_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M1385.04,-12C1393.67,-12 1402.32,-12 1410.89,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1410.91,-15.5 1420.91,-12 1410.91,-8.5 1410.91,-15.5"/>
+</g>
+<!-- interface~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node6" class="node">
+<title>interface~solve_time_step_check_convergence_conserved_ftcms</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node6"><a xlink:href="../interface/solve_time_step_check_convergence_conserved_ftcms.html" xlink:title="type_ftcms%solve_time_step_check_convergence_conserved_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1045,-24 673,-24 673,0 1045,0 1045,-24"/>
+<text text-anchor="middle" x="859" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_check_convergence_conserved_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;proc~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_edge5" class="edge">
+<title>interface~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;proc~solve_time_step_check_convergence_conserved_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1045.18,-12C1053.67,-12 1062.15,-12 1070.57,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1070.8,-15.5 1080.8,-12 1070.8,-8.5 1070.8,-15.5"/>
+</g>
+<!-- proc~solve_time_step_ftcms -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node7" class="node">
+<title>proc~solve_time_step_ftcms</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node7"><a xlink:href="../proc/solve_time_step_ftcms.html" xlink:title="solve_time_step_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="637,-24 505,-24 505,0 637,0 637,-24"/>
+<text text-anchor="middle" x="571" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_edge6" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_check_convergence_conserved_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M637.26,-12C645.34,-12 653.9,-12 662.78,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="662.92,-15.5 672.92,-12 662.92,-8.5 662.92,-15.5"/>
+</g>
+<!-- interface~solve_time_step_ftcms -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node8" class="node">
+<title>interface~solve_time_step_ftcms</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node8"><a xlink:href="../interface/solve_time_step_ftcms.html" xlink:title="type_ftcms%solve_time_step_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="469,-24 270,-24 270,0 469,0 469,-24"/>
+<text text-anchor="middle" x="369.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_edge7" class="edge">
+<title>interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M469.08,-12C477.74,-12 486.4,-12 494.82,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="494.94,-15.5 504.94,-12 494.94,-8.5 494.94,-15.5"/>
+</g>
+<!-- proc~run_ftcms -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node9" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node9"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 169,-24 169,0 234,0 234,-24"/>
+<text text-anchor="middle" x="201.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_edge8" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M234.11,-12C241.85,-12 250.57,-12 259.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="259.88,-15.5 269.88,-12 259.88,-8.5 259.88,-15.5"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node10" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_proc~~calc_effective_density_value_hydraulic~~CalledByGraph_node10"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="133,-24 0,-24 0,0 133,0 133,-24"/>
+<text text-anchor="middle" x="66.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="proc~~calc_effective_density_value_hydraulic~~CalledByGraph_edge9" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M133.22,-12C141.87,-12 150.53,-12 158.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="158.89,-15.5 168.89,-12 158.89,-8.5 158.89,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccalc_effective_density_value_hydraulicCalledByGraph = svgPanZoom('#proccalc_effective_density_value_hydraulicCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">calc_effective_density_value_hydraulic</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">rho_eff</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_hydraulic</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_state</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">state</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">rho_eff</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Qw</span><span class="p">,</span><span class="w"> </span><span class="n">Qi</span><span class="p">,</span><span class="w"> </span><span class="n">Qv</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">rho_w</span><span class="p">,</span><span class="w"> </span><span class="n">rho_i</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">state</span><span class="p">%</span><span class="n">water_content</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">Qw</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">state</span><span class="p">%</span><span class="n">ice_content</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">Qi</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">state</span><span class="p">%</span><span class="n">vapor_content</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">Qv</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">calc_density_water</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">rho_w</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">calc_density_ice</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">rho_i</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">rho_eff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rho_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Qw</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rho_i</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Qi</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rho_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Qv</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">calc_effective_density_value_hydraulic</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-07-13 12:46 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

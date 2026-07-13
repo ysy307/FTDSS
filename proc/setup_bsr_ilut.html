@@ -1,0 +1,828 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>setup_bsr_ilut &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>setup_bsr_ilut
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">114 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/preconditioner_ilut.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/preconditioner_ilut.f90.html'>preconditioner_ilut.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/solver_preconditioner_ilut.html'>solver_preconditioner_ilut</a></li>
+            <li class="breadcrumb-item active" aria-current="page">setup_bsr_ilut</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/setup_bsr_ilut.html#src">setup_bsr_ilut</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine setup_bsr_ilut(self, A)  
+    <a href="../interface/setup_bsr_ilut.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>Block ILUT factorization for BSR matrix.
+Drop criterion: ||block|| &lt; tau * ||row||
+Fill control: keep at most max_fill entries per row in L and U.</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~685"></span>
+              class(<a href='../type/type_preconditioner_ilut.html'>type_preconditioner_ilut</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-a~16"></span>
+              class(<a href='../type/type_matrix_bsr.html'>type_matrix_bsr</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~setup_bsr_ilut~~CallsGraph Pages: 1 -->
+<svg id="procsetup_bsr_ilutCallsGraph" width="406pt" height="284pt"
+ viewBox="0.00 0.00 406.00 284.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~setup_bsr_ilut~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 280)">
+<title>proc~~setup_bsr_ilut~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-280 402,-280 402,4 -4,4"/>
+<!-- proc~setup_bsr_ilut -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_node1" class="node">
+<title>proc~setup_bsr_ilut</title>
+<polygon fill="none" stroke="black" points="85,-150 0,-150 0,-126 85,-126 85,-150"/>
+<text text-anchor="middle" x="42.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50">setup_bsr_ilut</text>
+</g>
+<!-- dgemm -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_node2" class="node">
+<title>dgemm</title>
+<polygon fill="#777777" stroke="#777777" points="232,-276 178,-276 178,-252 232,-252 232,-276"/>
+<text text-anchor="middle" x="205" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dgemm</text>
+</g>
+<!-- proc~setup_bsr_ilut&#45;&gt;dgemm -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_edge1" class="edge">
+<title>proc~setup_bsr_ilut&#45;&gt;dgemm</title>
+<path fill="none" stroke="#ff0000" d="M49,-150.2C59.62,-172.3 85.07,-218.87 121,-243 134.74,-252.22 152.22,-257.4 167.59,-260.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="167.4,-263.81 177.83,-261.96 168.52,-256.9 167.4,-263.81"/>
+</g>
+<!-- dgetrf -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_node3" class="node">
+<title>dgetrf</title>
+<polygon fill="#777777" stroke="#777777" points="232,-234 178,-234 178,-210 232,-210 232,-234"/>
+<text text-anchor="middle" x="205" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dgetrf</text>
+</g>
+<!-- proc~setup_bsr_ilut&#45;&gt;dgetrf -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_edge2" class="edge">
+<title>proc~setup_bsr_ilut&#45;&gt;dgetrf</title>
+<path fill="none" stroke="#ff0000" d="M54.94,-150.08C69.12,-164.33 94.65,-187.78 121,-201 135.57,-208.31 152.89,-213.22 167.93,-216.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="167.43,-219.9 177.92,-218.39 168.78,-213.03 167.43,-219.9"/>
+</g>
+<!-- dtrsm -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_node4" class="node">
+<title>dtrsm</title>
+<polygon fill="#777777" stroke="#777777" points="232,-192 178,-192 178,-168 232,-168 232,-192"/>
+<text text-anchor="middle" x="205" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dtrsm</text>
+</g>
+<!-- proc~setup_bsr_ilut&#45;&gt;dtrsm -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_edge3" class="edge">
+<title>proc~setup_bsr_ilut&#45;&gt;dtrsm</title>
+<path fill="none" stroke="#ff0000" d="M85.3,-149.46C96.85,-152.6 109.4,-155.96 121,-159 136.27,-163 153.16,-167.3 167.69,-170.95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="167.25,-174.45 177.8,-173.49 168.96,-167.66 167.25,-174.45"/>
+</g>
+<!-- interface~get_ind_bsr -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_node5" class="node">
+<title>interface~get_ind_bsr</title>
+<g id="a_proc~~setup_bsr_ilut~~CallsGraph_node5"><a xlink:href="../interface/get_ind_bsr.html" xlink:title="type_matrix_bsr%get_ind_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="289,-150 121,-150 121,-126 289,-126 289,-150"/>
+<text text-anchor="middle" x="205" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%get_ind_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~setup_bsr_ilut&#45;&gt;interface~get_ind_bsr -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_edge4" class="edge">
+<title>proc~setup_bsr_ilut&#45;&gt;interface~get_ind_bsr</title>
+<path fill="none" stroke="#ff0000" d="M85.25,-138C93.21,-138 101.84,-138 110.68,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="110.74,-141.5 120.74,-138 110.74,-134.5 110.74,-141.5"/>
+</g>
+<!-- interface~get_ptr_bsr -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_node6" class="node">
+<title>interface~get_ptr_bsr</title>
+<g id="a_proc~~setup_bsr_ilut~~CallsGraph_node6"><a xlink:href="../interface/get_ptr_bsr.html" xlink:title="type_matrix_bsr%get_ptr_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="288,-108 122,-108 122,-84 288,-84 288,-108"/>
+<text text-anchor="middle" x="205" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%get_ptr_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~setup_bsr_ilut&#45;&gt;interface~get_ptr_bsr -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_edge5" class="edge">
+<title>proc~setup_bsr_ilut&#45;&gt;interface~get_ptr_bsr</title>
+<path fill="none" stroke="#ff0000" d="M85.3,-126.54C96.85,-123.4 109.4,-120.04 121,-117 129.06,-114.89 137.57,-112.69 145.95,-110.56"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="146.86,-113.94 155.69,-108.08 145.13,-107.15 146.86,-113.94"/>
+</g>
+<!-- interface~get_val_bsr -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_node7" class="node">
+<title>interface~get_val_bsr</title>
+<g id="a_proc~~setup_bsr_ilut~~CallsGraph_node7"><a xlink:href="../interface/get_val_bsr.html" xlink:title="type_matrix_bsr%get_val_bsr">
+<polygon fill="#a7506f" stroke="#a7506f" points="288.5,-66 121.5,-66 121.5,-42 288.5,-42 288.5,-66"/>
+<text text-anchor="middle" x="205" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_matrix_bsr%get_val_bsr</text>
+</a>
+</g>
+</g>
+<!-- proc~setup_bsr_ilut&#45;&gt;interface~get_val_bsr -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_edge6" class="edge">
+<title>proc~setup_bsr_ilut&#45;&gt;interface~get_val_bsr</title>
+<path fill="none" stroke="#ff0000" d="M54.94,-125.92C69.12,-111.67 94.65,-88.22 121,-75 125.07,-72.96 129.36,-71.1 133.75,-69.42"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="135.2,-72.62 143.48,-66.01 132.89,-66.01 135.2,-72.62"/>
+</g>
+<!-- proc~block_frobenius_norm -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_node8" class="node">
+<title>proc~block_frobenius_norm</title>
+<g id="a_proc~~setup_bsr_ilut~~CallsGraph_node8"><a xlink:href="../proc/block_frobenius_norm.html" xlink:title="block_frobenius_norm">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="270,-24 140,-24 140,0 270,0 270,-24"/>
+<text text-anchor="middle" x="205" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">block_frobenius_norm</text>
+</a>
+</g>
+</g>
+<!-- proc~setup_bsr_ilut&#45;&gt;proc~block_frobenius_norm -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_edge7" class="edge">
+<title>proc~setup_bsr_ilut&#45;&gt;proc~block_frobenius_norm</title>
+<path fill="none" stroke="#ff0000" d="M49,-125.8C59.62,-103.7 85.07,-57.13 121,-33 124.08,-30.93 127.35,-29.07 130.74,-27.38"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="132.2,-30.56 139.96,-23.35 129.4,-24.15 132.2,-30.56"/>
+</g>
+<!-- proc~get_ind_bsr -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_node9" class="node">
+<title>proc~get_ind_bsr</title>
+<g id="a_proc~~setup_bsr_ilut~~CallsGraph_node9"><a xlink:href="../proc/get_ind_bsr.html" xlink:title="get_ind_bsr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="398,-150 325,-150 325,-126 398,-126 398,-150"/>
+<text text-anchor="middle" x="361.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_ind_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_ind_bsr&#45;&gt;proc~get_ind_bsr -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_edge8" class="edge">
+<title>interface~get_ind_bsr&#45;&gt;proc~get_ind_bsr</title>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M289.13,-138C297.97,-138 306.7,-138 314.87,-138"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="314.87,-141.5 324.87,-138 314.87,-134.5 314.87,-141.5"/>
+</g>
+<!-- proc~get_ptr_bsr -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_node10" class="node">
+<title>proc~get_ptr_bsr</title>
+<g id="a_proc~~setup_bsr_ilut~~CallsGraph_node10"><a xlink:href="../proc/get_ptr_bsr.html" xlink:title="get_ptr_bsr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="397.5,-108 325.5,-108 325.5,-84 397.5,-84 397.5,-108"/>
+<text text-anchor="middle" x="361.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_ptr_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_ptr_bsr&#45;&gt;proc~get_ptr_bsr -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_edge9" class="edge">
+<title>interface~get_ptr_bsr&#45;&gt;proc~get_ptr_bsr</title>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M288.23,-96C297.55,-96 306.78,-96 315.36,-96"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="315.48,-99.5 325.48,-96 315.48,-92.5 315.48,-99.5"/>
+</g>
+<!-- proc~get_val_bsr -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_node11" class="node">
+<title>proc~get_val_bsr</title>
+<g id="a_proc~~setup_bsr_ilut~~CallsGraph_node11"><a xlink:href="../proc/get_val_bsr.html" xlink:title="get_val_bsr">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="398,-66 325,-66 325,-42 398,-42 398,-66"/>
+<text text-anchor="middle" x="361.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_val_bsr</text>
+</a>
+</g>
+</g>
+<!-- interface~get_val_bsr&#45;&gt;proc~get_val_bsr -->
+<g id="proc~~setup_bsr_ilut~~CallsGraph_edge10" class="edge">
+<title>interface~get_val_bsr&#45;&gt;proc~get_val_bsr</title>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M288.68,-54C297.66,-54 306.54,-54 314.83,-54"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="314.99,-57.5 324.99,-54 314.99,-50.5 314.99,-57.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~setup_bsr_ilut~~CalledByGraph Pages: 1 -->
+<svg id="procsetup_bsr_ilutCalledByGraph" width="641pt" height="24pt"
+ viewBox="0.00 0.00 641.00 23.96" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~setup_bsr_ilut~~CalledByGraph" class="graph" transform="scale(0.75 0.75) rotate(0) translate(4 28)">
+<title>proc~~setup_bsr_ilut~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 852,-28 852,4 -4,4"/>
+<!-- proc~setup_bsr_ilut -->
+<g id="proc~~setup_bsr_ilut~~CalledByGraph_node1" class="node">
+<title>proc~setup_bsr_ilut</title>
+<polygon fill="none" stroke="black" points="848,-24 763,-24 763,0 848,0 848,-24"/>
+<text text-anchor="middle" x="805.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">setup_bsr_ilut</text>
+</g>
+<!-- interface~setup_bsr_ilut -->
+<g id="proc~~setup_bsr_ilut~~CalledByGraph_node2" class="node">
+<title>interface~setup_bsr_ilut</title>
+<g id="a_proc~~setup_bsr_ilut~~CalledByGraph_node2"><a xlink:href="../interface/setup_bsr_ilut.html" xlink:title="type_preconditioner_ilut%setup_bsr_ilut">
+<polygon fill="#a7506f" stroke="#a7506f" points="727,-24 504,-24 504,0 727,0 727,-24"/>
+<text text-anchor="middle" x="615.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_preconditioner_ilut%setup_bsr_ilut</text>
+</a>
+</g>
+</g>
+<!-- interface~setup_bsr_ilut&#45;&gt;proc~setup_bsr_ilut -->
+<g id="proc~~setup_bsr_ilut~~CalledByGraph_edge1" class="edge">
+<title>interface~setup_bsr_ilut&#45;&gt;proc~setup_bsr_ilut</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M727.22,-12C735.98,-12 744.53,-12 752.57,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="752.82,-15.5 762.82,-12 752.82,-8.5 752.82,-15.5"/>
+</g>
+<!-- proc~setup_preconditioner_ilut -->
+<g id="proc~~setup_bsr_ilut~~CalledByGraph_node3" class="node">
+<title>proc~setup_preconditioner_ilut</title>
+<g id="a_proc~~setup_bsr_ilut~~CalledByGraph_node3"><a xlink:href="../proc/setup_preconditioner_ilut.html" xlink:title="setup_preconditioner_ilut">
+<polygon fill="#d9534f" stroke="#d9534f" points="468,-24 321,-24 321,0 468,0 468,-24"/>
+<text text-anchor="middle" x="394.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">setup_preconditioner_ilut</text>
+</a>
+</g>
+</g>
+<!-- proc~setup_preconditioner_ilut&#45;&gt;interface~setup_bsr_ilut -->
+<g id="proc~~setup_bsr_ilut~~CalledByGraph_edge2" class="edge">
+<title>proc~setup_preconditioner_ilut&#45;&gt;interface~setup_bsr_ilut</title>
+<path fill="none" stroke="#ff0000" d="M468.12,-12C476.35,-12 484.9,-12 493.55,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="493.72,-15.5 503.72,-12 493.72,-8.5 493.72,-15.5"/>
+</g>
+<!-- interface~setup_preconditioner_ilut -->
+<g id="proc~~setup_bsr_ilut~~CalledByGraph_node4" class="node">
+<title>interface~setup_preconditioner_ilut</title>
+<g id="a_proc~~setup_bsr_ilut~~CalledByGraph_node4"><a xlink:href="../interface/setup_preconditioner_ilut.html" xlink:title="type_preconditioner_ilut%setup_preconditioner_ilut">
+<polygon fill="#a7506f" stroke="#a7506f" points="285,-24 0,-24 0,0 285,0 285,-24"/>
+<text text-anchor="middle" x="142.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_preconditioner_ilut%setup_preconditioner_ilut</text>
+</a>
+</g>
+</g>
+<!-- interface~setup_preconditioner_ilut&#45;&gt;proc~setup_preconditioner_ilut -->
+<g id="proc~~setup_bsr_ilut~~CalledByGraph_edge3" class="edge">
+<title>interface~setup_preconditioner_ilut&#45;&gt;proc~setup_preconditioner_ilut</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M285.3,-12C293.9,-12 302.39,-12 310.61,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="310.86,-15.5 320.86,-12 310.86,-8.5 310.86,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocsetup_bsr_ilutCalledByGraph = svgPanZoom('#procsetup_bsr_ilutCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">setup_bsr_ilut</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_preconditioner_ilut</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">class</span><span class="p">(</span><span class="n">type_matrix_bsr</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">A</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mat_ptr</span><span class="p">,</span><span class="w"> </span><span class="n">mat_ind</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="p">:),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mat_val</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">nnz_orig</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">jj</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="p">,</span><span class="w"> </span><span class="n">target_idx</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">info_lapack</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nnz_L</span><span class="p">,</span><span class="w"> </span><span class="n">nnz_U</span><span class="p">,</span><span class="w"> </span><span class="n">kb</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">row_norm</span><span class="p">,</span><span class="w"> </span><span class="n">blk_norm</span><span class="p">,</span><span class="w"> </span><span class="n">tau</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">PIVOT_TOL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d-12</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">work_pos</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="c">! Temporary storage for row-by-row factorization</span>
+<span class="w">        </span><span class="c">! We use the same sparsity pattern as ILU(0) but with threshold dropping</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">max_nnz_per_row</span><span class="p">,</span><span class="w"> </span><span class="n">nnz_row</span><span class="p">,</span><span class="w"> </span><span class="n">nnz_total</span><span class="p">,</span><span class="w"> </span><span class="n">nnz_alloc</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ptr_pos</span>
+
+<span class="w">        </span><span class="n">bs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">block_size</span>
+<span class="w">        </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_rows</span>
+<span class="w">        </span><span class="n">tau</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">drop_tolerance</span>
+
+<span class="w">        </span><span class="n">mat_ptr</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">get_ptr</span><span class="p">()</span>
+<span class="w">        </span><span class="n">mat_ind</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">get_ind</span><span class="p">()</span>
+<span class="w">        </span><span class="n">mat_val</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">A</span><span class="p">%</span><span class="n">get_val</span><span class="p">()</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">mat_val</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="k">        </span><span class="n">nnz_orig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">mat_val</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! For ILUT, we allow additional fill-in. Allocate extra space.</span>
+<span class="w">        </span><span class="c">! Estimate: original nnz + max_fill per row for L and U</span>
+<span class="w">        </span><span class="n">max_nnz_per_row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n</span>
+<span class="w">            </span><span class="n">max_nnz_per_row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">max_nnz_per_row</span><span class="p">,</span><span class="w"> </span><span class="n">mat_ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">mat_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="w">        </span><span class="k">end do</span>
+<span class="k">        </span><span class="n">nnz_alloc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nnz_orig</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">max_fill</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">n</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_pivots</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_pivots</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! For simplicity with ILUT+BSR, use same sparsity as ILU(0)</span>
+<span class="w">        </span><span class="c">! but apply threshold dropping to values (zero out small blocks)</span>
+<span class="w">        </span><span class="c">! This avoids complex dynamic sparsity management</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(</span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">nnz_orig</span><span class="p">))</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">nnz_orig</span><span class="p">))</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_pivots</span><span class="p">(</span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">))</span>
+
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">work_pos</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+<span class="w">        </span><span class="n">work_pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mat_ptr</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mat_ind</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mat_val</span>
+
+<span class="w">        </span><span class="c">! Find diagonal pointers and compute modified diagonal for stability</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
+<span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span>
+<span class="w">                    </span><span class="k">exit</span>
+<span class="k">                end if</span>
+<span class="k">            end do</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS</span><span class="p">%</span><span class="n">DECOMPOSITION_FAILURE</span><span class="p">%</span><span class="n">ID</span>
+<span class="w">                </span><span class="k">return</span>
+<span class="k">            end if</span>
+<span class="k">        end do</span>
+
+<span class="w">        </span><span class="c">! Stabilize diagonal blocks (same as ILU(0))</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n</span>
+<span class="w">            </span><span class="k">do </span><span class="n">kb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(</span><span class="n">kb</span><span class="p">,</span><span class="w"> </span><span class="n">kb</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(</span><span class="n">kb</span><span class="p">,</span><span class="w"> </span><span class="n">kb</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                        </span><span class="nb">abs</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(</span><span class="n">kb</span><span class="p">,</span><span class="w"> </span><span class="n">kb</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)))</span>
+<span class="w">                </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(</span><span class="n">kb</span><span class="p">,</span><span class="w"> </span><span class="n">kb</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)))</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">PIVOT_TOL</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(</span><span class="n">kb</span><span class="p">,</span><span class="w"> </span><span class="n">kb</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PIVOT_TOL</span>
+<span class="w">                </span><span class="k">end if</span>
+<span class="k">            end do</span>
+<span class="k">        end do</span>
+
+<span class="w">        </span><span class="c">! ILU factorization with threshold dropping</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n</span>
+<span class="w">            </span><span class="c">! Compute row norm for drop criterion</span>
+<span class="w">            </span><span class="n">row_norm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">                </span><span class="n">row_norm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">row_norm</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">block_frobenius_norm</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">k</span><span class="p">),</span><span class="w"> </span><span class="n">bs</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end do</span>
+<span class="k">            </span><span class="n">row_norm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">row_norm</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+<span class="w">            </span><span class="c">! Build work_pos map for this row</span>
+<span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">                </span><span class="n">work_pos</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span>
+<span class="w">            </span><span class="k">end do</span>
+
+<span class="w">            </span><span class="c">! Elimination: process L part (columns &lt; i)</span>
+<span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">                </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+<span class="w">                </span><span class="c">! L_ik = A_ik * U_kk^{-1}</span>
+<span class="w">                </span><span class="k">call </span><span class="n">dtrsm</span><span class="p">(</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;U&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                           </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">col</span><span class="p">)),</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                           </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">k</span><span class="p">),</span><span class="w"> </span><span class="n">bs</span><span class="p">)</span>
+
+<span class="w">                </span><span class="c">! Drop small L blocks</span>
+<span class="w">                </span><span class="n">blk_norm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">block_frobenius_norm</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">k</span><span class="p">),</span><span class="w"> </span><span class="n">bs</span><span class="p">)</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">blk_norm</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">tau</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">row_norm</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">                    </span><span class="k">cycle</span>
+<span class="k">                end if</span>
+
+<span class="w">                </span><span class="c">! Update remaining row: A_ij -= L_ik * U_kj</span>
+<span class="w">                </span><span class="k">do </span><span class="n">jj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">col</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">                    </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">jj</span><span class="p">)</span>
+<span class="w">                    </span><span class="n">target_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">work_pos</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">target_idx</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                        call </span><span class="n">dgemm</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                   </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">k</span><span class="p">),</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                   </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">jj</span><span class="p">),</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                   </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">target_idx</span><span class="p">),</span><span class="w"> </span><span class="n">bs</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">end if</span>
+<span class="k">                end do</span>
+<span class="k">            end do</span>
+
+<span class="w">            </span><span class="c">! Drop small U blocks (columns &gt; i)</span>
+<span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">                </span><span class="n">blk_norm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">block_frobenius_norm</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">k</span><span class="p">),</span><span class="w"> </span><span class="n">bs</span><span class="p">)</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">blk_norm</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">tau</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">row_norm</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">                </span><span class="k">end if</span>
+<span class="k">            end do</span>
+
+<span class="w">            </span><span class="c">! Stabilize diagonal</span>
+<span class="w">            </span><span class="k">do </span><span class="n">kb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(</span><span class="n">kb</span><span class="p">,</span><span class="w"> </span><span class="n">kb</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)))</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">PIVOT_TOL</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(</span><span class="n">kb</span><span class="p">,</span><span class="w"> </span><span class="n">kb</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PIVOT_TOL</span>
+<span class="w">                </span><span class="k">end if</span>
+<span class="k">            end do</span>
+
+<span class="w">            </span><span class="c">! LU factorize diagonal block</span>
+<span class="w">            </span><span class="k">call </span><span class="n">dgetrf</span><span class="p">(</span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">val_blocks</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diag_ptr</span><span class="p">(</span><span class="n">i</span><span class="p">)),</span><span class="w"> </span><span class="n">bs</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                        </span><span class="n">self</span><span class="p">%</span><span class="n">diag_pivots</span><span class="p">(:,</span><span class="w"> </span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">info_lapack</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">info_lapack</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS</span><span class="p">%</span><span class="n">DECOMPOSITION_FAILURE</span><span class="p">%</span><span class="n">ID</span>
+<span class="w">                </span><span class="k">return</span>
+<span class="k">            end if</span>
+
+<span class="w">            </span><span class="c">! Clear work_pos for this row</span>
+<span class="w">            </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">ptr</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">                </span><span class="n">work_pos</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ind</span><span class="p">(</span><span class="n">k</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">            </span><span class="k">end do</span>
+<span class="k">        end do</span>
+
+<span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS</span><span class="p">%</span><span class="n">SUCCESS</span><span class="p">%</span><span class="n">ID</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">setup_bsr_ilut</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-07-13 12:46 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.4% of total for derived types.</p>Including implementation: 15 statements,  0.1% of total for derived types.">15 statements</a>
+                 title="<p> 0.3% of total for derived types.</p>Including implementation: 25 statements,  0.1% of total for derived types.">15 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -136,10 +136,10 @@
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#variable-m_inv">M_inv</a>
             <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#variable-m_inv_blocks">M_inv_blocks</a>
-            <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#variable-block_size~2">block_size</a>
+            <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#variable-block_size~3">block_size</a>
             <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#variable-ipiv_blocks">ipiv_blocks</a>
             <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#variable-is_block">is_block</a>
-            <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#variable-num_nodes~10">num_nodes</a>
+            <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#variable-num_nodes~62">num_nodes</a>
         </div>
       </div>
     </div>
@@ -166,9 +166,11 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#boundprocedure-apply~3">apply</a>
-            <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#boundprocedure-destroy~14">destroy</a>
-            <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#boundprocedure-initialize~33">initialize</a>
+            <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#boundprocedure-apply~7">apply</a>
+            <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#boundprocedure-destroy~50">destroy</a>
+            <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#boundprocedure-get_status~4">get_status</a>
+            <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#boundprocedure-initialize~89">initialize</a>
+            <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#boundprocedure-is_success~2">is_success</a>
             <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#boundprocedure-setup~3">setup</a>
             <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#boundprocedure-setup_block">setup_block</a>
             <a class="list-group-item" href="../type/type_preconditioner_jacobi.html#boundprocedure-setup_point">setup_point</a>
@@ -367,7 +369,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-block_size~2"></span>
+              <span class="anchor" id="variable-block_size~3"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -418,7 +420,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_nodes~10"></span>
+              <span class="anchor" id="variable-num_nodes~62"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -446,7 +448,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-apply~3"></span>
+      <span class="anchor" id="boundprocedure-apply~7"></span>
       <h3>
           procedure, public ::
   <strong>apply</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/apply_preconditioner_jacobi.html'>apply_preconditioner_jacobi</a>
@@ -531,7 +533,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-destroy~14"></span>
+      <span class="anchor" id="boundprocedure-destroy~50"></span>
       <h3>
           procedure, public ::
   <strong>destroy</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/destroy_preconditioner_jacobi.html'>destroy_preconditioner_jacobi</a>
@@ -586,7 +588,66 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~33"></span>
+      <span class="anchor" id="boundprocedure-get_status~4"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_status</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_status_preconditioner.html'>get_status_preconditioner</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  function <a href='../proc/get_status_preconditioner.html'>get_status_preconditioner</a>(self)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_preconditioner.html'>abst_preconditioner</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32)</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-initialize~89"></span>
       <h3>
           procedure, public ::
   <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/initialize_preconditioner_jacobi.html'>initialize_preconditioner_jacobi</a>
@@ -647,6 +708,65 @@ large graphs.</div>
     </tbody>
   </table>
 
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_success~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_success</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_success_preconditioner.html'>is_success_preconditioner</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  function <a href='../proc/is_success_preconditioner.html'>is_success_preconditioner</a>(self)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_preconditioner.html'>abst_preconditioner</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
 
           </li>
       </ul>
@@ -910,7 +1030,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

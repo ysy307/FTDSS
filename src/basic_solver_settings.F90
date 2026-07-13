@@ -21,6 +21,10 @@ submodule(io_input_basic) input_basic_solver_settings
     character(*), parameter :: logic = "logic"
     character(*), parameter :: absolute_tolerance = "absolute_tolerance"
     character(*), parameter :: relative_tolerance = "relative_tolerance"
+    character(*), parameter :: key_atol_enthalpy = "atol_enthalpy"
+    character(*), parameter :: key_atol_density = "atol_density"
+    character(*), parameter :: key_rtol = "rtol"
+    character(*), parameter :: key_residual_eps = "residual_eps"
     character(*), parameter :: linear_solver = "linear_solver"
     character(*), parameter :: iterative_solver = "iterative_solver"
     character(*), parameter :: solver_type = "type"
@@ -58,7 +62,8 @@ submodule(io_input_basic) input_basic_solver_settings
     character(len=16), parameter :: valid_nonlinear_solver_methods_str(5) = &
                                     [character(len=16) :: "none", "newton", "modified_newton", "picard", "modified_picard"]
     character(len=16), parameter :: valid_norm_types_str(3) = [character(len=4) :: "l1", "l2", "linf"]
-    character(len=16), parameter :: valid_criteria_types_str(4) = [character(len=16) :: "none", "residual", "update", "both"]
+    character(len=16), parameter :: valid_criteria_types_str(5) = &
+                                    [character(len=16) :: "none", "residual", "update", "both", "conserved"]
     character(len=16), parameter :: valid_logic_types_str(2) = [character(len=16) :: "and", "or"]
     character(len=16), parameter :: valid_local_criteria_types_str(3) = [character(len=16) :: "absolute", "relative", "both"]
 
@@ -91,59 +96,107 @@ contains
         implicit none
         class(type_input_basic), intent(inout) :: self
         type(json_file), intent(inout) :: json
-        character(256) :: buffer(4)
+        character(256) :: buffer(6)
         character(:), allocatable :: temp_string
 
         buffer(1) = solver_settings
         buffer(2) = t_nonlinear_solver
 
-        buffer(3) = method
-        call get_json_value(json, join(buffer(1:3)), temp_string, &
-                            is_required=.true., default_value="none", valid_list=valid_nonlinear_solver_methods_str)
-        self%solver_settings%nonlinear_solver%method = NONLINEAR_SOLVER%to_id(temp_string)
+        ! Nonlinear iteration is fixed to Picard in this project.
+        self%solver_settings%nonlinear_solver%method = NONLINEAR_SOLVER%PICARD%ID
+        self%solver_settings%nonlinear_solver%update_frequency = 1
 
-        if (self%solver_settings%nonlinear_solver%method == NONLINEAR_SOLVER%MODIFIED_NEWTON%ID) then
-            buffer(3) = update_frequency
-            call get_json_value(json, join(buffer(1:3)), self%solver_settings%nonlinear_solver%update_frequency, &
-                                is_required=.true., default_value=5, valid_range=[1, huge(1)])
+        buffer(3) = max_iterations
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%nonlinear_solver%max_iterations, &
+                            is_required=.true., default_value=1000, valid_range=[1, huge(1)])
+
+        buffer(3) = convergence
+        buffer(4) = use_criteria
+        call get_json_value(json, join(buffer(1:4)), temp_string, &
+                            is_required=.true., default_value="both", valid_list=valid_criteria_types_str)
+        self%solver_settings%nonlinear_solver%convergence%use_criteria = NONLINEAR_NORM_CRITERIA%to_id(temp_string)
+
+        if (self%solver_settings%nonlinear_solver%convergence%use_criteria == NONLINEAR_NORM_CRITERIA%BOTH%ID) then
+            buffer(4) = logic_between_criteria
+            call get_json_value(json, join(buffer(1:4)), temp_string, &
+                                is_required=.true., default_value="and", valid_list=valid_logic_types_str)
+            self%solver_settings%nonlinear_solver%convergence%use_logic = NONLINEAR_LOGIC%to_id(temp_string)
         end if
 
-        if (any(self%solver_settings%nonlinear_solver%method == [ &
-                NONLINEAR_SOLVER%NEWTON%ID, NONLINEAR_SOLVER%MODIFIED_NEWTON%ID, NONLINEAR_SOLVER%PICARD%ID])) then
-            buffer(3) = max_iterations
-            call get_json_value(json, join(buffer(1:3)), self%solver_settings%nonlinear_solver%max_iterations, &
-                                is_required=.true., default_value=1000, valid_range=[1, huge(1)])
+        buffer(4) = norm_type
+        call get_json_value(json, join(buffer(1:4)), temp_string, &
+                            is_required=.true., default_value="l2", valid_list=valid_norm_types_str)
+        self%solver_settings%nonlinear_solver%convergence%norm_type = NORM_TYPES%to_id(temp_string)
 
-            buffer(3) = convergence
-            buffer(4) = use_criteria
-            call get_json_value(json, join(buffer), temp_string, &
-                                is_required=.true., default_value="both", valid_list=valid_criteria_types_str)
-            self%solver_settings%nonlinear_solver%convergence%use_criteria = NONLINEAR_NORM_CRITERIA%to_id(temp_string)
+        if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == &
+                [NONLINEAR_NORM_CRITERIA%RESIDUAL%ID, NONLINEAR_NORM_CRITERIA%BOTH%ID])) then
+            buffer(4) = residual
+            call read_solver_settings_nonlinear_convergence( &
+                self%solver_settings%nonlinear_solver%convergence%residual, json, buffer, 4)
+        end if
+        if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == &
+                [NONLINEAR_NORM_CRITERIA%UPDATE%ID, NONLINEAR_NORM_CRITERIA%BOTH%ID])) then
+            buffer(4) = update
+            call read_solver_settings_nonlinear_convergence( &
+                self%solver_settings%nonlinear_solver%convergence%update, json, buffer, 4)
+        end if
 
-            if (self%solver_settings%nonlinear_solver%convergence%use_criteria == NONLINEAR_NORM_CRITERIA%BOTH%ID) then
-                buffer(4) = logic_between_criteria
-                call get_json_value(json, join(buffer), temp_string, &
-                                    is_required=.true., default_value="and", valid_list=valid_logic_types_str)
-                self%solver_settings%nonlinear_solver%convergence%use_logic = NONLINEAR_LOGIC%to_id(temp_string)
-            end if
+        ! Conserved-quantity convergence (PDF 6.2.4): weighted-RMS norm of the
+        ! nodal enthalpy and effective-density increments plus a per-block
+        ! residual ratio.
+        if (self%solver_settings%nonlinear_solver%convergence%use_criteria == &
+            NONLINEAR_NORM_CRITERIA%CONSERVED%ID) then
+            ! Legacy flat keys (backward compatible)
+            buffer(4) = key_atol_enthalpy
+            call get_json_value(json, join(buffer(1:4)), &
+                                self%solver_settings%nonlinear_solver%convergence%atol_enthalpy, &
+                                is_required=.false., default_value=1.0d2, valid_range=[0.0d0, huge(0.0d0)])
+            buffer(4) = key_atol_density
+            call get_json_value(json, join(buffer(1:4)), &
+                                self%solver_settings%nonlinear_solver%convergence%atol_density, &
+                                is_required=.false., default_value=1.0d-3, valid_range=[0.0d0, huge(0.0d0)])
+            buffer(4) = key_rtol
+            call get_json_value(json, join(buffer(1:4)), &
+                                self%solver_settings%nonlinear_solver%convergence%rtol_conserved, &
+                                is_required=.false., default_value=1.0d-3, valid_range=[0.0d0, huge(0.0d0)])
+            buffer(4) = key_residual_eps
+            call get_json_value(json, join(buffer(1:4)), &
+                                self%solver_settings%nonlinear_solver%convergence%residual_eps, &
+                                is_required=.false., default_value=1.0d-1, valid_range=[0.0d0, huge(0.0d0)])
 
-            buffer(4) = norm_type
-            call get_json_value(json, join(buffer), temp_string, &
-                                is_required=.true., default_value="l2", valid_list=valid_norm_types_str)
-            self%solver_settings%nonlinear_solver%convergence%norm_type = NORM_TYPES%to_id(temp_string)
+            ! Hierarchical keys (preferred)
+            buffer(4) = "conserved"
+            buffer(5) = "thermal"
+            buffer(6) = absolute_tolerance
+            call get_json_value(json, join(buffer(1:6)), &
+                                self%solver_settings%nonlinear_solver%convergence%atol_enthalpy, &
+                                is_required=.false., &
+                                default_value=self%solver_settings%nonlinear_solver%convergence%atol_enthalpy, &
+                                valid_range=[0.0d0, huge(0.0d0)])
 
-            if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == &
-                    [NONLINEAR_NORM_CRITERIA%RESIDUAL%ID, NONLINEAR_NORM_CRITERIA%BOTH%ID])) then
-                buffer(4) = residual
-                call read_solver_settings_nonlinear_convergence( &
-                    self%solver_settings%nonlinear_solver%convergence%residual, json, buffer, 4)
-            end if
-            if (any(self%solver_settings%nonlinear_solver%convergence%use_criteria == &
-                    [NONLINEAR_NORM_CRITERIA%UPDATE%ID, NONLINEAR_NORM_CRITERIA%BOTH%ID])) then
-                buffer(4) = update
-                call read_solver_settings_nonlinear_convergence( &
-                    self%solver_settings%nonlinear_solver%convergence%update, json, buffer, 4)
-            end if
+            buffer(5) = "hydraulic"
+            buffer(6) = absolute_tolerance
+            call get_json_value(json, join(buffer(1:6)), &
+                                self%solver_settings%nonlinear_solver%convergence%atol_density, &
+                                is_required=.false., &
+                                default_value=self%solver_settings%nonlinear_solver%convergence%atol_density, &
+                                valid_range=[0.0d0, huge(0.0d0)])
+
+            buffer(5) = ""
+            buffer(6) = ""
+            buffer(5) = "relative_tolerance"
+            call get_json_value(json, join(buffer(1:5)), &
+                                self%solver_settings%nonlinear_solver%convergence%rtol_conserved, &
+                                is_required=.false., &
+                                default_value=self%solver_settings%nonlinear_solver%convergence%rtol_conserved, &
+                                valid_range=[0.0d0, huge(0.0d0)])
+
+            buffer(5) = "residual_ratio_tolerance"
+            call get_json_value(json, join(buffer(1:5)), &
+                                self%solver_settings%nonlinear_solver%convergence%residual_eps, &
+                                is_required=.false., &
+                                default_value=self%solver_settings%nonlinear_solver%convergence%residual_eps, &
+                                valid_range=[0.0d0, huge(0.0d0)])
         end if
 
         if (allocated(temp_string)) deallocate (temp_string)
@@ -196,22 +249,61 @@ contains
         type(json_file), intent(inout) :: json
         character(256) :: buffer(3)
         character(256) :: legacy_buffer(2)
+        character(:), allocatable :: temp_string
 
         buffer(1) = solver_settings
         buffer(2) = linear_solver
         buffer(3) = solver_type
 
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%solver_type, &
-                            is_required=.true., default_value=4, valid_range=[1, 20])
+                    is_required=.true., default_value=4, valid_range=[1, 26])
         buffer(3) = preconditioner_type
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%preconditioner_type, &
-                            is_required=.true., default_value=1, valid_range=[0, 10])
+                            is_required=.true., default_value=1, valid_range=[0, 11])
         buffer(3) = max_iterations
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%max_iterations, &
                             is_required=.true., default_value=10000, valid_range=[1, huge(1)])
         buffer(3) = tolerance
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%tolerance, &
                             is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
+        buffer(3) = restart_size
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%m_restarts, &
+                    is_required=.false., default_value=30, valid_range=[1, huge(1)])
+
+        ! Optional SA-AMG parameters. These defaults are used when the keys are omitted.
+        buffer(3) = "amg_strength_threshold"
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_strength_threshold, &
+                    is_required=.false., default_value=0.25d0, valid_range=[0.0d0, huge(0.0d0)])
+
+        buffer(3) = "amg_smoother_sweeps"
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_smoother_sweeps, &
+                    is_required=.false., default_value=2, valid_range=[1, huge(1)])
+
+        buffer(3) = "amg_max_agg_size"
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_max_agg_size, &
+                    is_required=.false., default_value=8, valid_range=[1, huge(1)])
+
+        buffer(3) = "amg_drop_tolerance"
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_drop_tolerance, &
+                    is_required=.false., default_value=1.0d-4, valid_range=[0.0d0, huge(0.0d0)])
+
+        buffer(3) = "amg_drop_strategy"
+        call get_json_value(json, join(buffer(1:3)), temp_string, &
+                is_required=.false., default_value="RELATIVE")
+        self%solver_settings%linear_solver%amg_drop_strategy = temp_string
+
+        buffer(3) = "amg_smoother_type"
+        call get_json_value(json, join(buffer(1:3)), temp_string, &
+                is_required=.false., default_value="HYBRID")
+        self%solver_settings%linear_solver%amg_smoother_type = temp_string
+
+        buffer(3) = "amg_rebuild_frequency"
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_rebuild_frequency, &
+                    is_required=.false., default_value=5, valid_range=[1, huge(1)])
+
+        buffer(3) = "amg_rebuild_threshold"
+        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_rebuild_threshold, &
+                    is_required=.false., default_value=1.0d-2, valid_range=[0.0d0, huge(0.0d0)])
 
         ! Backward compatibility: also accept legacy top-level "linear_solver".
         legacy_buffer(1) = linear_solver
@@ -219,12 +311,12 @@ contains
         legacy_buffer(2) = solver_type
         call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%solver_type, &
                     is_required=.false., default_value=self%solver_settings%linear_solver%solver_type, &
-                    valid_range=[1, 20])
+                    valid_range=[1, 26])
 
         legacy_buffer(2) = preconditioner_type
         call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%preconditioner_type, &
                     is_required=.false., default_value=self%solver_settings%linear_solver%preconditioner_type, &
-                    valid_range=[0, 10])
+                    valid_range=[0, 11])
 
         legacy_buffer(2) = max_iterations
         call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%max_iterations, &
@@ -235,6 +327,13 @@ contains
         call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%tolerance, &
                     is_required=.false., default_value=self%solver_settings%linear_solver%tolerance, &
                     valid_range=[0.0d0, huge(0.0d0)])
+
+        legacy_buffer(2) = restart_size
+        call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%m_restarts, &
+                    is_required=.false., default_value=self%solver_settings%linear_solver%m_restarts, &
+                    valid_range=[1, huge(1)])
+
+        if (allocated(temp_string)) deallocate (temp_string)
 
     end subroutine read_solver_settings_linear
 

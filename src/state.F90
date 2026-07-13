@@ -53,15 +53,20 @@ module core_types_physics_state
     type :: type_state
         ! --- Thermodynamic & Physical Properties ---
         type(type_field_dp) :: temperature ! Temperature [C]
-        type(type_field_dp) :: pressure ! Pressure [m]
+        type(type_field_dp) :: pressure ! Pore pressure [Pa]
         type(type_field_dp) :: water_content ! Water content [-]
         type(type_field_dp) :: ice_content ! Ice content [-]
         type(type_field_dp) :: vapor_content ! Vapor content [-]
         type(type_field_dp) :: air_content ! Air content [-]
         type(type_field_dp) :: porosity ! Porosity [-]
+        ! Generalized suction p_c* = max(psi_cap, psi_cryo) [Pa].
+        ! Set by update_water_phases; the liquid-phase potential is
+        ! -effective_suction, and retention-based properties (theta_w,
+        ! relative permeability) must be evaluated at this suction.
+        type(type_field_dp) :: effective_suction ! [Pa]
 
-        type(type_field_array_dp) :: temperature_history ! Temperature history [-]
-        type(type_field_array_dp) :: pressure_history ! Pressure history [-]
+        type(type_field_array_dp) :: temperature_history ! Temperature history [C]
+        type(type_field_array_dp) :: pressure_history ! Pressure history [Pa]
         type(type_field_array_dp) :: porosity_history ! Porosity history [-]
 
         ! --- Thermal Properties ---
@@ -469,6 +474,7 @@ contains
         call self%vapor_content%reset()
         call self%air_content%reset()
         call self%porosity%reset()
+        call self%effective_suction%reset()
         call self%temperature_history%reset()
         call self%pressure_history%reset()
         call self%porosity_history%reset()
@@ -495,32 +501,70 @@ contains
         class(type_state), intent(inout) :: self
         class(type_state), intent(in) :: source
 
-        call self%temperature%set(source%temperature%value)
-        call self%pressure%set(source%pressure%value)
-        call self%water_content%set(source%water_content%value)
-        call self%ice_content%set(source%ice_content%value)
-        call self%vapor_content%set(source%vapor_content%value)
-        call self%air_content%set(source%air_content%value)
-        call self%porosity%set(source%porosity%value)
-        call self%temperature_history%set(source%temperature_history%value)
-        call self%pressure_history%set(source%pressure_history%value)
-        call self%latent_heat_fusion%set(source%latent_heat_fusion%value)
-        call self%latent_heat_vaporization%set(source%latent_heat_vaporization%value)
-        call self%dQw_dT%set(source%dQw_dT%value)
-        call self%dQv_dT%set(source%dQv_dT%value)
-        call self%dQa_dT%set(source%dQa_dT%value)
-        call self%dQi_dT%set(source%dQi_dT%value)
-        call self%dQw_dP%set(source%dQw_dP%value)
-        call self%dQv_dP%set(source%dQv_dP%value)
-        call self%dQa_dP%set(source%dQa_dP%value)
-        call self%dQi_dP%set(source%dQi_dP%value)
-        call self%grad_T%set(source%grad_T%value)
-        call self%grad_P%set(source%grad_P%value)
-        call self%relative_humidity%set(source%relative_humidity%value)
-        call self%mass_fraction_clay%set(source%mass_fraction_clay%value)
-        call self%water_flux%set(source%water_flux%value)
-        call self%mass_fraction_clay%set(source%mass_fraction_clay%value)
+        call copy_field(self%temperature, source%temperature)
+        call copy_field(self%pressure, source%pressure)
+        call copy_field(self%water_content, source%water_content)
+        call copy_field(self%ice_content, source%ice_content)
+        call copy_field(self%vapor_content, source%vapor_content)
+        call copy_field(self%air_content, source%air_content)
+        call copy_field(self%porosity, source%porosity)
+        call copy_field(self%effective_suction, source%effective_suction)
+        call copy_array_field(self%temperature_history, source%temperature_history)
+        call copy_array_field(self%pressure_history, source%pressure_history)
+        call copy_array_field(self%porosity_history, source%porosity_history)
+        call copy_field(self%latent_heat_fusion, source%latent_heat_fusion)
+        call copy_field(self%latent_heat_vaporization, source%latent_heat_vaporization)
+        call copy_field(self%dQw_dT, source%dQw_dT)
+        call copy_field(self%dQv_dT, source%dQv_dT)
+        call copy_field(self%dQa_dT, source%dQa_dT)
+        call copy_field(self%dQi_dT, source%dQi_dT)
+        call copy_field(self%dQw_dP, source%dQw_dP)
+        call copy_field(self%dQv_dP, source%dQv_dP)
+        call copy_field(self%dQa_dP, source%dQa_dP)
+        call copy_field(self%dQi_dP, source%dQi_dP)
+        call copy_coord_field(self%grad_T, source%grad_T)
+        call copy_coord_field(self%grad_P, source%grad_P)
+        call copy_field(self%relative_humidity, source%relative_humidity)
+        call copy_field(self%mass_fraction_clay, source%mass_fraction_clay)
+        call copy_coord_field(self%water_flux, source%water_flux)
+        call copy_coord_field(self%vapor_flux, source%vapor_flux)
 
+    contains
+        subroutine copy_field(dst, src)
+            implicit none
+            type(type_field_dp), intent(inout) :: dst
+            type(type_field_dp), intent(in) :: src
+
+            if (src%is_set) then
+                call dst%set(src%value)
+            else
+                call dst%reset()
+            end if
+        end subroutine copy_field
+
+        subroutine copy_array_field(dst, src)
+            implicit none
+            type(type_field_array_dp), intent(inout) :: dst
+            type(type_field_array_dp), intent(in) :: src
+
+            if (src%is_set) then
+                call dst%set(src%value)
+            else
+                call dst%reset()
+            end if
+        end subroutine copy_array_field
+
+        subroutine copy_coord_field(dst, src)
+            implicit none
+            type(type_field_coord), intent(inout) :: dst
+            type(type_field_coord), intent(in) :: src
+
+            if (src%is_set) then
+                call dst%set(src%value)
+            else
+                call dst%reset()
+            end if
+        end subroutine copy_coord_field
     end subroutine copy_state
 
 end module core_types_physics_state

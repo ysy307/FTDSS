@@ -36,6 +36,7 @@ contains
         ! Removed resize logic; trust num_nodes set in initialize
 
         self%status = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+
         select type (A)
         type is (type_matrix_dense)
             self%is_block = .false.
@@ -100,11 +101,14 @@ contains
 
         select type (A)
         type is (type_matrix_bsr)
-            if (allocated(self%M_inv_blocks)) deallocate (self%M_inv_blocks)
-            if (allocated(self%ipiv_blocks)) deallocate (self%ipiv_blocks)
-
-            allocate (self%M_inv_blocks(bs, bs, num_blocks))
-            allocate (self%ipiv_blocks(bs, num_blocks))
+            if (allocated(self%M_inv_blocks)) then
+                if (any(shape(self%M_inv_blocks) /= [bs, bs, num_blocks])) deallocate (self%M_inv_blocks)
+            end if
+            if (allocated(self%ipiv_blocks)) then
+                if (any(shape(self%ipiv_blocks) /= [bs, num_blocks])) deallocate (self%ipiv_blocks)
+            end if
+            if (.not. allocated(self%M_inv_blocks)) allocate (self%M_inv_blocks(bs, bs, num_blocks))
+            if (.not. allocated(self%ipiv_blocks)) allocate (self%ipiv_blocks(bs, num_blocks))
 
             !$omp parallel do private(i, ierr)
             do i = 1, num_blocks

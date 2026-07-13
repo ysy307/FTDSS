@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">42 statements</a>
+                 title=" 0.0% of total for procedures.">48 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -178,7 +178,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~446"></span>
+              <span class="anchor" id="variable-self~2268"></span>
               class(<a href='../type/type_input_basic.html'>type_input_basic</a>),
             </td>
 <td>intent(inout)</td>
@@ -193,7 +193,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-json~11"></span>
+              <span class="anchor" id="variable-json~38"></span>
               type(json_file),
             </td>
 <td>intent(inout)</td>
@@ -1113,6 +1113,18 @@ large graphs.</div>
 <span class="w">            </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">phase_change</span><span class="p">%</span><span class="n">equilibrium_model</span><span class="p">%</span><span class="n">segregation</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
 <span class="w">                                </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.,</span><span class="w"> </span><span class="n">default_value</span><span class="o">=</span><span class="p">.</span><span class="n">false</span><span class="p">.)</span>
 
+<span class="w">            </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">segregation_potential_key</span>
+<span class="w">            </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">)),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">phase_change</span><span class="p">%</span><span class="n">segregation_potential</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">false</span><span class="p">.,</span><span class="w"> </span><span class="n">default_value</span><span class="o">=</span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">valid_range</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">)])</span>
+
+<span class="w">            </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t_fringe_low_key</span>
+<span class="w">            </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">)),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">phase_change</span><span class="p">%</span><span class="n">T_fringe_low</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">false</span><span class="p">.,</span><span class="w"> </span><span class="n">default_value</span><span class="o">=-</span><span class="mf">1.0d0</span><span class="p">)</span>
+
+<span class="w">            </span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t_fringe_high_key</span>
+<span class="w">            </span><span class="k">call </span><span class="n">get_json_value</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">join</span><span class="p">(</span><span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">)),</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">i_material</span><span class="p">)%</span><span class="n">phase_change</span><span class="p">%</span><span class="n">T_fringe_high</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                </span><span class="n">is_required</span><span class="o">=</span><span class="p">.</span><span class="n">false</span><span class="p">.,</span><span class="w"> </span><span class="n">default_value</span><span class="o">=</span><span class="mf">0.0d0</span><span class="p">)</span>
+
 <span class="w">            </span><span class="k">call </span><span class="n">read_materials_swcc</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">i_material</span><span class="p">)</span>
 <span class="w">            </span><span class="k">call </span><span class="n">read_materials_hydraulic_model</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="n">i_material</span><span class="p">)</span>
 <span class="w">        </span><span class="k">end if</span>
@@ -1141,7 +1153,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

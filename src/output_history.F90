@@ -11,6 +11,7 @@ submodule(io_input_output_conditions) input_output_conditions_history
     character(*), parameter :: y = "y"
     character(*), parameter :: z = "z"
     character(*), parameter :: output_time_unit = "output_time_unit"
+    character(*), parameter :: output_time_offset_key = "output_time_offset"
 
 contains
 
@@ -36,6 +37,9 @@ contains
             buffer(2) = output_time_unit
             call get_json_value(json, join(buffer(1:2)), self%history_output%output_time_unit, &
                                 is_required=.true., valid_list=valid_time_units)
+            buffer(2) = output_time_offset_key
+            call get_json_value(json, join(buffer(1:2)), self%history_output%output_time_offset, &
+                                is_required=.false., default_value=0.0d0)
 
             buffer(2) = output_interval
             buffer(3) = unit

@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.4% of total for derived types.</p>Including implementation: 115 statements,  0.4% of total for derived types.">16 statements</a>
+                 title="<p> 0.4% of total for derived types.</p>Including implementation: 118 statements,  0.4% of total for derived types.">17 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,11 +134,12 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_scheduler_manager.html#variable-active~5">active</a>
+            <a class="list-group-item" href="../type/type_scheduler_manager.html#variable-active">active</a>
             <a class="list-group-item" href="../type/type_scheduler_manager.html#variable-current_step">current_step</a>
             <a class="list-group-item" href="../type/type_scheduler_manager.html#variable-interval_seconds">interval_seconds</a>
             <a class="list-group-item" href="../type/type_scheduler_manager.html#variable-next_output_seconds">next_output_seconds</a>
-            <a class="list-group-item" href="../type/type_scheduler_manager.html#variable-output_time_unit~5">output_time_unit</a>
+            <a class="list-group-item" href="../type/type_scheduler_manager.html#variable-output_time_offset">output_time_offset</a>
+            <a class="list-group-item" href="../type/type_scheduler_manager.html#variable-output_time_unit">output_time_unit</a>
         </div>
       </div>
     </div>
@@ -167,12 +168,12 @@
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_scheduler_manager.html#boundprocedure-get_next_target_time">get_next_target_time</a>
             <a class="list-group-item" href="../type/type_scheduler_manager.html#boundprocedure-get_next_time">get_next_time</a>
-            <a class="list-group-item" href="../type/type_scheduler_manager.html#boundprocedure-get_output_time~2">get_output_time</a>
+            <a class="list-group-item" href="../type/type_scheduler_manager.html#boundprocedure-get_output_time">get_output_time</a>
             <a class="list-group-item" href="../type/type_scheduler_manager.html#boundprocedure-get_step">get_step</a>
-            <a class="list-group-item" href="../type/type_scheduler_manager.html#boundprocedure-initialize~92">initialize</a>
-            <a class="list-group-item" href="../type/type_scheduler_manager.html#boundprocedure-is_active~12">is_active</a>
-            <a class="list-group-item" href="../type/type_scheduler_manager.html#boundprocedure-is_output_triggered~3">is_output_triggered</a>
-            <a class="list-group-item" href="../type/type_scheduler_manager.html#boundprocedure-update~6">update</a>
+            <a class="list-group-item" href="../type/type_scheduler_manager.html#boundprocedure-initialize~2">initialize</a>
+            <a class="list-group-item" href="../type/type_scheduler_manager.html#boundprocedure-is_active">is_active</a>
+            <a class="list-group-item" href="../type/type_scheduler_manager.html#boundprocedure-is_output_triggered">is_output_triggered</a>
+            <a class="list-group-item" href="../type/type_scheduler_manager.html#boundprocedure-update">update</a>
         </div>
       </div>
     </div>
@@ -409,7 +410,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-active~5"></span>
+              <span class="anchor" id="variable-active"></span>
               logical,
             </td>
               <td>private</td>
@@ -477,7 +478,24 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-output_time_unit~5"></span>
+              <span class="anchor" id="variable-output_time_offset"></span>
+              real(kind=real64),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>output_time_offset</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-output_time_unit"></span>
               type(<a href='type_constant_value.html'>type_constant_value</a>),
             </td>
               <td>private</td>
@@ -648,7 +666,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_output_time~2"></span>
+      <span class="anchor" id="boundprocedure-get_output_time"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>get_output_time</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_output_time_scheduler_manager.html'>get_output_time_scheduler_manager</a>
@@ -801,7 +819,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~92"></span>
+      <span class="anchor" id="boundprocedure-initialize~2"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/initialize_manager.html'>initialize_manager</a>
@@ -885,7 +903,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-is_active~12"></span>
+      <span class="anchor" id="boundprocedure-is_active"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>is_active</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_active_scheduler_manager.html'>is_active_scheduler_manager</a>
@@ -944,7 +962,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-is_output_triggered~3"></span>
+      <span class="anchor" id="boundprocedure-is_output_triggered"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>is_output_triggered</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/check_output_timing.html'>check_output_timing</a>
@@ -1018,7 +1036,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-update~6"></span>
+      <span class="anchor" id="boundprocedure-update"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>update</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/update_state.html'>update_state</a>
@@ -1093,7 +1111,8 @@ large graphs.</div>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">interval_seconds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w"> </span><span class="c">! Always stored in seconds</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">next_output_seconds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w"> </span><span class="c">! Always stored in seconds</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">current_step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
-<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_value</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">output_time_unit</span><span class="w"> </span><span class="c">! For output time conversion</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_value</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">output_time_unit</span><span class="w">   </span><span class="c">! For output time conversion</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">output_time_offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w">    </span><span class="c">! Added to converted time (e.g. 1.0 for DOY)</span>
 <span class="w">    </span><span class="k">contains</span>
 <span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_manager</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_output_triggered</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">check_output_timing</span>
@@ -1126,7 +1145,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

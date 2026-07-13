@@ -75,6 +75,11 @@ contains
             self%norms_history(NORM_TYPES%L1%ID, iter) = vector_norm1(vector)
             self%norms_history(NORM_TYPES%L2%ID, iter) = vector_norm2(vector)
             self%norms_history(NORM_TYPES%LINF%ID, iter) = vector_norminf(vector)
+
+            write (*, '(A, I6, A, ES13.6, A, ES13.6, A, ES13.6)') '    [Debug] Iteration:', iter, ' Norms - L1:', &
+                self%norms_history(NORM_TYPES%L1%ID, iter), &
+                ' L2:', self%norms_history(NORM_TYPES%L2%ID, iter), &
+                ' LInf:', self%norms_history(NORM_TYPES%LINF%ID, iter)
         end if
 
         if (.not. self%should_check) then
@@ -135,4 +140,20 @@ contains
         end if
 
     end subroutine get_tolerances_convergence_criterion
+
+    !> Update the reference value for relative error normalization.
+    !> Typically called per time step with a characteristic scale of the physical variable.
+    module subroutine update_reference_value_type_convergence_criterion(self, reference_value)
+        implicit none
+        class(type_convergence_criterion), intent(inout) :: self
+        real(real64), intent(in) :: reference_value
+
+        if (abs(reference_value) < 1.0d-6) then
+            self%reference_value = 1.0d0
+        else
+            self%reference_value = abs(reference_value)
+        end if
+
+    end subroutine update_reference_value_type_convergence_criterion
+
 end submodule convergence_criterion

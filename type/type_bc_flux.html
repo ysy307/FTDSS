@@ -104,7 +104,7 @@
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/strategy_interface.f90.html'>strategy_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/strategy_interface.f90~2.html'>strategy_interface.F90</a></li>
                 <li class="breadcrumb-item"><a href='../module/boundary_strategy.html'>boundary_strategy</a></li>
             <li class="breadcrumb-item active" aria-current="page">type_bc_flux</li>
           </ol>
@@ -135,7 +135,7 @@
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_bc_flux.html#variable-bc_kind~3">bc_kind</a>
-            <a class="list-group-item" href="../type/type_bc_flux.html#variable-physics_type~55">physics_type</a>
+            <a class="list-group-item" href="../type/type_bc_flux.html#variable-physics_type~31">physics_type</a>
         </div>
       </div>
     </div>
@@ -162,9 +162,10 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_bc_flux.html#boundprocedure-destroy~47">destroy</a>
-            <a class="list-group-item" href="../type/type_bc_flux.html#boundprocedure-evaluate~4">evaluate</a>
-            <a class="list-group-item" href="../type/type_bc_flux.html#boundprocedure-initialize~89">initialize</a>
+            <a class="list-group-item" href="../type/type_bc_flux.html#boundprocedure-destroy~43">destroy</a>
+            <a class="list-group-item" href="../type/type_bc_flux.html#boundprocedure-evaluate~5">evaluate</a>
+            <a class="list-group-item" href="../type/type_bc_flux.html#boundprocedure-initialize~77">initialize</a>
+            <a class="list-group-item" href="../type/type_bc_flux.html#boundprocedure-update_provider_data">update_provider_data</a>
         </div>
       </div>
     </div>
@@ -349,7 +350,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-physics_type~55"></span>
+              <span class="anchor" id="variable-physics_type~31"></span>
               type(<a href='type_constant_id.html'>type_constant_id</a>),
             </td>
               <td>public</td>
@@ -377,7 +378,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-destroy~47"></span>
+      <span class="anchor" id="boundprocedure-destroy~43"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>destroy</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/destroy_abst_bc.html'>destroy_abst_bc</a>
@@ -432,7 +433,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-evaluate~4"></span>
+      <span class="anchor" id="boundprocedure-evaluate~5"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>evaluate</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/evaluate_flux_bc.html'>evaluate_flux_bc</a>
@@ -532,7 +533,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~89"></span>
+      <span class="anchor" id="boundprocedure-initialize~77"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/initialize_abst_bc.html'>initialize_abst_bc</a>
@@ -614,6 +615,76 @@ large graphs.</div>
   </div>
 
           </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-update_provider_data"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>update_provider_data</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/update_provider_data_abst_bc.html'>update_provider_data_abst_bc</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine update_provider_data_abst_bc(self, new_values)  
+    <a href="../proc/update_provider_data_abst_bc.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_bc.html'>abst_bc</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>new_values</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
       </section>
 
     <section>
@@ -644,7 +715,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

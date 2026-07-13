@@ -1,16 +1,21 @@
 module numerical_solver_interface
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
+    use, intrinsic :: iso_c_binding, only: c_int
 !$  use omp_lib
     use :: stdlib_strings, only:strip
     use :: module_core
     use :: module_linalg
     use :: numerical_solver_preconditioner
+#ifdef _MKL
+    use :: linalg_mkl_interface, only: mkl_pardiso_handle
+#endif
     implicit none
     private
 
     public :: abst_solver
     public :: type_solver_bicgstab
     public :: type_solver_gmres
+    public :: type_solver_pardiso
 
     public :: type_solver_settings
     public :: create_solver
@@ -20,8 +25,12 @@ module numerical_solver_interface
         integer(int32) :: id
         integer(int32) :: preconditioner_id
         real(real64) :: tolerance
+        real(real64) :: relative_tolerance = 1.0d-6
         integer(int32) :: max_iterations
         integer(int32) :: m_restart
+        logical :: projection_enabled = .false.
+        integer(int32) :: projection_offset = 0
+        integer(int32) :: projection_stride = 0
 
         integer(int32) :: num_nodes
         integer(int32) :: num_dofs_per_node
@@ -44,6 +53,9 @@ module numerical_solver_interface
         real(real64) :: tolerance = 0.0d0
         real(real64) :: relative_tolerance = 1.0d-6
         integer(int32) :: max_iterations = 0
+        logical :: projection_enabled = .false.
+        integer(int32) :: projection_offset = 0
+        integer(int32) :: projection_stride = 0
 
         type(type_vector_dp) :: residual_history
         integer(int32) :: current_iteration = 0
@@ -153,6 +165,26 @@ module numerical_solver_interface
         procedure :: destroy => destroy_type_solver_gmres
     end type type_solver_gmres
 
+    type, extends(abst_solver) :: type_solver_pardiso
+        integer(int32) :: mtype = 11
+        integer(int32) :: maxfct = 1
+        integer(int32) :: mnum = 1
+        integer(int32) :: msglvl = 0
+        integer(int32) :: nrhs = 1
+        integer(int32) :: last_error = 0
+#ifdef _MKL
+        type(mkl_pardiso_handle) :: pt(64)
+        integer(c_int), allocatable :: analyzed_ia(:)
+        integer(c_int), allocatable :: analyzed_ja(:)
+#endif
+        integer(c_int) :: iparm(64) = 0
+        logical :: analysis_ready = .false.
+    contains
+        procedure :: initialize => initialize_type_solver_pardiso
+        procedure :: solve => solve_type_solver_pardiso
+        procedure :: destroy => destroy_type_solver_pardiso
+    end type type_solver_pardiso
+
     interface
         module subroutine initialize_type_solver_gmres(self, solver_settings, preconditioner_settings)
             implicit none
@@ -177,8 +209,34 @@ module numerical_solver_interface
         end subroutine destroy_type_solver_gmres
     end interface
 
+    interface
+        module subroutine initialize_type_solver_pardiso(self, solver_settings, preconditioner_settings)
+            implicit none
+            class(type_solver_pardiso), intent(inout) :: self
+            type(type_solver_settings), intent(in) :: solver_settings
+            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+
+        end subroutine initialize_type_solver_pardiso
+
+        module subroutine solve_type_solver_pardiso(self, A, b, x)
+            implicit none
+            class(type_solver_pardiso), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+            type(type_vector_dp), intent(in) :: b
+            type(type_vector_dp), intent(inout) :: x
+        end subroutine solve_type_solver_pardiso
+
+        module subroutine destroy_type_solver_pardiso(self)
+            implicit none
+            class(type_solver_pardiso), intent(inout) :: self
+
+        end subroutine destroy_type_solver_pardiso
+    end interface
+
 contains
-    subroutine set_solver_settings(self, id, num_nodes, tolerance, max_iterations, m_restart)
+    subroutine set_solver_settings(self, id, num_nodes, tolerance, max_iterations, m_restart, &
+                                   projection_enabled, projection_offset, projection_stride, &
+                                   relative_tolerance)
         implicit none
         class(type_solver_settings), intent(inout) :: self
         integer(int32), intent(in) :: id
@@ -186,11 +244,24 @@ contains
         real(real64), intent(in) :: tolerance
         integer(int32), intent(in) :: max_iterations
         integer(int32), intent(in), optional :: m_restart
+        logical, intent(in), optional :: projection_enabled
+        integer(int32), intent(in), optional :: projection_offset
+        integer(int32), intent(in), optional :: projection_stride
+        real(real64), intent(in), optional :: relative_tolerance
 
         self%ID = id
         self%num_nodes = num_nodes
         self%tolerance = tolerance
+        self%relative_tolerance = 1.0d-6
+        if (present(relative_tolerance)) self%relative_tolerance = relative_tolerance
         self%max_iterations = max_iterations
+        self%projection_enabled = .false.
+        self%projection_offset = 0
+        self%projection_stride = 0
+
+        if (present(projection_enabled)) self%projection_enabled = projection_enabled
+        if (present(projection_offset)) self%projection_offset = projection_offset
+        if (present(projection_stride)) self%projection_stride = projection_stride
 
         select case (self%ID)
         case (LINEAR_SOLVER_TYPES%GMRES_M%ID)
@@ -279,6 +350,47 @@ contains
 
     end subroutine display_residual_history_solver
 
+    !> Project the constant-vector null-mode out of `vec` on a strided DOF component.
+    !>
+    !> For an all-Neumann physics block the matrix is singular with a constant
+    !> null-space; registering that as the null-space and orthogonalising every
+    !> residual/matvec to it keeps Krylov iterations stable. `offset`/`stride`
+    !> address a single physics field inside a coupled DOF layout.
+    subroutine project_component_mean_zero(vec, enabled, offset, stride)
+        implicit none
+        type(type_vector_dp), intent(inout) :: vec
+        logical, intent(in) :: enabled
+        integer(int32), intent(in) :: offset, stride
+
+        real(real64), pointer :: data(:)
+        real(real64) :: mean_val
+        integer(int32) :: i, count, first_idx
+
+        if (.not. enabled) return
+        if (stride <= 0 .or. offset <= 0) return
+
+        data => vec%get_data()
+        if (.not. associated(data)) return
+
+        first_idx = offset
+        if (first_idx > size(data)) return
+
+        mean_val = 0.0d0
+        count = 0
+        do i = first_idx, size(data), stride
+            mean_val = mean_val + data(i)
+            count = count + 1
+        end do
+        if (count <= 0) return
+
+        mean_val = mean_val / real(count, real64)
+        do i = first_idx, size(data), stride
+            data(i) = data(i) - mean_val
+        end do
+
+        nullify (data)
+    end subroutine project_component_mean_zero
+
     subroutine create_solver(solver, solver_settings, preconditioner_settings, ierr)
         implicit none
         class(abst_solver), allocatable, intent(inout) :: solver
@@ -345,6 +457,10 @@ contains
             ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
         case (LINEAR_SOLVER_TYPES%COCR%ID)
             ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+        case (LINEAR_SOLVER_TYPES%PARDISO%ID)
+            allocate (type_solver_pardiso :: solver)
+            call solver%initialize(solver_settings, preconditioner_settings)
+            ierr = solver%status
         case default
             ierr = SOLVER_STATUS%ILL_OPTIONS%ID
         end select
@@ -352,4 +468,3 @@ contains
     end subroutine create_solver
 
 end module numerical_solver_interface
-

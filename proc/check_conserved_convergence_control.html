@@ -1,0 +1,1098 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>check_conserved_convergence_control &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>check_conserved_convergence_control
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">144 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/convergence_control.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/convergence_control.f90.html'>convergence_control.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/convergence_control.html'>convergence_control</a></li>
+            <li class="breadcrumb-item active" aria-current="page">check_conserved_convergence_control</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/check_conserved_convergence_control.html#src">check_conserved_convergence_control</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine check_conserved_convergence_control(self, enthalpy, density, residual_thermal, residual_hydraulic, nonlinear_iter, check_thermal, check_hydraulic, is_ok, is_diverged)  
+    <a href="../interface/check_conserved_convergence_control.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>Conserved-quantity convergence check (PDF 6.2.4). See interface for the
+mathematical definition. Mutates the stored previous iterate and counters.</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~1084"></span>
+              class(<a href='../type/type_convergence_control.html'>type_convergence_control</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-enthalpy~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>enthalpy</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-density~16"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>density</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-residual_thermal~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>residual_thermal</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-residual_hydraulic~3"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>residual_hydraulic</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nonlinear_iter~10"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nonlinear_iter</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-check_thermal~3"></span>
+              logical,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>check_thermal</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-check_hydraulic~3"></span>
+              logical,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>check_hydraulic</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-is_ok~8"></span>
+              logical,
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>is_ok</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-is_diverged~5"></span>
+              logical,
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>is_diverged</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~check_conserved_convergence_control~~CallsGraph Pages: 1 -->
+<svg id="proccheck_conserved_convergence_controlCallsGraph" width="641pt" height="50pt"
+ viewBox="0.00 0.00 641.00 50.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~check_conserved_convergence_control~~CallsGraph" class="graph" transform="scale(0.53 0.53) rotate(0) translate(4 90)">
+<title>proc~~check_conserved_convergence_control~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-90 1201,-90 1201,4 -4,4"/>
+<!-- proc~check_conserved_convergence_control -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_node1" class="node">
+<title>proc~check_conserved_convergence_control</title>
+<polygon fill="none" stroke="black" points="222,-45 0,-45 0,-21 222,-21 222,-45"/>
+<text text-anchor="middle" x="111" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">check_conserved_convergence_control</text>
+</g>
+<!-- proc~block_residual_norm -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_node2" class="node">
+<title>proc~block_residual_norm</title>
+<g id="a_proc~~check_conserved_convergence_control~~CallsGraph_node2"><a xlink:href="../proc/block_residual_norm.html" xlink:title="block_residual_norm">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="393,-66 271,-66 271,-42 393,-42 393,-66"/>
+<text text-anchor="middle" x="332" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">block_residual_norm</text>
+</a>
+</g>
+</g>
+<!-- proc~check_conserved_convergence_control&#45;&gt;proc~block_residual_norm -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_edge1" class="edge">
+<title>proc~check_conserved_convergence_control&#45;&gt;proc~block_residual_norm</title>
+<path fill="none" stroke="#ff0000" d="M222.14,-43.56C235.29,-44.82 248.42,-46.08 260.79,-47.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="260.69,-50.77 270.98,-48.24 261.36,-43.81 260.69,-50.77"/>
+</g>
+<!-- proc~weighted_rms_conserved -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_node3" class="node">
+<title>proc~weighted_rms_conserved</title>
+<g id="a_proc~~check_conserved_convergence_control~~CallsGraph_node3"><a xlink:href="../proc/weighted_rms_conserved.html" xlink:title="weighted_rms_conserved">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="406,-24 258,-24 258,0 406,0 406,-24"/>
+<text text-anchor="middle" x="332" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">weighted_rms_conserved</text>
+</a>
+</g>
+</g>
+<!-- proc~check_conserved_convergence_control&#45;&gt;proc~weighted_rms_conserved -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_edge2" class="edge">
+<title>proc~check_conserved_convergence_control&#45;&gt;proc~weighted_rms_conserved</title>
+<path fill="none" stroke="#ff0000" d="M222.14,-22.44C230.77,-21.61 239.4,-20.78 247.81,-19.98"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="248.32,-23.44 257.94,-19.01 247.65,-16.48 248.32,-23.44"/>
+</g>
+<!-- interface~vector_norm2 -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_node4" class="node">
+<title>interface~vector_norm2</title>
+<g id="a_proc~~check_conserved_convergence_control~~CallsGraph_node4"><a xlink:href="../interface/vector_norm2.html" xlink:title="vector_norm2">
+<polygon fill="#a7506f" stroke="#a7506f" points="529,-66 442,-66 442,-42 529,-42 529,-66"/>
+<text text-anchor="middle" x="485.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_norm2</text>
+</a>
+</g>
+</g>
+<!-- proc~block_residual_norm&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_edge3" class="edge">
+<title>proc~block_residual_norm&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#ff0000" d="M393.31,-54C405.95,-54 419.18,-54 431.53,-54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="431.65,-57.5 441.65,-54 431.65,-50.5 431.65,-57.5"/>
+</g>
+<!-- proc~norm_2_native~2 -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_node5" class="node">
+<title>proc~norm_2_native~2</title>
+<g id="a_proc~~check_conserved_convergence_control~~CallsGraph_node5"><a xlink:href="../proc/norm_2_native~2.html" xlink:title="norm_2_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="861.5,-86 770.5,-86 770.5,-62 861.5,-62 861.5,-86"/>
+<text text-anchor="middle" x="816" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_native</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm2&#45;&gt;proc~norm_2_native~2 -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_edge4" class="edge">
+<title>interface~vector_norm2&#45;&gt;proc~norm_2_native~2</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M529.11,-56.59C588.27,-60.2 695.32,-66.71 760.31,-70.67"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="760.17,-74.17 770.37,-71.28 760.6,-67.18 760.17,-74.17"/>
+</g>
+<!-- proc~norm_2_vector_dp -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_node6" class="node">
+<title>proc~norm_2_vector_dp</title>
+<g id="a_proc~~check_conserved_convergence_control~~CallsGraph_node6"><a xlink:href="../proc/norm_2_vector_dp.html" xlink:title="norm_2_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="676,-46 565,-46 565,-22 676,-22 676,-46"/>
+<text text-anchor="middle" x="620.5" y="-31.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm2&#45;&gt;proc~norm_2_vector_dp -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_edge5" class="edge">
+<title>interface~vector_norm2&#45;&gt;proc~norm_2_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M529.31,-47.56C537.39,-46.35 546.01,-45.05 554.59,-43.76"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="555.24,-47.2 564.61,-42.25 554.2,-40.28 555.24,-47.2"/>
+</g>
+<!-- proc~norm_2_native -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_node8" class="node">
+<title>proc~norm_2_native</title>
+<g id="a_proc~~check_conserved_convergence_control~~CallsGraph_node8"><a xlink:href="../proc/norm_2_native.html" xlink:title="norm_2_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1060,-86 969,-86 969,-62 1060,-62 1060,-86"/>
+<text text-anchor="middle" x="1014.5" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_native</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_2_native~2&#45;&gt;proc~norm_2_native -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_edge6" class="edge">
+<title>proc~norm_2_native~2&#45;&gt;proc~norm_2_native</title>
+<path fill="none" stroke="#ff0000" d="M861.59,-74C890.38,-74 928.04,-74 958.66,-74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="958.75,-77.5 968.75,-74 958.75,-70.5 958.75,-77.5"/>
+</g>
+<!-- proc~norm_2_vector_dp&#45;&gt;proc~norm_2_native~2 -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_edge8" class="edge">
+<title>proc~norm_2_vector_dp&#45;&gt;proc~norm_2_native~2</title>
+<path fill="none" stroke="#00ffff" d="M676.05,-45.51C687.9,-47.99 700.37,-50.59 712,-53 727.69,-56.25 744.72,-59.73 760.34,-62.92"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="759.88,-66.39 770.37,-64.96 761.27,-59.54 759.88,-66.39"/>
+</g>
+<!-- interface~get_data_vector_dp -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_node7" class="node">
+<title>interface~get_data_vector_dp</title>
+<g id="a_proc~~check_conserved_convergence_control~~CallsGraph_node7"><a xlink:href="../interface/get_data_vector_dp.html" xlink:title="type_vector_dp%get_data_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="920,-44 712,-44 712,-20 920,-20 920,-44"/>
+<text text-anchor="middle" x="816" y="-29.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_2_vector_dp&#45;&gt;interface~get_data_vector_dp -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_edge7" class="edge">
+<title>proc~norm_2_vector_dp&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#00ffff" d="M676.17,-33.43C684.21,-33.35 692.72,-33.26 701.42,-33.17"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="701.74,-36.67 711.7,-33.07 701.67,-29.67 701.74,-36.67"/>
+</g>
+<!-- proc~get_data_vector_dp -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_node10" class="node">
+<title>proc~get_data_vector_dp</title>
+<g id="a_proc~~check_conserved_convergence_control~~CallsGraph_node10"><a xlink:href="../proc/get_data_vector_dp.html" xlink:title="get_data_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1073,-44 956,-44 956,-20 1073,-20 1073,-44"/>
+<text text-anchor="middle" x="1014.5" y="-29.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_edge9" class="edge">
+<title>interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M920.14,-32C928.74,-32 937.29,-32 945.53,-32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="945.77,-35.5 955.77,-32 945.77,-28.5 945.77,-35.5"/>
+</g>
+<!-- mpi_allreduce -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_node9" class="node">
+<title>mpi_allreduce</title>
+<polygon fill="#777777" stroke="#777777" points="1197,-86 1109,-86 1109,-62 1197,-62 1197,-86"/>
+<text text-anchor="middle" x="1153" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_allreduce</text>
+</g>
+<!-- proc~norm_2_native&#45;&gt;mpi_allreduce -->
+<g id="proc~~check_conserved_convergence_control~~CallsGraph_edge10" class="edge">
+<title>proc~norm_2_native&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#00ffff" d="M1060.2,-74C1072.34,-74 1085.63,-74 1098.22,-74"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1098.6,-77.5 1108.6,-74 1098.6,-70.5 1098.6,-77.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccheck_conserved_convergence_controlCallsGraph = svgPanZoom('#proccheck_conserved_convergence_controlCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~check_conserved_convergence_control~~CalledByGraph Pages: 1 -->
+<svg id="proccheck_conserved_convergence_controlCalledByGraph" width="641pt" height="7pt"
+ viewBox="0.00 0.00 641.00 6.73" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph" class="graph" transform="scale(0.21 0.21) rotate(0) translate(4 28)">
+<title>proc~~check_conserved_convergence_control~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 3044,-28 3044,4 -4,4"/>
+<!-- proc~check_conserved_convergence_control -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_node1" class="node">
+<title>proc~check_conserved_convergence_control</title>
+<polygon fill="none" stroke="black" points="3040,-24 2818,-24 2818,0 3040,0 3040,-24"/>
+<text text-anchor="middle" x="2929" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">check_conserved_convergence_control</text>
+</g>
+<!-- interface~check_conserved_convergence_control -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_node2" class="node">
+<title>interface~check_conserved_convergence_control</title>
+<g id="a_proc~~check_conserved_convergence_control~~CalledByGraph_node2"><a xlink:href="../interface/check_conserved_convergence_control.html" xlink:title="type_convergence_control%check_conserved_convergence_control">
+<polygon fill="#a7506f" stroke="#a7506f" points="2782,-24 2410,-24 2410,0 2782,0 2782,-24"/>
+<text text-anchor="middle" x="2596" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_control%check_conserved_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- interface~check_conserved_convergence_control&#45;&gt;proc~check_conserved_convergence_control -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_edge1" class="edge">
+<title>interface~check_conserved_convergence_control&#45;&gt;proc~check_conserved_convergence_control</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2782.34,-12C2790.95,-12 2799.49,-12 2807.86,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2807.98,-15.5 2817.98,-12 2807.98,-8.5 2807.98,-15.5"/>
+</g>
+<!-- proc~check_conserved_setting -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_node3" class="node">
+<title>proc~check_conserved_setting</title>
+<g id="a_proc~~check_conserved_convergence_control~~CalledByGraph_node3"><a xlink:href="../proc/check_conserved_setting.html" xlink:title="type_iteration_setting%check_conserved_setting">
+<polygon fill="#d9534f" stroke="#d9534f" points="2374,-24 2103,-24 2103,0 2374,0 2374,-24"/>
+<text text-anchor="middle" x="2238.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration_setting%check_conserved_setting</text>
+</a>
+</g>
+</g>
+<!-- proc~check_conserved_setting&#45;&gt;interface~check_conserved_convergence_control -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_edge2" class="edge">
+<title>proc~check_conserved_setting&#45;&gt;interface~check_conserved_convergence_control</title>
+<path fill="none" stroke="#ff0000" d="M2374.15,-12C2382.56,-12 2391.1,-12 2399.69,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2399.81,-15.5 2409.81,-12 2399.81,-8.5 2399.81,-15.5"/>
+</g>
+<!-- proc~check_convergence_conserved_iteration -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_node4" class="node">
+<title>proc~check_convergence_conserved_iteration</title>
+<g id="a_proc~~check_conserved_convergence_control~~CalledByGraph_node4"><a xlink:href="../proc/check_convergence_conserved_iteration.html" xlink:title="type_iteration%check_convergence_conserved_iteration">
+<polygon fill="#d9534f" stroke="#d9534f" points="2067,-24 1754,-24 1754,0 2067,0 2067,-24"/>
+<text text-anchor="middle" x="1910.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%check_convergence_conserved_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_conserved_iteration&#45;&gt;proc~check_conserved_setting -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_edge3" class="edge">
+<title>proc~check_convergence_conserved_iteration&#45;&gt;proc~check_conserved_setting</title>
+<path fill="none" stroke="#ff0000" d="M2067.34,-12C2075.72,-12 2084.12,-12 2092.46,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2092.6,-15.5 2102.6,-12 2092.6,-8.5 2092.6,-15.5"/>
+</g>
+<!-- proc~check_convergence_conserved_control -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_node5" class="node">
+<title>proc~check_convergence_conserved_control</title>
+<g id="a_proc~~check_conserved_convergence_control~~CalledByGraph_node5"><a xlink:href="../proc/check_convergence_conserved_control.html" xlink:title="type_control%check_convergence_conserved_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="1718,-24 1421,-24 1421,0 1718,0 1718,-24"/>
+<text text-anchor="middle" x="1569.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control%check_convergence_conserved_control</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_conserved_control&#45;&gt;proc~check_convergence_conserved_iteration -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_edge4" class="edge">
+<title>proc~check_convergence_conserved_control&#45;&gt;proc~check_convergence_conserved_iteration</title>
+<path fill="none" stroke="#ff0000" d="M1718.2,-12C1726.73,-12 1735.34,-12 1743.92,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1744,-15.5 1754,-12 1744,-8.5 1744,-15.5"/>
+</g>
+<!-- proc~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_node6" class="node">
+<title>proc~solve_time_step_check_convergence_conserved_ftcms</title>
+<g id="a_proc~~check_conserved_convergence_control~~CalledByGraph_node6"><a xlink:href="../proc/solve_time_step_check_convergence_conserved_ftcms.html" xlink:title="solve_time_step_check_convergence_conserved_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1385,-24 1081,-24 1081,0 1385,0 1385,-24"/>
+<text text-anchor="middle" x="1233" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_check_convergence_conserved_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;proc~check_convergence_conserved_control -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_edge5" class="edge">
+<title>proc~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;proc~check_convergence_conserved_control</title>
+<path fill="none" stroke="#ff0000" d="M1385.1,-12C1393.63,-12 1402.21,-12 1410.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1410.77,-15.5 1420.77,-12 1410.77,-8.5 1410.77,-15.5"/>
+</g>
+<!-- interface~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_node7" class="node">
+<title>interface~solve_time_step_check_convergence_conserved_ftcms</title>
+<g id="a_proc~~check_conserved_convergence_control~~CalledByGraph_node7"><a xlink:href="../interface/solve_time_step_check_convergence_conserved_ftcms.html" xlink:title="type_ftcms%solve_time_step_check_convergence_conserved_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1045,-24 673,-24 673,0 1045,0 1045,-24"/>
+<text text-anchor="middle" x="859" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_check_convergence_conserved_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;proc~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_edge6" class="edge">
+<title>interface~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;proc~solve_time_step_check_convergence_conserved_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1045.18,-12C1053.67,-12 1062.15,-12 1070.57,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1070.8,-15.5 1080.8,-12 1070.8,-8.5 1070.8,-15.5"/>
+</g>
+<!-- proc~solve_time_step_ftcms -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_node8" class="node">
+<title>proc~solve_time_step_ftcms</title>
+<g id="a_proc~~check_conserved_convergence_control~~CalledByGraph_node8"><a xlink:href="../proc/solve_time_step_ftcms.html" xlink:title="solve_time_step_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="637,-24 505,-24 505,0 637,0 637,-24"/>
+<text text-anchor="middle" x="571" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_edge7" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_check_convergence_conserved_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M637.26,-12C645.34,-12 653.9,-12 662.78,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="662.92,-15.5 672.92,-12 662.92,-8.5 662.92,-15.5"/>
+</g>
+<!-- interface~solve_time_step_ftcms -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_node9" class="node">
+<title>interface~solve_time_step_ftcms</title>
+<g id="a_proc~~check_conserved_convergence_control~~CalledByGraph_node9"><a xlink:href="../interface/solve_time_step_ftcms.html" xlink:title="type_ftcms%solve_time_step_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="469,-24 270,-24 270,0 469,0 469,-24"/>
+<text text-anchor="middle" x="369.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_edge8" class="edge">
+<title>interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M469.08,-12C477.74,-12 486.4,-12 494.82,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="494.94,-15.5 504.94,-12 494.94,-8.5 494.94,-15.5"/>
+</g>
+<!-- proc~run_ftcms -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_node10" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_proc~~check_conserved_convergence_control~~CalledByGraph_node10"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 169,-24 169,0 234,0 234,-24"/>
+<text text-anchor="middle" x="201.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_edge9" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M234.11,-12C241.85,-12 250.57,-12 259.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="259.88,-15.5 269.88,-12 259.88,-8.5 259.88,-15.5"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_node11" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_proc~~check_conserved_convergence_control~~CalledByGraph_node11"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="133,-24 0,-24 0,0 133,0 133,-24"/>
+<text text-anchor="middle" x="66.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="proc~~check_conserved_convergence_control~~CalledByGraph_edge10" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M133.22,-12C141.87,-12 150.53,-12 158.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="158.89,-15.5 168.89,-12 158.89,-8.5 158.89,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccheck_conserved_convergence_controlCalledByGraph = svgPanZoom('#proccheck_conserved_convergence_controlCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">check_conserved_convergence_control</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">enthalpy</span><span class="p">,</span><span class="w"> </span><span class="n">density</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                          </span><span class="n">residual_thermal</span><span class="p">,</span><span class="w"> </span><span class="n">residual_hydraulic</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                          </span><span class="n">nonlinear_iter</span><span class="p">,</span><span class="w"> </span><span class="n">check_thermal</span><span class="p">,</span><span class="w"> </span><span class="n">check_hydraulic</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                          </span><span class="n">is_ok</span><span class="p">,</span><span class="w"> </span><span class="n">is_diverged</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_convergence_control</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">enthalpy</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">density</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">residual_thermal</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">residual_hydraulic</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nonlinear_iter</span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">check_thermal</span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">check_hydraulic</span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_ok</span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_diverged</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dq_norm</span><span class="p">,</span><span class="w"> </span><span class="n">kappa</span><span class="p">,</span><span class="w"> </span><span class="n">lambda_est</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">aitken_omega</span><span class="p">,</span><span class="w"> </span><span class="n">numerator</span><span class="p">,</span><span class="w"> </span><span class="n">denominator</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">wH</span><span class="p">,</span><span class="w"> </span><span class="n">wR</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="n">z_prev</span><span class="p">,</span><span class="w"> </span><span class="n">dz</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">rT</span><span class="p">,</span><span class="w"> </span><span class="n">rH</span><span class="p">,</span><span class="w"> </span><span class="n">ratioT</span><span class="p">,</span><span class="w"> </span><span class="n">ratioH</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dq_ok</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">omega_updated</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">n_cons</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dH</span><span class="p">(:),</span><span class="w"> </span><span class="n">drho</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="n">is_ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="n">is_diverged</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="n">dq_norm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">)</span>
+<span class="w">        </span><span class="n">kappa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="n">rT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="n">rH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="n">ratioT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="n">ratioH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+
+<span class="w">        </span><span class="c">! Divergence guard: NaN in the conserved fields</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">any</span><span class="p">(</span><span class="n">enthalpy</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">enthalpy</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="nb">any</span><span class="p">(</span><span class="n">density</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">density</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">is_diverged</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="w">        </span><span class="c">! Weighted-RMS norm of the inter-iteration conserved-quantity change</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">has_prev_conserved</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">n_cons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">min</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">enthalpy</span><span class="p">),</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">density</span><span class="p">),</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">enthalpy_prev</span><span class="p">),</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">density_prev</span><span class="p">))</span>
+<span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">dH</span><span class="p">(</span><span class="n">n_cons</span><span class="p">))</span>
+<span class="w">            </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">drho</span><span class="p">(</span><span class="n">n_cons</span><span class="p">))</span>
+<span class="w">            </span><span class="n">dH</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">enthalpy</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">n_cons</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">enthalpy_prev</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">n_cons</span><span class="p">)</span>
+<span class="w">            </span><span class="n">drho</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">density</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">n_cons</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">density_prev</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">n_cons</span><span class="p">)</span>
+<span class="w">            </span><span class="n">dq_norm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">weighted_rms_conserved</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">dH</span><span class="p">,</span><span class="w"> </span><span class="n">drho</span><span class="p">,</span><span class="w"> </span><span class="n">enthalpy</span><span class="p">,</span><span class="w"> </span><span class="n">density</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="w">        </span><span class="c">! Per-block residual ratios; reference ||R^0|| captured on first evaluation</span>
+<span class="w">        </span><span class="c">! Block residual ratios (peak-relative, with the constant/nullspace mode</span>
+<span class="w">        </span><span class="c">! removed) are computed for monitoring and divergence context only. They are</span>
+<span class="w">        </span><span class="c">! intentionally NOT a hard convergence gate: for stiff and all-Neumann blocks</span>
+<span class="w">        </span><span class="c">! the Picard residual reduces far more slowly than the solution change, and</span>
+<span class="w">        </span><span class="c">! forcing extra iterations to satisfy a residual ratio destabilises the</span>
+<span class="w">        </span><span class="c">! iteration. Convergence is governed by the weighted conserved-quantity change</span>
+<span class="w">        </span><span class="c">! ||dQ||_W &lt;= 1 (a complete WRMS criterion over energy and water mass, PDF</span>
+<span class="w">        </span><span class="c">! 6.2.3-6.2.4); genuine divergence is caught by the kappa monitor below.</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">check_thermal</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">residual_thermal</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">rT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">block_residual_norm</span><span class="p">(</span><span class="n">residual_thermal</span><span class="p">)</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">residual0_thermal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">residual0_thermal</span><span class="p">,</span><span class="w"> </span><span class="n">rT</span><span class="p">,</span><span class="w"> </span><span class="nb">tiny</span><span class="p">(</span><span class="mf">1.0d0</span><span class="p">))</span>
+<span class="w">            </span><span class="n">ratioT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rT</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">residual0_thermal</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">check_hydraulic</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">present</span><span class="p">(</span><span class="n">residual_hydraulic</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">rH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">block_residual_norm</span><span class="p">(</span><span class="n">residual_hydraulic</span><span class="p">)</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">residual0_hydraulic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">residual0_hydraulic</span><span class="p">,</span><span class="w"> </span><span class="n">rH</span><span class="p">,</span><span class="w"> </span><span class="nb">tiny</span><span class="p">(</span><span class="mf">1.0d0</span><span class="p">))</span>
+<span class="w">            </span><span class="n">ratioH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rH</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">residual0_hydraulic</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="w">        </span><span class="c">! Convergence is the complete weighted-RMS criterion over the conserved</span>
+<span class="w">        </span><span class="c">! quantities (energy and water mass, PDF 6.2.3-6.2.4), CORRECTED for the</span>
+<span class="w">        </span><span class="c">! contraction rate: for a fixed-point iteration the true error obeys</span>
+<span class="w">        </span><span class="c">! ||e_k|| &lt;= ||dQ_k|| * kappa/(1 - kappa), so the raw change ||dQ||_W &lt;= 1</span>
+<span class="w">        </span><span class="c">! alone is vacuous when the step is strongly under-relaxed (small change</span>
+<span class="w">        </span><span class="c">! per iteration says nothing about distance to the fixed point). Requiring</span>
+<span class="w">        </span><span class="c">! the kappa-corrected bound as well makes acceptance omega-independent and</span>
+<span class="w">        </span><span class="c">! prevents &quot;converged&quot; steps in which the physics has silently stalled.</span>
+<span class="w">        </span><span class="n">dq_ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">has_prev_conserved</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">(</span><span class="n">dq_norm</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dq_ok</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">dq_norm_prev</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">kappa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dq_norm</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">dq_norm_prev</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">kappa</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">dq_ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">            </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">kappa</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">dq_ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dq_norm</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">kappa</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">kappa</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mf">1.0d0</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        else if</span><span class="w"> </span><span class="p">(</span><span class="n">dq_ok</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="c">! No contraction estimate yet (first measurable change): do not accept</span>
+<span class="w">            </span><span class="c">! on the raw change alone.</span>
+<span class="w">            </span><span class="n">dq_ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">        </span><span class="n">is_ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dq_ok</span>
+
+<span class="w">        </span><span class="c">! Convergence-rate monitoring (PDF 6.2.4.3) with coupled globalization.</span>
+<span class="w">        </span><span class="c">! The next Picard update uses the same omega for T and p, so freezing-front</span>
+<span class="w">        </span><span class="c">! growth in the conserved variables cannot be hidden by independent block</span>
+<span class="w">        </span><span class="c">! relaxation. For a growing fixed-point map, reducing omega by 1/(1+kappa)</span>
+<span class="w">        </span><span class="c">! is a scale-free way to move the relaxed map back toward contraction; when</span>
+<span class="w">        </span><span class="c">! the conserved change contracts strongly, omega is released back toward 1.</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">has_prev_conserved</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">dq_norm_prev</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">kappa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dq_norm</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">dq_norm_prev</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">kappa</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">self</span><span class="p">%</span><span class="n">diverge_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">diverge_count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">            </span><span class="k">else</span>
+<span class="k">                </span><span class="n">self</span><span class="p">%</span><span class="n">diverge_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">            </span><span class="k">end if</span>
+
+<span class="k">            </span><span class="n">omega_updated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">has_prev_conserved_increment</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">dH</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">drho</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">dH_prev</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">drho_prev</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">dH_prev</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">dH</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">drho_prev</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">drho</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    </span><span class="n">numerator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">                    </span><span class="n">denominator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">                    </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">dH</span><span class="p">)</span>
+<span class="w">                        </span><span class="n">wH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">atol_enthalpy</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">rtol_conserved</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="n">enthalpy</span><span class="p">(</span><span class="n">j</span><span class="p">))</span>
+<span class="w">                        </span><span class="n">wR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">atol_density</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">rtol_conserved</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="n">density</span><span class="p">(</span><span class="n">j</span><span class="p">))</span>
+
+<span class="w">                        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">wH</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                            </span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dH</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">wH</span>
+<span class="w">                            </span><span class="n">z_prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">dH_prev</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">wH</span>
+<span class="w">                            </span><span class="n">dz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">z</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">z_prev</span>
+<span class="w">                            </span><span class="n">numerator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">numerator</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dz</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">z_prev</span>
+<span class="w">                            </span><span class="n">denominator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">denominator</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dz</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dz</span>
+<span class="w">                        </span><span class="k">end if</span>
+
+<span class="k">                        if</span><span class="w"> </span><span class="p">(</span><span class="n">wR</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                            </span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">drho</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">wR</span>
+<span class="w">                            </span><span class="n">z_prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">drho_prev</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">wR</span>
+<span class="w">                            </span><span class="n">dz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">z</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">z_prev</span>
+<span class="w">                            </span><span class="n">numerator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">numerator</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dz</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">z_prev</span>
+<span class="w">                            </span><span class="n">denominator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">denominator</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dz</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dz</span>
+<span class="w">                        </span><span class="k">end if</span>
+<span class="k">                    end do</span>
+
+<span class="k">                    if</span><span class="w"> </span><span class="p">(</span><span class="n">denominator</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nb">epsilon</span><span class="p">(</span><span class="mf">1.0d0</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                        </span><span class="n">aitken_omega</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">self</span><span class="p">%</span><span class="n">relaxation_omega</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">numerator</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">denominator</span><span class="p">)</span>
+<span class="w">                        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">aitken_omega</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">aitken_omega</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">aitken_omega</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                            </span><span class="nb">abs</span><span class="p">(</span><span class="n">aitken_omega</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mf">1.0d0</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                            </span><span class="n">self</span><span class="p">%</span><span class="n">relaxation_omega</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">CONSERVED_OMEGA_MIN</span><span class="p">,</span><span class="w"> </span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">aitken_omega</span><span class="p">))</span>
+<span class="w">                            </span><span class="n">omega_updated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">                        </span><span class="k">end if</span>
+<span class="k">                    end if</span>
+<span class="k">                end if</span>
+<span class="k">            end if</span>
+
+<span class="k">            if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">omega_updated</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                if</span><span class="w"> </span><span class="p">(</span><span class="n">kappa</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                    </span><span class="n">self</span><span class="p">%</span><span class="n">relaxation_omega</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">CONSERVED_OMEGA_MIN</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                </span><span class="n">self</span><span class="p">%</span><span class="n">relaxation_omega</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">kappa</span><span class="p">))</span>
+<span class="w">                </span><span class="k">else</span>
+<span class="w">                    </span><span class="c">! Fallback rate estimate for the first two increments or</span>
+<span class="w">                    </span><span class="c">! degenerate Aitken denominators.</span>
+<span class="w">                    </span><span class="n">lambda_est</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">kappa</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">relaxation_omega</span><span class="p">,</span><span class="w"> </span><span class="nb">tiny</span><span class="p">(</span><span class="mf">1.0d0</span><span class="p">))</span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">lambda_est</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">lambda_est</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">                        </span><span class="c">! The relaxed map is behaving like a monotone contraction:</span>
+<span class="w">                        </span><span class="c">! kappa ~= 1 - omega*(1-lambda). In that regime the unrelaxed</span>
+<span class="w">                        </span><span class="c">! step has contraction factor lambda &lt; kappa, so holding omega</span>
+<span class="w">                        </span><span class="c">! at 0.5 only slows convergence without adding stability.</span>
+<span class="w">                        </span><span class="n">self</span><span class="p">%</span><span class="n">relaxation_omega</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span>
+<span class="w">                    </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">lambda_est</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">                        </span><span class="c">! A negative inferred fixed-point factor means the relaxed map</span>
+<span class="w">                        </span><span class="c">! is alternating across the front. Treat that as oscillatory</span>
+<span class="w">                        </span><span class="c">! contraction, not as permission to release omega to 1; otherwise</span>
+<span class="w">                        </span><span class="c">! a small kappa is followed by a full-step overshoot and omega</span>
+<span class="w">                        </span><span class="c">! ratchets down to its floor.</span>
+<span class="w">                        </span><span class="n">self</span><span class="p">%</span><span class="n">relaxation_omega</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">CONSERVED_OMEGA_MIN</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                    </span><span class="n">self</span><span class="p">%</span><span class="n">relaxation_omega</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">kappa</span><span class="p">))</span>
+<span class="w">                    </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">kappa</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">CONSERVED_KAPPA_RECOVER</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                        </span><span class="n">self</span><span class="p">%</span><span class="n">relaxation_omega</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                    </span><span class="n">self</span><span class="p">%</span><span class="n">relaxation_omega</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                    </span><span class="nb">min</span><span class="p">(</span><span class="n">CONSERVED_OMEGA_GROW_MAX</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                        </span><span class="n">CONSERVED_KAPPA_RECOVER</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">kappa</span><span class="p">,</span><span class="w"> </span><span class="nb">tiny</span><span class="p">(</span><span class="mf">1.0d0</span><span class="p">))))</span>
+<span class="w">                    </span><span class="k">end if</span>
+<span class="k">                end if</span>
+<span class="k">            end if</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">diverge_count</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">15</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">relaxation_omega</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">CONSERVED_OMEGA_MIN</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">epsilon</span><span class="p">(</span><span class="mf">1.0d0</span><span class="p">)))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">is_diverged</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">CONSERVED_VERBOSE</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(A,I4,A,ES12.5,A,F6.4,A,ES10.3,A,ES10.3,A,ES10.3)&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="s1">&#39;    [Conserved] iter:&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">nonlinear_iter</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;  ||dQ||_W:&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">dq_norm</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="s1">&#39;  omega:&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">relaxation_omega</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;  kappa:&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">kappa</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="s1">&#39;  resT/0:&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">ratioT</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;  resH/0:&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">ratioH</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="w">        </span><span class="c">! Store current iterate as previous for the next check</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">enthalpy_prev</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">enthalpy_prev</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">density_prev</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">density_prev</span><span class="p">)</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">enthalpy_prev</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">enthalpy</span><span class="p">)))</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">density_prev</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">density</span><span class="p">)))</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">enthalpy_prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">enthalpy</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">density_prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">density</span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">has_prev_conserved</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dq_norm</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nb">huge</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">))</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">dq_norm_prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dq_norm</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">dH</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">drho</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">dH_prev</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">dH_prev</span><span class="p">)</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">dH</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">dH_prev</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">drho_prev</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">drho_prev</span><span class="p">)</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">drho</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">drho_prev</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">dH_prev</span><span class="p">))</span><span class="w"> </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">dH_prev</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">dH</span><span class="p">)))</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">drho_prev</span><span class="p">))</span><span class="w"> </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">drho_prev</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">drho</span><span class="p">)))</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">dH_prev</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dH</span><span class="p">(:)</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">drho_prev</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">drho</span><span class="p">(:)</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">has_prev_conserved_increment</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">    end subroutine </span><span class="n">check_conserved_convergence_control</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-07-13 12:46 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

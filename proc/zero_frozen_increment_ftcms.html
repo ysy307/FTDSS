@@ -1,0 +1,838 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>zero_frozen_increment_ftcms &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>zero_frozen_increment_ftcms
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">17 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/ftcms_boundary.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/ftcms_boundary.f90.html'>ftcms_boundary.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/ftcms_boundary.html'>ftcms_boundary</a></li>
+            <li class="breadcrumb-item active" aria-current="page">zero_frozen_increment_ftcms</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/zero_frozen_increment_ftcms.html#src">zero_frozen_increment_ftcms</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine zero_frozen_increment_ftcms(self, frozen_physics)  
+    <a href="../interface/zero_frozen_increment_ftcms.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+    <p>Zero the increment (du) entries for the frozen physics DOFs.
+Prevents GMRES restart drift from contaminating frozen-phase updates.</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~36"></span>
+              class(<a href='../type/type_ftcms.html'>type_ftcms</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-frozen_physics"></span>
+              type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>frozen_physics</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~zero_frozen_increment_ftcms~~CallsGraph Pages: 1 -->
+<svg id="proczero_frozen_increment_ftcmsCallsGraph" width="641pt" height="106pt"
+ viewBox="0.00 0.00 641.00 105.89" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph" class="graph" transform="scale(0.44 0.44) rotate(0) translate(4 238)">
+<title>proc~~zero_frozen_increment_ftcms~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-238 1461,-238 1461,4 -4,4"/>
+<!-- proc~zero_frozen_increment_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node1" class="node">
+<title>proc~zero_frozen_increment_ftcms</title>
+<polygon fill="none" stroke="black" points="167,-108 0,-108 0,-84 167,-84 167,-108"/>
+<text text-anchor="middle" x="83.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50">zero_frozen_increment_ftcms</text>
+</g>
+<!-- proc~get_data_vector -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node2" class="node">
+<title>proc~get_data_vector</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CallsGraph_node2"><a xlink:href="../proc/get_data_vector.html" xlink:title="type_residual_vector%get_data_vector">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="442.5,-192 225.5,-192 225.5,-168 442.5,-168 442.5,-192"/>
+<text text-anchor="middle" x="334" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_residual_vector%get_data_vector</text>
+</a>
+</g>
+</g>
+<!-- proc~zero_frozen_increment_ftcms&#45;&gt;proc~get_data_vector -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge1" class="edge">
+<title>proc~zero_frozen_increment_ftcms&#45;&gt;proc~get_data_vector</title>
+<path fill="none" stroke="#ff0000" d="M102.53,-108.02C125.05,-122.46 165.24,-146.3 203,-159 210.39,-161.48 218.12,-163.68 225.96,-165.62"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="225.41,-169.09 235.94,-167.94 227,-162.27 225.41,-169.09"/>
+</g>
+<!-- proc~get_num_dof_per_node_domain -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node3" class="node">
+<title>proc~get_num_dof_per_node_domain</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CallsGraph_node3"><a xlink:href="../proc/get_num_dof_per_node_domain.html" xlink:title="type_domain%get_num_dof_per_node_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="465,-150 203,-150 203,-126 465,-126 465,-150"/>
+<text text-anchor="middle" x="334" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_num_dof_per_node_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~zero_frozen_increment_ftcms&#45;&gt;proc~get_num_dof_per_node_domain -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge2" class="edge">
+<title>proc~zero_frozen_increment_ftcms&#45;&gt;proc~get_num_dof_per_node_domain</title>
+<path fill="none" stroke="#ff0000" d="M151.21,-108.01C168.1,-111 186.21,-114.16 203,-117 217.29,-119.42 232.46,-121.93 247.22,-124.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="246.92,-127.83 257.35,-125.98 248.04,-120.92 246.92,-127.83"/>
+</g>
+<!-- proc~get_num_nodes_domain -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node4" class="node">
+<title>proc~get_num_nodes_domain</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CallsGraph_node4"><a xlink:href="../proc/get_num_nodes_domain.html" xlink:title="type_domain%get_num_nodes_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="444.5,-108 223.5,-108 223.5,-84 444.5,-84 444.5,-108"/>
+<text text-anchor="middle" x="334" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_num_nodes_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~zero_frozen_increment_ftcms&#45;&gt;proc~get_num_nodes_domain -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge3" class="edge">
+<title>proc~zero_frozen_increment_ftcms&#45;&gt;proc~get_num_nodes_domain</title>
+<path fill="none" stroke="#ff0000" d="M167.25,-96C181.96,-96 197.54,-96 213.04,-96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="213.2,-99.5 223.2,-96 213.2,-92.5 213.2,-99.5"/>
+</g>
+<!-- proc~get_start_dof_index_domain -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node5" class="node">
+<title>proc~get_start_dof_index_domain</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CallsGraph_node5"><a xlink:href="../proc/get_start_dof_index_domain.html" xlink:title="type_domain%get_start_dof_index_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="454,-66 214,-66 214,-42 454,-42 454,-66"/>
+<text text-anchor="middle" x="334" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%get_start_dof_index_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~zero_frozen_increment_ftcms&#45;&gt;proc~get_start_dof_index_domain -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge4" class="edge">
+<title>proc~zero_frozen_increment_ftcms&#45;&gt;proc~get_start_dof_index_domain</title>
+<path fill="none" stroke="#ff0000" d="M151.21,-83.99C168.1,-81 186.21,-77.84 203,-75 217.29,-72.58 232.46,-70.07 247.22,-67.67"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="248.04,-71.08 257.35,-66.02 246.92,-64.17 248.04,-71.08"/>
+</g>
+<!-- proc~is_staggered_control -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node6" class="node">
+<title>proc~is_staggered_control</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CallsGraph_node6"><a xlink:href="../proc/is_staggered_control.html" xlink:title="type_control%is_staggered_control">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="432,-24 236,-24 236,0 432,0 432,-24"/>
+<text text-anchor="middle" x="334" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control%is_staggered_control</text>
+</a>
+</g>
+</g>
+<!-- proc~zero_frozen_increment_ftcms&#45;&gt;proc~is_staggered_control -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge5" class="edge">
+<title>proc~zero_frozen_increment_ftcms&#45;&gt;proc~is_staggered_control</title>
+<path fill="none" stroke="#ff0000" d="M102.53,-83.98C125.05,-69.54 165.24,-45.7 203,-33 210.39,-30.52 218.12,-28.32 225.96,-26.38"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="227,-29.73 235.94,-24.06 225.41,-22.91 227,-29.73"/>
+</g>
+<!-- interface~get_data_vector_dp -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node7" class="node">
+<title>interface~get_data_vector_dp</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CallsGraph_node7"><a xlink:href="../interface/get_data_vector_dp.html" xlink:title="type_vector_dp%get_data_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="761.5,-234 553.5,-234 553.5,-210 761.5,-210 761.5,-234"/>
+<text text-anchor="middle" x="657.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~get_data_vector&#45;&gt;interface~get_data_vector_dp -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge6" class="edge">
+<title>proc~get_data_vector&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#ff0000" d="M427.13,-192.04C466.98,-197.24 513.77,-203.35 554.65,-208.69"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="554.27,-212.17 564.64,-210 555.17,-205.23 554.27,-212.17"/>
+</g>
+<!-- proc~get_underlying_vector -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node11" class="node">
+<title>proc~get_underlying_vector</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CallsGraph_node11"><a xlink:href="../proc/get_underlying_vector.html" xlink:title="type_residual_vector%get_underlying_vector">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="782.5,-192 532.5,-192 532.5,-168 782.5,-168 782.5,-192"/>
+<text text-anchor="middle" x="657.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_residual_vector%get_underlying_vector</text>
+</a>
+</g>
+</g>
+<!-- proc~get_data_vector&#45;&gt;proc~get_underlying_vector -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge7" class="edge">
+<title>proc~get_data_vector&#45;&gt;proc~get_underlying_vector</title>
+<path fill="none" stroke="#ff0000" d="M442.5,-180C468.08,-180 495.68,-180 522.28,-180"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="522.42,-183.5 532.42,-180 522.42,-176.5 522.42,-183.5"/>
+</g>
+<!-- proc~get_num_dofs_per_node_dof_map -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node8" class="node">
+<title>proc~get_num_dofs_per_node_dof_map</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CallsGraph_node8"><a xlink:href="../proc/get_num_dofs_per_node_dof_map.html" xlink:title="type_dof_map%get_num_dofs_per_node_dof_map">
+<polygon fill="#d9534f" stroke="#d9534f" points="797,-150 518,-150 518,-126 797,-126 797,-150"/>
+<text text-anchor="middle" x="657.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_dof_map%get_num_dofs_per_node_dof_map</text>
+</a>
+</g>
+</g>
+<!-- proc~get_num_dof_per_node_domain&#45;&gt;proc~get_num_dofs_per_node_dof_map -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge8" class="edge">
+<title>proc~get_num_dof_per_node_domain&#45;&gt;proc~get_num_dofs_per_node_dof_map</title>
+<path fill="none" stroke="#cbff00" d="M465.3,-138C479.24,-138 493.49,-138 507.62,-138"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="507.88,-141.5 517.88,-138 507.88,-134.5 507.88,-141.5"/>
+</g>
+<!-- proc~get_num_nodes_nodes_manager -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node9" class="node">
+<title>proc~get_num_nodes_nodes_manager</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CallsGraph_node9"><a xlink:href="../proc/get_num_nodes_nodes_manager.html" xlink:title="type_nodes_manager%get_num_nodes_nodes_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="814,-108 501,-108 501,-84 814,-84 814,-108"/>
+<text text-anchor="middle" x="657.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_nodes_manager%get_num_nodes_nodes_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~get_num_nodes_domain&#45;&gt;proc~get_num_nodes_nodes_manager -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge9" class="edge">
+<title>proc~get_num_nodes_domain&#45;&gt;proc~get_num_nodes_nodes_manager</title>
+<path fill="none" stroke="#00ff66" d="M444.74,-96C459.59,-96 475.09,-96 490.64,-96"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="490.87,-99.5 500.87,-96 490.87,-92.5 490.87,-99.5"/>
+</g>
+<!-- proc~get_start_dof_index_dof_map -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node10" class="node">
+<title>proc~get_start_dof_index_dof_map</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CallsGraph_node10"><a xlink:href="../proc/get_start_dof_index_dof_map.html" xlink:title="type_dof_map%get_start_dof_index_dof_map">
+<polygon fill="#d9534f" stroke="#d9534f" points="783.5,-66 531.5,-66 531.5,-42 783.5,-42 783.5,-66"/>
+<text text-anchor="middle" x="657.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_dof_map%get_start_dof_index_dof_map</text>
+</a>
+</g>
+</g>
+<!-- proc~get_start_dof_index_domain&#45;&gt;proc~get_start_dof_index_dof_map -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge10" class="edge">
+<title>proc~get_start_dof_index_domain&#45;&gt;proc~get_start_dof_index_dof_map</title>
+<path fill="none" stroke="#0066ff" d="M454.26,-54C476.03,-54 498.89,-54 521.1,-54"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="521.24,-57.5 531.24,-54 521.24,-50.5 521.24,-57.5"/>
+</g>
+<!-- proc~get_data_vector_dp -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node13" class="node">
+<title>proc~get_data_vector_dp</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CallsGraph_node13"><a xlink:href="../proc/get_data_vector_dp.html" xlink:title="get_data_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1026,-234 909,-234 909,-210 1026,-210 1026,-234"/>
+<text text-anchor="middle" x="967.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge11" class="edge">
+<title>interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M761.92,-222C806.93,-222 858.43,-222 898.5,-222"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="898.69,-225.5 908.69,-222 898.69,-218.5 898.69,-225.5"/>
+</g>
+<!-- proc~is_valid_physics_type -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node14" class="node">
+<title>proc~is_valid_physics_type</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CallsGraph_node14"><a xlink:href="../proc/is_valid_physics_type.html" xlink:title="type_physics_types%is_valid_physics_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1085,-66 850,-66 850,-42 1085,-42 1085,-66"/>
+<text text-anchor="middle" x="967.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_types%is_valid_physics_type</text>
+</a>
+</g>
+</g>
+<!-- proc~get_start_dof_index_dof_map&#45;&gt;proc~is_valid_physics_type -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge12" class="edge">
+<title>proc~get_start_dof_index_dof_map&#45;&gt;proc~is_valid_physics_type</title>
+<path fill="none" stroke="#0066ff" d="M783.78,-54C802.18,-54 821.16,-54 839.6,-54"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="839.78,-57.5 849.78,-54 839.78,-50.5 839.78,-57.5"/>
+</g>
+<!-- optval -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node12" class="node">
+<title>optval</title>
+<polygon fill="#777777" stroke="#777777" points="994.5,-192 940.5,-192 940.5,-168 994.5,-168 994.5,-192"/>
+<text text-anchor="middle" x="967.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">optval</text>
+</g>
+<!-- proc~get_underlying_vector&#45;&gt;optval -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge13" class="edge">
+<title>proc~get_underlying_vector&#45;&gt;optval</title>
+<path fill="none" stroke="#cc00ff" d="M782.89,-180C835.92,-180 893.82,-180 930.14,-180"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="930.24,-183.5 940.24,-180 930.24,-176.5 930.24,-183.5"/>
+</g>
+<!-- proc~in_group_physics_type -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node15" class="node">
+<title>proc~in_group_physics_type</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CallsGraph_node15"><a xlink:href="../proc/in_group_physics_type.html" xlink:title="type_physics_types%in_group_physics_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1363,-66 1121,-66 1121,-42 1363,-42 1363,-66"/>
+<text text-anchor="middle" x="1242" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_types%in_group_physics_type</text>
+</a>
+</g>
+</g>
+<!-- proc~is_valid_physics_type&#45;&gt;proc~in_group_physics_type -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge14" class="edge">
+<title>proc~is_valid_physics_type&#45;&gt;proc~in_group_physics_type</title>
+<path fill="none" stroke="#0000ff" d="M1085.25,-54C1093.57,-54 1101.99,-54 1110.38,-54"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1110.59,-57.5 1120.59,-54 1110.59,-50.5 1110.59,-57.5"/>
+</g>
+<!-- strip -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node16" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="1455,-87 1401,-87 1401,-63 1455,-63 1455,-87"/>
+<text text-anchor="middle" x="1428" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~in_group_physics_type&#45;&gt;strip -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge15" class="edge">
+<title>proc~in_group_physics_type&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M1348.17,-66C1363.51,-67.75 1378.36,-69.45 1390.95,-70.89"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1390.63,-74.37 1400.96,-72.03 1391.42,-67.42 1390.63,-74.37"/>
+</g>
+<!-- to_lower -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_node17" class="node">
+<title>to_lower</title>
+<polygon fill="#777777" stroke="#777777" points="1457,-45 1399,-45 1399,-21 1457,-21 1457,-45"/>
+<text text-anchor="middle" x="1428" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_lower</text>
+</g>
+<!-- proc~in_group_physics_type&#45;&gt;to_lower -->
+<g id="proc~~zero_frozen_increment_ftcms~~CallsGraph_edge16" class="edge">
+<title>proc~in_group_physics_type&#45;&gt;to_lower</title>
+<path fill="none" stroke="#ff0000" d="M1348.17,-42C1362.61,-40.35 1376.61,-38.75 1388.71,-37.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1389.27,-40.83 1398.81,-36.22 1388.48,-33.87 1389.27,-40.83"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproczero_frozen_increment_ftcmsCallsGraph = svgPanZoom('#proczero_frozen_increment_ftcmsCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~zero_frozen_increment_ftcms~~CalledByGraph Pages: 1 -->
+<svg id="proczero_frozen_increment_ftcmsCalledByGraph" width="641pt" height="13pt"
+ viewBox="0.00 0.00 641.00 12.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph" class="graph" transform="scale(0.39 0.39) rotate(0) translate(4 28)">
+<title>proc~~zero_frozen_increment_ftcms~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 1635,-28 1635,4 -4,4"/>
+<!-- proc~zero_frozen_increment_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph_node1" class="node">
+<title>proc~zero_frozen_increment_ftcms</title>
+<polygon fill="none" stroke="black" points="1631,-24 1464,-24 1464,0 1631,0 1631,-24"/>
+<text text-anchor="middle" x="1547.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">zero_frozen_increment_ftcms</text>
+</g>
+<!-- interface~zero_frozen_increment_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph_node2" class="node">
+<title>interface~zero_frozen_increment_ftcms</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CalledByGraph_node2"><a xlink:href="../interface/zero_frozen_increment_ftcms.html" xlink:title="type_ftcms%zero_frozen_increment_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1428,-24 1193,-24 1193,0 1428,0 1428,-24"/>
+<text text-anchor="middle" x="1310.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%zero_frozen_increment_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~zero_frozen_increment_ftcms&#45;&gt;proc~zero_frozen_increment_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph_edge1" class="edge">
+<title>interface~zero_frozen_increment_ftcms&#45;&gt;proc~zero_frozen_increment_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1428.31,-12C1436.83,-12 1445.35,-12 1453.7,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1453.78,-15.5 1463.78,-12 1453.78,-8.5 1453.78,-15.5"/>
+</g>
+<!-- proc~solve_time_step_staggered_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph_node3" class="node">
+<title>proc~solve_time_step_staggered_ftcms</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CalledByGraph_node3"><a xlink:href="../proc/solve_time_step_staggered_ftcms.html" xlink:title="solve_time_step_staggered_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1157,-24 967,-24 967,0 1157,0 1157,-24"/>
+<text text-anchor="middle" x="1062" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_staggered_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_staggered_ftcms&#45;&gt;interface~zero_frozen_increment_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph_edge2" class="edge">
+<title>proc~solve_time_step_staggered_ftcms&#45;&gt;interface~zero_frozen_increment_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M1157.25,-12C1165.65,-12 1174.24,-12 1182.85,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1182.97,-15.5 1192.97,-12 1182.97,-8.5 1182.97,-15.5"/>
+</g>
+<!-- interface~solve_time_step_staggered_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph_node4" class="node">
+<title>interface~solve_time_step_staggered_ftcms</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CalledByGraph_node4"><a xlink:href="../interface/solve_time_step_staggered_ftcms.html" xlink:title="type_ftcms%solve_time_step_staggered_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="931,-24 673,-24 673,0 931,0 931,-24"/>
+<text text-anchor="middle" x="802" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_staggered_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_staggered_ftcms&#45;&gt;proc~solve_time_step_staggered_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph_edge3" class="edge">
+<title>interface~solve_time_step_staggered_ftcms&#45;&gt;proc~solve_time_step_staggered_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M931.24,-12C939.79,-12 948.33,-12 956.73,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="956.9,-15.5 966.9,-12 956.9,-8.5 956.9,-15.5"/>
+</g>
+<!-- proc~solve_time_step_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph_node5" class="node">
+<title>proc~solve_time_step_ftcms</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CalledByGraph_node5"><a xlink:href="../proc/solve_time_step_ftcms.html" xlink:title="solve_time_step_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="637,-24 505,-24 505,0 637,0 637,-24"/>
+<text text-anchor="middle" x="571" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_staggered_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph_edge4" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_staggered_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M637.01,-12C645.27,-12 653.96,-12 662.85,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="662.95,-15.5 672.95,-12 662.95,-8.5 662.95,-15.5"/>
+</g>
+<!-- interface~solve_time_step_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph_node6" class="node">
+<title>interface~solve_time_step_ftcms</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CalledByGraph_node6"><a xlink:href="../interface/solve_time_step_ftcms.html" xlink:title="type_ftcms%solve_time_step_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="469,-24 270,-24 270,0 469,0 469,-24"/>
+<text text-anchor="middle" x="369.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph_edge5" class="edge">
+<title>interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M469.08,-12C477.74,-12 486.4,-12 494.82,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="494.94,-15.5 504.94,-12 494.94,-8.5 494.94,-15.5"/>
+</g>
+<!-- proc~run_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph_node7" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CalledByGraph_node7"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 169,-24 169,0 234,0 234,-24"/>
+<text text-anchor="middle" x="201.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph_edge6" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M234.11,-12C241.85,-12 250.57,-12 259.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="259.88,-15.5 269.88,-12 259.88,-8.5 259.88,-15.5"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph_node8" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_proc~~zero_frozen_increment_ftcms~~CalledByGraph_node8"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="133,-24 0,-24 0,0 133,0 133,-24"/>
+<text text-anchor="middle" x="66.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="proc~~zero_frozen_increment_ftcms~~CalledByGraph_edge7" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M133.22,-12C141.87,-12 150.53,-12 158.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="158.89,-15.5 168.89,-12 158.89,-8.5 158.89,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproczero_frozen_increment_ftcmsCalledByGraph = svgPanZoom('#proczero_frozen_increment_ftcmsCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">zero_frozen_increment_ftcms</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">frozen_physics</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_ftcms</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">frozen_physics</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i_node</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes</span><span class="p">,</span><span class="w"> </span><span class="n">dof_index</span><span class="p">,</span><span class="w"> </span><span class="n">num_dofs_per_node</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">du</span><span class="p">(:)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nb">null</span><span class="p">()</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">control</span><span class="p">%</span><span class="n">is_staggered</span><span class="p">())</span><span class="w"> </span><span class="k">return</span>
+
+<span class="k">        call </span><span class="n">self</span><span class="p">%</span><span class="n">domain</span><span class="p">%</span><span class="n">get_num_nodes</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">domain</span><span class="p">%</span><span class="n">get_num_dof_per_node</span><span class="p">(</span><span class="n">num_dofs_per_node</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">domain</span><span class="p">%</span><span class="n">get_start_dof_index</span><span class="p">(</span><span class="n">frozen_physics</span><span class="p">,</span><span class="w"> </span><span class="n">dof_index</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">du</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">du</span><span class="p">%</span><span class="n">get_data</span><span class="p">()</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="nb">associated</span><span class="p">(</span><span class="n">du</span><span class="p">))</span><span class="w"> </span><span class="k">return</span>
+
+<span class="k">        do </span><span class="n">i_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">num_nodes</span>
+<span class="w">            </span><span class="n">du</span><span class="p">(</span><span class="n">num_dofs_per_node</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">i_node</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dof_index</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="k">end do</span>
+
+<span class="k">        nullify</span><span class="w"> </span><span class="p">(</span><span class="n">du</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">zero_frozen_increment_ftcms</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-07-13 12:46 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

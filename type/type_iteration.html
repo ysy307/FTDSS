@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.9% of total for derived types.</p>Including implementation: 217 statements,  0.8% of total for derived types.">35 statements</a>
+                 title="<p> 0.9% of total for derived types.</p>Including implementation: 287 statements,  1.0% of total for derived types.">41 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -135,7 +135,7 @@
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_iteration.html#variable-compute_nonlinear_solver_type">compute_nonlinear_solver_type</a>
-            <a class="list-group-item" href="../type/type_iteration.html#variable-converged">converged</a>
+            <a class="list-group-item" href="../type/type_iteration.html#variable-converged~3">converged</a>
             <a class="list-group-item" href="../type/type_iteration.html#variable-diverged">diverged</a>
             <a class="list-group-item" href="../type/type_iteration.html#variable-nonlinear_iter">nonlinear_iter</a>
             <a class="list-group-item" href="../type/type_iteration.html#variable-nonlinear_solver_type">nonlinear_solver_type</a>
@@ -169,6 +169,10 @@
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-check_convergence">check_convergence</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-check_convergence_conserved">check_convergence_conserved</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-compute_error_norm">compute_error_norm</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_conserved_dq_norm">get_conserved_dq_norm</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_conserved_relaxation">get_conserved_relaxation</a>
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_current_norm">get_current_norm</a>
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_max_iterations">get_max_iterations</a>
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_nonlinear_iter">get_nonlinear_iter</a>
@@ -178,10 +182,11 @@
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-get_update_frequency">get_update_frequency</a>
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-increment_nonlinear">increment_nonlinear</a>
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-increment_total">increment_total</a>
-            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-initialize~2">initialize</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-initialize~4">initialize</a>
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-is_compute_newton">is_compute_newton</a>
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-is_compute_none">is_compute_none</a>
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-is_compute_picard">is_compute_picard</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-is_conserved">is_conserved</a>
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-is_converged">is_converged</a>
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-is_diverged">is_diverged</a>
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-is_newton">is_newton</a>
@@ -192,6 +197,7 @@
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-set_diverged">set_diverged</a>
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-set_nonlinear_solver">set_nonlinear_solver</a>
             <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-should_continue">should_continue</a>
+            <a class="list-group-item" href="../type/type_iteration.html#boundprocedure-update_reference_values">update_reference_values</a>
         </div>
       </div>
     </div>
@@ -527,7 +533,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-converged"></span>
+              <span class="anchor" id="variable-converged~3"></span>
               logical,
             </td>
               <td>private</td>
@@ -747,6 +753,400 @@ large graphs.</div>
     </tbody>
   </table>
 
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-check_convergence_conserved"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>check_convergence_conserved</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/check_convergence_conserved_iteration.html'>check_convergence_conserved_iteration</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/check_convergence_conserved_iteration.html'>check_convergence_conserved_iteration</a>(self, enthalpy, density, residual_thermal, residual_hydraulic, check_thermal, check_hydraulic)  
+</h3>
+    
+
+  <p>Conserved-quantity convergence check (PDF 6.2.4). Evaluates a single coupled
+indicator from the nodal enthalpy/effective-density increments and the
+per-block residual ratio, then sets the converged/diverged flags of both
+active physics accordingly.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>enthalpy</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>density</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>residual_thermal</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>residual_hydraulic</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              logical,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>check_thermal</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              logical,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>check_hydraulic</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-compute_error_norm"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>compute_error_norm</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/compute_error_norm_iteration.html'>compute_error_norm_iteration</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/compute_error_norm_iteration.html'>compute_error_norm_iteration</a>(self, enthalpy_a, density_a, enthalpy_b, density_b, eps)  
+</h3>
+    
+
+  <p>Weighted-RMS conserved-quantity error norm for the Richardson estimate.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>enthalpy_a</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>density_a</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>enthalpy_b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>density_b</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>eps</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_conserved_dq_norm"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_conserved_dq_norm</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_conserved_dq_norm_iteration.html'>get_conserved_dq_norm_iteration</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/get_conserved_dq_norm_iteration.html'>get_conserved_dq_norm_iteration</a>(self) result(dq_norm)  
+</h3>
+    
+
+  <p>Last weighted-RMS conserved-quantity change ||dQ||_W (diagnostics).</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64)</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-get_conserved_relaxation"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_conserved_relaxation</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_conserved_relaxation_iteration.html'>get_conserved_relaxation_iteration</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/get_conserved_relaxation_iteration.html'>get_conserved_relaxation_iteration</a>(self) result(omega)  
+</h3>
+    
+
+  <p>Current adaptive under-relaxation factor for the globalized modified Picard.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>real(kind=real64)</small>
+    </h4>
+    
 
           </li>
       </ul>
@@ -1422,7 +1822,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~2"></span>
+      <span class="anchor" id="boundprocedure-initialize~4"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/initialize_type_iteration.html'>initialize_type_iteration</a>
@@ -1641,6 +2041,65 @@ large graphs.</div>
 
   <p>Returns true if the ACTIVE solver is Picard
 (Returns false if solver is NONE)</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_conserved"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_conserved</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_conserved_iteration.html'>is_conserved_iteration</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_conserved_iteration.html'>is_conserved_iteration</a>(self) result(is_conserved)  
+</h3>
+    
+
+  <p>Returns true when the conserved-quantity convergence mode is selected.</p>
 
   <h4>Arguments</h4>
       <table class="table table-striped varlist">
@@ -2329,6 +2788,75 @@ large graphs.</div>
   </div>
 
           </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-update_reference_values"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>update_reference_values</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/update_reference_values_iteration.html'>update_reference_values_iteration</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/update_reference_values_iteration.html'>update_reference_values_iteration</a>(self, reference_values)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>reference_values</strong>(:)</td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
       </section>
 
     <section>
@@ -2365,6 +2893,8 @@ large graphs.</div>
 
 <span class="w">        </span><span class="c">! ---- Algorithm / Operation ----</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">check_convergence</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">check_convergence_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">check_convergence_conserved</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">check_convergence_conserved_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">compute_error_norm</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">compute_error_norm_iteration</span>
 
 <span class="w">        </span><span class="c">! ---- Inquiry ----</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_converged</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_converged_iteration</span>
@@ -2375,6 +2905,9 @@ large graphs.</div>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_newton</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_newton_iteration</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_picard</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_picard_iteration</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_none</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_none_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_conserved</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_conserved_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_conserved_relaxation</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_conserved_relaxation_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_conserved_dq_norm</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_conserved_dq_norm_iteration</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">should_continue</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">should_continue_iteration</span>
 
 <span class="w">        </span><span class="c">! ---- Getter ----</span>
@@ -2385,6 +2918,7 @@ large graphs.</div>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_update_frequency</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_update_frequency_iteration</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_current_norm</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_current_norm_iteration</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">get_tolerances</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">get_tolerances_iteration</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">update_reference_values</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">update_reference_values_iteration</span>
 <span class="w">        </span><span class="c">! ---- Meta / Utility ----</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_iteration</span>
 </pre></div>
@@ -2409,7 +2943,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

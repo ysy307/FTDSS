@@ -19,6 +19,7 @@ module io_input_basic
     character(*), parameter :: calculate_thermal = "calculate_thermal"
     character(*), parameter :: calculate_hydraulic = "calculate_hydraulic"
     character(*), parameter :: calculate_mechanical = "calculate_mechanical"
+    character(*), parameter :: enable_vapor_transport = "enable_vapor_transport"
 
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_simulation_settings
@@ -38,6 +39,10 @@ module io_input_basic
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_analysis_controls
         logical :: is_active(IC_TARGETS%NUM_ID)
+        logical :: enable_vapor_transport = .true.
+        !> Interface-split subcell quadrature for elements cut by the freezing
+        !> interface (parameter-free; disable only for A/B comparison runs).
+        logical :: enable_fringe_subcell_quadrature = .true.
         character(:), allocatable :: coupling_mode
         logical :: partitioning
     contains
@@ -100,6 +105,9 @@ module io_input_basic
 
     type :: type_phase_change
         type(type_equilibrium_model) :: equilibrium_model
+        real(real64) :: segregation_potential = 0.0d0
+        real(real64) :: T_fringe_low = -1.0d0
+        real(real64) :: T_fringe_high = 0.0d0
     end type type_phase_change
 
     type :: type_hydraulic_conductivity_model
@@ -227,6 +235,11 @@ module io_input_basic
         integer(int32) :: use_logic
         type(type_convergence_criteria) :: residual
         type(type_convergence_criteria) :: update
+        !> Conserved-quantity convergence tolerances (used when use_criteria == CONSERVED)
+        real(real64) :: atol_enthalpy = 1.0d2
+        real(real64) :: atol_density = 1.0d-3
+        real(real64) :: rtol_conserved = 1.0d-3
+        real(real64) :: residual_eps = 1.0d-1
     end type type_convergence
 
     type :: type_nonlinear_solver
@@ -248,7 +261,23 @@ module io_input_basic
         integer(int32) :: preconditioner_type
         integer(int32) :: max_iterations
         real(real64) :: tolerance
-        integer(int32) :: m_restarts
+        integer(int32) :: m_restarts = 30
+        !> Optional AMG strength threshold for SA-AMG; default 0.25.
+        real(real64) :: amg_strength_threshold = 0.25d0
+        !> Optional AMG smoother sweeps for SA-AMG; default 2.
+        integer(int32) :: amg_smoother_sweeps = 2
+        !> Optional AMG maximum aggregate size for SA-AMG; default 8.
+        integer(int32) :: amg_max_agg_size = 8
+        !> Optional AMG coarse-matrix drop tolerance for SA-AMG; default 1.0e-4.
+        real(real64) :: amg_drop_tolerance = 1.0d-4
+        !> Optional AMG drop strategy for SA-AMG; default 'RELATIVE'.
+        character(len=32) :: amg_drop_strategy = 'RELATIVE'
+        !> Optional AMG smoother type for SA-AMG; default 'JACOBI'.
+        character(len=32) :: amg_smoother_type = 'JACOBI'
+        !> Optional AMG rebuild frequency for SA-AMG; default 5.
+        integer(int32) :: amg_rebuild_frequency = 5
+        !> Optional AMG rebuild threshold for SA-AMG; default 1.0e-2.
+        real(real64) :: amg_rebuild_threshold = 1.0d-2
     end type type_linear_solver
 
     type :: type_parallel_threads

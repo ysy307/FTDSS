@@ -160,11 +160,21 @@
                </tr>
 			   <tr>
                  <td><a href='../interface/abst_calc_wrf.html'>abst_calc_wrf</a></td>
+                 <td><a href='../module/models_wrf~2.html'>models_wrf</a></td>
+                 <td><p>Calculate water content based on pressure head.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_calc_wrf~2.html'>abst_calc_wrf</a></td>
                  <td><a href='../module/models_wrf.html'>models_wrf</a></td>
                  <td><p>Calculate water content based on pressure head.</p></td>
                </tr>
 			   <tr>
                  <td><a href='../interface/abst_calc_wrf_derivative.html'>abst_calc_wrf_derivative</a></td>
+                 <td><a href='../module/models_wrf~2.html'>models_wrf</a></td>
+                 <td><p>Calculate derivative of water content with respect to pressure head.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../interface/abst_calc_wrf_derivative~2.html'>abst_calc_wrf_derivative</a></td>
                  <td><a href='../module/models_wrf.html'>models_wrf</a></td>
                  <td><p>Calculate derivative of water content with respect to pressure head.</p></td>
                </tr>
@@ -201,7 +211,7 @@
 			   <tr>
                  <td><a href='../interface/abst_destroy.html'>abst_destroy</a></td>
                  <td><a href='../module/core_types_algebra_matrix.html'>core_types_algebra_matrix</a></td>
-                 <td><p>Deallocates all memory associated with the matrix.</p></td>
+                 <td></td>
                </tr>
 			   <tr>
                  <td><a href='../interface/abst_destroy_acceleration.html'>abst_destroy_acceleration</a></td>
@@ -216,7 +226,7 @@
 			   <tr>
                  <td><a href='../interface/abst_display.html'>abst_display</a></td>
                  <td><a href='../module/core_types_algebra_matrix.html'>core_types_algebra_matrix</a></td>
-                 <td><p>Prints the matrix contents to standard output for debugging.</p></td>
+                 <td></td>
                </tr>
 			   <tr>
                  <td><a href='../interface/abst_evaluate.html'>abst_evaluate</a></td>
@@ -227,11 +237,6 @@
                  <td><a href='../interface/abst_extract_value.html'>abst_extract_value</a></td>
                  <td><a href='../module/io_output_observation.html'>io_output_observation</a></td>
                  <td><p>Evaluates the field data at this specific observation point</p></td>
-               </tr>
-			   <tr>
-                 <td><a href='../interface/abst_find.html'>abst_find</a></td>
-                 <td><a href='../module/core_types_algebra_matrix.html'>core_types_algebra_matrix</a></td>
-                 <td><p>Finds the storage index of a matrix entry.</p></td>
                </tr>
 			   <tr>
                  <td><a href='../interface/abst_get_current_relaxation.html'>abst_get_current_relaxation</a></td>
@@ -293,8 +298,7 @@ Failure behavior:
 			   <tr>
                  <td><a href='../interface/abst_initialize.html'>abst_initialize</a></td>
                  <td><a href='../module/core_types_algebra_matrix.html'>core_types_algebra_matrix</a></td>
-                 <td><p>Initializes the matrix structure based on the number of nodes and DOFs.
-For sparse matrices, a sparsity pattern can be provided.</p></td>
+                 <td></td>
                </tr>
 			   <tr>
                  <td><a href='../interface/abst_initialize~2.html'>abst_initialize</a></td>
@@ -379,21 +383,6 @@ Failure behavior:
 - Returns .true. if minimum relaxation is reached, .false. otherwise</p></td>
                </tr>
 			   <tr>
-                 <td><a href='../interface/abst_real_from_one_vector_function.html'>abst_real_from_one_vector_function</a></td>
-                 <td><a href='../module/linalg_vector_operations.html'>linalg_vector_operations</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../interface/abst_real_from_two_vectors_function.html'>abst_real_from_two_vectors_function</a></td>
-                 <td><a href='../module/linalg_vector_operations.html'>linalg_vector_operations</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
-                 <td><a href='../interface/abst_real_from_vector_for_inf_norm_function.html'>abst_real_from_vector_for_inf_norm_function</a></td>
-                 <td><a href='../module/linalg_vector_operations.html'>linalg_vector_operations</a></td>
-                 <td></td>
-               </tr>
-			   <tr>
                  <td><a href='../interface/abst_reset_acceleration.html'>abst_reset_acceleration</a></td>
                  <td><a href='../module/control_acceleration.html'>control_acceleration</a></td>
                  <td><p>Reset internal states for a new step</p><a href="../interface/abst_reset_acceleration.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
@@ -406,27 +395,29 @@ Failure behavior:
 			   <tr>
                  <td><a href='../interface/abst_scale.html'>abst_scale</a></td>
                  <td><a href='../module/core_types_algebra_matrix.html'>core_types_algebra_matrix</a></td>
-                 <td><p>Scales the matrix by a given scalar value.</p></td>
+                 <td></td>
                </tr>
 			   <tr>
-                 <td><a href='../interface/abst_set_all.html'>abst_set_all</a></td>
+                 <td><a href='../interface/abst_set_local_matrix.html'>abst_set_local_matrix</a></td>
                  <td><a href='../module/core_types_algebra_matrix.html'>core_types_algebra_matrix</a></td>
-                 <td><p>Sets all stored entries in the matrix to a single value.</p></td>
+                 <td><p>Scatter a local element matrix into the global matrix.
+indices(n_local,n_local): pre-computed flat block indices from scatter_map.
+row_sys/col_sys: 1-based DOF offsets within the block.</p></td>
                </tr>
 			   <tr>
                  <td><a href='../interface/abst_set_row.html'>abst_set_row</a></td>
                  <td><a href='../module/core_types_algebra_matrix.html'>core_types_algebra_matrix</a></td>
-                 <td><p>Sets all entries in a specified row to a single value.</p></td>
+                 <td></td>
                </tr>
 			   <tr>
                  <td><a href='../interface/abst_set_value.html'>abst_set_value</a></td>
                  <td><a href='../module/core_types_algebra_matrix.html'>core_types_algebra_matrix</a></td>
-                 <td><p>Sets the value of a single entry in the matrix.</p></td>
+                 <td></td>
                </tr>
 			   <tr>
-                 <td><a href='../interface/abst_set_value_block.html'>abst_set_value_block</a></td>
+                 <td><a href='../interface/abst_set_value_at.html'>abst_set_value_at</a></td>
                  <td><a href='../module/core_types_algebra_matrix.html'>core_types_algebra_matrix</a></td>
-                 <td><p>Sets the value in block of a single entry in the matrix.</p></td>
+                 <td></td>
                </tr>
 			   <tr>
                  <td><a href='../interface/abst_solver_destroy.html'>abst_solver_destroy</a></td>
@@ -461,12 +452,12 @@ Failure behavior:
 			   <tr>
                  <td><a href='../interface/abst_zero_all.html'>abst_zero_all</a></td>
                  <td><a href='../module/core_types_algebra_matrix.html'>core_types_algebra_matrix</a></td>
-                 <td><p>Sets all stored entries in the matrix to zero.</p></td>
+                 <td></td>
                </tr>
 			   <tr>
                  <td><a href='../interface/abst_zero_row.html'>abst_zero_row</a></td>
                  <td><a href='../module/core_types_algebra_matrix.html'>core_types_algebra_matrix</a></td>
-                 <td><p>Sets all entries in a specified row to zero.</p></td>
+                 <td></td>
                </tr>
 			   <tr>
                  <td><a href='../interface/finalize_vtk_writer_interface.html'>finalize_vtk_writer_interface</a></td>
@@ -526,7 +517,7 @@ Failure behavior:
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

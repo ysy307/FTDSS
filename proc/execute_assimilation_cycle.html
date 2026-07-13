@@ -1,0 +1,1165 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>execute_assimilation_cycle &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>execute_assimilation_cycle
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">74 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/assimilation_controller.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/assimilation_controller.f90.html'>assimilation_controller.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/physics_governing_atmosphere_controller.html'>physics_governing_atmosphere_controller</a></li>
+            <li class="breadcrumb-item active" aria-current="page">execute_assimilation_cycle</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/execute_assimilation_cycle.html#src">execute_assimilation_cycle</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine execute_assimilation_cycle(self, current_time, current_doy, bc_thermal, bc_hydraulic)  
+</h2>
+    
+
+    <p>Main cycle: ETKF analysis -&gt; surface energy balance -&gt; BC update.</p>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_assimilation_controller.html'>type_assimilation_controller</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~113"></span>
+              class(<a href='../type/type_assimilation_controller.html'>type_assimilation_controller</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-current_time~8"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_time</strong></td>
+            <td>
+                <p>elapsed simulation time [s]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-current_doy~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_doy</strong></td>
+            <td>
+                <p>day of year (used for solar geometry)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_thermal"></span>
+              type(<a href='../type/type_bc_manager.html'>type_bc_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>bc_thermal</strong></td>
+            <td>
+                <p>bc_manager for thermal physics (ID=3 Robin)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_hydraulic"></span>
+              type(<a href='../type/type_bc_manager.html'>type_bc_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>bc_hydraulic</strong></td>
+            <td>
+                <p>bc_manager for hydraulic physics (ID=3 Seepage)</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~execute_assimilation_cycle~~CallsGraph Pages: 1 -->
+<svg id="procexecute_assimilation_cycleCallsGraph" width="641pt" height="288pt"
+ viewBox="0.00 0.00 641.00 287.99" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~execute_assimilation_cycle~~CallsGraph" class="graph" transform="scale(0.42 0.42) rotate(0) translate(4 687)">
+<title>proc~~execute_assimilation_cycle~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-687 1534,-687 1534,4 -4,4"/>
+<!-- proc~execute_assimilation_cycle -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node1" class="node">
+<title>proc~execute_assimilation_cycle</title>
+<polygon fill="none" stroke="black" points="315,-290 0,-290 0,-266 315,-266 315,-290"/>
+<text text-anchor="middle" x="157.5" y="-275.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_assimilation_controller%execute_assimilation_cycle</text>
+</g>
+<!-- proc~add_perturbation_ensemble -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node2" class="node">
+<title>proc~add_perturbation_ensemble</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node2"><a xlink:href="../proc/add_perturbation_ensemble.html" xlink:title="type_ensemble_manager%add_perturbation_ensemble">
+<polygon fill="#d9534f" stroke="#d9534f" points="670,-658 363,-658 363,-634 670,-634 670,-658"/>
+<text text-anchor="middle" x="516.5" y="-643.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ensemble_manager%add_perturbation_ensemble</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_assimilation_cycle&#45;&gt;proc~add_perturbation_ensemble -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge1" class="edge">
+<title>proc~execute_assimilation_cycle&#45;&gt;proc~add_perturbation_ensemble</title>
+<path fill="none" stroke="#ff0000" d="M162.09,-290.15C176.81,-337.73 237.13,-513.02 351,-600 369.97,-614.49 393.28,-624.42 416.31,-631.22"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="415.59,-634.65 426.16,-633.94 417.46,-627.9 415.59,-634.65"/>
+</g>
+<!-- proc~apply_upper_bc -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node3" class="node">
+<title>proc~apply_upper_bc</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node3"><a xlink:href="../proc/apply_upper_bc.html" xlink:title="type_assimilation_controller%apply_upper_bc">
+<polygon fill="#d9534f" stroke="#d9534f" points="644,-591 389,-591 389,-567 644,-567 644,-591"/>
+<text text-anchor="middle" x="516.5" y="-576.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assimilation_controller%apply_upper_bc</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_assimilation_cycle&#45;&gt;proc~apply_upper_bc -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge2" class="edge">
+<title>proc~execute_assimilation_cycle&#45;&gt;proc~apply_upper_bc</title>
+<path fill="none" stroke="#ff0000" d="M162.96,-290.23C179.71,-334.29 243.5,-485.84 351,-553 359.73,-558.46 369.22,-562.9 379.08,-566.5"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="378.05,-569.85 388.64,-569.7 380.27,-563.21 378.05,-569.85"/>
+</g>
+<!-- proc~calculate_analysis_etkf -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node4" class="node">
+<title>proc~calculate_analysis_etkf</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node4"><a xlink:href="../proc/calculate_analysis_etkf.html" xlink:title="type_etkf_solver%calculate_analysis_etkf">
+<polygon fill="#d9534f" stroke="#d9534f" points="632,-473 401,-473 401,-449 632,-449 632,-473"/>
+<text text-anchor="middle" x="516.5" y="-458.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_etkf_solver%calculate_analysis_etkf</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_assimilation_cycle&#45;&gt;proc~calculate_analysis_etkf -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge3" class="edge">
+<title>proc~execute_assimilation_cycle&#45;&gt;proc~calculate_analysis_etkf</title>
+<path fill="none" stroke="#ff0000" d="M181.92,-290.01C243.83,-321.74 411.9,-407.89 483.02,-444.35"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="481.49,-447.5 491.99,-448.95 484.69,-441.27 481.49,-447.5"/>
+</g>
+<!-- proc~compute_friction_velocity -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node5" class="node">
+<title>proc~compute_friction_velocity</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node5"><a xlink:href="../proc/compute_friction_velocity.html" xlink:title="type_assimilation_controller%compute_friction_velocity">
+<polygon fill="#d9534f" stroke="#d9534f" points="1415,-291 1108,-291 1108,-267 1415,-267 1415,-291"/>
+<text text-anchor="middle" x="1261.5" y="-276.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assimilation_controller%compute_friction_velocity</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_assimilation_cycle&#45;&gt;proc~compute_friction_velocity -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge4" class="edge">
+<title>proc~execute_assimilation_cycle&#45;&gt;proc~compute_friction_velocity</title>
+<path fill="none" stroke="#ff0000" d="M202.04,-290.01C240.79,-300.04 299.18,-313.54 351,-319 647.56,-350.23 1001.01,-313.7 1166.41,-292.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1167.08,-295.77 1176.55,-291 1166.18,-288.83 1167.08,-295.77"/>
+</g>
+<!-- proc~compute_mean_ensemble -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node6" class="node">
+<title>proc~compute_mean_ensemble</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node6"><a xlink:href="../proc/compute_mean_ensemble.html" xlink:title="type_ensemble_manager%compute_mean_ensemble">
+<polygon fill="#d9534f" stroke="#d9534f" points="1044,-641 746,-641 746,-617 1044,-617 1044,-641"/>
+<text text-anchor="middle" x="895" y="-626.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ensemble_manager%compute_mean_ensemble</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_assimilation_cycle&#45;&gt;proc~compute_mean_ensemble -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge5" class="edge">
+<title>proc~execute_assimilation_cycle&#45;&gt;proc~compute_mean_ensemble</title>
+<path fill="none" stroke="#ff0000" d="M164.03,-290.14C183.16,-330.58 250.92,-461.28 351,-517 480.52,-589.11 554.48,-482.42 682,-558 705.56,-571.96 694.41,-594.09 718,-608 723.88,-611.47 730.06,-614.49 736.44,-617.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="735.34,-620.44 745.93,-620.7 737.81,-613.89 735.34,-620.44"/>
+</g>
+<!-- proc~compute_moisture_bc -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node7" class="node">
+<title>proc~compute_moisture_bc</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node7"><a xlink:href="../proc/compute_moisture_bc.html" xlink:title="type_assimilation_controller%compute_moisture_bc">
+<polygon fill="#d9534f" stroke="#d9534f" points="1039,-271 751,-271 751,-247 1039,-247 1039,-271"/>
+<text text-anchor="middle" x="895" y="-256.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assimilation_controller%compute_moisture_bc</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_assimilation_cycle&#45;&gt;proc~compute_moisture_bc -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge6" class="edge">
+<title>proc~execute_assimilation_cycle&#45;&gt;proc~compute_moisture_bc</title>
+<path fill="none" stroke="#ff0000" d="M315.38,-273.95C440.97,-270.7 616.12,-266.18 740.75,-262.96"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="740.85,-266.46 750.76,-262.7 740.67,-259.46 740.85,-266.46"/>
+</g>
+<!-- proc~compute_surface_energy_balance -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node8" class="node">
+<title>proc~compute_surface_energy_balance</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node8"><a xlink:href="../proc/compute_surface_energy_balance.html" xlink:title="type_assimilation_controller%compute_surface_energy_balance">
+<polygon fill="#d9534f" stroke="#d9534f" points="1072,-149 718,-149 718,-125 1072,-125 1072,-149"/>
+<text text-anchor="middle" x="895" y="-134.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assimilation_controller%compute_surface_energy_balance</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_assimilation_cycle&#45;&gt;proc~compute_surface_energy_balance -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge7" class="edge">
+<title>proc~execute_assimilation_cycle&#45;&gt;proc~compute_surface_energy_balance</title>
+<path fill="none" stroke="#ff0000" d="M181.15,-265.92C216.39,-247.72 286.95,-213.64 351,-197 370.92,-191.83 613.42,-166.09 767.54,-150.05"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="767.98,-153.52 777.56,-149.01 767.25,-146.56 767.98,-153.52"/>
+</g>
+<!-- proc~destroy_atmos_state -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node9" class="node">
+<title>proc~destroy_atmos_state</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node9"><a xlink:href="../proc/destroy_atmos_state.html" xlink:title="type_atmos_state%destroy_atmos_state">
+<polygon fill="#d9534f" stroke="#d9534f" points="1007,-599 783,-599 783,-575 1007,-575 1007,-599"/>
+<text text-anchor="middle" x="895" y="-584.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_atmos_state%destroy_atmos_state</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_assimilation_cycle&#45;&gt;proc~destroy_atmos_state -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge8" class="edge">
+<title>proc~execute_assimilation_cycle&#45;&gt;proc~destroy_atmos_state</title>
+<path fill="none" stroke="#ff0000" d="M165.61,-290.11C187.71,-326.48 259.26,-435.19 351,-482 483.14,-549.42 551.09,-455.22 682,-525 703.4,-536.41 696.54,-554.71 718,-566 734.81,-574.85 753.75,-580.65 772.81,-584.36"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="772.33,-587.83 782.78,-586.12 773.54,-580.94 772.33,-587.83"/>
+</g>
+<!-- proc~get_observation_obs_manager -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node10" class="node">
+<title>proc~get_observation_obs_manager</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node10"><a xlink:href="../proc/get_observation_obs_manager.html" xlink:title="type_observation_manager%get_observation_obs_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="682,-150 351,-150 351,-126 682,-126 682,-150"/>
+<text text-anchor="middle" x="516.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_observation_manager%get_observation_obs_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_assimilation_cycle&#45;&gt;proc~get_observation_obs_manager -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge9" class="edge">
+<title>proc~execute_assimilation_cycle&#45;&gt;proc~get_observation_obs_manager</title>
+<path fill="none" stroke="#ff0000" d="M174.43,-265.67C206.11,-241.84 280.11,-189.53 351,-164 364.26,-159.22 378.44,-155.32 392.7,-152.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="393.52,-155.54 402.58,-150.05 392.07,-148.7 393.52,-155.54"/>
+</g>
+<!-- proc~propagate_atmosphere -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node11" class="node">
+<title>proc~propagate_atmosphere</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node11"><a xlink:href="../proc/propagate_atmosphere.html" xlink:title="type_assimilation_controller%propagate_atmosphere">
+<polygon fill="#d9534f" stroke="#d9534f" points="664,-310 369,-310 369,-286 664,-286 664,-310"/>
+<text text-anchor="middle" x="516.5" y="-295.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assimilation_controller%propagate_atmosphere</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_assimilation_cycle&#45;&gt;proc~propagate_atmosphere -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge10" class="edge">
+<title>proc~execute_assimilation_cycle&#45;&gt;proc~propagate_atmosphere</title>
+<path fill="none" stroke="#ff0000" d="M315.09,-286.77C329.62,-287.59 344.36,-288.41 358.89,-289.23"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="358.74,-292.72 368.92,-289.79 359.13,-285.73 358.74,-292.72"/>
+</g>
+<!-- proc~update_bc_data_manager -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node12" class="node">
+<title>proc~update_bc_data_manager</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node12"><a xlink:href="../proc/update_bc_data_manager.html" xlink:title="type_bc_manager%update_bc_data_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="644.5,-108 388.5,-108 388.5,-84 644.5,-84 644.5,-108"/>
+<text text-anchor="middle" x="516.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_bc_manager%update_bc_data_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_assimilation_cycle&#45;&gt;proc~update_bc_data_manager -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge11" class="edge">
+<title>proc~execute_assimilation_cycle&#45;&gt;proc~update_bc_data_manager</title>
+<path fill="none" stroke="#ff0000" d="M168.63,-265.63C194.95,-234.48 269.15,-152.74 351,-117 359.71,-113.19 368.92,-110.02 378.34,-107.38"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="379.42,-110.72 388.23,-104.82 377.67,-103.94 379.42,-110.72"/>
+</g>
+<!-- proc~update_longwave_radiation -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node13" class="node">
+<title>proc~update_longwave_radiation</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node13"><a xlink:href="../proc/update_longwave_radiation.html" xlink:title="type_assimilation_controller%update_longwave_radiation">
+<polygon fill="#d9534f" stroke="#d9534f" points="675.5,-66 357.5,-66 357.5,-42 675.5,-42 675.5,-66"/>
+<text text-anchor="middle" x="516.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assimilation_controller%update_longwave_radiation</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_assimilation_cycle&#45;&gt;proc~update_longwave_radiation -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge12" class="edge">
+<title>proc~execute_assimilation_cycle&#45;&gt;proc~update_longwave_radiation</title>
+<path fill="none" stroke="#ff0000" d="M165.62,-265.94C187.76,-229.72 259.39,-121.47 351,-75 354.83,-73.06 358.77,-71.27 362.79,-69.63"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="364.2,-72.84 372.33,-66.05 361.74,-66.29 364.2,-72.84"/>
+</g>
+<!-- proc~update_solar_radiation -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node14" class="node">
+<title>proc~update_solar_radiation</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node14"><a xlink:href="../proc/update_solar_radiation.html" xlink:title="type_assimilation_controller%update_solar_radiation">
+<polygon fill="#d9534f" stroke="#d9534f" points="663,-24 370,-24 370,0 663,0 663,-24"/>
+<text text-anchor="middle" x="516.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assimilation_controller%update_solar_radiation</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_assimilation_cycle&#45;&gt;proc~update_solar_radiation -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge13" class="edge">
+<title>proc~execute_assimilation_cycle&#45;&gt;proc~update_solar_radiation</title>
+<path fill="none" stroke="#ff0000" d="M163.82,-265.86C182.51,-224.81 249.6,-90.51 351,-33 354.1,-31.24 357.28,-29.61 360.54,-28.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="362.06,-31.24 369.88,-24.08 359.3,-24.8 362.06,-31.24"/>
+</g>
+<!-- proc~write_surface_log -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node15" class="node">
+<title>proc~write_surface_log</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node15"><a xlink:href="../proc/write_surface_log.html" xlink:title="type_assimilation_controller%write_surface_log">
+<polygon fill="#d9534f" stroke="#d9534f" points="648.5,-230 384.5,-230 384.5,-206 648.5,-206 648.5,-230"/>
+<text text-anchor="middle" x="516.5" y="-215.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assimilation_controller%write_surface_log</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_assimilation_cycle&#45;&gt;proc~write_surface_log -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge14" class="edge">
+<title>proc~execute_assimilation_cycle&#45;&gt;proc~write_surface_log</title>
+<path fill="none" stroke="#ff0000" d="M224.82,-265.98C261.91,-259.34 308.99,-251.03 351,-244 375.81,-239.85 402.76,-235.51 427.53,-231.6"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="428.3,-235.03 437.63,-230.01 427.21,-228.11 428.3,-235.03"/>
+</g>
+<!-- proc~random_normal_atm -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node25" class="node">
+<title>proc~random_normal_atm</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node25"><a xlink:href="../proc/random_normal_atm.html" xlink:title="random_normal_atm">
+<polygon fill="#d9534f" stroke="#d9534f" points="957,-683 833,-683 833,-659 957,-659 957,-683"/>
+<text text-anchor="middle" x="895" y="-668.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">random_normal_atm</text>
+</a>
+</g>
+</g>
+<!-- proc~add_perturbation_ensemble&#45;&gt;proc~random_normal_atm -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge15" class="edge">
+<title>proc~add_perturbation_ensemble&#45;&gt;proc~random_normal_atm</title>
+<path fill="none" stroke="#ff0000" d="M670.09,-656.13C722.93,-659.64 779.66,-663.41 822.8,-666.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="822.69,-669.77 832.9,-666.94 823.15,-662.79 822.69,-669.77"/>
+</g>
+<!-- proc~calculate_analysis_etkf&#45;&gt;proc~compute_mean_ensemble -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge21" class="edge">
+<title>proc~calculate_analysis_etkf&#45;&gt;proc~compute_mean_ensemble</title>
+<path fill="none" stroke="#ffda00" d="M580.16,-473.04C613.9,-482.3 654.18,-498.22 682,-525 710.97,-552.88 685.75,-583.98 718,-608 723.72,-612.26 729.85,-615.92 736.26,-619.06"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="735.29,-622.45 745.85,-623.28 738.11,-616.05 735.29,-622.45"/>
+</g>
+<!-- proc~calculate_analysis_etkf&#45;&gt;proc~destroy_atmos_state -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge22" class="edge">
+<title>proc~calculate_analysis_etkf&#45;&gt;proc~destroy_atmos_state</title>
+<path fill="none" stroke="#ffda00" d="M632.29,-464.25C650.17,-468.8 667.5,-475.98 682,-487 712.72,-510.35 686.84,-543.24 718,-566 734.05,-577.73 753.2,-584.87 772.87,-589"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="772.4,-592.47 782.87,-590.84 773.67,-585.59 772.4,-592.47"/>
+</g>
+<!-- dgemm -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node16" class="node">
+<title>dgemm</title>
+<polygon fill="#777777" stroke="#777777" points="922,-431 868,-431 868,-407 922,-407 922,-431"/>
+<text text-anchor="middle" x="895" y="-416.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dgemm</text>
+</g>
+<!-- proc~calculate_analysis_etkf&#45;&gt;dgemm -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge16" class="edge">
+<title>proc~calculate_analysis_etkf&#45;&gt;dgemm</title>
+<path fill="none" stroke="#ffda00" d="M625.14,-448.99C703.37,-440.27 804.51,-428.98 857.67,-423.05"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="858.09,-426.53 867.64,-421.94 857.31,-419.57 858.09,-426.53"/>
+</g>
+<!-- dgemv -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node17" class="node">
+<title>dgemv</title>
+<polygon fill="#777777" stroke="#777777" points="922,-389 868,-389 868,-365 922,-365 922,-389"/>
+<text text-anchor="middle" x="895" y="-374.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dgemv</text>
+</g>
+<!-- proc~calculate_analysis_etkf&#45;&gt;dgemv -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge17" class="edge">
+<title>proc~calculate_analysis_etkf&#45;&gt;dgemv</title>
+<path fill="none" stroke="#ffda00" d="M549.3,-448.98C588.44,-434.67 657.18,-411.07 718,-398 765.78,-387.74 822.02,-382.12 857.83,-379.34"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="858.09,-382.83 867.81,-378.6 857.57,-375.85 858.09,-382.83"/>
+</g>
+<!-- dsyev -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node18" class="node">
+<title>dsyev</title>
+<polygon fill="#777777" stroke="#777777" points="922,-557 868,-557 868,-533 922,-533 922,-557"/>
+<text text-anchor="middle" x="895" y="-542.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dsyev</text>
+</g>
+<!-- proc~calculate_analysis_etkf&#45;&gt;dsyev -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge18" class="edge">
+<title>proc~calculate_analysis_etkf&#45;&gt;dsyev</title>
+<path fill="none" stroke="#ffda00" d="M632.04,-469.35C649.38,-473.35 666.6,-479.02 682,-487 702.37,-497.55 697.43,-513.84 718,-524 762.32,-545.9 820.32,-548.58 857.38,-547.54"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="857.85,-551.03 867.71,-547.14 857.58,-544.03 857.85,-551.03"/>
+</g>
+<!-- proc~build_h_obs_manager -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node20" class="node">
+<title>proc~build_h_obs_manager</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node20"><a xlink:href="../proc/build_h_obs_manager.html" xlink:title="type_observation_manager%build_H_obs_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="1038,-515 752,-515 752,-491 1038,-491 1038,-515"/>
+<text text-anchor="middle" x="895" y="-500.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_observation_manager%build_H_obs_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_analysis_etkf&#45;&gt;proc~build_h_obs_manager -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge19" class="edge">
+<title>proc~calculate_analysis_etkf&#45;&gt;proc~build_h_obs_manager</title>
+<path fill="none" stroke="#ffda00" d="M625.14,-473.01C672.31,-478.27 727.81,-484.46 776.09,-489.85"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="775.96,-493.35 786.28,-490.98 776.73,-486.4 775.96,-493.35"/>
+</g>
+<!-- proc~compute_anomalies_ensemble -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node21" class="node">
+<title>proc~compute_anomalies_ensemble</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node21"><a xlink:href="../proc/compute_anomalies_ensemble.html" xlink:title="type_ensemble_manager%compute_anomalies_ensemble">
+<polygon fill="#d9534f" stroke="#d9534f" points="1056.5,-473 733.5,-473 733.5,-449 1056.5,-449 1056.5,-473"/>
+<text text-anchor="middle" x="895" y="-458.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ensemble_manager%compute_anomalies_ensemble</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_analysis_etkf&#45;&gt;proc~compute_anomalies_ensemble -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge20" class="edge">
+<title>proc~calculate_analysis_etkf&#45;&gt;proc~compute_anomalies_ensemble</title>
+<path fill="none" stroke="#ffda00" d="M632.25,-461C660.92,-461 692.28,-461 723.02,-461"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="723.41,-464.5 733.41,-461 723.41,-457.5 723.41,-464.5"/>
+</g>
+<!-- proc~initialize_atmos_state -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node24" class="node">
+<title>proc~initialize_atmos_state</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node24"><a xlink:href="../proc/initialize_atmos_state.html" xlink:title="type_atmos_state%initialize_atmos_state">
+<polygon fill="#d9534f" stroke="#d9534f" points="1376,-641 1147,-641 1147,-617 1376,-617 1376,-641"/>
+<text text-anchor="middle" x="1261.5" y="-626.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_atmos_state%initialize_atmos_state</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_mean_ensemble&#45;&gt;proc~initialize_atmos_state -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge23" class="edge">
+<title>proc~compute_mean_ensemble&#45;&gt;proc~initialize_atmos_state</title>
+<path fill="none" stroke="#48ff00" d="M1044.26,-629C1074.85,-629 1106.76,-629 1136.39,-629"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="1136.76,-632.5 1146.76,-629 1136.76,-625.5 1136.76,-632.5"/>
+</g>
+<!-- proc~compute_moisture_bc&#45;&gt;proc~compute_friction_velocity -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge24" class="edge">
+<title>proc~compute_moisture_bc&#45;&gt;proc~compute_friction_velocity</title>
+<path fill="none" stroke="#00ff24" d="M1039.01,-266.85C1058.29,-267.9 1078.18,-269 1097.77,-270.07"/>
+<polygon fill="#00ff24" stroke="#00ff24" points="1097.8,-273.58 1107.98,-270.63 1098.19,-266.59 1097.8,-273.58"/>
+</g>
+<!-- proc~sat_vapor_density_atm -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node26" class="node">
+<title>proc~sat_vapor_density_atm</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node26"><a xlink:href="../proc/sat_vapor_density_atm.html" xlink:title="sat_vapor_density_atm">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1328.5,-191 1194.5,-191 1194.5,-167 1328.5,-167 1328.5,-191"/>
+<text text-anchor="middle" x="1261.5" y="-176.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">sat_vapor_density_atm</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_moisture_bc&#45;&gt;proc~sat_vapor_density_atm -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge25" class="edge">
+<title>proc~compute_moisture_bc&#45;&gt;proc~sat_vapor_density_atm</title>
+<path fill="none" stroke="#00ff24" d="M950.96,-246.94C1016.55,-232.54 1126.07,-208.51 1195.71,-193.22"/>
+<polygon fill="#00ff24" stroke="#00ff24" points="1196.67,-196.59 1205.69,-191.03 1195.17,-189.76 1196.67,-196.59"/>
+</g>
+<!-- proc~compute_surface_energy_balance&#45;&gt;proc~sat_vapor_density_atm -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge26" class="edge">
+<title>proc~compute_surface_energy_balance&#45;&gt;proc~sat_vapor_density_atm</title>
+<path fill="none" stroke="#00ff91" d="M1000.45,-149.04C1059.15,-155.8 1131.1,-164.09 1184.43,-170.23"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="1184.16,-173.73 1194.5,-171.39 1184.96,-166.77 1184.16,-173.73"/>
+</g>
+<!-- proc~propagate_atmosphere&#45;&gt;proc~compute_friction_velocity -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge27" class="edge">
+<title>proc~propagate_atmosphere&#45;&gt;proc~compute_friction_velocity</title>
+<path fill="none" stroke="#0024ff" d="M664.29,-294.25C789.29,-291.05 968.64,-286.46 1097.95,-283.16"/>
+<polygon fill="#0024ff" stroke="#0024ff" points="1098.04,-286.66 1107.95,-282.9 1097.86,-279.66 1098.04,-286.66"/>
+</g>
+<!-- interface~update_provider_data_abst_bc -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node19" class="node">
+<title>interface~update_provider_data_abst_bc</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node19"><a xlink:href="../interface/update_provider_data_abst_bc.html" xlink:title="abst_bc%update_provider_data_abst_bc">
+<polygon fill="#a7506f" stroke="#a7506f" points="1007.5,-107 782.5,-107 782.5,-83 1007.5,-83 1007.5,-107"/>
+<text text-anchor="middle" x="895" y="-92.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_bc%update_provider_data_abst_bc</text>
+</a>
+</g>
+</g>
+<!-- proc~update_bc_data_manager&#45;&gt;interface~update_provider_data_abst_bc -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge28" class="edge">
+<title>proc~update_bc_data_manager&#45;&gt;interface~update_provider_data_abst_bc</title>
+<path fill="none" stroke="#4800ff" d="M644.7,-95.66C685.82,-95.55 731.3,-95.43 772.02,-95.32"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="772.28,-98.82 782.27,-95.3 772.26,-91.82 772.28,-98.82"/>
+</g>
+<!-- proc~get_bc_index_bc_manager -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node23" class="node">
+<title>proc~get_bc_index_bc_manager</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node23"><a xlink:href="../proc/get_bc_index_bc_manager.html" xlink:title="type_bc_manager%get_bc_index_bc_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="1024.5,-65 765.5,-65 765.5,-41 1024.5,-41 1024.5,-65"/>
+<text text-anchor="middle" x="895" y="-50.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_bc_manager%get_bc_index_bc_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~update_bc_data_manager&#45;&gt;proc~get_bc_index_bc_manager -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge29" class="edge">
+<title>proc~update_bc_data_manager&#45;&gt;proc~get_bc_index_bc_manager</title>
+<path fill="none" stroke="#4800ff" d="M622.63,-83.99C671.17,-78.45 728.94,-71.85 778.68,-66.17"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="779.3,-69.62 788.84,-65.01 778.51,-62.67 779.3,-69.62"/>
+</g>
+<!-- proc~write_surface_log&#45;&gt;proc~compute_friction_velocity -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge30" class="edge">
+<title>proc~write_surface_log&#45;&gt;proc~compute_friction_velocity</title>
+<path fill="none" stroke="#ff006d" d="M648.55,-216.17C761.25,-216.16 927.92,-219.88 1072,-238 1117.56,-243.73 1168.39,-255.08 1205.77,-264.39"/>
+<polygon fill="#ff006d" stroke="#ff006d" points="1205.39,-267.91 1215.95,-266.96 1207.11,-261.12 1205.39,-267.91"/>
+</g>
+<!-- proc~write_surface_log&#45;&gt;proc~compute_moisture_bc -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge31" class="edge">
+<title>proc~write_surface_log&#45;&gt;proc~compute_moisture_bc</title>
+<path fill="none" stroke="#ff006d" d="M627.92,-230.02C673.6,-235 726.71,-240.78 773.41,-245.87"/>
+<polygon fill="#ff006d" stroke="#ff006d" points="773.26,-249.37 783.58,-246.98 774.02,-242.41 773.26,-249.37"/>
+</g>
+<!-- proc~write_surface_log&#45;&gt;proc~compute_surface_energy_balance -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge32" class="edge">
+<title>proc~write_surface_log&#45;&gt;proc~compute_surface_energy_balance</title>
+<path fill="none" stroke="#ff006d" d="M644.31,-205.94C657.39,-202.36 670.19,-197.8 682,-192 701.75,-182.29 698.07,-167.33 718,-158 722.39,-155.95 726.9,-154.07 731.5,-152.35"/>
+<polygon fill="#ff006d" stroke="#ff006d" points="732.77,-155.61 741.07,-149.04 730.48,-149 732.77,-155.61"/>
+</g>
+<!-- proc~compute_surface_energy_diag -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node22" class="node">
+<title>proc~compute_surface_energy_diag</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node22"><a xlink:href="../proc/compute_surface_energy_diag.html" xlink:title="type_assimilation_controller%compute_surface_energy_diag">
+<polygon fill="#d9534f" stroke="#d9534f" points="1062,-191 728,-191 728,-167 1062,-167 1062,-191"/>
+<text text-anchor="middle" x="895" y="-176.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assimilation_controller%compute_surface_energy_diag</text>
+</a>
+</g>
+</g>
+<!-- proc~write_surface_log&#45;&gt;proc~compute_surface_energy_diag -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge33" class="edge">
+<title>proc~write_surface_log&#45;&gt;proc~compute_surface_energy_diag</title>
+<path fill="none" stroke="#ff006d" d="M633.53,-205.98C676.13,-201.57 724.54,-196.55 767.97,-192.05"/>
+<polygon fill="#ff006d" stroke="#ff006d" points="768.44,-195.53 778.02,-191.01 767.72,-188.56 768.44,-195.53"/>
+</g>
+<!-- proc~update_provider_data_abst_bc -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node28" class="node">
+<title>proc~update_provider_data_abst_bc</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node28"><a xlink:href="../proc/update_provider_data_abst_bc.html" xlink:title="update_provider_data_abst_bc">
+<polygon fill="#d9534f" stroke="#d9534f" points="1349,-107 1174,-107 1174,-83 1349,-83 1349,-107"/>
+<text text-anchor="middle" x="1261.5" y="-92.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">update_provider_data_abst_bc</text>
+</a>
+</g>
+</g>
+<!-- interface~update_provider_data_abst_bc&#45;&gt;proc~update_provider_data_abst_bc -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge34" class="edge">
+<title>interface~update_provider_data_abst_bc&#45;&gt;proc~update_provider_data_abst_bc</title>
+<path fill="none" stroke="#5cff00" stroke-dasharray="5,2" d="M1007.84,-95C1057.66,-95 1115.77,-95 1163.7,-95"/>
+<polygon fill="#5cff00" stroke="#5cff00" points="1163.77,-98.5 1173.77,-95 1163.77,-91.5 1163.77,-98.5"/>
+</g>
+<!-- proc~find_interp_indices_atm -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node27" class="node">
+<title>proc~find_interp_indices_atm</title>
+<g id="a_proc~~execute_assimilation_cycle~~CallsGraph_node27"><a xlink:href="../proc/find_interp_indices_atm.html" xlink:title="find_interp_indices_atm">
+<polygon fill="#d9534f" stroke="#d9534f" points="1331,-515 1192,-515 1192,-491 1331,-491 1331,-515"/>
+<text text-anchor="middle" x="1261.5" y="-500.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">find_interp_indices_atm</text>
+</a>
+</g>
+</g>
+<!-- proc~build_h_obs_manager&#45;&gt;proc~find_interp_indices_atm -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge35" class="edge">
+<title>proc~build_h_obs_manager&#45;&gt;proc~find_interp_indices_atm</title>
+<path fill="none" stroke="#00ff2e" d="M1038.23,-503C1086.96,-503 1139.69,-503 1181.57,-503"/>
+<polygon fill="#00ff2e" stroke="#00ff2e" points="1181.7,-506.5 1191.7,-503 1181.7,-499.5 1181.7,-506.5"/>
+</g>
+<!-- proc~compute_surface_energy_diag&#45;&gt;proc~sat_vapor_density_atm -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge36" class="edge">
+<title>proc~compute_surface_energy_diag&#45;&gt;proc~sat_vapor_density_atm</title>
+<path fill="none" stroke="#00b9ff" d="M1062.25,-179C1104.8,-179 1148.53,-179 1184.05,-179"/>
+<polygon fill="#00b9ff" stroke="#00b9ff" points="1184.32,-182.5 1194.32,-179 1184.32,-175.5 1184.32,-182.5"/>
+</g>
+<!-- update_data -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_node29" class="node">
+<title>update_data</title>
+<polygon fill="#777777" stroke="#777777" points="1530,-107 1451,-107 1451,-83 1530,-83 1530,-107"/>
+<text text-anchor="middle" x="1490.5" y="-92.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">update_data</text>
+</g>
+<!-- proc~update_provider_data_abst_bc&#45;&gt;update_data -->
+<g id="proc~~execute_assimilation_cycle~~CallsGraph_edge37" class="edge">
+<title>proc~update_provider_data_abst_bc&#45;&gt;update_data</title>
+<path fill="none" stroke="#00ffff" d="M1349.29,-95C1380.23,-95 1413.97,-95 1440.61,-95"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1440.81,-98.5 1450.81,-95 1440.81,-91.5 1440.81,-98.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocexecute_assimilation_cycleCallsGraph = svgPanZoom('#procexecute_assimilation_cycleCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~execute_assimilation_cycle~~CalledByGraph Pages: 1 -->
+<svg id="procexecute_assimilation_cycleCalledByGraph" width="641pt" height="20pt"
+ viewBox="0.00 0.00 641.00 20.49" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~execute_assimilation_cycle~~CalledByGraph" class="graph" transform="scale(0.64 0.64) rotate(0) translate(4 28)">
+<title>proc~~execute_assimilation_cycle~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 997,-28 997,4 -4,4"/>
+<!-- proc~execute_assimilation_cycle -->
+<g id="proc~~execute_assimilation_cycle~~CalledByGraph_node1" class="node">
+<title>proc~execute_assimilation_cycle</title>
+<polygon fill="none" stroke="black" points="993,-24 678,-24 678,0 993,0 993,-24"/>
+<text text-anchor="middle" x="835.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_assimilation_controller%execute_assimilation_cycle</text>
+</g>
+<!-- proc~run_assimilation_ftcms -->
+<g id="proc~~execute_assimilation_cycle~~CalledByGraph_node2" class="node">
+<title>proc~run_assimilation_ftcms</title>
+<g id="a_proc~~execute_assimilation_cycle~~CalledByGraph_node2"><a xlink:href="../proc/run_assimilation_ftcms.html" xlink:title="run_assimilation_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="642,-24 508,-24 508,0 642,0 642,-24"/>
+<text text-anchor="middle" x="575" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_assimilation_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_assimilation_ftcms&#45;&gt;proc~execute_assimilation_cycle -->
+<g id="proc~~execute_assimilation_cycle~~CalledByGraph_edge1" class="edge">
+<title>proc~run_assimilation_ftcms&#45;&gt;proc~execute_assimilation_cycle</title>
+<path fill="none" stroke="#ff0000" d="M642.23,-12C650.39,-12 658.98,-12 667.83,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="667.92,-15.5 677.92,-12 667.92,-8.5 667.92,-15.5"/>
+</g>
+<!-- interface~run_assimilation_ftcms -->
+<g id="proc~~execute_assimilation_cycle~~CalledByGraph_node3" class="node">
+<title>interface~run_assimilation_ftcms</title>
+<g id="a_proc~~execute_assimilation_cycle~~CalledByGraph_node3"><a xlink:href="../interface/run_assimilation_ftcms.html" xlink:title="type_ftcms%run_assimilation_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="472,-24 270,-24 270,0 472,0 472,-24"/>
+<text text-anchor="middle" x="371" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_assimilation_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_assimilation_ftcms&#45;&gt;proc~run_assimilation_ftcms -->
+<g id="proc~~execute_assimilation_cycle~~CalledByGraph_edge2" class="edge">
+<title>interface~run_assimilation_ftcms&#45;&gt;proc~run_assimilation_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M472.11,-12C480.72,-12 489.33,-12 497.7,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="497.78,-15.5 507.78,-12 497.78,-8.5 497.78,-15.5"/>
+</g>
+<!-- proc~run_ftcms -->
+<g id="proc~~execute_assimilation_cycle~~CalledByGraph_node4" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_proc~~execute_assimilation_cycle~~CalledByGraph_node4"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 169,-24 169,0 234,0 234,-24"/>
+<text text-anchor="middle" x="201.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~run_assimilation_ftcms -->
+<g id="proc~~execute_assimilation_cycle~~CalledByGraph_edge3" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~run_assimilation_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M234.01,-12C241.73,-12 250.44,-12 259.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="259.77,-15.5 269.77,-12 259.77,-8.5 259.77,-15.5"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="proc~~execute_assimilation_cycle~~CalledByGraph_node5" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_proc~~execute_assimilation_cycle~~CalledByGraph_node5"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="133,-24 0,-24 0,0 133,0 133,-24"/>
+<text text-anchor="middle" x="66.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="proc~~execute_assimilation_cycle~~CalledByGraph_edge4" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M133.22,-12C141.87,-12 150.53,-12 158.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="158.89,-15.5 168.89,-12 158.89,-8.5 158.89,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocexecute_assimilation_cycleCalledByGraph = svgPanZoom('#procexecute_assimilation_cycleCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">execute_assimilation_cycle</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">current_time</span><span class="p">,</span><span class="w"> </span><span class="n">current_doy</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                          </span><span class="n">bc_thermal</span><span class="p">,</span><span class="w"> </span><span class="n">bc_hydraulic</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_assimilation_controller</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">current_time</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">current_doy</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_bc_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">bc_thermal</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_bc_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">bc_hydraulic</span>
+
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_atmos_state</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mean_state</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">y</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">R</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">R_diag</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_available</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ii</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Ta</span><span class="p">,</span><span class="w"> </span><span class="n">qa</span><span class="p">,</span><span class="w"> </span><span class="n">Ua</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">u_ast</span><span class="p">,</span><span class="w"> </span><span class="n">r_H</span><span class="p">,</span><span class="w"> </span><span class="n">r_v</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">h_eff</span><span class="p">,</span><span class="w"> </span><span class="n">G_ast</span><span class="p">,</span><span class="w"> </span><span class="n">T_ref</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Rnet</span><span class="p">,</span><span class="w"> </span><span class="n">H_flux</span><span class="p">,</span><span class="w"> </span><span class="n">LvE</span><span class="p">,</span><span class="w"> </span><span class="n">E_pot_ms</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">q_potential</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">bc_vals_th</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">bc_vals_hyd</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">precip_rate</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">is_initialized</span><span class="p">)</span><span class="w"> </span><span class="k">return</span>
+
+<span class="w">        </span><span class="c">! Update solar shortwave from orbital geometry</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">update_solar_radiation</span><span class="p">(</span><span class="n">current_doy</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Apply ERA5 ML135 upper Dirichlet BC to all ensemble members every step</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">apply_upper_bc</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">obs_manager</span><span class="p">%</span><span class="n">get_observation</span><span class="p">(</span><span class="n">current_time</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">R</span><span class="p">,</span><span class="w"> </span><span class="n">is_available</span><span class="p">,</span><span class="w"> </span><span class="n">precip_rate</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">is_available</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            do </span><span class="n">ii</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">                </span><span class="n">R_diag</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">R</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="w"> </span><span class="n">ii</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end do</span>
+
+<span class="w">            </span><span class="c">! ETKF analysis: pass y and R_diag directly</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">etkf_solver</span><span class="p">%</span><span class="n">calculate_analysis</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">ensemble</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">obs_manager</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">R_diag</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c">! Re-inject perturbations to prevent ensemble collapse</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">ensemble</span><span class="p">%</span><span class="n">add_perturbation</span><span class="p">(</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="mf">0.5d0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">obs_manager</span><span class="p">%</span><span class="n">sigma_T</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="mf">0.5d0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">obs_manager</span><span class="p">%</span><span class="n">sigma_q</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="mf">0.5d0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">obs_manager</span><span class="p">%</span><span class="n">sigma_U</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c">! Re-apply upper BC after perturbation to keep top node anchored</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">apply_upper_bc</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c">! Analysis mean</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">ensemble</span><span class="p">%</span><span class="n">compute_mean</span><span class="p">(</span><span class="n">mean_state</span><span class="p">)</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">Ta_last</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean_state</span><span class="p">%</span><span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">qa_last</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean_state</span><span class="p">%</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">Ua_last</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean_state</span><span class="p">%</span><span class="n">U</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">precip</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">precip_rate</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">has_first_obs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">            </span><span class="k">call </span><span class="n">mean_state</span><span class="p">%</span><span class="n">destroy</span><span class="p">()</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="w">            </span><span class="c">! Between DA cycles: ensure we have a baseline Ta, qa, Ua</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">has_first_obs</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                call </span><span class="n">self</span><span class="p">%</span><span class="n">ensemble</span><span class="p">%</span><span class="n">compute_mean</span><span class="p">(</span><span class="n">mean_state</span><span class="p">)</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">Ta_last</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean_state</span><span class="p">%</span><span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">qa_last</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean_state</span><span class="p">%</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                </span><span class="n">self</span><span class="p">%</span><span class="n">Ua_last</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean_state</span><span class="p">%</span><span class="n">U</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">mean_state</span><span class="p">%</span><span class="n">destroy</span><span class="p">()</span>
+<span class="w">            </span><span class="k">end if</span>
+
+<span class="w">            </span><span class="c">! Log at specified intervals even without observations</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">has_first_obs</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">log_io_unit</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="n">current_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">last_log_time</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">log_interval_s</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                call </span><span class="n">self</span><span class="p">%</span><span class="n">write_surface_log</span><span class="p">(</span><span class="n">current_time</span><span class="p">,</span><span class="w"> </span><span class="n">current_doy</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                            </span><span class="n">self</span><span class="p">%</span><span class="n">Ta_last</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">qa_last</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">Ua_last</span><span class="p">)</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        end if</span>
+
+<span class="w">        </span><span class="c">! --- ALWAYS update surface energy balance and BC parameters ---</span>
+<span class="w">        </span><span class="n">Ta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">Ta_last</span>
+<span class="w">        </span><span class="n">qa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">qa_last</span>
+<span class="w">        </span><span class="n">Ua</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">Ua_last</span>
+
+<span class="w">        </span><span class="c">! Physical propagation of atmospheric state (1D vertical diffusion)</span>
+<span class="w">        </span><span class="c">! This ensures T(1) doesn&#39;t stay stagnant between DA cycles.</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">propagate_atmosphere</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Re-fetch mean state after propagation</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">ensemble</span><span class="p">%</span><span class="n">compute_mean</span><span class="p">(</span><span class="n">mean_state</span><span class="p">)</span>
+<span class="w">        </span><span class="n">Ta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean_state</span><span class="p">%</span><span class="n">T</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="n">qa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean_state</span><span class="p">%</span><span class="n">q</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="n">Ua</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean_state</span><span class="p">%</span><span class="n">U</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">mean_state</span><span class="p">%</span><span class="n">destroy</span><span class="p">()</span>
+
+<span class="w">        </span><span class="c">! Update downwelling longwave from current Ta, qa</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">update_longwave_radiation</span><span class="p">(</span><span class="n">Ta</span><span class="p">,</span><span class="w"> </span><span class="n">qa</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Aerodynamic resistances</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">compute_friction_velocity</span><span class="p">(</span><span class="n">Ua</span><span class="p">,</span><span class="w"> </span><span class="n">u_ast</span><span class="p">,</span><span class="w"> </span><span class="n">r_H</span><span class="p">,</span><span class="w"> </span><span class="n">r_v</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Surface energy balance -&gt; Robin BC parameters</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">compute_surface_energy_balance</span><span class="p">(</span><span class="n">Ta</span><span class="p">,</span><span class="w"> </span><span class="n">qa</span><span class="p">,</span><span class="w"> </span><span class="n">r_H</span><span class="p">,</span><span class="w"> </span><span class="n">r_v</span><span class="p">,</span><span class="w"> </span><span class="n">h_eff</span><span class="p">,</span><span class="w"> </span><span class="n">G_ast</span><span class="p">,</span><span class="w"> </span><span class="n">T_ref</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Thermal: values(1)=h_eff, values(2)=T_ref for Robin BC</span>
+<span class="w">        </span><span class="n">bc_vals_th</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">h_eff</span>
+<span class="w">        </span><span class="n">bc_vals_th</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">T_ref</span>
+<span class="w">        </span><span class="n">bc_vals_th</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="k">call </span><span class="n">bc_thermal</span><span class="p">%</span><span class="n">update_bc_data</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">bc_entity_thermal</span><span class="p">,</span><span class="w"> </span><span class="n">bc_vals_th</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Moisture BC</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">compute_moisture_bc</span><span class="p">(</span><span class="n">qa</span><span class="p">,</span><span class="w"> </span><span class="n">Ua</span><span class="p">,</span><span class="w"> </span><span class="n">q_potential</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Hydraulic: values(1)=q_potential [m/s], values(2)=Pmin [Pa], values(3)=Pmax [Pa]</span>
+<span class="w">        </span><span class="n">bc_vals_hyd</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">q_potential</span>
+<span class="w">        </span><span class="n">bc_vals_hyd</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">Pmin</span>
+<span class="w">        </span><span class="n">bc_vals_hyd</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">Pmax</span>
+<span class="w">        </span><span class="k">call </span><span class="n">bc_hydraulic</span><span class="p">%</span><span class="n">update_bc_data</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">bc_entity_hydraulic</span><span class="p">,</span><span class="w"> </span><span class="n">bc_vals_hyd</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">is_available</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(A,ES10.3,A,F7.2,A,F7.3,A,ES10.3,A,F8.3,A,F8.3)&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="s1">&#39;[DA] t=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">current_time</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39; DOY=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">current_doy</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="s1">&#39; Ta=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">Ta</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39; qa=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">qa</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39; h_eff=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">h_eff</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39; G*=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">G_ast</span>
+<span class="w">            </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">write_surface_log</span><span class="p">(</span><span class="n">current_time</span><span class="p">,</span><span class="w"> </span><span class="n">current_doy</span><span class="p">,</span><span class="w"> </span><span class="n">Ta</span><span class="p">,</span><span class="w"> </span><span class="n">qa</span><span class="p">,</span><span class="w"> </span><span class="n">Ua</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">    end subroutine </span><span class="n">execute_assimilation_cycle</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-07-13 12:46 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

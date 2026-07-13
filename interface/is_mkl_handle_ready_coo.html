@@ -1,0 +1,1293 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>is_mkl_handle_ready_coo &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>is_mkl_handle_ready_coo
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">107 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/matrix_interface.fypp"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/matrix_interface.fypp.html'>matrix_interface.fypp</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_types_algebra_matrix.html'>core_types_algebra_matrix</a></li>
+            <li class="breadcrumb-item active" aria-current="page">is_mkl_handle_ready_coo</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~is_mkl_handle_ready_coo~~CallsGraph Pages: 1 -->
+<svg id="interfaceis_mkl_handle_ready_cooCallsGraph" width="437pt" height="32pt"
+ viewBox="0.00 0.00 437.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~is_mkl_handle_ready_coo~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>interface~~is_mkl_handle_ready_coo~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 433,-28 433,4 -4,4"/>
+<!-- interface~is_mkl_handle_ready_coo -->
+<g id="interface~~is_mkl_handle_ready_coo~~CallsGraph_node1" class="node">
+<title>interface~is_mkl_handle_ready_coo</title>
+<polygon fill="none" stroke="black" points="245,-24 0,-24 0,0 245,0 245,-24"/>
+<text text-anchor="middle" x="122.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_matrix_coo%is_mkl_handle_ready_coo</text>
+</g>
+<!-- proc~is_mkl_handle_ready_coo -->
+<g id="interface~~is_mkl_handle_ready_coo~~CallsGraph_node2" class="node">
+<title>proc~is_mkl_handle_ready_coo</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CallsGraph_node2"><a xlink:href="../proc/is_mkl_handle_ready_coo.html" xlink:title="is_mkl_handle_ready_coo">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="429,-24 281,-24 281,0 429,0 429,-24"/>
+<text text-anchor="middle" x="355" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">is_mkl_handle_ready_coo</text>
+</a>
+</g>
+</g>
+<!-- interface~is_mkl_handle_ready_coo&#45;&gt;proc~is_mkl_handle_ready_coo -->
+<g id="interface~~is_mkl_handle_ready_coo~~CallsGraph_edge1" class="edge">
+<title>interface~is_mkl_handle_ready_coo&#45;&gt;proc~is_mkl_handle_ready_coo</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M245.16,-12C253.78,-12 262.35,-12 270.68,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="270.7,-15.5 280.7,-12 270.7,-8.5 270.7,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~is_mkl_handle_ready_coo~~CalledByGraph Pages: 1 -->
+<svg id="interfaceis_mkl_handle_ready_cooCalledByGraph" width="641pt" height="210pt"
+ viewBox="0.00 0.00 641.00 209.90" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph" class="graph" transform="scale(0.18 0.18) rotate(0) translate(4 1166)">
+<title>interface~~is_mkl_handle_ready_coo~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1166 3569,-1166 3569,4 -4,4"/>
+<!-- interface~is_mkl_handle_ready_coo -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node1" class="node">
+<title>interface~is_mkl_handle_ready_coo</title>
+<polygon fill="none" stroke="black" points="3565,-612 3320,-612 3320,-588 3565,-588 3565,-612"/>
+<text text-anchor="middle" x="3442.5" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_matrix_coo%is_mkl_handle_ready_coo</text>
+</g>
+<!-- proc~gemv_matrix_coo -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node2" class="node">
+<title>proc~gemv_matrix_coo</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node2"><a xlink:href="../proc/gemv_matrix_coo.html" xlink:title="gemv_matrix_coo">
+<polygon fill="#d9534f" stroke="#d9534f" points="3284,-612 3177,-612 3177,-588 3284,-588 3284,-612"/>
+<text text-anchor="middle" x="3230.5" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gemv_matrix_coo</text>
+</a>
+</g>
+</g>
+<!-- proc~gemv_matrix_coo&#45;&gt;interface~is_mkl_handle_ready_coo -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge1" class="edge">
+<title>proc~gemv_matrix_coo&#45;&gt;interface~is_mkl_handle_ready_coo</title>
+<path fill="none" stroke="#ff0000" d="M3284.22,-600C3292.25,-600 3300.83,-600 3309.69,-600"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3309.79,-603.5 3319.79,-600 3309.79,-596.5 3309.79,-603.5"/>
+</g>
+<!-- interface~matrix_gemv -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node3" class="node">
+<title>interface~matrix_gemv</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node3"><a xlink:href="../interface/matrix_gemv.html" xlink:title="matrix_gemv">
+<polygon fill="#a7506f" stroke="#a7506f" points="3136,-633 3054,-633 3054,-609 3136,-609 3136,-633"/>
+<text text-anchor="middle" x="3095" y="-618.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matrix_gemv</text>
+</a>
+</g>
+</g>
+<!-- interface~matrix_gemv&#45;&gt;proc~gemv_matrix_coo -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge3" class="edge">
+<title>interface~matrix_gemv&#45;&gt;proc~gemv_matrix_coo</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M3136.05,-614.7C3145.72,-613.18 3156.27,-611.52 3166.7,-609.88"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3167.29,-613.33 3176.62,-608.32 3166.2,-606.41 3167.29,-613.33"/>
+</g>
+<!-- proc~matvec_matrix -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node4" class="node">
+<title>proc~matvec_matrix</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node4"><a xlink:href="../proc/matvec_matrix.html" xlink:title="matvec_matrix">
+<polygon fill="#d9534f" stroke="#d9534f" points="3141,-591 3049,-591 3049,-567 3141,-567 3141,-591"/>
+<text text-anchor="middle" x="3095" y="-576.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matvec_matrix</text>
+</a>
+</g>
+</g>
+<!-- proc~matvec_matrix&#45;&gt;proc~gemv_matrix_coo -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge2" class="edge">
+<title>proc~matvec_matrix&#45;&gt;proc~gemv_matrix_coo</title>
+<path fill="none" stroke="#ff0000" d="M3141.2,-586.11C3149.46,-587.41 3158.22,-588.79 3166.88,-590.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3166.55,-593.64 3176.98,-591.74 3167.64,-586.73 3166.55,-593.64"/>
+</g>
+<!-- interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node5" class="node">
+<title>interface~matvec</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node5"><a xlink:href="../interface/matvec.html" xlink:title="matvec">
+<polygon fill="#a7506f" stroke="#a7506f" points="3013,-591 2959,-591 2959,-567 3013,-567 3013,-591"/>
+<text text-anchor="middle" x="2986" y="-576.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matvec</text>
+</a>
+</g>
+</g>
+<!-- interface~matvec&#45;&gt;proc~matvec_matrix -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge4" class="edge">
+<title>interface~matvec&#45;&gt;proc~matvec_matrix</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M3013.18,-579C3021,-579 3029.88,-579 3038.83,-579"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="3038.91,-582.5 3048.91,-579 3038.91,-575.5 3038.91,-582.5"/>
+</g>
+<!-- proc~assemble_local_picard_hydraulic -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node6" class="node">
+<title>proc~assemble_local_picard_hydraulic</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node6"><a xlink:href="../proc/assemble_local_picard_hydraulic.html" xlink:title="assemble_local_picard_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="2923,-1157 2735,-1157 2735,-1133 2923,-1133 2923,-1157"/>
+<text text-anchor="middle" x="2829" y="-1142.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_picard_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_picard_hydraulic&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge5" class="edge">
+<title>proc~assemble_local_picard_hydraulic&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2900.53,-1132.91C2909.11,-1128.78 2916.96,-1123.29 2923,-1116 2956.4,-1075.68 2978.68,-697.58 2983.85,-601.25"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2987.35,-601.34 2984.38,-591.17 2980.36,-600.97 2987.35,-601.34"/>
+</g>
+<!-- proc~assemble_local_picard_thermal -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node7" class="node">
+<title>proc~assemble_local_picard_thermal</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node7"><a xlink:href="../proc/assemble_local_picard_thermal.html" xlink:title="assemble_local_picard_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2919.5,-1074 2738.5,-1074 2738.5,-1050 2919.5,-1050 2919.5,-1074"/>
+<text text-anchor="middle" x="2829" y="-1059.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_picard_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_picard_thermal&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge6" class="edge">
+<title>proc~assemble_local_picard_thermal&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2912.46,-1049.84C2916.31,-1047.34 2919.87,-1044.42 2923,-1041 2982.8,-975.64 2985.66,-684.17 2985.24,-601.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2988.74,-601.03 2985.16,-591.05 2981.74,-601.08 2988.74,-601.03"/>
+</g>
+<!-- proc~dlerp_abst_fe -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node8" class="node">
+<title>proc~dlerp_abst_fe</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node8"><a xlink:href="../proc/dlerp_abst_fe.html" xlink:title="dlerp_abst_fe">
+<polygon fill="#d9534f" stroke="#d9534f" points="2602.5,-1114 2518.5,-1114 2518.5,-1090 2602.5,-1090 2602.5,-1114"/>
+<text text-anchor="middle" x="2560.5" y="-1099.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dlerp_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- proc~dlerp_abst_fe&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge7" class="edge">
+<title>proc~dlerp_abst_fe&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2602.72,-1106.14C2687.58,-1113.68 2877.67,-1125.27 2923,-1083 2958.82,-1049.6 2979.17,-694.38 2983.92,-601.25"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2987.43,-601.17 2984.43,-591.01 2980.44,-600.82 2987.43,-601.17"/>
+</g>
+<!-- proc~solve_type_solver_bicg -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node9" class="node">
+<title>proc~solve_type_solver_bicg</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node9"><a xlink:href="../proc/solve_type_solver_bicg.html" xlink:title="solve_type_solver_bicg">
+<polygon fill="#d9534f" stroke="#d9534f" points="2896,-1032 2762,-1032 2762,-1008 2896,-1008 2896,-1032"/>
+<text text-anchor="middle" x="2829" y="-1017.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicg</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicg&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge8" class="edge">
+<title>proc~solve_type_solver_bicg&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2896.31,-1015.39C2906.38,-1011.96 2915.8,-1006.77 2923,-999 2977.33,-940.4 2984.11,-679.75 2984.91,-601.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2988.41,-601.2 2984.99,-591.17 2981.41,-601.14 2988.41,-601.2"/>
+</g>
+<!-- proc~solve_type_solver_bicgsafe -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node10" class="node">
+<title>proc~solve_type_solver_bicgsafe</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node10"><a xlink:href="../proc/solve_type_solver_bicgsafe.html" xlink:title="solve_type_solver_bicgsafe">
+<polygon fill="#d9534f" stroke="#d9534f" points="2907.5,-990 2750.5,-990 2750.5,-966 2907.5,-966 2907.5,-990"/>
+<text text-anchor="middle" x="2829" y="-975.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicgsafe</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicgsafe&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge9" class="edge">
+<title>proc~solve_type_solver_bicgsafe&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2907.64,-968.44C2913.34,-965.45 2918.57,-961.7 2923,-957 2971.92,-905.08 2982.39,-674.74 2984.5,-601.46"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2988.01,-601.19 2984.77,-591.1 2981.01,-601.01 2988.01,-601.19"/>
+</g>
+<!-- proc~solve_type_solver_bicgstab -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node11" class="node">
+<title>proc~solve_type_solver_bicgstab</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node11"><a xlink:href="../proc/solve_type_solver_bicgstab.html" xlink:title="solve_type_solver_bicgstab">
+<polygon fill="#d9534f" stroke="#d9534f" points="2907.5,-948 2750.5,-948 2750.5,-924 2907.5,-924 2907.5,-948"/>
+<text text-anchor="middle" x="2829" y="-933.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicgstab</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicgstab&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge10" class="edge">
+<title>proc~solve_type_solver_bicgstab&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2907.54,-926.35C2913.26,-923.38 2918.53,-919.65 2923,-915 2966.52,-869.72 2980.46,-669.46 2983.98,-601.59"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2987.5,-601.35 2984.49,-591.19 2980.51,-601.01 2987.5,-601.35"/>
+</g>
+<!-- proc~solve_type_solver_bicgstab_l -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node12" class="node">
+<title>proc~solve_type_solver_bicgstab_l</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node12"><a xlink:href="../proc/solve_type_solver_bicgstab_l.html" xlink:title="solve_type_solver_bicgstab_l">
+<polygon fill="#d9534f" stroke="#d9534f" points="2911.5,-906 2746.5,-906 2746.5,-882 2911.5,-882 2911.5,-906"/>
+<text text-anchor="middle" x="2829" y="-891.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicgstab_l</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicgstab_l&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge11" class="edge">
+<title>proc~solve_type_solver_bicgstab_l&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2911.74,-881.81C2915.83,-879.33 2919.63,-876.42 2923,-873 2961.18,-834.27 2978.3,-663.57 2983.33,-601.59"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2986.84,-601.58 2984.14,-591.34 2979.87,-601.03 2986.84,-601.58"/>
+</g>
+<!-- proc~solve_type_solver_bicr -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node13" class="node">
+<title>proc~solve_type_solver_bicr</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node13"><a xlink:href="../proc/solve_type_solver_bicr.html" xlink:title="solve_type_solver_bicr">
+<polygon fill="#d9534f" stroke="#d9534f" points="2895,-864 2763,-864 2763,-840 2895,-840 2895,-864"/>
+<text text-anchor="middle" x="2829" y="-849.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicr</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicr&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge12" class="edge">
+<title>proc~solve_type_solver_bicr&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2895.23,-846.96C2905.54,-843.6 2915.32,-838.53 2923,-831 2955.95,-798.68 2975.87,-656.68 2982.51,-601.26"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2986.01,-601.44 2983.7,-591.11 2979.06,-600.63 2986.01,-601.44"/>
+</g>
+<!-- proc~solve_type_solver_bicrsafe -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node14" class="node">
+<title>proc~solve_type_solver_bicrsafe</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node14"><a xlink:href="../proc/solve_type_solver_bicrsafe.html" xlink:title="solve_type_solver_bicrsafe">
+<polygon fill="#d9534f" stroke="#d9534f" points="2906,-822 2752,-822 2752,-798 2906,-798 2906,-822"/>
+<text text-anchor="middle" x="2829" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicrsafe</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicrsafe&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge13" class="edge">
+<title>proc~solve_type_solver_bicrsafe&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2906.13,-800.26C2912.3,-797.33 2918.05,-793.64 2923,-789 2976.73,-738.66 2984.65,-644.28 2985.32,-601.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2988.82,-601.11 2985.35,-591.1 2981.82,-601.09 2988.82,-601.11"/>
+</g>
+<!-- proc~solve_type_solver_bicrstab -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node15" class="node">
+<title>proc~solve_type_solver_bicrstab</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node15"><a xlink:href="../proc/solve_type_solver_bicrstab.html" xlink:title="solve_type_solver_bicrstab">
+<polygon fill="#d9534f" stroke="#d9534f" points="2906,-780 2752,-780 2752,-756 2906,-756 2906,-780"/>
+<text text-anchor="middle" x="2829" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicrstab</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicrstab&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge14" class="edge">
+<title>proc~solve_type_solver_bicrstab&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2906.26,-757.7C2912.33,-754.88 2918.02,-751.36 2923,-747 2966.44,-708.93 2979.48,-637.64 2983.37,-601.39"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2986.86,-601.63 2984.31,-591.34 2979.89,-600.98 2986.86,-601.63"/>
+</g>
+<!-- proc~solve_type_solver_cg -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node16" class="node">
+<title>proc~solve_type_solver_cg</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node16"><a xlink:href="../proc/solve_type_solver_cg.html" xlink:title="solve_type_solver_cg">
+<polygon fill="#d9534f" stroke="#d9534f" points="2891,-738 2767,-738 2767,-714 2891,-714 2891,-738"/>
+<text text-anchor="middle" x="2829" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_cg</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_cg&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge15" class="edge">
+<title>proc~solve_type_solver_cg&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2891.05,-720.35C2902.51,-717.13 2913.77,-712.28 2923,-705 2956.44,-678.63 2973.11,-629.58 2980.33,-601.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2983.76,-601.79 2982.65,-591.25 2976.94,-600.18 2983.76,-601.79"/>
+</g>
+<!-- proc~solve_type_solver_cgs -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node17" class="node">
+<title>proc~solve_type_solver_cgs</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node17"><a xlink:href="../proc/solve_type_solver_cgs.html" xlink:title="solve_type_solver_cgs">
+<polygon fill="#d9534f" stroke="#d9534f" points="2894,-696 2764,-696 2764,-672 2894,-672 2894,-696"/>
+<text text-anchor="middle" x="2829" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_cgs</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_cgs&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge16" class="edge">
+<title>proc~solve_type_solver_cgs&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2894.47,-675.77C2904.52,-672.74 2914.41,-668.61 2923,-663 2946.76,-647.48 2964.64,-619.53 2974.96,-600.16"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2978.11,-601.67 2979.53,-591.17 2971.87,-598.5 2978.11,-601.67"/>
+</g>
+<!-- proc~solve_type_solver_cocg -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node18" class="node">
+<title>proc~solve_type_solver_cocg</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node18"><a xlink:href="../proc/solve_type_solver_cocg.html" xlink:title="solve_type_solver_cocg">
+<polygon fill="#d9534f" stroke="#d9534f" points="2897.5,-654 2760.5,-654 2760.5,-630 2897.5,-630 2897.5,-654"/>
+<text text-anchor="middle" x="2829" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_cocg</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_cocg&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge17" class="edge">
+<title>proc~solve_type_solver_cocg&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2897.51,-629.91C2906.25,-627.43 2914.95,-624.49 2923,-621 2937.07,-614.91 2951.33,-605.51 2962.63,-597.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2964.81,-599.89 2970.63,-591.03 2960.56,-594.33 2964.81,-599.89"/>
+</g>
+<!-- proc~solve_type_solver_cocr -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node19" class="node">
+<title>proc~solve_type_solver_cocr</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node19"><a xlink:href="../proc/solve_type_solver_cocr.html" xlink:title="solve_type_solver_cocr">
+<polygon fill="#d9534f" stroke="#d9534f" points="2896.5,-612 2761.5,-612 2761.5,-588 2896.5,-588 2896.5,-612"/>
+<text text-anchor="middle" x="2829" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_cocr</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_cocr&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge18" class="edge">
+<title>proc~solve_type_solver_cocr&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2896.63,-590.97C2914.5,-588.55 2933.15,-586.02 2948.69,-583.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2949.46,-587.35 2958.9,-582.54 2948.52,-580.41 2949.46,-587.35"/>
+</g>
+<!-- proc~solve_type_solver_cr -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node20" class="node">
+<title>proc~solve_type_solver_cr</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node20"><a xlink:href="../proc/solve_type_solver_cr.html" xlink:title="solve_type_solver_cr">
+<polygon fill="#d9534f" stroke="#d9534f" points="2890,-570 2768,-570 2768,-546 2890,-546 2890,-570"/>
+<text text-anchor="middle" x="2829" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_cr</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_cr&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge19" class="edge">
+<title>proc~solve_type_solver_cr&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2890.37,-566.18C2910.08,-568.85 2931.35,-571.73 2948.72,-574.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2948.6,-577.6 2958.98,-575.47 2949.54,-570.66 2948.6,-577.6"/>
+</g>
+<!-- proc~solve_type_solver_crs -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node21" class="node">
+<title>proc~solve_type_solver_crs</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node21"><a xlink:href="../proc/solve_type_solver_crs.html" xlink:title="solve_type_solver_crs">
+<polygon fill="#d9534f" stroke="#d9534f" points="2892.5,-528 2765.5,-528 2765.5,-504 2892.5,-504 2892.5,-528"/>
+<text text-anchor="middle" x="2829" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_crs</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_crs&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge20" class="edge">
+<title>proc~solve_type_solver_crs&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2892.56,-526.74C2902.94,-529.48 2913.43,-532.86 2923,-537 2937.07,-543.09 2951.33,-552.49 2962.63,-560.85"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2960.56,-563.67 2970.63,-566.97 2964.81,-558.11 2960.56,-563.67"/>
+</g>
+<!-- proc~solve_type_solver_fgmres -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node22" class="node">
+<title>proc~solve_type_solver_fgmres</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node22"><a xlink:href="../proc/solve_type_solver_fgmres.html" xlink:title="solve_type_solver_fgmres">
+<polygon fill="#d9534f" stroke="#d9534f" points="2903,-486 2755,-486 2755,-462 2903,-462 2903,-486"/>
+<text text-anchor="middle" x="2829" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_fgmres</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_fgmres&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge21" class="edge">
+<title>proc~solve_type_solver_fgmres&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2903.16,-485.16C2910.15,-487.78 2916.9,-491.02 2923,-495 2946.76,-510.52 2964.64,-538.47 2974.96,-557.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2971.87,-559.5 2979.53,-566.83 2978.11,-556.33 2971.87,-559.5"/>
+</g>
+<!-- proc~solve_type_solver_gmres -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node23" class="node">
+<title>proc~solve_type_solver_gmres</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node23"><a xlink:href="../proc/solve_type_solver_gmres.html" xlink:title="solve_type_solver_gmres">
+<polygon fill="#d9534f" stroke="#d9534f" points="2901.5,-444 2756.5,-444 2756.5,-420 2901.5,-420 2901.5,-444"/>
+<text text-anchor="middle" x="2829" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge22" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2901.59,-441.13C2909.29,-444.11 2916.63,-447.98 2923,-453 2956.44,-479.37 2973.11,-528.42 2980.33,-556.92"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2976.94,-557.82 2982.65,-566.75 2983.76,-556.21 2976.94,-557.82"/>
+</g>
+<!-- proc~solve_type_solver_gpbicg -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node24" class="node">
+<title>proc~solve_type_solver_gpbicg</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node24"><a xlink:href="../proc/solve_type_solver_gpbicg.html" xlink:title="solve_type_solver_gpbicg">
+<polygon fill="#d9534f" stroke="#d9534f" points="2903,-402 2755,-402 2755,-378 2903,-378 2903,-402"/>
+<text text-anchor="middle" x="2829" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_gpbicg</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gpbicg&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge23" class="edge">
+<title>proc~solve_type_solver_gpbicg&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2903.05,-398.88C2910.31,-401.92 2917.15,-405.87 2923,-411 2966.44,-449.07 2979.48,-520.36 2983.37,-556.61"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2979.89,-557.02 2984.31,-566.66 2986.86,-556.37 2979.89,-557.02"/>
+</g>
+<!-- proc~solve_type_solver_gpbicr -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node25" class="node">
+<title>proc~solve_type_solver_gpbicr</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node25"><a xlink:href="../proc/solve_type_solver_gpbicr.html" xlink:title="solve_type_solver_gpbicr">
+<polygon fill="#d9534f" stroke="#d9534f" points="2901.5,-360 2756.5,-360 2756.5,-336 2901.5,-336 2901.5,-360"/>
+<text text-anchor="middle" x="2829" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_gpbicr</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gpbicr&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge24" class="edge">
+<title>proc~solve_type_solver_gpbicr&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2901.55,-355.73C2909.44,-358.92 2916.84,-363.23 2923,-369 2976.73,-419.34 2984.65,-513.72 2985.32,-556.68"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2981.82,-556.91 2985.35,-566.9 2988.82,-556.89 2981.82,-556.91"/>
+</g>
+<!-- proc~solve_type_solver_gs -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node26" class="node">
+<title>proc~solve_type_solver_gs</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node26"><a xlink:href="../proc/solve_type_solver_gs.html" xlink:title="solve_type_solver_gs">
+<polygon fill="#d9534f" stroke="#d9534f" points="2891,-318 2767,-318 2767,-294 2891,-294 2891,-318"/>
+<text text-anchor="middle" x="2829" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_gs</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gs&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge25" class="edge">
+<title>proc~solve_type_solver_gs&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2891.4,-309.88C2903.11,-313.19 2914.37,-318.54 2923,-327 2955.95,-359.32 2975.87,-501.32 2982.51,-556.74"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2979.06,-557.37 2983.7,-566.89 2986.01,-556.56 2979.06,-557.37"/>
+</g>
+<!-- proc~solve_type_solver_idr1 -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node27" class="node">
+<title>proc~solve_type_solver_idr1</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node27"><a xlink:href="../proc/solve_type_solver_idr1.html" xlink:title="solve_type_solver_idr1">
+<polygon fill="#d9534f" stroke="#d9534f" points="2895.5,-276 2762.5,-276 2762.5,-252 2895.5,-252 2895.5,-276"/>
+<text text-anchor="middle" x="2829" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_idr1</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_idr1&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge26" class="edge">
+<title>proc~solve_type_solver_idr1&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2895.92,-268.99C2906.03,-272.37 2915.56,-277.46 2923,-285 2961.18,-323.73 2978.3,-494.43 2983.33,-556.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2979.87,-556.97 2984.14,-566.66 2986.84,-556.42 2979.87,-556.97"/>
+</g>
+<!-- proc~solve_type_solver_idr_s -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node28" class="node">
+<title>proc~solve_type_solver_idr_s</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node28"><a xlink:href="../proc/solve_type_solver_idr_s.html" xlink:title="solve_type_solver_idr_s">
+<polygon fill="#d9534f" stroke="#d9534f" points="2897,-234 2761,-234 2761,-210 2897,-210 2897,-234"/>
+<text text-anchor="middle" x="2829" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_idr_s</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_idr_s&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge27" class="edge">
+<title>proc~solve_type_solver_idr_s&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2897.03,-227.15C2906.77,-230.55 2915.89,-235.6 2923,-243 2966.52,-288.28 2980.46,-488.54 2983.98,-556.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2980.51,-556.99 2984.49,-566.81 2987.5,-556.65 2980.51,-556.99"/>
+</g>
+<!-- proc~solve_type_solver_jacobi_iter -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node29" class="node">
+<title>proc~solve_type_solver_jacobi_iter</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node29"><a xlink:href="../proc/solve_type_solver_jacobi_iter.html" xlink:title="solve_type_solver_jacobi_iter">
+<polygon fill="#d9534f" stroke="#d9534f" points="2912.5,-192 2745.5,-192 2745.5,-168 2912.5,-168 2912.5,-192"/>
+<text text-anchor="middle" x="2829" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_jacobi_iter</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_jacobi_iter&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge28" class="edge">
+<title>proc~solve_type_solver_jacobi_iter&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2911.93,-192.01C2915.97,-194.53 2919.71,-197.51 2923,-201 2971.92,-252.92 2982.39,-483.26 2984.5,-556.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2981.01,-556.99 2984.77,-566.9 2988.01,-556.81 2981.01,-556.99"/>
+</g>
+<!-- proc~solve_type_solver_minres -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node30" class="node">
+<title>proc~solve_type_solver_minres</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node30"><a xlink:href="../proc/solve_type_solver_minres.html" xlink:title="solve_type_solver_minres">
+<polygon fill="#d9534f" stroke="#d9534f" points="2903,-150 2755,-150 2755,-126 2903,-126 2903,-150"/>
+<text text-anchor="middle" x="2829" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_minres</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_minres&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge29" class="edge">
+<title>proc~solve_type_solver_minres&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2903.27,-145.32C2910.67,-148.61 2917.49,-153.05 2923,-159 2977.33,-217.6 2984.11,-478.25 2984.91,-556.63"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2981.41,-556.86 2984.99,-566.83 2988.41,-556.8 2981.41,-556.86"/>
+</g>
+<!-- proc~solve_type_solver_orthomin -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node31" class="node">
+<title>proc~solve_type_solver_orthomin</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node31"><a xlink:href="../proc/solve_type_solver_orthomin.html" xlink:title="solve_type_solver_orthomin">
+<polygon fill="#d9534f" stroke="#d9534f" points="2909,-108 2749,-108 2749,-84 2909,-84 2909,-108"/>
+<text text-anchor="middle" x="2829" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_orthomin</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_orthomin&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge30" class="edge">
+<title>proc~solve_type_solver_orthomin&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2909.09,-106.13C2914.25,-109.03 2918.98,-112.6 2923,-117 2982.8,-182.36 2985.66,-473.83 2985.24,-556.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2981.74,-556.92 2985.16,-566.95 2988.74,-556.97 2981.74,-556.92"/>
+</g>
+<!-- proc~solve_type_solver_sor -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node32" class="node">
+<title>proc~solve_type_solver_sor</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node32"><a xlink:href="../proc/solve_type_solver_sor.html" xlink:title="solve_type_solver_sor">
+<polygon fill="#d9534f" stroke="#d9534f" points="2893,-66 2765,-66 2765,-42 2893,-42 2893,-66"/>
+<text text-anchor="middle" x="2829" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_sor</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_sor&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge31" class="edge">
+<title>proc~solve_type_solver_sor&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2893.15,-57.4C2904.45,-60.79 2915.11,-66.29 2923,-75 2988.17,-147.01 2987.09,-468.44 2985.52,-556.58"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2982.02,-556.72 2985.32,-566.79 2989.01,-556.86 2982.02,-556.72"/>
+</g>
+<!-- proc~solve_type_solver_tfqmr -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node33" class="node">
+<title>proc~solve_type_solver_tfqmr</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node33"><a xlink:href="../proc/solve_type_solver_tfqmr.html" xlink:title="solve_type_solver_tfqmr">
+<polygon fill="#d9534f" stroke="#d9534f" points="2899.5,-24 2758.5,-24 2758.5,0 2899.5,0 2899.5,-24"/>
+<text text-anchor="middle" x="2829" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_tfqmr</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_tfqmr&#45;&gt;interface~matvec -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge32" class="edge">
+<title>proc~solve_type_solver_tfqmr&#45;&gt;interface~matvec</title>
+<path fill="none" stroke="#ff0000" d="M2899.8,-17.61C2908.6,-21.04 2916.7,-25.98 2923,-33 2958.53,-72.63 2979.23,-458.08 2983.96,-556.31"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2980.47,-556.77 2984.44,-566.59 2987.46,-556.44 2980.47,-556.77"/>
+</g>
+<!-- interface~assemble_local_picard_hydraulic -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node34" class="node">
+<title>interface~assemble_local_picard_hydraulic</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node34"><a xlink:href="../interface/assemble_local_picard_hydraulic.html" xlink:title="type_hydraulic%assemble_local_picard_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="2698.5,-1158 2422.5,-1158 2422.5,-1134 2698.5,-1134 2698.5,-1158"/>
+<text text-anchor="middle" x="2560.5" y="-1143.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_picard_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_picard_hydraulic&#45;&gt;proc~assemble_local_picard_hydraulic -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge33" class="edge">
+<title>interface~assemble_local_picard_hydraulic&#45;&gt;proc~assemble_local_picard_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2698.65,-1145.49C2707.45,-1145.45 2716.23,-1145.42 2724.83,-1145.39"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2724.85,-1148.89 2734.84,-1145.35 2724.82,-1141.89 2724.85,-1148.89"/>
+</g>
+<!-- interface~assemble_local_picard_thermal -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node35" class="node">
+<title>interface~assemble_local_picard_thermal</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node35"><a xlink:href="../interface/assemble_local_picard_thermal.html" xlink:title="type_thermal%assemble_local_picard_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2691,-1051 2430,-1051 2430,-1027 2691,-1027 2691,-1051"/>
+<text text-anchor="middle" x="2560.5" y="-1036.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_picard_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_picard_thermal&#45;&gt;proc~assemble_local_picard_thermal -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge34" class="edge">
+<title>interface~assemble_local_picard_thermal&#45;&gt;proc~assemble_local_picard_thermal</title>
+<path fill="none" stroke="#ff3600" stroke-dasharray="5,2" d="M2691.24,-1050.2C2703.65,-1051.27 2716.1,-1052.34 2728.16,-1053.38"/>
+<polygon fill="#ff3600" stroke="#ff3600" points="2727.92,-1056.88 2738.19,-1054.25 2728.53,-1049.9 2727.92,-1056.88"/>
+</g>
+<!-- interface~dlerp_abst_fe -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node36" class="node">
+<title>interface~dlerp_abst_fe</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node36"><a xlink:href="../interface/dlerp_abst_fe.html" xlink:title="abst_fe%dlerp_abst_fe">
+<polygon fill="#a7506f" stroke="#a7506f" points="2377.5,-1114 2245.5,-1114 2245.5,-1090 2377.5,-1090 2377.5,-1114"/>
+<text text-anchor="middle" x="2311.5" y="-1099.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_fe%dlerp_abst_fe</text>
+</a>
+</g>
+</g>
+<!-- interface~dlerp_abst_fe&#45;&gt;proc~dlerp_abst_fe -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge35" class="edge">
+<title>interface~dlerp_abst_fe&#45;&gt;proc~dlerp_abst_fe</title>
+<path fill="none" stroke="#ff6d00" stroke-dasharray="5,2" d="M2377.72,-1102C2418.48,-1102 2470.23,-1102 2508.08,-1102"/>
+<polygon fill="#ff6d00" stroke="#ff6d00" points="2508.37,-1105.5 2518.37,-1102 2508.37,-1098.5 2508.37,-1105.5"/>
+</g>
+<!-- interface~solve_type_solver_bicgstab -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node37" class="node">
+<title>interface~solve_type_solver_bicgstab</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node37"><a xlink:href="../interface/solve_type_solver_bicgstab.html" xlink:title="type_solver_bicgstab%solve_type_solver_bicgstab">
+<polygon fill="#a7506f" stroke="#a7506f" points="2699,-948 2422,-948 2422,-924 2699,-924 2699,-948"/>
+<text text-anchor="middle" x="2560.5" y="-933.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_bicgstab%solve_type_solver_bicgstab</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_type_solver_bicgstab&#45;&gt;proc~solve_type_solver_bicgstab -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge36" class="edge">
+<title>interface~solve_type_solver_bicgstab&#45;&gt;proc~solve_type_solver_bicgstab</title>
+<path fill="none" stroke="#ecff00" stroke-dasharray="5,2" d="M2699.04,-936C2712.9,-936 2726.7,-936 2739.83,-936"/>
+<polygon fill="#ecff00" stroke="#ecff00" points="2740.21,-939.5 2750.21,-936 2740.21,-932.5 2740.21,-939.5"/>
+</g>
+<!-- interface~solve_type_solver_gmres -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node38" class="node">
+<title>interface~solve_type_solver_gmres</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node38"><a xlink:href="../interface/solve_type_solver_gmres.html" xlink:title="type_solver_gmres%solve_type_solver_gmres">
+<polygon fill="#a7506f" stroke="#a7506f" points="2687,-444 2434,-444 2434,-420 2687,-420 2687,-444"/>
+<text text-anchor="middle" x="2560.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_gmres%solve_type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_type_solver_gmres&#45;&gt;proc~solve_type_solver_gmres -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge37" class="edge">
+<title>interface~solve_type_solver_gmres&#45;&gt;proc~solve_type_solver_gmres</title>
+<path fill="none" stroke="#005bff" stroke-dasharray="5,2" d="M2687.34,-432C2707.35,-432 2727.59,-432 2746.23,-432"/>
+<polygon fill="#005bff" stroke="#005bff" points="2746.42,-435.5 2756.42,-432 2746.42,-428.5 2746.42,-435.5"/>
+</g>
+<!-- proc~assemble_local_hydraulic -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node39" class="node">
+<title>proc~assemble_local_hydraulic</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node39"><a xlink:href="../proc/assemble_local_hydraulic.html" xlink:title="assemble_local_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="2386,-1159 2237,-1159 2237,-1135 2386,-1135 2386,-1159"/>
+<text text-anchor="middle" x="2311.5" y="-1144.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_picard_hydraulic -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge38" class="edge">
+<title>proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_picard_hydraulic</title>
+<path fill="none" stroke="#ff0000" d="M2386.27,-1146.7C2394.64,-1146.67 2403.37,-1146.63 2412.27,-1146.6"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2412.4,-1150.1 2422.39,-1146.56 2412.37,-1143.1 2412.4,-1150.1"/>
+</g>
+<!-- proc~assemble_local_thermal -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node40" class="node">
+<title>proc~assemble_local_thermal</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node40"><a xlink:href="../proc/assemble_local_thermal.html" xlink:title="assemble_local_thermal">
+<polygon fill="#d9534f" stroke="#d9534f" points="2382.5,-1041 2240.5,-1041 2240.5,-1017 2382.5,-1017 2382.5,-1041"/>
+<text text-anchor="middle" x="2311.5" y="-1026.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_thermal</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_thermal&#45;&gt;interface~assemble_local_picard_thermal -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge39" class="edge">
+<title>proc~assemble_local_thermal&#45;&gt;interface~assemble_local_picard_thermal</title>
+<path fill="none" stroke="#cbff00" d="M2382.62,-1031.84C2394.32,-1032.31 2406.82,-1032.82 2419.55,-1033.33"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="2419.67,-1036.84 2429.81,-1033.75 2419.96,-1029.85 2419.67,-1036.84"/>
+</g>
+<!-- proc~dlerp_domain -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node41" class="node">
+<title>proc~dlerp_domain</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node41"><a xlink:href="../proc/dlerp_domain.html" xlink:title="type_domain%dlerp_domain">
+<polygon fill="#d9534f" stroke="#d9534f" points="2165,-1120 2000,-1120 2000,-1096 2165,-1096 2165,-1120"/>
+<text text-anchor="middle" x="2082.5" y="-1105.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_domain%dlerp_domain</text>
+</a>
+</g>
+</g>
+<!-- proc~dlerp_domain&#45;&gt;interface~dlerp_abst_fe -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge40" class="edge">
+<title>proc~dlerp_domain&#45;&gt;interface~dlerp_abst_fe</title>
+<path fill="none" stroke="#00ff66" d="M2165.13,-1105.84C2187.95,-1105.24 2212.63,-1104.59 2235.08,-1103.99"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="2235.31,-1107.49 2245.21,-1103.73 2235.12,-1100.49 2235.31,-1107.49"/>
+</g>
+<!-- proc~lerp_states -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node42" class="node">
+<title>proc~lerp_states</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node42"><a xlink:href="../proc/lerp_states.html" xlink:title="type_assemble_workspace%lerp_states">
+<polygon fill="#d9534f" stroke="#d9534f" points="2193.5,-1078 1971.5,-1078 1971.5,-1054 2193.5,-1054 2193.5,-1078"/>
+<text text-anchor="middle" x="2082.5" y="-1063.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assemble_workspace%lerp_states</text>
+</a>
+</g>
+</g>
+<!-- proc~lerp_states&#45;&gt;interface~dlerp_abst_fe -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge41" class="edge">
+<title>proc~lerp_states&#45;&gt;interface~dlerp_abst_fe</title>
+<path fill="none" stroke="#00ff66" d="M2159.4,-1078.04C2183.87,-1081.92 2210.97,-1086.22 2235.38,-1090.09"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="2234.88,-1093.55 2245.3,-1091.66 2235.98,-1086.64 2234.88,-1093.55"/>
+</g>
+<!-- interface~assemble_local_hydraulic -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node43" class="node">
+<title>interface~assemble_local_hydraulic</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node43"><a xlink:href="../interface/assemble_local_hydraulic.html" xlink:title="type_hydraulic%assemble_local_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="2201,-1162 1964,-1162 1964,-1138 2201,-1138 2201,-1162"/>
+<text text-anchor="middle" x="2082.5" y="-1147.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_hydraulic&#45;&gt;proc~assemble_local_hydraulic -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge42" class="edge">
+<title>interface~assemble_local_hydraulic&#45;&gt;proc~assemble_local_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2201.32,-1148.44C2209.92,-1148.33 2218.48,-1148.22 2226.81,-1148.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2226.9,-1151.61 2236.85,-1147.97 2226.8,-1144.61 2226.9,-1151.61"/>
+</g>
+<!-- interface~assemble_local_thermal -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node44" class="node">
+<title>interface~assemble_local_thermal</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node44"><a xlink:href="../interface/assemble_local_thermal.html" xlink:title="type_thermal%assemble_local_thermal">
+<polygon fill="#a7506f" stroke="#a7506f" points="2193.5,-1036 1971.5,-1036 1971.5,-1012 2193.5,-1012 2193.5,-1036"/>
+<text text-anchor="middle" x="2082.5" y="-1021.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_thermal%assemble_local_thermal</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_thermal&#45;&gt;proc~assemble_local_thermal -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge43" class="edge">
+<title>interface~assemble_local_thermal&#45;&gt;proc~assemble_local_thermal</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M2193.68,-1026.43C2205.99,-1026.7 2218.37,-1026.97 2230.21,-1027.23"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="2230.39,-1030.74 2240.46,-1027.46 2230.54,-1023.74 2230.39,-1030.74"/>
+</g>
+<!-- proc~assemble_initialize_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node45" class="node">
+<title>proc~assemble_initialize_ftcms</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node45"><a xlink:href="../proc/assemble_initialize_ftcms.html" xlink:title="assemble_initialize_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1928,-1078 1780,-1078 1780,-1054 1928,-1054 1928,-1078"/>
+<text text-anchor="middle" x="1854" y="-1063.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_initialize_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_initialize_ftcms&#45;&gt;proc~lerp_states -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge44" class="edge">
+<title>proc~assemble_initialize_ftcms&#45;&gt;proc~lerp_states</title>
+<path fill="none" stroke="#7f00ff" d="M1928.23,-1066C1938.81,-1066 1949.94,-1066 1961.15,-1066"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1961.47,-1069.5 1971.47,-1066 1961.47,-1062.5 1961.47,-1069.5"/>
+</g>
+<!-- interface~assemble_initialize_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node46" class="node">
+<title>interface~assemble_initialize_ftcms</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node46"><a xlink:href="../interface/assemble_initialize_ftcms.html" xlink:title="type_ftcms%assemble_initialize_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1744,-1078 1529,-1078 1529,-1054 1744,-1054 1744,-1078"/>
+<text text-anchor="middle" x="1636.5" y="-1063.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%assemble_initialize_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_initialize_ftcms&#45;&gt;proc~assemble_initialize_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge46" class="edge">
+<title>interface~assemble_initialize_ftcms&#45;&gt;proc~assemble_initialize_ftcms</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M1744.3,-1066C1752.88,-1066 1761.47,-1066 1769.84,-1066"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1769.94,-1069.5 1779.94,-1066 1769.94,-1062.5 1769.94,-1069.5"/>
+</g>
+<!-- proc~assemble_local_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node47" class="node">
+<title>proc~assemble_local_ftcms</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node47"><a xlink:href="../proc/assemble_local_ftcms.html" xlink:title="assemble_local_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1918.5,-1036 1789.5,-1036 1789.5,-1012 1918.5,-1012 1918.5,-1036"/>
+<text text-anchor="middle" x="1854" y="-1021.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_ftcms&#45;&gt;interface~assemble_local_thermal -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge45" class="edge">
+<title>proc~assemble_local_ftcms&#45;&gt;interface~assemble_local_thermal</title>
+<path fill="none" stroke="#00ff00" d="M1918.7,-1024C1931.98,-1024 1946.41,-1024 1960.99,-1024"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1961.1,-1027.5 1971.1,-1024 1961.1,-1020.5 1961.1,-1027.5"/>
+</g>
+<!-- interface~assemble_local_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node48" class="node">
+<title>interface~assemble_local_ftcms</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node48"><a xlink:href="../interface/assemble_local_ftcms.html" xlink:title="type_ftcms%assemble_local_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1734.5,-1036 1538.5,-1036 1538.5,-1012 1734.5,-1012 1734.5,-1036"/>
+<text text-anchor="middle" x="1636.5" y="-1021.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%assemble_local_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_ftcms&#45;&gt;proc~assemble_local_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge48" class="edge">
+<title>interface~assemble_local_ftcms&#45;&gt;proc~assemble_local_ftcms</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1734.53,-1024C1749.46,-1024 1764.66,-1024 1778.97,-1024"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1779.22,-1027.5 1789.22,-1024 1779.22,-1020.5 1779.22,-1027.5"/>
+</g>
+<!-- proc~assemble_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node49" class="node">
+<title>proc~assemble_ftcms</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node49"><a xlink:href="../proc/assemble_ftcms.html" xlink:title="assemble_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1493,-1057 1395,-1057 1395,-1033 1493,-1033 1493,-1057"/>
+<text text-anchor="middle" x="1444" y="-1042.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_ftcms&#45;&gt;interface~assemble_initialize_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge47" class="edge">
+<title>proc~assemble_ftcms&#45;&gt;interface~assemble_initialize_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M1493.07,-1050.3C1501.08,-1051.18 1509.68,-1052.13 1518.55,-1053.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1518.34,-1056.61 1528.66,-1054.22 1519.1,-1049.65 1518.34,-1056.61"/>
+</g>
+<!-- proc~assemble_ftcms&#45;&gt;interface~assemble_local_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge49" class="edge">
+<title>proc~assemble_ftcms&#45;&gt;interface~assemble_local_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M1493.07,-1039.7C1503.92,-1038.5 1515.86,-1037.19 1528.08,-1035.84"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1528.83,-1039.28 1538.38,-1034.71 1528.06,-1032.32 1528.83,-1039.28"/>
+</g>
+<!-- interface~assemble_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node50" class="node">
+<title>interface~assemble_ftcms</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node50"><a xlink:href="../interface/assemble_ftcms.html" xlink:title="type_ftcms%assemble_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1359,-1057 1193,-1057 1193,-1033 1359,-1033 1359,-1057"/>
+<text text-anchor="middle" x="1276" y="-1042.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%assemble_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_ftcms&#45;&gt;proc~assemble_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge50" class="edge">
+<title>interface~assemble_ftcms&#45;&gt;proc~assemble_ftcms</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1359.03,-1045C1367.64,-1045 1376.27,-1045 1384.54,-1045"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1384.8,-1048.5 1394.8,-1045 1384.8,-1041.5 1384.8,-1048.5"/>
+</g>
+<!-- proc~solve_time_step_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node51" class="node">
+<title>proc~solve_time_step_ftcms</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node51"><a xlink:href="../proc/solve_time_step_ftcms.html" xlink:title="solve_time_step_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="637,-1057 505,-1057 505,-1033 637,-1033 637,-1057"/>
+<text text-anchor="middle" x="571" y="-1042.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~assemble_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge51" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~assemble_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M637.2,-1045.74C649.11,-1045.85 661.43,-1045.94 673,-1046 888.11,-1047.06 941.89,-1046.91 1157,-1046 1165.32,-1045.96 1173.97,-1045.92 1182.63,-1045.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1182.82,-1049.36 1192.79,-1045.79 1182.77,-1042.36 1182.82,-1049.36"/>
+</g>
+<!-- interface~solve_time_step_staggered_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node54" class="node">
+<title>interface~solve_time_step_staggered_ftcms</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node54"><a xlink:href="../interface/solve_time_step_staggered_ftcms.html" xlink:title="type_ftcms%solve_time_step_staggered_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="931,-1037 673,-1037 673,-1013 931,-1013 931,-1037"/>
+<text text-anchor="middle" x="802" y="-1022.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_staggered_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_staggered_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge56" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_staggered_ftcms</title>
+<path fill="none" stroke="#00ffff" d="M637.01,-1039.32C645.27,-1038.6 653.96,-1037.84 662.85,-1037.07"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="663.3,-1040.54 672.95,-1036.18 662.69,-1033.57 663.3,-1040.54"/>
+</g>
+<!-- proc~solve_time_step_staggered_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node52" class="node">
+<title>proc~solve_time_step_staggered_ftcms</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node52"><a xlink:href="../proc/solve_time_step_staggered_ftcms.html" xlink:title="solve_time_step_staggered_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1157,-1037 967,-1037 967,-1013 1157,-1013 1157,-1037"/>
+<text text-anchor="middle" x="1062" y="-1022.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_staggered_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_staggered_ftcms&#45;&gt;interface~assemble_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge52" class="edge">
+<title>proc~solve_time_step_staggered_ftcms&#45;&gt;interface~assemble_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M1157.22,-1033.89C1165.63,-1034.68 1174.15,-1035.49 1182.54,-1036.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1182.43,-1039.78 1192.71,-1037.24 1183.09,-1032.81 1182.43,-1039.78"/>
+</g>
+<!-- interface~solve_time_step_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node53" class="node">
+<title>interface~solve_time_step_ftcms</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node53"><a xlink:href="../interface/solve_time_step_ftcms.html" xlink:title="type_ftcms%solve_time_step_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="469,-1057 270,-1057 270,-1033 469,-1033 469,-1057"/>
+<text text-anchor="middle" x="369.5" y="-1042.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge53" class="edge">
+<title>interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M469.08,-1045C477.74,-1045 486.4,-1045 494.82,-1045"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="494.94,-1048.5 504.94,-1045 494.94,-1041.5 494.94,-1048.5"/>
+</g>
+<!-- interface~solve_time_step_staggered_ftcms&#45;&gt;proc~solve_time_step_staggered_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge54" class="edge">
+<title>interface~solve_time_step_staggered_ftcms&#45;&gt;proc~solve_time_step_staggered_ftcms</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M931.24,-1025C939.79,-1025 948.33,-1025 956.73,-1025"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="956.9,-1028.5 966.9,-1025 956.9,-1021.5 956.9,-1028.5"/>
+</g>
+<!-- proc~run_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node55" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node55"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-1057 169,-1057 169,-1033 234,-1033 234,-1057"/>
+<text text-anchor="middle" x="201.5" y="-1042.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge55" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M234.11,-1045C241.85,-1045 250.57,-1045 259.76,-1045"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="259.88,-1048.5 269.88,-1045 259.88,-1041.5 259.88,-1048.5"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_node56" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_interface~~is_mkl_handle_ready_coo~~CalledByGraph_node56"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="133,-1057 0,-1057 0,-1033 133,-1033 133,-1057"/>
+<text text-anchor="middle" x="66.5" y="-1042.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="interface~~is_mkl_handle_ready_coo~~CalledByGraph_edge57" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M133.22,-1045C141.87,-1045 150.53,-1045 158.63,-1045"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="158.89,-1048.5 168.89,-1045 158.89,-1041.5 158.89,-1048.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfaceis_mkl_handle_ready_cooCalledByGraph = svgPanZoom('#interfaceis_mkl_handle_ready_cooCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>private pure module function is_mkl_handle_ready_coo(self) result(ready)  
+    <a href="../proc/is_mkl_handle_ready_coo.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~562"></span>
+              class(<a href='../type/type_matrix_coo.html'>type_matrix_coo</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <h3>Return Value <span class="anchor" id="variable-ready~3"></span><small>logical</small></h3>
+    
+    <h3>Description</h3>
+    <p>Returns .true. if the MKL handle is committed and ready for SpMV.</p>
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-07-13 12:46 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

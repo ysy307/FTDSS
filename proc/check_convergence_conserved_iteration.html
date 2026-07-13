@@ -1,0 +1,1061 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>check_convergence_conserved_iteration &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>check_convergence_conserved_iteration
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">33 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/iteration_manager.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/iteration_manager.f90.html'>iteration_manager.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/control_iteration_manager.html'>control_iteration_manager</a></li>
+            <li class="breadcrumb-item active" aria-current="page">check_convergence_conserved_iteration</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/check_convergence_conserved_iteration.html#src">check_convergence_conserved_iteration</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine check_convergence_conserved_iteration(self, enthalpy, density, residual_thermal, residual_hydraulic, check_thermal, check_hydraulic)  
+</h2>
+    
+
+    <p>Conserved-quantity convergence check (PDF 6.2.4). Evaluates a single coupled
+indicator from the nodal enthalpy/effective-density increments and the
+per-block residual ratio, then sets the converged/diverged flags of both
+active physics accordingly.</p>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_iteration.html'>type_iteration</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~48"></span>
+              class(<a href='../type/type_iteration.html'>type_iteration</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-enthalpy"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>enthalpy</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-density"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>density</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-residual_thermal"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>residual_thermal</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-residual_hydraulic"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>residual_hydraulic</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-check_thermal"></span>
+              logical,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>check_thermal</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-check_hydraulic"></span>
+              logical,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>check_hydraulic</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~check_convergence_conserved_iteration~~CallsGraph Pages: 1 -->
+<svg id="proccheck_convergence_conserved_iterationCallsGraph" width="641pt" height="94pt"
+ viewBox="0.00 0.00 641.00 93.68" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph" class="graph" transform="scale(0.28 0.28) rotate(0) translate(4 330.54)">
+<title>proc~~check_convergence_conserved_iteration~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-330.54 2285,-330.54 2285,4 -4,4"/>
+<!-- proc~check_convergence_conserved_iteration -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node1" class="node">
+<title>proc~check_convergence_conserved_iteration</title>
+<polygon fill="none" stroke="black" points="313,-188.54 0,-188.54 0,-164.54 313,-164.54 313,-188.54"/>
+<text text-anchor="middle" x="156.5" y="-174.14" font-family="Helvetica,sans-Serif" font-size="10.50">type_iteration%check_convergence_conserved_iteration</text>
+</g>
+<!-- proc~check_conserved_setting -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node2" class="node">
+<title>proc~check_conserved_setting</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node2"><a xlink:href="../proc/check_conserved_setting.html" xlink:title="type_iteration_setting%check_conserved_setting">
+<polygon fill="#d9534f" stroke="#d9534f" points="620,-268.54 349,-268.54 349,-244.54 620,-244.54 620,-268.54"/>
+<text text-anchor="middle" x="484.5" y="-254.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration_setting%check_conserved_setting</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_conserved_iteration&#45;&gt;proc~check_conserved_setting -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge1" class="edge">
+<title>proc~check_convergence_conserved_iteration&#45;&gt;proc~check_conserved_setting</title>
+<path fill="none" stroke="#ff0000" d="M206.66,-188.6C264.96,-202.91 362.06,-226.74 424.4,-242.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="423.93,-245.52 434.48,-244.51 425.6,-238.73 423.93,-245.52"/>
+</g>
+<!-- proc~is_compute_none_iteration -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node3" class="node">
+<title>proc~is_compute_none_iteration</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node3"><a xlink:href="../proc/is_compute_none_iteration.html" xlink:title="type_iteration%is_compute_none_iteration">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="604,-209.54 365,-209.54 365,-185.54 604,-185.54 604,-209.54"/>
+<text text-anchor="middle" x="484.5" y="-195.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%is_compute_none_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_conserved_iteration&#45;&gt;proc~is_compute_none_iteration -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge2" class="edge">
+<title>proc~check_convergence_conserved_iteration&#45;&gt;proc~is_compute_none_iteration</title>
+<path fill="none" stroke="#ff0000" d="M313.34,-186.58C327.17,-187.47 341.06,-188.36 354.63,-189.24"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="354.73,-192.75 364.93,-189.9 355.18,-185.77 354.73,-192.75"/>
+</g>
+<!-- proc~set_converged_iteration -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node4" class="node">
+<title>proc~set_converged_iteration</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node4"><a xlink:href="../proc/set_converged_iteration.html" xlink:title="type_iteration%set_converged_iteration">
+<polygon fill="#d9534f" stroke="#d9534f" points="596.5,-167.54 372.5,-167.54 372.5,-143.54 596.5,-143.54 596.5,-167.54"/>
+<text text-anchor="middle" x="484.5" y="-153.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%set_converged_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_conserved_iteration&#45;&gt;proc~set_converged_iteration -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge3" class="edge">
+<title>proc~check_convergence_conserved_iteration&#45;&gt;proc~set_converged_iteration</title>
+<path fill="none" stroke="#ff0000" d="M313.34,-166.5C329.72,-165.44 346.2,-164.38 362.11,-163.36"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="362.73,-166.83 372.48,-162.69 362.28,-159.84 362.73,-166.83"/>
+</g>
+<!-- proc~set_diverged_iteration -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node5" class="node">
+<title>proc~set_diverged_iteration</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node5"><a xlink:href="../proc/set_diverged_iteration.html" xlink:title="type_iteration%set_diverged_iteration">
+<polygon fill="#d9534f" stroke="#d9534f" points="591.5,-125.54 377.5,-125.54 377.5,-101.54 591.5,-101.54 591.5,-125.54"/>
+<text text-anchor="middle" x="484.5" y="-111.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%set_diverged_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_conserved_iteration&#45;&gt;proc~set_diverged_iteration -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge4" class="edge">
+<title>proc~check_convergence_conserved_iteration&#45;&gt;proc~set_diverged_iteration</title>
+<path fill="none" stroke="#ff0000" d="M208.53,-164.46C247.01,-155.56 301.16,-143.51 349,-134.54 362.55,-132 376.91,-129.52 391.01,-127.22"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="391.9,-130.62 401.21,-125.57 390.78,-123.71 391.9,-130.62"/>
+</g>
+<!-- interface~check_conserved_convergence_control -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node6" class="node">
+<title>interface~check_conserved_convergence_control</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node6"><a xlink:href="../interface/check_conserved_convergence_control.html" xlink:title="type_convergence_control%check_conserved_convergence_control">
+<polygon fill="#a7506f" stroke="#a7506f" points="1028,-285.54 656,-285.54 656,-261.54 1028,-261.54 1028,-285.54"/>
+<text text-anchor="middle" x="842" y="-271.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_control%check_conserved_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- proc~check_conserved_setting&#45;&gt;interface~check_conserved_convergence_control -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge5" class="edge">
+<title>proc~check_conserved_setting&#45;&gt;interface~check_conserved_convergence_control</title>
+<path fill="none" stroke="#ff0000" d="M620.15,-262.98C628.56,-263.38 637.1,-263.79 645.69,-264.2"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="645.65,-267.7 655.81,-264.68 645.99,-260.71 645.65,-267.7"/>
+</g>
+<!-- proc~is_valid_physics_type -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node7" class="node">
+<title>proc~is_valid_physics_type</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node7"><a xlink:href="../proc/is_valid_physics_type.html" xlink:title="type_physics_types%is_valid_physics_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="959.5,-125.54 724.5,-125.54 724.5,-101.54 959.5,-101.54 959.5,-125.54"/>
+<text text-anchor="middle" x="842" y="-111.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_types%is_valid_physics_type</text>
+</a>
+</g>
+</g>
+<!-- proc~set_converged_iteration&#45;&gt;proc~is_valid_physics_type -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge6" class="edge">
+<title>proc~set_converged_iteration&#45;&gt;proc~is_valid_physics_type</title>
+<path fill="none" stroke="#00ffff" d="M581.96,-143.5C606.13,-140.52 632.01,-137.38 656,-134.54 677.71,-131.97 700.87,-129.29 723.19,-126.74"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="723.83,-130.19 733.37,-125.58 723.04,-123.24 723.83,-130.19"/>
+</g>
+<!-- proc~raise_error -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node8" class="node">
+<title>proc~raise_error</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node8"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="877,-167.54 807,-167.54 807,-143.54 877,-143.54 877,-167.54"/>
+<text text-anchor="middle" x="842" y="-153.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~set_converged_iteration&#45;&gt;proc~raise_error -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge7" class="edge">
+<title>proc~set_converged_iteration&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ffff" d="M596.52,-155.54C664.23,-155.54 747.05,-155.54 796.84,-155.54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="796.94,-159.04 806.94,-155.54 796.94,-152.04 796.94,-159.04"/>
+</g>
+<!-- strip -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node9" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="1443,-125.54 1389,-125.54 1389,-101.54 1443,-101.54 1443,-125.54"/>
+<text text-anchor="middle" x="1416" y="-111.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~set_converged_iteration&#45;&gt;strip -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge8" class="edge">
+<title>proc~set_converged_iteration&#45;&gt;strip</title>
+<path fill="none" stroke="#00ffff" d="M566.09,-167.55C745.18,-193.01 1171.06,-246.36 1306,-199.54 1343.76,-186.44 1378.33,-154.23 1398.01,-133.16"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1400.66,-135.45 1404.79,-125.69 1395.48,-130.74 1400.66,-135.45"/>
+</g>
+<!-- proc~set_diverged_iteration&#45;&gt;proc~is_valid_physics_type -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge9" class="edge">
+<title>proc~set_diverged_iteration&#45;&gt;proc~is_valid_physics_type</title>
+<path fill="none" stroke="#7f00ff" d="M591.68,-113.54C630.16,-113.54 674.01,-113.54 714.09,-113.54"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="714.19,-117.04 724.19,-113.54 714.19,-110.04 714.19,-117.04"/>
+</g>
+<!-- proc~set_diverged_iteration&#45;&gt;proc~raise_error -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge10" class="edge">
+<title>proc~set_diverged_iteration&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#7f00ff" d="M581.96,-125.58C606.13,-128.55 632.01,-131.7 656,-134.54 704.12,-140.23 759.32,-146.46 796.81,-150.64"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="796.57,-154.14 806.89,-151.77 797.34,-147.18 796.57,-154.14"/>
+</g>
+<!-- proc~set_diverged_iteration&#45;&gt;strip -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge11" class="edge">
+<title>proc~set_diverged_iteration&#45;&gt;strip</title>
+<path fill="none" stroke="#7f00ff" d="M580.6,-101.48C605.15,-98.47 631.55,-95.3 656,-92.54 943.66,-60.02 1042.99,70.43 1306,-50.54 1328.34,-60.81 1321.32,-79.25 1342,-92.54 1353.01,-99.61 1366.45,-104.36 1378.78,-107.52"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1378.28,-110.99 1388.81,-109.81 1379.84,-104.17 1378.28,-110.99"/>
+</g>
+<!-- proc~check_conserved_convergence_control -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node10" class="node">
+<title>proc~check_conserved_convergence_control</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node10"><a xlink:href="../proc/check_conserved_convergence_control.html" xlink:title="check_conserved_convergence_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="1296,-285.54 1074,-285.54 1074,-261.54 1296,-261.54 1296,-285.54"/>
+<text text-anchor="middle" x="1185" y="-271.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">check_conserved_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- interface~check_conserved_convergence_control&#45;&gt;proc~check_conserved_convergence_control -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge12" class="edge">
+<title>interface~check_conserved_convergence_control&#45;&gt;proc~check_conserved_convergence_control</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1028.47,-273.54C1040.43,-273.54 1052.29,-273.54 1063.82,-273.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1063.85,-277.04 1073.85,-273.54 1063.85,-270.04 1063.85,-277.04"/>
+</g>
+<!-- proc~in_group_physics_type -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node11" class="node">
+<title>proc~in_group_physics_type</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node11"><a xlink:href="../proc/in_group_physics_type.html" xlink:title="type_physics_types%in_group_physics_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1306,-83.54 1064,-83.54 1064,-59.54 1306,-59.54 1306,-83.54"/>
+<text text-anchor="middle" x="1185" y="-69.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_types%in_group_physics_type</text>
+</a>
+</g>
+</g>
+<!-- proc~is_valid_physics_type&#45;&gt;proc~in_group_physics_type -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge13" class="edge">
+<title>proc~is_valid_physics_type&#45;&gt;proc~in_group_physics_type</title>
+<path fill="none" stroke="#7fff00" d="M940.72,-101.5C983.17,-96.27 1033.03,-90.13 1076.52,-84.78"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1077.07,-88.24 1086.56,-83.54 1076.21,-81.29 1077.07,-88.24"/>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge15" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#00ffff" d="M877.17,-164.03C954.92,-181.87 1150.37,-218.28 1306,-176.54 1338.14,-167.92 1370.61,-147.27 1391.64,-131.95"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1394.01,-134.55 1399.92,-125.76 1389.82,-128.94 1394.01,-134.55"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node12" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node12"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1245.5,-125.54 1124.5,-125.54 1124.5,-101.54 1245.5,-101.54 1245.5,-125.54"/>
+<text text-anchor="middle" x="1185" y="-111.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge14" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#00ffff" d="M877.12,-151.88C914.26,-147.85 975.39,-141.06 1028,-134.54 1056.26,-131.03 1087.35,-126.9 1114.3,-123.24"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1114.97,-126.68 1124.4,-121.86 1114.02,-119.74 1114.97,-126.68"/>
+</g>
+<!-- to_string -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node13" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="1214,-167.54 1156,-167.54 1156,-143.54 1214,-143.54 1214,-167.54"/>
+<text text-anchor="middle" x="1185" y="-153.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge16" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#00ffff" d="M877.26,-155.54C941.22,-155.54 1078.4,-155.54 1145.48,-155.54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1145.62,-159.04 1155.62,-155.54 1145.62,-152.04 1145.62,-159.04"/>
+</g>
+<!-- proc~block_residual_norm -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node14" class="node">
+<title>proc~block_residual_norm</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node14"><a xlink:href="../proc/block_residual_norm.html" xlink:title="block_residual_norm">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1477,-306.54 1355,-306.54 1355,-282.54 1477,-282.54 1477,-306.54"/>
+<text text-anchor="middle" x="1416" y="-292.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">block_residual_norm</text>
+</a>
+</g>
+</g>
+<!-- proc~check_conserved_convergence_control&#45;&gt;proc~block_residual_norm -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge17" class="edge">
+<title>proc~check_conserved_convergence_control&#45;&gt;proc~block_residual_norm</title>
+<path fill="none" stroke="#ff0000" d="M1296.14,-283.64C1312.78,-285.16 1329.54,-286.7 1345.01,-288.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1344.7,-291.61 1354.98,-289.03 1345.34,-284.64 1344.7,-291.61"/>
+</g>
+<!-- proc~weighted_rms_conserved -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node15" class="node">
+<title>proc~weighted_rms_conserved</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node15"><a xlink:href="../proc/weighted_rms_conserved.html" xlink:title="weighted_rms_conserved">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1490,-264.54 1342,-264.54 1342,-240.54 1490,-240.54 1490,-264.54"/>
+<text text-anchor="middle" x="1416" y="-250.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">weighted_rms_conserved</text>
+</a>
+</g>
+</g>
+<!-- proc~check_conserved_convergence_control&#45;&gt;proc~weighted_rms_conserved -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge18" class="edge">
+<title>proc~check_conserved_convergence_control&#45;&gt;proc~weighted_rms_conserved</title>
+<path fill="none" stroke="#ff0000" d="M1296.14,-263.44C1308.1,-262.34 1320.13,-261.24 1331.7,-260.18"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1332.09,-263.66 1341.73,-259.26 1331.46,-256.69 1332.09,-263.66"/>
+</g>
+<!-- proc~in_group_physics_type&#45;&gt;strip -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge19" class="edge">
+<title>proc~in_group_physics_type&#45;&gt;strip</title>
+<path fill="none" stroke="#7fff00" d="M1255.84,-83.55C1272.3,-86.44 1289.77,-89.56 1306,-92.54 1330.27,-97 1357.53,-102.25 1378.72,-106.39"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1378.11,-109.83 1388.59,-108.32 1379.45,-102.96 1378.11,-109.83"/>
+</g>
+<!-- to_lower -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node16" class="node">
+<title>to_lower</title>
+<polygon fill="#777777" stroke="#777777" points="1445,-83.54 1387,-83.54 1387,-59.54 1445,-59.54 1445,-83.54"/>
+<text text-anchor="middle" x="1416" y="-69.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_lower</text>
+</g>
+<!-- proc~in_group_physics_type&#45;&gt;to_lower -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge20" class="edge">
+<title>proc~in_group_physics_type&#45;&gt;to_lower</title>
+<path fill="none" stroke="#7fff00" d="M1306.2,-71.54C1331.83,-71.54 1357.08,-71.54 1376.79,-71.54"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1376.85,-75.04 1386.85,-71.54 1376.85,-68.04 1376.85,-75.04"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge21" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#00ffff" d="M1245.57,-113.54C1287.6,-113.54 1342.58,-113.54 1378.34,-113.54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1378.78,-117.04 1388.78,-113.54 1378.78,-110.04 1378.78,-117.04"/>
+</g>
+<!-- interface~vector_norm2 -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node17" class="node">
+<title>interface~vector_norm2</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node17"><a xlink:href="../interface/vector_norm2.html" xlink:title="vector_norm2">
+<polygon fill="#a7506f" stroke="#a7506f" points="1613,-306.54 1526,-306.54 1526,-282.54 1613,-282.54 1613,-306.54"/>
+<text text-anchor="middle" x="1569.5" y="-292.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_norm2</text>
+</a>
+</g>
+</g>
+<!-- proc~block_residual_norm&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge22" class="edge">
+<title>proc~block_residual_norm&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#ff0000" d="M1477.31,-294.54C1489.95,-294.54 1503.18,-294.54 1515.53,-294.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1515.65,-298.04 1525.65,-294.54 1515.65,-291.04 1515.65,-298.04"/>
+</g>
+<!-- proc~norm_2_native~2 -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node18" class="node">
+<title>proc~norm_2_native~2</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node18"><a xlink:href="../proc/norm_2_native~2.html" xlink:title="norm_2_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1945.5,-326.54 1854.5,-326.54 1854.5,-302.54 1945.5,-302.54 1945.5,-326.54"/>
+<text text-anchor="middle" x="1900" y="-312.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_native</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm2&#45;&gt;proc~norm_2_native~2 -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge23" class="edge">
+<title>interface~vector_norm2&#45;&gt;proc~norm_2_native~2</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1613.11,-297.13C1672.27,-300.73 1779.32,-307.25 1844.31,-311.21"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1844.17,-314.71 1854.37,-311.82 1844.6,-307.72 1844.17,-314.71"/>
+</g>
+<!-- proc~norm_2_vector_dp -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node19" class="node">
+<title>proc~norm_2_vector_dp</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node19"><a xlink:href="../proc/norm_2_vector_dp.html" xlink:title="norm_2_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1760,-286.54 1649,-286.54 1649,-262.54 1760,-262.54 1760,-286.54"/>
+<text text-anchor="middle" x="1704.5" y="-272.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm2&#45;&gt;proc~norm_2_vector_dp -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge24" class="edge">
+<title>interface~vector_norm2&#45;&gt;proc~norm_2_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1613.31,-288.1C1621.39,-286.89 1630.01,-285.59 1638.59,-284.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1639.24,-287.74 1648.61,-282.79 1638.2,-280.82 1639.24,-287.74"/>
+</g>
+<!-- proc~norm_2_native -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node21" class="node">
+<title>proc~norm_2_native</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node21"><a xlink:href="../proc/norm_2_native.html" xlink:title="norm_2_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="2144,-326.54 2053,-326.54 2053,-302.54 2144,-302.54 2144,-326.54"/>
+<text text-anchor="middle" x="2098.5" y="-312.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_native</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_2_native~2&#45;&gt;proc~norm_2_native -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge25" class="edge">
+<title>proc~norm_2_native~2&#45;&gt;proc~norm_2_native</title>
+<path fill="none" stroke="#ff0000" d="M1945.59,-314.54C1974.38,-314.54 2012.04,-314.54 2042.66,-314.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2042.75,-318.04 2052.75,-314.54 2042.75,-311.04 2042.75,-318.04"/>
+</g>
+<!-- proc~norm_2_vector_dp&#45;&gt;proc~norm_2_native~2 -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge27" class="edge">
+<title>proc~norm_2_vector_dp&#45;&gt;proc~norm_2_native~2</title>
+<path fill="none" stroke="#00ffff" d="M1760.05,-286.04C1771.9,-288.53 1784.37,-291.13 1796,-293.54 1811.69,-296.78 1828.72,-300.27 1844.34,-303.46"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1843.88,-306.93 1854.37,-305.5 1845.27,-300.07 1843.88,-306.93"/>
+</g>
+<!-- interface~get_data_vector_dp -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node20" class="node">
+<title>interface~get_data_vector_dp</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node20"><a xlink:href="../interface/get_data_vector_dp.html" xlink:title="type_vector_dp%get_data_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="2004,-284.54 1796,-284.54 1796,-260.54 2004,-260.54 2004,-284.54"/>
+<text text-anchor="middle" x="1900" y="-270.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_2_vector_dp&#45;&gt;interface~get_data_vector_dp -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge26" class="edge">
+<title>proc~norm_2_vector_dp&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#00ffff" d="M1760.17,-273.97C1768.21,-273.89 1776.72,-273.8 1785.42,-273.71"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1785.74,-277.21 1795.7,-273.61 1785.67,-270.21 1785.74,-277.21"/>
+</g>
+<!-- proc~get_data_vector_dp -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node23" class="node">
+<title>proc~get_data_vector_dp</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CallsGraph_node23"><a xlink:href="../proc/get_data_vector_dp.html" xlink:title="get_data_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="2157,-284.54 2040,-284.54 2040,-260.54 2157,-260.54 2157,-284.54"/>
+<text text-anchor="middle" x="2098.5" y="-270.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge28" class="edge">
+<title>interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M2004.14,-272.54C2012.74,-272.54 2021.29,-272.54 2029.53,-272.54"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2029.77,-276.04 2039.77,-272.54 2029.77,-269.04 2029.77,-276.04"/>
+</g>
+<!-- mpi_allreduce -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_node22" class="node">
+<title>mpi_allreduce</title>
+<polygon fill="#777777" stroke="#777777" points="2281,-326.54 2193,-326.54 2193,-302.54 2281,-302.54 2281,-326.54"/>
+<text text-anchor="middle" x="2237" y="-312.14" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_allreduce</text>
+</g>
+<!-- proc~norm_2_native&#45;&gt;mpi_allreduce -->
+<g id="proc~~check_convergence_conserved_iteration~~CallsGraph_edge29" class="edge">
+<title>proc~norm_2_native&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#00ffff" d="M2144.2,-314.54C2156.34,-314.54 2169.63,-314.54 2182.22,-314.54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2182.6,-318.04 2192.6,-314.54 2182.6,-311.04 2182.6,-318.04"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccheck_convergence_conserved_iterationCallsGraph = svgPanZoom('#proccheck_convergence_conserved_iterationCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~check_convergence_conserved_iteration~~CalledByGraph Pages: 1 -->
+<svg id="proccheck_convergence_conserved_iterationCalledByGraph" width="641pt" height="10pt"
+ viewBox="0.00 0.00 641.00 9.89" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph" class="graph" transform="scale(0.31 0.31) rotate(0) translate(4 28)">
+<title>proc~~check_convergence_conserved_iteration~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 2071,-28 2071,4 -4,4"/>
+<!-- proc~check_convergence_conserved_iteration -->
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph_node1" class="node">
+<title>proc~check_convergence_conserved_iteration</title>
+<polygon fill="none" stroke="black" points="2067,-24 1754,-24 1754,0 2067,0 2067,-24"/>
+<text text-anchor="middle" x="1910.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_iteration%check_convergence_conserved_iteration</text>
+</g>
+<!-- proc~check_convergence_conserved_control -->
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph_node2" class="node">
+<title>proc~check_convergence_conserved_control</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CalledByGraph_node2"><a xlink:href="../proc/check_convergence_conserved_control.html" xlink:title="type_control%check_convergence_conserved_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="1718,-24 1421,-24 1421,0 1718,0 1718,-24"/>
+<text text-anchor="middle" x="1569.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control%check_convergence_conserved_control</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_conserved_control&#45;&gt;proc~check_convergence_conserved_iteration -->
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph_edge1" class="edge">
+<title>proc~check_convergence_conserved_control&#45;&gt;proc~check_convergence_conserved_iteration</title>
+<path fill="none" stroke="#ff0000" d="M1718.2,-12C1726.73,-12 1735.34,-12 1743.92,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1744,-15.5 1754,-12 1744,-8.5 1744,-15.5"/>
+</g>
+<!-- proc~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph_node3" class="node">
+<title>proc~solve_time_step_check_convergence_conserved_ftcms</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CalledByGraph_node3"><a xlink:href="../proc/solve_time_step_check_convergence_conserved_ftcms.html" xlink:title="solve_time_step_check_convergence_conserved_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1385,-24 1081,-24 1081,0 1385,0 1385,-24"/>
+<text text-anchor="middle" x="1233" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_check_convergence_conserved_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;proc~check_convergence_conserved_control -->
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph_edge2" class="edge">
+<title>proc~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;proc~check_convergence_conserved_control</title>
+<path fill="none" stroke="#ff0000" d="M1385.1,-12C1393.63,-12 1402.21,-12 1410.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1410.77,-15.5 1420.77,-12 1410.77,-8.5 1410.77,-15.5"/>
+</g>
+<!-- interface~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph_node4" class="node">
+<title>interface~solve_time_step_check_convergence_conserved_ftcms</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CalledByGraph_node4"><a xlink:href="../interface/solve_time_step_check_convergence_conserved_ftcms.html" xlink:title="type_ftcms%solve_time_step_check_convergence_conserved_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1045,-24 673,-24 673,0 1045,0 1045,-24"/>
+<text text-anchor="middle" x="859" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_check_convergence_conserved_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;proc~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph_edge3" class="edge">
+<title>interface~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;proc~solve_time_step_check_convergence_conserved_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1045.18,-12C1053.67,-12 1062.15,-12 1070.57,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1070.8,-15.5 1080.8,-12 1070.8,-8.5 1070.8,-15.5"/>
+</g>
+<!-- proc~solve_time_step_ftcms -->
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph_node5" class="node">
+<title>proc~solve_time_step_ftcms</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CalledByGraph_node5"><a xlink:href="../proc/solve_time_step_ftcms.html" xlink:title="solve_time_step_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="637,-24 505,-24 505,0 637,0 637,-24"/>
+<text text-anchor="middle" x="571" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph_edge4" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_check_convergence_conserved_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M637.26,-12C645.34,-12 653.9,-12 662.78,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="662.92,-15.5 672.92,-12 662.92,-8.5 662.92,-15.5"/>
+</g>
+<!-- interface~solve_time_step_ftcms -->
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph_node6" class="node">
+<title>interface~solve_time_step_ftcms</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CalledByGraph_node6"><a xlink:href="../interface/solve_time_step_ftcms.html" xlink:title="type_ftcms%solve_time_step_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="469,-24 270,-24 270,0 469,0 469,-24"/>
+<text text-anchor="middle" x="369.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms -->
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph_edge5" class="edge">
+<title>interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M469.08,-12C477.74,-12 486.4,-12 494.82,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="494.94,-15.5 504.94,-12 494.94,-8.5 494.94,-15.5"/>
+</g>
+<!-- proc~run_ftcms -->
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph_node7" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CalledByGraph_node7"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 169,-24 169,0 234,0 234,-24"/>
+<text text-anchor="middle" x="201.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms -->
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph_edge6" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M234.11,-12C241.85,-12 250.57,-12 259.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="259.88,-15.5 269.88,-12 259.88,-8.5 259.88,-15.5"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph_node8" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_proc~~check_convergence_conserved_iteration~~CalledByGraph_node8"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="133,-24 0,-24 0,0 133,0 133,-24"/>
+<text text-anchor="middle" x="66.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="proc~~check_convergence_conserved_iteration~~CalledByGraph_edge7" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M133.22,-12C141.87,-12 150.53,-12 158.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="158.89,-15.5 168.89,-12 158.89,-8.5 158.89,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccheck_convergence_conserved_iterationCalledByGraph = svgPanZoom('#proccheck_convergence_conserved_iterationCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">check_convergence_conserved_iteration</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">enthalpy</span><span class="p">,</span><span class="w"> </span><span class="n">density</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                     </span><span class="n">residual_thermal</span><span class="p">,</span><span class="w"> </span><span class="n">residual_hydraulic</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                                     </span><span class="n">check_thermal</span><span class="p">,</span><span class="w"> </span><span class="n">check_hydraulic</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_iteration</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">enthalpy</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">density</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">residual_thermal</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">residual_hydraulic</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">check_thermal</span>
+<span class="w">        </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">check_hydraulic</span>
+
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_ok</span><span class="p">,</span><span class="w"> </span><span class="n">is_diverged</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">is_compute_none</span><span class="p">())</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">check_thermal</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                call </span><span class="n">self</span><span class="p">%</span><span class="n">set_converged</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">THERMAL</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">set_diverged</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">THERMAL</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.)</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="n">check_hydraulic</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                call </span><span class="n">self</span><span class="p">%</span><span class="n">set_converged</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">set_diverged</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.)</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">            return</span>
+<span class="k">        end if</span>
+
+<span class="k">        </span><span class="n">is_ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="n">is_diverged</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">%</span><span class="n">check_conserved</span><span class="p">(</span><span class="n">enthalpy</span><span class="p">,</span><span class="w"> </span><span class="n">density</span><span class="p">,</span><span class="w"> </span><span class="n">residual_thermal</span><span class="p">,</span><span class="w"> </span><span class="n">residual_hydraulic</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                           </span><span class="n">self</span><span class="p">%</span><span class="n">nonlinear_iter</span><span class="p">,</span><span class="w"> </span><span class="n">check_thermal</span><span class="p">,</span><span class="w"> </span><span class="n">check_hydraulic</span><span class="p">,</span><span class="w"> </span><span class="n">is_ok</span><span class="p">,</span><span class="w"> </span><span class="n">is_diverged</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">check_thermal</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">set_converged</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">THERMAL</span><span class="p">,</span><span class="w"> </span><span class="n">is_ok</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">is_diverged</span><span class="p">)</span><span class="w"> </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">set_diverged</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">THERMAL</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.)</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">check_hydraulic</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">set_converged</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">,</span><span class="w"> </span><span class="n">is_ok</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">is_diverged</span><span class="p">)</span><span class="w"> </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">set_diverged</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.)</span>
+<span class="w">        </span><span class="k">end if</span>
+<span class="k">    end subroutine </span><span class="n">check_convergence_conserved_iteration</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-07-13 12:46 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

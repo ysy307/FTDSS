@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">37 statements</a>
+                 title=" 0.0% of total for procedures.">38 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -180,7 +180,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~500"></span>
+              <span class="anchor" id="variable-self~713"></span>
               class(<a href='../type/type_matrix_dense.html'>type_matrix_dense</a>),
             </td>
 <td>intent(inout)</td>
@@ -195,7 +195,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-op~5"></span>
+              <span class="anchor" id="variable-op~50"></span>
               type(<a href='../type/type_constant_id.html'>type_constant_id</a>),
             </td>
 <td>intent(in)</td>
@@ -210,7 +210,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-alpha"></span>
+              <span class="anchor" id="variable-alpha~16"></span>
               type(<a href='../type/type_vector_dp.html'>type_vector_dp</a>),
             </td>
 <td>intent(in)</td>
@@ -574,20 +574,14 @@ large graphs.</div>
 
 <span class="w">        </span><span class="n">alpha_data</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">alpha</span><span class="p">%</span><span class="n">get_data</span><span class="p">()</span>
 
-<span class="w">        </span><span class="c">! alphaのサイズチェック (行数分必要)</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">alpha_data</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">nrows</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">alpha_data</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span><span class="w"> </span><span class="n">ncols</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
 <span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS</span><span class="p">%</span><span class="n">ILL_OPERATIONS</span>
 <span class="w">            </span><span class="k">return</span>
 <span class="k">        end if</span>
 
-<span class="w">        </span><span class="c">!-------------------------------------------------</span>
-<span class="w">        </span><span class="c">! Symmetric Scaling: A_ij &lt;- A_ij * alpha(i) * alpha(j)</span>
-<span class="w">        </span><span class="c">!-------------------------------------------------</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">op</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MATRIX_OPS</span><span class="p">%</span><span class="n">SCALE_SYMM_DIAG</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-<span class="w">            </span><span class="c">! Fortranは列優先(Column-Major)なので、j(列)を外側、i(行)を内側にするのが</span>
-<span class="w">            </span><span class="c">! メモリアクセス的には最速ですが、alpha(j)へのアクセス頻度等を考慮し</span>
-<span class="w">            </span><span class="c">! コンパイラの最適化に任せつつ、OpenMPは列(j)で切ります。</span>
-
+<span class="k">        select case</span><span class="w"> </span><span class="p">(</span><span class="n">op</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">MATRIX_OPS</span><span class="p">%</span><span class="n">SCALE_SYMM_DIAG</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
+<span class="w">            </span><span class="c">! Column-major: outer loop on j gives contiguous inner loop on i</span>
 <span class="w">            </span><span class="c">!$omp parallel do default(shared) private(i, j)</span>
 <span class="w">            </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">ncols</span>
 <span class="w">                </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">nrows</span>
@@ -595,31 +589,19 @@ large graphs.</div>
 <span class="w">                </span><span class="k">end do</span>
 <span class="k">            end do</span>
 <span class="w">            </span><span class="c">!$omp end parallel do</span>
-
 <span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS</span><span class="p">%</span><span class="n">SUCCESS</span>
-
-<span class="w">            </span><span class="c">!-------------------------------------------------</span>
-<span class="w">            </span><span class="c">! Jacobi Scaling: A_ij &lt;- A_ij * alpha(i)</span>
-<span class="w">            </span><span class="c">! (左からのスケーリング: 行 i に alpha(i) を掛ける)</span>
-<span class="w">            </span><span class="c">!-------------------------------------------------</span>
-<span class="w">        </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">op</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MATRIX_OPS</span><span class="p">%</span><span class="n">SCALE_JACOBI</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">MATRIX_OPS</span><span class="p">%</span><span class="n">SCALE_JACOBI</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
 <span class="w">            </span><span class="c">!$omp parallel do default(shared) private(i, j)</span>
 <span class="w">            </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">ncols</span>
 <span class="w">                </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">nrows</span>
-<span class="w">                    </span><span class="c">! ここで val(i, j) はメモリ連続アクセス</span>
-<span class="w">                    </span><span class="c">! alpha(i) は各ステップで値が変わるがキャッシュに載りやすい</span>
 <span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">val</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">alpha_data</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 <span class="w">                </span><span class="k">end do</span>
 <span class="k">            end do</span>
 <span class="w">            </span><span class="c">!$omp end parallel do</span>
-
 <span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS</span><span class="p">%</span><span class="n">SUCCESS</span>
-
-<span class="w">        </span><span class="k">else</span>
-<span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS</span><span class="p">%</span><span class="n">ILL_OPERATIONS</span>
-<span class="w">        </span><span class="k">end if</span>
-
+<span class="w">        </span><span class="k">case </span><span class="n">default</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MATRIX_STATUS</span><span class="p">%</span><span class="n">ILL_OPERATIONS</span>
+<span class="w">        </span><span class="k">end select</span>
 <span class="k">    end subroutine </span><span class="n">scale_dense</span>
 </pre></div>
 
@@ -644,7 +626,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.1% of total for procedures.">135 statements</a>
+                 title=" 0.1% of total for procedures.">142 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -179,7 +179,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1092"></span>
+              <span class="anchor" id="variable-self~2281"></span>
               class(<a href='../type/type_output_observation.html'>type_output_observation</a>),
             </td>
 <td>intent(inout)</td>
@@ -194,7 +194,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-dir_output~8"></span>
+              <span class="anchor" id="variable-dir_output~12"></span>
               character(len=*),
             </td>
 <td>intent(in)</td>
@@ -209,7 +209,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-config~50"></span>
+              <span class="anchor" id="variable-config~96"></span>
               type(<a href='../type/type_config_observation.html'>type_config_observation</a>),
             </td>
 <td>intent(in)</td>
@@ -720,7 +720,7 @@ large graphs.</div>
 <span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">OUTPUT_VARIABLE_TYPES</span><span class="p">%</span><span class="n">PRESSURE</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
 <span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">do_output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
 <span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">variable_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">variable</span>
-<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">variable_unit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;m&quot;</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">variable_unit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Pa&quot;</span>
 <span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">file_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">strip</span><span class="p">(</span><span class="n">dir_output</span><span class="p">)</span><span class="o">//</span><span class="s2">&quot;obsf_P.&quot;</span><span class="o">//</span><span class="n">strip</span><span class="p">(</span><span class="n">file_format</span><span class="p">%</span><span class="n">NAME</span><span class="p">)</span>
 <span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">io_unit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">open</span><span class="w"> </span><span class="p">(</span><span class="n">strip</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">file_name</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;wt&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">iostat</span><span class="o">=</span><span class="n">iostat</span><span class="p">)</span>
 <span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">iostat</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">call </span><span class="n">raise_error</span><span class="p">(</span><span class="n">ERROR_CODES</span><span class="p">%</span><span class="n">OPEN_FILE_FAILED</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">file_name</span><span class="p">)</span>
@@ -736,6 +736,13 @@ large graphs.</div>
 <span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">variable_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">variable</span>
 <span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">variable_unit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;m/s&quot;</span>
 <span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">file_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">strip</span><span class="p">(</span><span class="n">dir_output</span><span class="p">)</span><span class="o">//</span><span class="s2">&quot;obsf_K.&quot;</span><span class="o">//</span><span class="n">strip</span><span class="p">(</span><span class="n">file_format</span><span class="p">%</span><span class="n">NAME</span><span class="p">)</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">io_unit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">open</span><span class="w"> </span><span class="p">(</span><span class="n">strip</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">file_name</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;wt&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">iostat</span><span class="o">=</span><span class="n">iostat</span><span class="p">)</span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">iostat</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">call </span><span class="n">raise_error</span><span class="p">(</span><span class="n">ERROR_CODES</span><span class="p">%</span><span class="n">OPEN_FILE_FAILED</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">file_name</span><span class="p">)</span>
+<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="n">OUTPUT_VARIABLE_TYPES</span><span class="p">%</span><span class="n">VAPOR_FLUX</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">do_output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">variable_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">variable</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">variable_unit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;m/s&quot;</span>
+<span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">file_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">strip</span><span class="p">(</span><span class="n">dir_output</span><span class="p">)</span><span class="o">//</span><span class="s2">&quot;obsf_Jv.&quot;</span><span class="o">//</span><span class="n">strip</span><span class="p">(</span><span class="n">file_format</span><span class="p">%</span><span class="n">NAME</span><span class="p">)</span>
 <span class="w">                    </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">io_unit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">open</span><span class="w"> </span><span class="p">(</span><span class="n">strip</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">file_name</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;wt&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">iostat</span><span class="o">=</span><span class="n">iostat</span><span class="p">)</span>
 <span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">iostat</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">call </span><span class="n">raise_error</span><span class="p">(</span><span class="n">ERROR_CODES</span><span class="p">%</span><span class="n">OPEN_FILE_FAILED</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">settings</span><span class="p">(</span><span class="n">variable</span><span class="p">%</span><span class="n">ID</span><span class="p">)%</span><span class="n">file_name</span><span class="p">)</span>
 <span class="w">                </span><span class="k">end select</span>
@@ -801,7 +808,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">19 statements</a>
+                 title=" 0.0% of total for procedures.">22 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -179,7 +179,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1220"></span>
+              <span class="anchor" id="variable-self~20"></span>
               class(<a href='../type/type_input_translator.html'>type_input_translator</a>),
             </td>
 <td>intent(in)</td>
@@ -194,7 +194,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-input~36"></span>
+              <span class="anchor" id="variable-input~5"></span>
               class(<a href='../type/type_input.html'>type_input</a>),
             </td>
 <td>intent(in)</td>
@@ -209,7 +209,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-material_id~38"></span>
+              <span class="anchor" id="variable-material_id~4"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -224,7 +224,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-config~56"></span>
+              <span class="anchor" id="variable-config~5"></span>
               type(<a href='../type/type_config_gcc.html'>type_config_gcc</a>),
             </td>
 <td>intent(inout)</td>
@@ -638,18 +638,23 @@ large graphs.</div>
 <span class="w">        </span><span class="c">! GCC model processing</span>
 <span class="w">        </span><span class="c">!==================================================</span>
 
-<span class="w">        </span><span class="k">associate</span><span class="w"> </span><span class="p">(</span><span class="n">material</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">material_id</span><span class="p">)%</span><span class="n">phase_change</span><span class="p">%</span><span class="n">equilibrium_model</span><span class="p">)</span>
+<span class="w">        </span><span class="k">associate</span><span class="w"> </span><span class="p">(</span><span class="n">material</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">material_id</span><span class="p">)%</span><span class="n">phase_change</span><span class="p">%</span><span class="n">equilibrium_model</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                   </span><span class="n">phase</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">input</span><span class="p">%</span><span class="n">basic</span><span class="p">%</span><span class="n">materials</span><span class="p">(</span><span class="n">material_id</span><span class="p">)%</span><span class="n">phase_change</span><span class="p">)</span>
 
 <span class="w">            </span><span class="k">call </span><span class="n">config</span><span class="p">%</span><span class="n">reset</span><span class="p">()</span>
 
 <span class="w">            </span><span class="n">config</span><span class="p">%</span><span class="n">material_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">material_id</span>
-<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">material</span><span class="p">%</span><span class="n">segregation</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">material</span><span class="p">%</span><span class="n">segregation</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">phase</span><span class="p">%</span><span class="n">segregation_potential</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 <span class="k">                </span><span class="n">config</span><span class="p">%</span><span class="n">gcc_model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GCC_TYPES</span><span class="p">%</span><span class="n">SEGREGATION</span>
 <span class="w">            </span><span class="k">else</span>
 <span class="k">                </span><span class="n">config</span><span class="p">%</span><span class="n">gcc_model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GCC_TYPES</span><span class="p">%</span><span class="n">NON_SEGREGATION</span>
 <span class="w">            </span><span class="k">end if</span>
 
-<span class="k">        end associate</span>
+<span class="k">            </span><span class="n">config</span><span class="p">%</span><span class="n">segregation_potential</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">phase</span><span class="p">%</span><span class="n">segregation_potential</span>
+<span class="w">            </span><span class="n">config</span><span class="p">%</span><span class="n">T_fringe_low</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">phase</span><span class="p">%</span><span class="n">T_fringe_low</span>
+<span class="w">            </span><span class="n">config</span><span class="p">%</span><span class="n">T_fringe_high</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">phase</span><span class="p">%</span><span class="n">T_fringe_high</span>
+
+<span class="w">        </span><span class="k">end associate</span>
 
 <span class="k">    end subroutine </span><span class="n">execute_basic_gcc</span>
 </pre></div>
@@ -675,7 +680,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

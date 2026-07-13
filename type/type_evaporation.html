@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.3% of total for derived types.</p>Including implementation: 325 statements,  1.2% of total for derived types.">10 statements</a>
+                 title="<p> 0.2% of total for derived types.</p>Including implementation: 365 statements,  1.3% of total for derived types.">11 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,9 +134,9 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_evaporation.html#variable-ice~11">ice</a>
-            <a class="list-group-item" href="../type/type_evaporation.html#variable-initialized~11">initialized</a>
-            <a class="list-group-item" href="../type/type_evaporation.html#variable-water~11">water</a>
+            <a class="list-group-item" href="../type/type_evaporation.html#variable-ice~19">ice</a>
+            <a class="list-group-item" href="../type/type_evaporation.html#variable-initialized~18">initialized</a>
+            <a class="list-group-item" href="../type/type_evaporation.html#variable-water~20">water</a>
         </div>
       </div>
     </div>
@@ -174,7 +174,7 @@
             <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-calc_drho_vapor_saturation_dt">calc_drho_vapor_saturation_dT</a>
             <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-calc_drho_water_dp">calc_drho_water_dP</a>
             <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-calc_drho_water_dt">calc_drho_water_dT</a>
-            <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-calc_latent_heat_vaporization~4">calc_latent_heat_vaporization</a>
+            <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-calc_latent_heat_vaporization">calc_latent_heat_vaporization</a>
             <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-calc_relative_humidity">calc_relative_humidity</a>
             <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-calc_rho_ice">calc_rho_ice</a>
             <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-calc_rho_vapor">calc_rho_vapor</a>
@@ -182,10 +182,11 @@
             <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-calc_rho_water">calc_rho_water</a>
             <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-calc_vapor_content">calc_vapor_content</a>
             <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-calc_vapor_content_derivatives">calc_vapor_content_derivatives</a>
+            <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-calc_vapor_content_with_derivatives">calc_vapor_content_with_derivatives</a>
             <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-deriv_relative_humidity_pressure">deriv_relative_humidity_pressure</a>
             <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-deriv_relative_humidity_temperature">deriv_relative_humidity_temperature</a>
-            <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-initialize~76">initialize</a>
-            <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-is_initialized~9">is_initialized</a>
+            <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-initialize~12">initialize</a>
+            <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-is_initialized~14">is_initialized</a>
             <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-shift_pressure_absolute">shift_pressure_absolute</a>
             <a class="list-group-item" href="../type/type_evaporation.html#boundprocedure-shift_temperature_absolute">shift_temperature_absolute</a>
         </div>
@@ -524,7 +525,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-ice~11"></span>
+              <span class="anchor" id="variable-ice~19"></span>
               type(type_iapws06),
             </td>
               <td>public,</td>
@@ -541,7 +542,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-initialized~11"></span>
+              <span class="anchor" id="variable-initialized~18"></span>
               logical,
             </td>
               <td>public</td>
@@ -558,7 +559,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-water~11"></span>
+              <span class="anchor" id="variable-water~20"></span>
               type(type_iapws97),
             </td>
               <td>public,</td>
@@ -1576,7 +1577,7 @@ Overwritten on exit</p>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc_latent_heat_vaporization~4"></span>
+      <span class="anchor" id="boundprocedure-calc_latent_heat_vaporization"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>calc_latent_heat_vaporization</strong>
@@ -1586,7 +1587,7 @@ Overwritten on exit</p>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_latent_heat_vaporization~4.html'>calc_latent_heat_vaporization</a>(self, temperature, latent_heat)  
+    private  subroutine <a href='../proc/calc_latent_heat_vaporization.html'>calc_latent_heat_vaporization</a>(self, temperature, latent_heat)  
 </h3>
     
 
@@ -2295,6 +2296,120 @@ Overwritten on exit</p>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_vapor_content_with_derivatives"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>calc_vapor_content_with_derivatives</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_vapor_content_with_derivatives.html'>calc_vapor_content_with_derivatives</a>(self, state, vapor_content, dvapor_dP, dvapor_dT)  
+</h3>
+    
+
+  <p>Compute vapor content and its pressure and temperature derivatives together.</p><a href="../proc/calc_vapor_content_with_derivatives.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_evaporation.html'>type_evaporation</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>vapor_content</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dvapor_dP</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dvapor_dT</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
       <span class="anchor" id="boundprocedure-deriv_relative_humidity_pressure"></span>
       <h3>
           procedure, public, pass(self) ::
@@ -2463,7 +2578,7 @@ Overwritten on exit</p>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~76"></span>
+      <span class="anchor" id="boundprocedure-initialize~12"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/initialize_evaporation_model.html'>initialize_evaporation_model</a>
@@ -2532,7 +2647,7 @@ Overwritten on exit</p>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-is_initialized~9"></span>
+      <span class="anchor" id="boundprocedure-is_initialized~14"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>is_initialized</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_initialized_abst_constitutive.html'>is_initialized_abst_constitutive</a>
@@ -2790,6 +2905,7 @@ Overwritten on exit</p>
 
 <span class="w">        </span><span class="c">!&gt; Calculate derivatives of vapor content w.r.t P and T</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_vapor_content_derivatives</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_vapor_content_with_derivatives</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_evaporation</span>
 </pre></div>
 
@@ -2813,7 +2929,7 @@ Overwritten on exit</p>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

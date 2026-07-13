@@ -1,0 +1,788 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>compute_C_eq_hydraulic &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>compute_C_eq_hydraulic
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">17 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/hydraulic_coefficients.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/hydraulic_coefficients.f90.html'>hydraulic_coefficients.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/hydraulic_coefficients.html'>hydraulic_coefficients</a></li>
+            <li class="breadcrumb-item active" aria-current="page">compute_C_eq_hydraulic</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/compute_c_eq_hydraulic.html#src">compute_C_eq_hydraulic</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine compute_C_eq_hydraulic(self, state, C_eq)  
+    <a href="../interface/compute_c_eq_hydraulic.html"><button type="button" class="btn btn-info depwarn">Interface &rarr;</button></a>
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~1238"></span>
+              class(<a href='../type/type_hydraulic.html'>type_hydraulic</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-state~122"></span>
+              type(<a href='../type/type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-c_eq"></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>C_eq</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~compute_c_eq_hydraulic~~CallsGraph Pages: 1 -->
+<svg id="proccompute_c_eq_hydraulicCallsGraph" width="641pt" height="61pt"
+ viewBox="0.00 0.00 641.00 61.13" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph" class="graph" transform="scale(0.45 0.45) rotate(0) translate(4 132)">
+<title>proc~~compute_c_eq_hydraulic~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-132 1422,-132 1422,4 -4,4"/>
+<!-- proc~compute_c_eq_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_node1" class="node">
+<title>proc~compute_c_eq_hydraulic</title>
+<polygon fill="none" stroke="black" points="146,-65 0,-65 0,-41 146,-41 146,-65"/>
+<text text-anchor="middle" x="73" y="-50.6" font-family="Helvetica,sans-Serif" font-size="10.50">compute_C_eq_hydraulic</text>
+</g>
+<!-- proc~calc_density_ice -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_node2" class="node">
+<title>proc~calc_density_ice</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CallsGraph_node2"><a xlink:href="../proc/calc_density_ice.html" xlink:title="type_constitutive_manager%calc_density_ice">
+<polygon fill="#d9534f" stroke="#d9534f" points="442,-107 189,-107 189,-83 442,-83 442,-107"/>
+<text text-anchor="middle" x="315.5" y="-92.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_constitutive_manager%calc_density_ice</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_c_eq_hydraulic&#45;&gt;proc~calc_density_ice -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_edge1" class="edge">
+<title>proc~compute_c_eq_hydraulic&#45;&gt;proc~calc_density_ice</title>
+<path fill="none" stroke="#ff0000" d="M133.91,-65.04C149.55,-68.07 166.39,-71.25 182,-74 196.07,-76.48 211.01,-78.98 225.58,-81.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="225.17,-84.82 235.6,-82.96 226.29,-77.91 225.17,-84.82"/>
+</g>
+<!-- proc~calc_density_water -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_node3" class="node">
+<title>proc~calc_density_water</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CallsGraph_node3"><a xlink:href="../proc/calc_density_water.html" xlink:title="type_constitutive_manager%calc_density_water">
+<polygon fill="#d9534f" stroke="#d9534f" points="449,-65 182,-65 182,-41 449,-41 449,-65"/>
+<text text-anchor="middle" x="315.5" y="-50.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_constitutive_manager%calc_density_water</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_c_eq_hydraulic&#45;&gt;proc~calc_density_water -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_edge2" class="edge">
+<title>proc~compute_c_eq_hydraulic&#45;&gt;proc~calc_density_water</title>
+<path fill="none" stroke="#ff0000" d="M146.16,-53C154.31,-53 162.82,-53 171.49,-53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="171.74,-56.5 181.74,-53 171.74,-49.5 171.74,-56.5"/>
+</g>
+<!-- proc~get_field_dp -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_node4" class="node">
+<title>proc~get_field_dp</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CallsGraph_node4"><a xlink:href="../proc/get_field_dp.html" xlink:title="type_field_dp%get_field_dp">
+<polygon fill="#d9534f" stroke="#d9534f" points="1320.5,-24 1163.5,-24 1163.5,0 1320.5,0 1320.5,-24"/>
+<text text-anchor="middle" x="1242" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_field_dp%get_field_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_c_eq_hydraulic&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_edge3" class="edge">
+<title>proc~compute_c_eq_hydraulic&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#ff0000" d="M127.03,-40.95C144.45,-37.46 163.97,-34.04 182,-32 556.61,10.44 653,-10.11 1030,-11 1070.35,-11.1 1115.04,-11.29 1152.86,-11.49"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1153.32,-14.99 1163.34,-11.54 1153.36,-7.99 1153.32,-14.99"/>
+</g>
+<!-- proc~calc_rho_ice_abst_constitutive -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_node5" class="node">
+<title>proc~calc_rho_ice_abst_constitutive</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CallsGraph_node5"><a xlink:href="../proc/calc_rho_ice_abst_constitutive.html" xlink:title="abst_constitutive%calc_rho_ice_abst_constitutive">
+<polygon fill="#d9534f" stroke="#d9534f" points="764,-107 492,-107 492,-83 764,-83 764,-107"/>
+<text text-anchor="middle" x="628" y="-92.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_constitutive%calc_rho_ice_abst_constitutive</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_density_ice&#45;&gt;proc~calc_rho_ice_abst_constitutive -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_edge4" class="edge">
+<title>proc~calc_density_ice&#45;&gt;proc~calc_rho_ice_abst_constitutive</title>
+<path fill="none" stroke="#ff0000" d="M442.34,-95C455.34,-95 468.62,-95 481.8,-95"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="481.86,-98.5 491.86,-95 481.86,-91.5 481.86,-98.5"/>
+</g>
+<!-- proc~calc_rho_water_abst_constitutive -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_node6" class="node">
+<title>proc~calc_rho_water_abst_constitutive</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CallsGraph_node6"><a xlink:href="../proc/calc_rho_water_abst_constitutive.html" xlink:title="abst_constitutive%calc_rho_water_abst_constitutive">
+<polygon fill="#d9534f" stroke="#d9534f" points="771,-65 485,-65 485,-41 771,-41 771,-65"/>
+<text text-anchor="middle" x="628" y="-50.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_constitutive%calc_rho_water_abst_constitutive</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_density_water&#45;&gt;proc~calc_rho_water_abst_constitutive -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_edge5" class="edge">
+<title>proc~calc_density_water&#45;&gt;proc~calc_rho_water_abst_constitutive</title>
+<path fill="none" stroke="#00ff00" d="M449.08,-53C457.61,-53 466.23,-53 474.84,-53"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="474.94,-56.5 484.94,-53 474.94,-49.5 474.94,-56.5"/>
+</g>
+<!-- calc_rho -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_node7" class="node">
+<title>calc_rho</title>
+<polygon fill="#777777" stroke="#777777" points="947.5,-128 889.5,-128 889.5,-104 947.5,-104 947.5,-128"/>
+<text text-anchor="middle" x="918.5" y="-113.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_rho</text>
+</g>
+<!-- proc~calc_rho_ice_abst_constitutive&#45;&gt;calc_rho -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_edge6" class="edge">
+<title>proc~calc_rho_ice_abst_constitutive&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#ff0000" d="M764.38,-104.85C806.37,-107.91 849.36,-111.04 879.05,-113.2"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="879.14,-116.72 889.37,-113.95 879.65,-109.74 879.14,-116.72"/>
+</g>
+<!-- proc~get_thermo_state_tp -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_node8" class="node">
+<title>proc~get_thermo_state_tp</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CallsGraph_node8"><a xlink:href="../proc/get_thermo_state_tp.html" xlink:title="abst_constitutive%get_thermo_state_TP">
+<polygon fill="#d9534f" stroke="#d9534f" points="1030,-86 807,-86 807,-62 1030,-62 1030,-86"/>
+<text text-anchor="middle" x="918.5" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_constitutive%get_thermo_state_TP</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_rho_ice_abst_constitutive&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_edge7" class="edge">
+<title>proc~calc_rho_ice_abst_constitutive&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#ff0000" d="M764.38,-85.15C775.14,-84.36 785.97,-83.57 796.62,-82.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="797.06,-86.28 806.77,-82.06 796.55,-79.3 797.06,-86.28"/>
+</g>
+<!-- proc~calc_rho_water_abst_constitutive&#45;&gt;calc_rho -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_edge8" class="edge">
+<title>proc~calc_rho_water_abst_constitutive&#45;&gt;calc_rho</title>
+<path fill="none" stroke="#00ffff" d="M739.33,-65.05C750.17,-67.5 760.89,-70.45 771,-74 788.48,-80.13 789.65,-88.51 807,-95 830.11,-103.64 857.31,-108.87 878.95,-111.95"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="878.71,-115.45 889.08,-113.29 879.63,-108.51 878.71,-115.45"/>
+</g>
+<!-- proc~calc_rho_water_abst_constitutive&#45;&gt;proc~get_thermo_state_tp -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_edge9" class="edge">
+<title>proc~calc_rho_water_abst_constitutive&#45;&gt;proc~get_thermo_state_tp</title>
+<path fill="none" stroke="#00ffff" d="M771.14,-63.35C779.63,-63.96 788.13,-64.58 796.53,-65.19"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="796.48,-68.7 806.71,-65.94 796.99,-61.72 796.48,-68.7"/>
+</g>
+<!-- proc~is_valid_iapws97_liquid_state -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_node9" class="node">
+<title>proc~is_valid_iapws97_liquid_state</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CallsGraph_node9"><a xlink:href="../proc/is_valid_iapws97_liquid_state.html" xlink:title="is_valid_iapws97_liquid_state">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1001.5,-44 835.5,-44 835.5,-20 1001.5,-20 1001.5,-44"/>
+<text text-anchor="middle" x="918.5" y="-29.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">is_valid_iapws97_liquid_state</text>
+</a>
+</g>
+</g>
+<!-- proc~calc_rho_water_abst_constitutive&#45;&gt;proc~is_valid_iapws97_liquid_state -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_edge10" class="edge">
+<title>proc~calc_rho_water_abst_constitutive&#45;&gt;proc~is_valid_iapws97_liquid_state</title>
+<path fill="none" stroke="#00ffff" d="M771.14,-42.65C789.57,-41.31 808.04,-39.97 825.36,-38.71"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="825.69,-42.19 835.41,-37.98 825.18,-35.21 825.69,-42.19"/>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_edge11" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~get_field_dp</title>
+<path fill="none" stroke="#00ff00" d="M987.77,-61.95C1001.78,-59.21 1016.4,-56.17 1030,-53 1046.17,-49.22 1049.81,-46.67 1066,-43 1094.41,-36.55 1125.66,-30.65 1153.8,-25.76"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1154.75,-29.14 1164.01,-24 1153.57,-22.25 1154.75,-29.14"/>
+</g>
+<!-- proc~shift_pressure_absolute_abst_constitutive -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_node10" class="node">
+<title>proc~shift_pressure_absolute_abst_constitutive</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CallsGraph_node10"><a xlink:href="../proc/shift_pressure_absolute_abst_constitutive.html" xlink:title="abst_constitutive%shift_pressure_absolute_abst_constitutive">
+<polygon fill="#d9534f" stroke="#d9534f" points="1407,-76 1077,-76 1077,-52 1407,-52 1407,-76"/>
+<text text-anchor="middle" x="1242" y="-61.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_constitutive%shift_pressure_absolute_abst_constitutive</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_constitutive -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_edge12" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_pressure_absolute_abst_constitutive</title>
+<path fill="none" stroke="#00ff00" d="M1030.14,-70.56C1041.92,-70.19 1054.1,-69.81 1066.38,-69.43"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1066.84,-72.92 1076.72,-69.11 1066.62,-65.92 1066.84,-72.92"/>
+</g>
+<!-- proc~shift_temperature_absolute_abst_constitutive -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_node11" class="node">
+<title>proc~shift_temperature_absolute_abst_constitutive</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CallsGraph_node11"><a xlink:href="../proc/shift_temperature_absolute_abst_constitutive.html" xlink:title="abst_constitutive%shift_temperature_absolute_abst_constitutive">
+<polygon fill="#d9534f" stroke="#d9534f" points="1418,-118 1066,-118 1066,-94 1418,-94 1418,-118"/>
+<text text-anchor="middle" x="1242" y="-103.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_constitutive%shift_temperature_absolute_abst_constitutive</text>
+</a>
+</g>
+</g>
+<!-- proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_constitutive -->
+<g id="proc~~compute_c_eq_hydraulic~~CallsGraph_edge13" class="edge">
+<title>proc~get_thermo_state_tp&#45;&gt;proc~shift_temperature_absolute_abst_constitutive</title>
+<path fill="none" stroke="#00ff00" d="M1030.14,-85.01C1055.91,-87.58 1083.59,-90.33 1110.14,-92.98"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1109.96,-96.47 1120.26,-93.98 1110.65,-89.51 1109.96,-96.47"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccompute_c_eq_hydraulicCallsGraph = svgPanZoom('#proccompute_c_eq_hydraulicCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~compute_c_eq_hydraulic~~CalledByGraph Pages: 1 -->
+<svg id="proccompute_c_eq_hydraulicCalledByGraph" width="641pt" height="10pt"
+ viewBox="0.00 0.00 641.00 10.22" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph" class="graph" transform="scale(0.32 0.32) rotate(0) translate(4 28)">
+<title>proc~~compute_c_eq_hydraulic~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 2004,-28 2004,4 -4,4"/>
+<!-- proc~compute_c_eq_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph_node1" class="node">
+<title>proc~compute_c_eq_hydraulic</title>
+<polygon fill="none" stroke="black" points="2000,-24 1854,-24 1854,0 2000,0 2000,-24"/>
+<text text-anchor="middle" x="1927" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">compute_C_eq_hydraulic</text>
+</g>
+<!-- interface~compute_c_eq_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph_node2" class="node">
+<title>interface~compute_c_eq_hydraulic</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CalledByGraph_node2"><a xlink:href="../interface/compute_c_eq_hydraulic.html" xlink:title="type_hydraulic%compute_C_eq_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="1818,-24 1584,-24 1584,0 1818,0 1818,-24"/>
+<text text-anchor="middle" x="1701" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%compute_C_eq_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_c_eq_hydraulic&#45;&gt;proc~compute_c_eq_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph_edge1" class="edge">
+<title>interface~compute_c_eq_hydraulic&#45;&gt;proc~compute_c_eq_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1818.26,-12C1826.9,-12 1835.5,-12 1843.86,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1843.92,-15.5 1853.92,-12 1843.92,-8.5 1843.92,-15.5"/>
+</g>
+<!-- proc~compute_iteration_capacity_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph_node3" class="node">
+<title>proc~compute_iteration_capacity_hydraulic</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CalledByGraph_node3"><a xlink:href="../proc/compute_iteration_capacity_hydraulic.html" xlink:title="compute_iteration_capacity_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="1548,-24 1333,-24 1333,0 1548,0 1548,-24"/>
+<text text-anchor="middle" x="1440.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_iteration_capacity_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_iteration_capacity_hydraulic&#45;&gt;interface~compute_c_eq_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph_edge2" class="edge">
+<title>proc~compute_iteration_capacity_hydraulic&#45;&gt;interface~compute_c_eq_hydraulic</title>
+<path fill="none" stroke="#ff0000" d="M1548.13,-12C1556.63,-12 1565.26,-12 1573.87,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1573.97,-15.5 1583.97,-12 1573.97,-8.5 1573.97,-15.5"/>
+</g>
+<!-- interface~compute_iteration_capacity_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph_node4" class="node">
+<title>interface~compute_iteration_capacity_hydraulic</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CalledByGraph_node4"><a xlink:href="../interface/compute_iteration_capacity_hydraulic.html" xlink:title="type_hydraulic%compute_iteration_capacity_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="1297,-24 994,-24 994,0 1297,0 1297,-24"/>
+<text text-anchor="middle" x="1145.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%compute_iteration_capacity_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_iteration_capacity_hydraulic&#45;&gt;proc~compute_iteration_capacity_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph_edge3" class="edge">
+<title>interface~compute_iteration_capacity_hydraulic&#45;&gt;proc~compute_iteration_capacity_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1297.29,-12C1305.76,-12 1314.22,-12 1322.54,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1322.62,-15.5 1332.62,-12 1322.62,-8.5 1322.62,-15.5"/>
+</g>
+<!-- proc~assemble_local_picard_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph_node5" class="node">
+<title>proc~assemble_local_picard_hydraulic</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CalledByGraph_node5"><a xlink:href="../proc/assemble_local_picard_hydraulic.html" xlink:title="assemble_local_picard_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="958,-24 770,-24 770,0 958,0 958,-24"/>
+<text text-anchor="middle" x="864" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_picard_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_picard_hydraulic&#45;&gt;interface~compute_iteration_capacity_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph_edge4" class="edge">
+<title>proc~assemble_local_picard_hydraulic&#45;&gt;interface~compute_iteration_capacity_hydraulic</title>
+<path fill="none" stroke="#ff0000" d="M958.07,-12C966.4,-12 974.98,-12 983.68,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="983.93,-15.5 993.93,-12 983.93,-8.5 983.93,-15.5"/>
+</g>
+<!-- interface~assemble_local_picard_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph_node6" class="node">
+<title>interface~assemble_local_picard_hydraulic</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CalledByGraph_node6"><a xlink:href="../interface/assemble_local_picard_hydraulic.html" xlink:title="type_hydraulic%assemble_local_picard_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="734,-24 458,-24 458,0 734,0 734,-24"/>
+<text text-anchor="middle" x="596" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_picard_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_picard_hydraulic&#45;&gt;proc~assemble_local_picard_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph_edge5" class="edge">
+<title>interface~assemble_local_picard_hydraulic&#45;&gt;proc~assemble_local_picard_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M734.29,-12C742.87,-12 751.42,-12 759.81,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="759.95,-15.5 769.95,-12 759.95,-8.5 759.95,-15.5"/>
+</g>
+<!-- proc~assemble_local_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph_node7" class="node">
+<title>proc~assemble_local_hydraulic</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CalledByGraph_node7"><a xlink:href="../proc/assemble_local_hydraulic.html" xlink:title="assemble_local_hydraulic">
+<polygon fill="#d9534f" stroke="#d9534f" points="422,-24 273,-24 273,0 422,0 422,-24"/>
+<text text-anchor="middle" x="347.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">assemble_local_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_picard_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph_edge6" class="edge">
+<title>proc~assemble_local_hydraulic&#45;&gt;interface~assemble_local_picard_hydraulic</title>
+<path fill="none" stroke="#ff0000" d="M422.12,-12C430.28,-12 438.79,-12 447.46,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="447.71,-15.5 457.71,-12 447.71,-8.5 447.71,-15.5"/>
+</g>
+<!-- interface~assemble_local_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph_node8" class="node">
+<title>interface~assemble_local_hydraulic</title>
+<g id="a_proc~~compute_c_eq_hydraulic~~CalledByGraph_node8"><a xlink:href="../interface/assemble_local_hydraulic.html" xlink:title="type_hydraulic%assemble_local_hydraulic">
+<polygon fill="#a7506f" stroke="#a7506f" points="237,-24 0,-24 0,0 237,0 237,-24"/>
+<text text-anchor="middle" x="118.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hydraulic%assemble_local_hydraulic</text>
+</a>
+</g>
+</g>
+<!-- interface~assemble_local_hydraulic&#45;&gt;proc~assemble_local_hydraulic -->
+<g id="proc~~compute_c_eq_hydraulic~~CalledByGraph_edge7" class="edge">
+<title>interface~assemble_local_hydraulic&#45;&gt;proc~assemble_local_hydraulic</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M237.32,-12C245.92,-12 254.48,-12 262.81,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="262.85,-15.5 272.85,-12 262.85,-8.5 262.85,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccompute_c_eq_hydraulicCalledByGraph = svgPanZoom('#proccompute_c_eq_hydraulicCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">compute_C_eq_hydraulic</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">C_eq</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_hydraulic</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_state</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">state</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">C_eq</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">rho_w</span><span class="p">,</span><span class="w"> </span><span class="n">rho_i</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dQw_dP</span><span class="p">,</span><span class="w"> </span><span class="n">dQi_dP</span><span class="p">,</span><span class="w"> </span><span class="n">dQv_dP</span>
+
+<span class="w">        </span><span class="n">dQw_dP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="n">dQi_dP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="n">dQv_dP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">state</span><span class="p">%</span><span class="n">dQw_dP</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">dQw_dP</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">state</span><span class="p">%</span><span class="n">dQi_dP</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">dQi_dP</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">state</span><span class="p">%</span><span class="n">dQv_dP</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">dQv_dP</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">calc_density_water</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">rho_w</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">physics</span><span class="p">%</span><span class="n">calc_density_ice</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">rho_i</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! C_eq = dTheta/dP = dQw_dP + (rho_i/rho_w)*dQi_dP + dQv_dP</span>
+<span class="w">        </span><span class="c">! (rho_v ~ rho_w approximation consistent with calc_effective_density)</span>
+<span class="w">        </span><span class="c">! Clamp to non-negative: thermodynamically dTheta/dP &gt;= 0 always holds,</span>
+<span class="w">        </span><span class="c">! but phase_systems compensation (dQw_dP = -dQi_dP) can cause numerical</span>
+<span class="w">        </span><span class="c">! sign reversal near the freezing front.</span>
+<span class="w">        </span><span class="n">C_eq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">dQw_dP</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">rho_i</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">rho_w</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dQi_dP</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dQv_dP</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">compute_C_eq_hydraulic</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-07-13 12:46 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -36,6 +36,7 @@ module io_output_manager
         procedure, pass(self), public :: output_history => output_history_output_manager
         procedure, pass(self), public :: output_system_log => output_system_log_output_manager
         procedure, pass(self), public :: get_log_io_unit => get_log_io_unit_output_manager
+        procedure, pass(self), public :: get_obs_fe_ids => get_obs_fe_ids_output_manager
     end type type_output_manager
 
 contains
@@ -103,7 +104,7 @@ contains
     end subroutine output_fields_output_manager
 
     subroutine output_history_output_manager(self, time, temperature, water_content, ice_content, &
-                                             vapor_content, pressure)
+                                             vapor_content, pressure, water_flux, vapor_flux)
         implicit none
         class(type_output_manager), intent(inout) :: self
         real(real64), intent(in) :: time
@@ -112,13 +113,17 @@ contains
         real(real64), intent(in), optional :: ice_content(:)
         real(real64), intent(in), optional :: vapor_content(:)
         real(real64), intent(in), optional :: pressure(:)
+        type(type_coordinate_array_dp), intent(in), optional :: water_flux
+        type(type_coordinate_array_dp), intent(in), optional :: vapor_flux
 
         call self%observation%output_history(time=time, &
                                              temperature=temperature, &
                                              water_content=water_content, &
                                              ice_content=ice_content, &
                                              vapor_content=vapor_content, &
-                                             pressure=pressure)
+                                             pressure=pressure, &
+                                             water_flux=water_flux, &
+                                             vapor_flux=vapor_flux)
     end subroutine output_history_output_manager
 
     subroutine get_log_io_unit_output_manager(self, io_unit)
@@ -135,5 +140,13 @@ contains
 
         call self%log%output_system_log()
     end subroutine output_system_log_output_manager
+
+    subroutine get_obs_fe_ids_output_manager(self, fe_ids)
+        implicit none
+        class(type_output_manager), intent(in) :: self
+        integer(int32), allocatable, intent(inout) :: fe_ids(:)
+
+        call self%observation%get_obs_fe_ids(fe_ids)
+    end subroutine get_obs_fe_ids_output_manager
 
 end module io_output_manager

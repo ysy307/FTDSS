@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.6% of total for derived types.</p>Including implementation: 21 statements,  0.1% of total for derived types.">21 statements</a>
+                 title="<p> 0.5% of total for derived types.</p>Including implementation: 32 statements,  0.1% of total for derived types.">22 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,15 +134,15 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#variable-block_size~3">block_size</a>
+            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#variable-block_size~4">block_size</a>
             <a class="list-group-item" href="../type/type_preconditioner_iluk.html#variable-diag_pivots">diag_pivots</a>
             <a class="list-group-item" href="../type/type_preconditioner_iluk.html#variable-diag_ptr">diag_ptr</a>
             <a class="list-group-item" href="../type/type_preconditioner_iluk.html#variable-fill_level">fill_level</a>
-            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#variable-ind~4">ind</a>
+            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#variable-ind~13">ind</a>
             <a class="list-group-item" href="../type/type_preconditioner_iluk.html#variable-is_block~2">is_block</a>
-            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#variable-num_rows">num_rows</a>
-            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#variable-ptr~2">ptr</a>
-            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#variable-val~13">val</a>
+            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#variable-num_rows~9">num_rows</a>
+            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#variable-ptr~14">ptr</a>
+            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#variable-val~38">val</a>
             <a class="list-group-item" href="../type/type_preconditioner_iluk.html#variable-val_blocks">val_blocks</a>
         </div>
       </div>
@@ -170,13 +170,16 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#boundprocedure-apply~4">apply</a>
+            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#boundprocedure-apply~8">apply</a>
             <a class="list-group-item" href="../type/type_preconditioner_iluk.html#boundprocedure-apply_bsr_ilu0">apply_bsr_ilu0</a>
             <a class="list-group-item" href="../type/type_preconditioner_iluk.html#boundprocedure-apply_csr_ilu0">apply_csr_ilu0</a>
-            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#boundprocedure-destroy~15">destroy</a>
-            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#boundprocedure-initialize~34">initialize</a>
+            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#boundprocedure-destroy~51">destroy</a>
+            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#boundprocedure-get_status~4">get_status</a>
+            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#boundprocedure-initialize~90">initialize</a>
+            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#boundprocedure-is_success~2">is_success</a>
             <a class="list-group-item" href="../type/type_preconditioner_iluk.html#boundprocedure-setup~4">setup</a>
             <a class="list-group-item" href="../type/type_preconditioner_iluk.html#boundprocedure-setup_bsr_ilu0">setup_bsr_ilu0</a>
+            <a class="list-group-item" href="../type/type_preconditioner_iluk.html#boundprocedure-setup_bsr_point_ilu0">setup_bsr_point_ilu0</a>
             <a class="list-group-item" href="../type/type_preconditioner_iluk.html#boundprocedure-setup_csr_ilu0">setup_csr_ilu0</a>
         </div>
       </div>
@@ -307,7 +310,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-block_size~3"></span>
+              <span class="anchor" id="variable-block_size~4"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -375,7 +378,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-ind~4"></span>
+              <span class="anchor" id="variable-ind~13"></span>
               integer(kind=int32),
             </td>
               <td>public,</td>
@@ -409,7 +412,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_rows"></span>
+              <span class="anchor" id="variable-num_rows~9"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -426,7 +429,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-ptr~2"></span>
+              <span class="anchor" id="variable-ptr~14"></span>
               integer(kind=int32),
             </td>
               <td>public,</td>
@@ -443,7 +446,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-val~13"></span>
+              <span class="anchor" id="variable-val~38"></span>
               real(kind=real64),
             </td>
               <td>public,</td>
@@ -488,7 +491,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-apply~4"></span>
+      <span class="anchor" id="boundprocedure-apply~8"></span>
       <h3>
           procedure, public ::
   <strong>apply</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/apply_preconditioner_iluk.html'>apply_preconditioner_iluk</a>
@@ -743,7 +746,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-destroy~15"></span>
+      <span class="anchor" id="boundprocedure-destroy~51"></span>
       <h3>
           procedure, public ::
   <strong>destroy</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/destroy_preconditioner_iluk.html'>destroy_preconditioner_iluk</a>
@@ -798,7 +801,66 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~34"></span>
+      <span class="anchor" id="boundprocedure-get_status~4"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>get_status</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/get_status_preconditioner.html'>get_status_preconditioner</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  function <a href='../proc/get_status_preconditioner.html'>get_status_preconditioner</a>(self)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_preconditioner.html'>abst_preconditioner</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>integer(kind=int32)</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-initialize~90"></span>
       <h3>
           procedure, public ::
   <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/initialize_preconditioner_iluk.html'>initialize_preconditioner_iluk</a>
@@ -859,6 +921,65 @@ large graphs.</div>
     </tbody>
   </table>
 
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-is_success~2"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>is_success</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_success_preconditioner.html'>is_success_preconditioner</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  function <a href='../proc/is_success_preconditioner.html'>is_success_preconditioner</a>(self)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='abst_preconditioner.html'>abst_preconditioner</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
 
           </li>
       </ul>
@@ -951,6 +1072,76 @@ large graphs.</div>
                     <h3>
     private module subroutine setup_bsr_ilu0(self, A)  
     <a href="../proc/setup_bsr_ilu0.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_preconditioner_iluk.html'>type_preconditioner_iluk</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_matrix_bsr.html'>type_matrix_bsr</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>A</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-setup_bsr_point_ilu0"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>setup_bsr_point_ilu0</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine setup_bsr_point_ilu0(self, A)  
+    <a href="../proc/setup_bsr_point_ilu0.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
 </h3>
 
   
@@ -1112,6 +1303,7 @@ large graphs.</div>
 <span class="w">        </span><span class="k">procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">setup</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">setup_preconditioner_iluk</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">setup_csr_ilu0</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">setup_bsr_ilu0</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">setup_bsr_point_ilu0</span>
 <span class="w">        </span><span class="k">procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">apply</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">apply_preconditioner_iluk</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">apply_csr_ilu0</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">),</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">apply_bsr_ilu0</span>
@@ -1139,7 +1331,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

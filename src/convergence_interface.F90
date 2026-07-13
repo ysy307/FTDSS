@@ -42,6 +42,7 @@ module control_iteration_convergence
         procedure, public, pass(self) :: destroy => destroy_type_convergence_criterion
         ! ---- Mutator ----
         procedure, public, pass(self) :: reset => reset_criterion
+        procedure, public, pass(self) :: update_reference_value => update_reference_value_type_convergence_criterion
         ! ---- Algorithm / Operation ----
         procedure, public, pass(self) :: check_convergence => check_convergence_criterion
         ! ---- Inquiry ----
@@ -101,6 +102,13 @@ module control_iteration_convergence
 
         end subroutine get_tolerances_convergence_criterion
 
+        module subroutine update_reference_value_type_convergence_criterion(self, reference_value)
+            implicit none
+            class(type_convergence_criterion), intent(inout) :: self
+            real(real64), intent(in) :: reference_value
+
+        end subroutine update_reference_value_type_convergence_criterion
+
     end interface
 
     !>
@@ -122,11 +130,41 @@ module control_iteration_convergence
         type(type_convergence_criterion), private :: residual(PHYSICS_TYPES%NUM_ID)
         !> Update vector convergence criteria (for each physical quantity)
         type(type_convergence_criterion), private :: update(PHYSICS_TYPES%NUM_ID)
+
+        ! --- Conserved-quantity convergence state (PDF 6.2.4) ---
+        !> Absolute weight floor for enthalpy [J/m3]
+        real(real64), private :: atol_enthalpy = 1.0d2
+        !> Absolute weight floor for effective density [kg/m3]
+        real(real64), private :: atol_density = 1.0d-3
+        !> Relative weight for both conserved quantities [-]
+        real(real64), private :: rtol_conserved = 1.0d-3
+        !> Per-block residual ratio tolerance eps_R [-]
+        real(real64), private :: residual_eps = 1.0d-3
+        !> Nodal conserved quantities at the previous nonlinear iterate
+        real(real64), allocatable, private :: enthalpy_prev(:)
+        real(real64), allocatable, private :: density_prev(:)
+        logical, private :: has_prev_conserved = .false.
+        !> Previous conserved-quantity increment for coupled Aitken globalization
+        real(real64), allocatable, private :: dH_prev(:)
+        real(real64), allocatable, private :: drho_prev(:)
+        logical, private :: has_prev_conserved_increment = .false.
+        !> Reference block residual norms ||R^0|| (set on first evaluation)
+        real(real64), private :: residual0_thermal = -1.0d0
+        real(real64), private :: residual0_hydraulic = -1.0d0
+        !> Previous weighted-RMS norm and divergence counter for kappa monitoring
+        real(real64), private :: dq_norm_prev = -1.0d0
+        integer(int32), private :: diverge_count = 0
+        !> Adaptive under-relaxation factor for the globalized modified-Picard step.
+        !> Driven by the convergence rate kappa: damped when the iteration grows
+        !> (kappa >= 1), relaxed back toward 1 when it contracts. Replaces ad-hoc
+        !> per-variable step clamps with a principled, condition-agnostic globalization.
+        real(real64), private :: relaxation_omega = 1.0d0
     contains
         ! ---- Lifecycle ----
         procedure, public, pass(self) :: initialize => initialize_convergence_control
         ! ---- Mutator ----
         procedure, public, pass(self) :: reset => reset_convergence_control
+        procedure, public, pass(self) :: update_reference_values => update_reference_values_convergence_control
         ! ---- Algorithm / Operation ----
         procedure, public, pass(self) :: check_convergence => check_convergence_control
         ! ---- Inquiry ----
@@ -139,6 +177,12 @@ module control_iteration_convergence
         procedure, public, pass(self) :: get_convergence_norm_type => get_convergence_norm_type_convergence_control
         procedure, public, pass(self) :: get_current_norm => get_current_norm_convergence_control
         procedure, public, pass(self) :: get_tolerances => get_tolerances_convergence_control
+        ! ---- Conserved-quantity convergence (PDF 6.2.4) ----
+        procedure, public, pass(self) :: is_conserved => is_conserved_convergence_control
+        procedure, public, pass(self) :: check_conserved => check_conserved_convergence_control
+        procedure, public, pass(self) :: compute_error_norm => compute_error_norm_convergence_control
+        procedure, public, pass(self) :: get_conserved_relaxation => get_conserved_relaxation_convergence_control
+        procedure, public, pass(self) :: get_conserved_dq_norm => get_conserved_dq_norm_convergence_control
         ! ---- Meta / Utility ----
     end type type_convergence_control
 
@@ -231,6 +275,73 @@ module control_iteration_convergence
             real(real64), intent(inout), optional :: relative_tolerance
 
         end subroutine get_tolerances_convergence_control
+
+        module subroutine update_reference_values_convergence_control(self, reference_values)
+            implicit none
+            class(type_convergence_control), intent(inout) :: self
+            real(real64), intent(in) :: reference_values(:)
+
+        end subroutine update_reference_values_convergence_control
+
+        !> Returns true when the conserved-quantity convergence mode is selected.
+        module pure function is_conserved_convergence_control(self) result(is_conserved)
+            implicit none
+            class(type_convergence_control), intent(in) :: self
+            logical :: is_conserved
+        end function is_conserved_convergence_control
+
+        !> Conserved-quantity convergence check (PDF 6.2.4).
+        !>
+        !> Mathematical definition:
+        !> - \( \lVert \delta Q \rVert_W = \sqrt{ \frac{1}{2N}\sum_j
+        !>   [(\delta H_j/w^H_j)^2 + (\delta\rho_j/w^\rho_j)^2] } \le 1 \)
+        !>   with \( w^H_j = atol_H + rtol|H_j| \), \( w^\rho_j = atol_\rho + rtol|\rho_j| \).
+        !> - per-block residual ratio \( \lVert R_b \rVert / \lVert R_b^0 \rVert < \varepsilon_R \).
+        !> Sets is_ok when both hold; sets is_diverged on NaN or kappa>=1 repeated.
+        module subroutine check_conserved_convergence_control(self, enthalpy, density, &
+                                                              residual_thermal, residual_hydraulic, &
+                                                              nonlinear_iter, check_thermal, check_hydraulic, &
+                                                              is_ok, is_diverged)
+            implicit none
+            class(type_convergence_control), intent(inout) :: self
+            real(real64), intent(in) :: enthalpy(:)
+            real(real64), intent(in) :: density(:)
+            real(real64), intent(in), optional :: residual_thermal(:)
+            real(real64), intent(in), optional :: residual_hydraulic(:)
+            integer(int32), intent(in) :: nonlinear_iter
+            logical, intent(in) :: check_thermal
+            logical, intent(in) :: check_hydraulic
+            logical, intent(inout) :: is_ok
+            logical, intent(inout) :: is_diverged
+        end subroutine check_conserved_convergence_control
+
+        !> Weighted-RMS norm of the conserved-quantity difference (Q_b - Q_a),
+        !> used for the Richardson local-error estimate (PDF 6.3.2-6.3.3, p=1).
+        module subroutine compute_error_norm_convergence_control(self, enthalpy_a, density_a, &
+                                                                 enthalpy_b, density_b, eps)
+            implicit none
+            class(type_convergence_control), intent(in) :: self
+            real(real64), intent(in) :: enthalpy_a(:)
+            real(real64), intent(in) :: density_a(:)
+            real(real64), intent(in) :: enthalpy_b(:)
+            real(real64), intent(in) :: density_b(:)
+            real(real64), intent(inout) :: eps
+        end subroutine compute_error_norm_convergence_control
+
+        !> Current adaptive under-relaxation factor for the globalized modified
+        !> Picard step (1 = full step). Updated by check_conserved from kappa.
+        module pure function get_conserved_relaxation_convergence_control(self) result(omega)
+            implicit none
+            class(type_convergence_control), intent(in) :: self
+            real(real64) :: omega
+        end function get_conserved_relaxation_convergence_control
+
+        !> Last weighted-RMS conserved-quantity change ||dQ||_W (diagnostics).
+        module pure function get_conserved_dq_norm_convergence_control(self) result(dq_norm)
+            implicit none
+            class(type_convergence_control), intent(in) :: self
+            real(real64) :: dq_norm
+        end function get_conserved_dq_norm_convergence_control
 
     end interface
 

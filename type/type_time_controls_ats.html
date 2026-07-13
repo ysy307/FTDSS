@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.2% of total for derived types.</p>Including implementation: 8 statements,  0.0% of total for derived types.">8 statements</a>
+                 title="<p> 0.4% of total for derived types.</p>Including implementation: 16 statements,  0.1% of total for derived types.">16 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,12 +134,20 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-is_active~10">is_active</a>
-            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-iter_max~4">iter_max</a>
-            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-iter_min~4">iter_min</a>
-            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-scale_down~4">scale_down</a>
-            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-scale_retry~4">scale_retry</a>
-            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-scale_up~4">scale_up</a>
+            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-error_relative_tolerance~2">error_relative_tolerance</a>
+            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-integral_gain~2">integral_gain</a>
+            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-is_active~8">is_active</a>
+            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-iter_max~3">iter_max</a>
+            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-iter_min~3">iter_min</a>
+            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-max_growth_rate~3">max_growth_rate</a>
+            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-max_relative_change_per_step~2">max_relative_change_per_step</a>
+            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-max_temperature_change_per_step~2">max_temperature_change_per_step</a>
+            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-proportional_gain~2">proportional_gain</a>
+            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-safety_factor~3">safety_factor</a>
+            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-scale_down~3">scale_down</a>
+            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-scale_retry~3">scale_retry</a>
+            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-scale_up~3">scale_up</a>
+            <a class="list-group-item" href="../type/type_time_controls_ats.html#variable-use_error_control~2">use_error_control</a>
         </div>
       </div>
     </div>
@@ -374,7 +382,41 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-is_active~10"></span>
+              <span class="anchor" id="variable-error_relative_tolerance~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>error_relative_tolerance</strong></td>
+<td> =</td>
+                <td>1.0d-2</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-integral_gain~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>integral_gain</strong></td>
+<td> =</td>
+                <td>0.15d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-is_active~8"></span>
               logical,
             </td>
               <td>public</td>
@@ -391,7 +433,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-iter_max~4"></span>
+              <span class="anchor" id="variable-iter_max~3"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -408,7 +450,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-iter_min~4"></span>
+              <span class="anchor" id="variable-iter_min~3"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -425,7 +467,92 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-scale_down~4"></span>
+              <span class="anchor" id="variable-max_growth_rate~3"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max_growth_rate</strong></td>
+<td> =</td>
+                <td>2.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-max_relative_change_per_step~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max_relative_change_per_step</strong></td>
+<td> =</td>
+                <td>0.3d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-max_temperature_change_per_step~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max_temperature_change_per_step</strong></td>
+<td> =</td>
+                <td>5.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-proportional_gain~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>proportional_gain</strong></td>
+<td> =</td>
+                <td>0.10d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-safety_factor~3"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>safety_factor</strong></td>
+<td> =</td>
+                <td>0.9d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-scale_down~3"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -442,7 +569,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-scale_retry~4"></span>
+              <span class="anchor" id="variable-scale_retry~3"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -459,7 +586,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-scale_up~4"></span>
+              <span class="anchor" id="variable-scale_up~3"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -470,6 +597,23 @@ large graphs.</div>
             <td><strong>scale_up</strong></td>
                 <td></td>
                 <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-use_error_control~2"></span>
+              logical,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>use_error_control</strong></td>
+<td> =</td>
+                <td>.true.</td>
             <td>
                 
             </td>
@@ -492,6 +636,14 @@ large graphs.</div>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scale_up</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scale_down</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">scale_retry</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">use_error_control</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">error_relative_tolerance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d-2</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">proportional_gain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.10d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">integral_gain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.15d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">safety_factor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.9d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">max_growth_rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.0d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">max_temperature_change_per_step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">5.0d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">max_relative_change_per_step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.3d0</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_time_controls_ats</span>
 </pre></div>
 
@@ -515,7 +667,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

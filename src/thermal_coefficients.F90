@@ -57,11 +57,11 @@ contains
         end if
 
         ! Ice phase (Include Latent Heat of Fusion)
+        ! Additional segregation-sink latent heat is handled by an explicit source term.
         if (Qi > 0.0d0) then
             call self%physics%calc_density_ice(state, rho_i)
             call self%physics%calc_specific_heat_ice(state, c_i)
             call self%physics%calc_latent_heat_fusion(material_id, state, Lf)
-            ! Reference state logic implies Lf is removed at T < 0
             U = U + rho_i * c_i * Qi * temperature - Lf * rho_i * Qi
         end if
 
@@ -182,16 +182,28 @@ contains
         if (.not. associated(pressure_history)) return
         if (.not. associated(porosity_history)) return
         n_hist = min(size(bdf_coeffs), size(temperature_history), size(pressure_history), size(porosity_history))
-        do j = 1, n_hist
-            ! Reconstruct state from history data and recalculate enthalpy
-            call local_state%temperature%set(temperature_history(j))
-            call local_state%pressure%set(pressure_history(j))
-            call local_state%porosity%set(porosity_history(j))
-            call self%update_water_phases(material_id, local_state)
-            call self%calc_enthalpy_density(material_id, local_state, Uj)
 
-            dU_dt = dU_dt + bdf_coeffs(j) * Uj
-        end do
+        ! Copy once: only T/P/porosity vary over the BDF history; the other state
+        ! fields (e.g. clay fraction) are constant, so the deep copy is hoisted
+        ! out of the history loop.
+        ! j = 1 is the current state: phases were already computed during set_state,
+        ! so reuse them directly and skip the redundant update_water_phases.
+        call self%calc_enthalpy_density(material_id, state, Uj)
+        dU_dt = dU_dt + bdf_coeffs(1) * Uj
+
+        ! j >= 2 are previous-step states: recompute phases at the historical T/P.
+        if (n_hist >= 2) then
+            call local_state%copy(state)
+            do j = 2, n_hist
+                call local_state%temperature%set(temperature_history(j))
+                call local_state%pressure%set(pressure_history(j))
+                call local_state%porosity%set(porosity_history(j))
+                call self%update_water_phases(material_id, local_state)
+                call self%calc_enthalpy_density(material_id, local_state, Uj)
+
+                dU_dt = dU_dt + bdf_coeffs(j) * Uj
+            end do
+        end if
 
     end subroutine compute_transient_term_thermal
 
@@ -227,9 +239,12 @@ contains
         logical :: has_rho_w
 
         ! Secant variables
-        real(real64) :: C_TT_current, C_TT_old, dT
+        real(real64) :: C_TT_current, C_TT_old, C_TT_secant, dT
         type(type_state) :: temp_state
         integer(int32) :: use_scheme
+        ! Minimum |T^m - T^n| for evaluating the chord heat capacity. Below this the
+        ! tangent is the correct slope and the chord would be ill-conditioned.
+        real(real64), parameter :: DT_SECANT_FLOOR = 1.0d-3
 
         ! Determine default behavior
         call state%get(temperature=temperature, temperature_history=temperature_history, &
@@ -254,94 +269,124 @@ contains
             dT = 0.0d0
         end if
 
-        if (present(scheme_opt)) then
-            use_scheme = scheme_opt
-        else
-            ! Legacy logic: stabilize with Secant if temperature change is large, otherwise use Tangent
-            if (abs(dT) > 1.0d-6) then
-                use_scheme = SCHEME_SECANT
-            else
-                use_scheme = SCHEME_TANGENT
-            end if
-        end if
-
         C_TT = 0.0d0
         has_rho_w = .false.
 
-        if (use_scheme == SCHEME_SECANT) then
-            ! --- Secant Method (Average/Effective Heat Capacity) ---
-            ! C_eff = (U(T) - U(T_old)) / (T - T_old)
+        ! --- Analytical tangent (apparent heat capacity) C_app = dU/dT (always) ---
+        call state%get(porosity=porosity, water_content=Qw, &
+                       ice_content=Qi, vapor_content=Qv)
 
-            if (size(temperature_history) < 2 .or. size(pressure_history) < 2 .or. size(porosity_history) < 2) then
-                use_scheme = SCHEME_TANGENT
-            end if
-
+        ! Solid
+        if (porosity > 0.0d0) then
+            call self%physics%get_density_solid(material_id, rho_s)
+            call self%physics%get_specific_heat_solid(material_id, c_s)
+            C_TT = C_TT + rho_s * c_s * (1.0d0 - porosity)
         end if
 
-        if (use_scheme == SCHEME_SECANT) then
+        ! Water
+        if (Qw > 0.0d0) then
+            call self%physics%calc_density_water(state, rho_w)
+            has_rho_w = .true.
+            call self%physics%calc_specific_heat_water(state, c_w)
+            C_TT = C_TT + rho_w * c_w * Qw
+        end if
 
-            ! Current U
-            call self%calc_enthalpy_density(material_id, state, C_TT_current)
+        ! Ice (including latent heat derivative).
+        ! Additional segregation-sink latent heat is handled by an explicit source.
+        call state%dQi_dT%get(dQi_dT)
+        if (Qi > 0.0d0 .or. dQi_dT /= 0.0d0) then
+            call self%physics%calc_density_ice(state, rho_i)
+            call self%physics%calc_specific_heat_ice(state, c_i)
+            C_TT = C_TT + rho_i * c_i * Qi
+            call self%physics%calc_latent_heat_fusion(material_id, state, Lf)
+            C_TT = C_TT - Lf * rho_i * dQi_dT
+        end if
 
-            ! Old U (from previous time step)
-            call temp_state%temperature%set(temperature_history(2))
-            call temp_state%pressure%set(pressure_history(2))
-            call temp_state%porosity%set(porosity_history(2))
-            call self%update_water_phases(material_id, temp_state)
-            call self%calc_enthalpy_density(material_id, temp_state, C_TT_old)
-
-            ! Prevent division by zero
-            dT = sign(max(abs(dT), 1.0d-8), dT)
-            C_TT = (C_TT_current - C_TT_old) / dT
-
-        else
-            ! --- Tangent Method (Apparent Heat Capacity) ---
-            ! C_app = dU/dT
-
-            call state%get(porosity=porosity, water_content=Qw, &
-                           ice_content=Qi, vapor_content=Qv)
-
-            ! Solid
-            if (porosity > 0.0d0) then
-                call self%physics%get_density_solid(material_id, rho_s)
-                call self%physics%get_specific_heat_solid(material_id, c_s)
-                C_TT = C_TT + rho_s * c_s * (1.0d0 - porosity)
-            end if
-
-            ! Water
-            if (Qw > 0.0d0) then
+        ! Vapor (including latent heat derivative)
+        if (Qv > 0.0d0) then
+            if (.not. has_rho_w) then
                 call self%physics%calc_density_water(state, rho_w)
                 has_rho_w = .true.
-                call self%physics%calc_specific_heat_water(state, c_w)
-                C_TT = C_TT + rho_w * c_w * Qw
             end if
+            call self%physics%calc_specific_heat_vapor(state, c_v)
+            call self%physics%calc_latent_heat_vaporization(material_id, state, Lv)
+            call state%dQv_dT%get(dQv_dT)
+            C_TT = C_TT + rho_w * c_v * Qv + Lv * rho_w * dQv_dT
+        end if
 
-            ! Ice (including latent heat derivative)
-            if (Qi > 0.0d0) then
-                call self%physics%calc_density_ice(state, rho_i)
-                call self%physics%calc_specific_heat_ice(state, c_i)
-                call self%physics%calc_latent_heat_fusion(material_id, state, Lf)
-                call state%dQi_dT%get(dQi_dT)
-                C_TT = C_TT + rho_i * c_i * Qi - Lf * rho_i * dQi_dT
-            end if
+        ! --- Phase-change stabilization: chord (secant) apparent heat capacity ---
+        ! Across the freezing front the instantaneous tangent under-estimates the
+        ! latent heat a node absorbs while crossing the freezing spike, so the
+        ! Picard/Newton step overshoots and the iteration chatters (the conserved
+        ! quantity toggles, independent of dt). The chord
+        !   C_chord = (H(T^m, p^m) - H(T^n, p^m)) / (T^m - T^n)
+        ! averages the latent heat actually crossed over the step; using
+        ! max(tangent, chord) damps the overshoot without changing the (conservative)
+        ! residual H^{n+1,m}-H^n. The chord is evaluated only for |dT| above a floor
+        ! so it stays bounded (no stall as T^m -> T^n, where the tangent is correct).
+        ! An explicit scheme_opt request still selects a pure scheme for testing.
+        use_scheme = SCHEME_TANGENT
+        if (present(scheme_opt)) use_scheme = scheme_opt
 
-            ! Vapor (including latent heat derivative)
-            if (Qv > 0.0d0) then
-                if (.not. has_rho_w) then
-                    call self%physics%calc_density_water(state, rho_w)
-                    has_rho_w = .true.
+        if (use_scheme /= SCHEME_TANGENT .or. .not. present(scheme_opt)) then
+            if (size(temperature_history) >= 2 .and. abs(dT) > DT_SECANT_FLOOR) then
+                call self%calc_enthalpy_density(material_id, state, C_TT_current)
+                call temp_state%copy(state)
+                call temp_state%temperature%set(temperature_history(2))
+                call self%update_water_phases(material_id, temp_state)
+                call self%calc_enthalpy_density(material_id, temp_state, C_TT_old)
+                C_TT_secant = (C_TT_current - C_TT_old) / dT
+
+                if (present(scheme_opt) .and. use_scheme == SCHEME_SECANT) then
+                    C_TT = C_TT_secant                 ! explicit pure-secant request
+                else
+                    C_TT = max(C_TT, C_TT_secant)      ! default: chord-stabilized tangent
                 end if
-                call self%physics%calc_specific_heat_vapor(state, c_v)
-                call self%physics%calc_latent_heat_vaporization(material_id, state, Lv)
-                call state%dQv_dT%get(dQv_dT)
-                C_TT = C_TT + rho_w * c_v * Qv + Lv * rho_w * dQv_dT
             end if
         end if
 
-        ! Clip negative heat capacity as it is physically invalid
-        C_TT = max(C_TT, 0.0d0)
-
     end subroutine compute_mass_term_thermal
+
+    !> @brief Calculate Coupling Mass Term C_TH = dU/dP
+    !> @details
+    !>   U = rho_w*c_w*Qw*T + (rho_i*c_i*T - Lf*rho_i)*Qi + (rho_w*c_v*T + Lv*rho_w)*Qv + solid
+    !>   C_TH = (rho_w*c_w*T)*dQw/dP + (rho_i*c_i*T - Lf*rho_i)*dQi/dP
+    !>          + (rho_w*c_v*T + Lv*rho_w)*dQv/dP
+    module subroutine compute_coupling_mass_term_thermal(self, material_id, state, C_TH)
+        implicit none
+        class(type_thermal), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: C_TH
+
+        real(real64) :: temperature
+        real(real64) :: rho_w, rho_i
+        real(real64) :: c_i, c_v
+        real(real64) :: Lf, Lv
+        real(real64) :: dQw_dP, dQi_dP, dQv_dP
+
+        C_TH = 0.0d0
+
+        call state%temperature%get(temperature)
+        call state%dQw_dP%get(dQw_dP)
+        call state%dQi_dP%get(dQi_dP)
+        call state%dQv_dP%get(dQv_dP)
+
+        if (abs(dQw_dP) + abs(dQi_dP) + abs(dQv_dP) < 1.0d-30) return
+
+        call self%physics%calc_density_water(state, rho_w)
+        call self%physics%calc_density_ice(state, rho_i)
+        call self%physics%calc_specific_heat_ice(state, c_i)
+        call self%physics%calc_specific_heat_vapor(state, c_v)
+        call self%physics%calc_latent_heat_fusion(material_id, state, Lf)
+        call self%physics%calc_latent_heat_vaporization(material_id, state, Lv)
+
+        ! Liquid water enthalpy coupling (rho_w*c_w*T)*dQw/dP is omitted:
+        ! the balancing divergence term T*nabla*q_w is absent from the formulation.
+        C_TH = (rho_i * c_i * temperature - Lf * rho_i) * dQi_dP &
+               + (rho_w * c_v * temperature + Lv * rho_w) * dQv_dP
+
+    end subroutine compute_coupling_mass_term_thermal
 
     ! ==========================================================================
     ! Flux Terms (Diffusion / Advection / Latent Source)
@@ -457,6 +502,12 @@ contains
         real(real64), intent(inout) :: L_TT
 
         real(real64) :: rho_w, L_v, K_vT
+
+        if (.not. self%enable_vapor_transport) then
+            L_TT = 0.0d0
+            return
+        end if
+
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_latent_heat_vaporization(material_id, state, L_v)
         call self%physics%calc_KvT(material_id, state, K_vT)
@@ -516,6 +567,16 @@ contains
     !> For each node and each history level (k = 1..num_hist), computes
     !> U(T_{n-k}, P_{n-k}, phi_{n-k}) and stores it in enthalpy_cache.
     !> This avoids redundant phase-change recalculation during assembly.
+    !>
+    !> NOTE (A1 Clapeyron closure): this cache is currently DEAD CODE - no
+    !> call site exists anywhere in src/ or test/ (enthalpy_cache_valid is
+    !> never set at runtime), so the prognostic-ice substitution applied to
+    !> compute_transient_term_thermal / compute_mass_term_thermal is NOT
+    !> replicated here. If this cache is ever revived, it must receive the
+    !> nodal prognostic ice history (its interface only carries T/P/phi
+    !> arrays) and apply the same per-level ice substitution, otherwise it
+    !> would silently reintroduce the equilibrium-ice bias at constrained
+    !> nodes.
     module subroutine cache_enthalpy_history_thermal(self, num_nodes, num_hist, material_ids, &
                                                      temperature_all, pressure_all, porosity_all)
         implicit none
@@ -574,5 +635,21 @@ contains
         self%enthalpy_cache_valid = .false.
 
     end subroutine invalidate_enthalpy_cache_thermal
+
+    module subroutine calc_specific_heat_water_thermal(self, state, c_w)
+        implicit none
+        class(type_thermal), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: c_w
+        call self%physics%calc_specific_heat_water(state, c_w)
+    end subroutine calc_specific_heat_water_thermal
+
+    module subroutine calc_specific_heat_vapor_thermal(self, state, c_v)
+        implicit none
+        class(type_thermal), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: c_v
+        call self%physics%calc_specific_heat_vapor(state, c_v)
+    end subroutine calc_specific_heat_vapor_thermal
 
 end submodule thermal_coefficients

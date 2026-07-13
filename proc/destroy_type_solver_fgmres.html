@@ -1,0 +1,1100 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>destroy_type_solver_fgmres &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>destroy_type_solver_fgmres
+      <small>Module Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">31 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/solve_fgmres.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/solve_fgmres.f90.html'>solve_fgmres.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/impl_solve_type_solver_fgmres.html'>impl_solve_type_solver_fgmres</a></li>
+            <li class="breadcrumb-item active" aria-current="page">destroy_type_solver_fgmres</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/destroy_type_solver_fgmres.html#src">destroy_type_solver_fgmres</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>module subroutine destroy_type_solver_fgmres(self)  
+</h2>
+    
+
+    <p>Finalize the FGMRES solver instance.</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~387"></span>
+              class(type_solver_fgmres),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~destroy_type_solver_fgmres~~CallsGraph Pages: 1 -->
+<svg id="procdestroy_type_solver_fgmresCallsGraph" width="641pt" height="945pt"
+ viewBox="0.00 0.00 641.00 944.87" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph" class="graph" transform="scale(0.76 0.76) rotate(0) translate(4 1246)">
+<title>proc~~destroy_type_solver_fgmres~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1246 844,-1246 844,4 -4,4"/>
+<!-- proc~destroy_type_solver_fgmres -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node1" class="node">
+<title>proc~destroy_type_solver_fgmres</title>
+<polygon fill="none" stroke="black" points="160,-654 0,-654 0,-630 160,-630 160,-654"/>
+<text text-anchor="middle" x="80" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50">destroy_type_solver_fgmres</text>
+</g>
+<!-- destroy -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node2" class="node">
+<title>destroy</title>
+<polygon fill="#777777" stroke="#777777" points="274.5,-675 220.5,-675 220.5,-651 274.5,-651 274.5,-675"/>
+<text text-anchor="middle" x="247.5" y="-660.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">destroy</text>
+</g>
+<!-- proc~destroy_type_solver_fgmres&#45;&gt;destroy -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge1" class="edge">
+<title>proc~destroy_type_solver_fgmres&#45;&gt;destroy</title>
+<path fill="none" stroke="#ff0000" d="M160.36,-652.07C177.85,-654.29 195.54,-656.53 210.3,-658.41"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="210.13,-661.91 220.49,-659.7 211.01,-654.97 210.13,-661.91"/>
+</g>
+<!-- interface~deallocate_array -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node3" class="node">
+<title>interface~deallocate_array</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node3"><a xlink:href="../interface/deallocate_array.html" xlink:title="deallocate_array">
+<polygon fill="#a7506f" stroke="#a7506f" points="299,-633 196,-633 196,-609 299,-609 299,-633"/>
+<text text-anchor="middle" x="247.5" y="-618.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_array</text>
+</a>
+</g>
+</g>
+<!-- proc~destroy_type_solver_fgmres&#45;&gt;interface~deallocate_array -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge2" class="edge">
+<title>proc~destroy_type_solver_fgmres&#45;&gt;interface~deallocate_array</title>
+<path fill="none" stroke="#ff0000" d="M160.36,-631.93C168.97,-630.84 177.63,-629.74 185.96,-628.68"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="186.46,-632.15 195.94,-627.42 185.58,-625.2 186.46,-632.15"/>
+</g>
+<!-- proc~deallocate_rank1_int16 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node4" class="node">
+<title>proc~deallocate_rank1_int16</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node4"><a xlink:href="../proc/deallocate_rank1_int16.html" xlink:title="deallocate_rank1_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="479.5,-1242 342.5,-1242 342.5,-1218 479.5,-1218 479.5,-1242"/>
+<text text-anchor="middle" x="411" y="-1227.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int16 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge3" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int16</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M289.57,-633.03C293.21,-635.49 296.46,-638.45 299,-642 372.36,-744.75 255.55,-1110.88 335,-1209 335.61,-1209.76 336.25,-1210.49 336.92,-1211.2"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="334.91,-1214.08 344.81,-1217.85 339.42,-1208.73 334.91,-1214.08"/>
+</g>
+<!-- proc~deallocate_rank1_int32 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node5" class="node">
+<title>proc~deallocate_rank1_int32</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node5"><a xlink:href="../proc/deallocate_rank1_int32.html" xlink:title="deallocate_rank1_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="479.5,-1200 342.5,-1200 342.5,-1176 479.5,-1176 479.5,-1200"/>
+<text text-anchor="middle" x="411" y="-1185.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int32 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge4" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int32</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M289.55,-633.05C293.19,-635.5 296.45,-638.45 299,-642 367.19,-737 261.18,-1076.3 335,-1167 335.62,-1167.76 336.26,-1168.49 336.92,-1169.19"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="334.92,-1172.08 344.83,-1175.84 339.42,-1166.72 334.92,-1172.08"/>
+</g>
+<!-- proc~deallocate_rank1_int64 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node6" class="node">
+<title>proc~deallocate_rank1_int64</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node6"><a xlink:href="../proc/deallocate_rank1_int64.html" xlink:title="deallocate_rank1_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="479.5,-1158 342.5,-1158 342.5,-1134 479.5,-1134 479.5,-1158"/>
+<text text-anchor="middle" x="411" y="-1143.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int64 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge5" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int64</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M289.53,-633.06C293.17,-635.51 296.44,-638.46 299,-642 362.02,-729.25 266.81,-1041.72 335,-1125 335.62,-1125.76 336.26,-1126.48 336.93,-1127.19"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="334.94,-1130.09 344.85,-1133.82 339.43,-1124.72 334.94,-1130.09"/>
+</g>
+<!-- proc~deallocate_rank1_int8 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node7" class="node">
+<title>proc~deallocate_rank1_int8</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node7"><a xlink:href="../proc/deallocate_rank1_int8.html" xlink:title="deallocate_rank1_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="476,-1116 346,-1116 346,-1092 476,-1092 476,-1116"/>
+<text text-anchor="middle" x="411" y="-1101.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int8 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge6" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_int8</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M289.51,-633.08C293.15,-635.53 296.43,-638.47 299,-642 356.86,-721.5 272.44,-1007.14 335,-1083 335.87,-1084.06 336.79,-1085.06 337.75,-1086.02"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="335.88,-1089 345.89,-1092.45 340.22,-1083.5 335.88,-1089"/>
+</g>
+<!-- proc~deallocate_rank1_logical1 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node8" class="node">
+<title>proc~deallocate_rank1_logical1</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node8"><a xlink:href="../proc/deallocate_rank1_logical1.html" xlink:title="deallocate_rank1_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="487,-1074 335,-1074 335,-1050 487,-1050 487,-1074"/>
+<text text-anchor="middle" x="411" y="-1059.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical1 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge7" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical1</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M289.48,-633.1C293.13,-635.55 296.41,-638.48 299,-642 351.69,-713.76 278.06,-972.56 335,-1041 335.74,-1041.88 336.5,-1042.73 337.3,-1043.55"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="335.28,-1046.41 345.25,-1049.99 339.69,-1040.97 335.28,-1046.41"/>
+</g>
+<!-- proc~deallocate_rank1_logical4 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node9" class="node">
+<title>proc~deallocate_rank1_logical4</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node9"><a xlink:href="../proc/deallocate_rank1_logical4.html" xlink:title="deallocate_rank1_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="487,-1032 335,-1032 335,-1008 487,-1008 487,-1032"/>
+<text text-anchor="middle" x="411" y="-1017.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical4 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge8" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical4</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M289.44,-633.13C293.1,-635.57 296.4,-638.49 299,-642 394.06,-770.04 232.37,-876.94 335,-999 335.74,-999.88 336.51,-1000.72 337.32,-1001.53"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="335.31,-1004.41 345.29,-1007.95 339.69,-998.96 335.31,-1004.41"/>
+</g>
+<!-- proc~deallocate_rank1_logical8 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node10" class="node">
+<title>proc~deallocate_rank1_logical8</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node10"><a xlink:href="../proc/deallocate_rank1_logical8.html" xlink:title="deallocate_rank1_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="487,-990 335,-990 335,-966 487,-966 487,-990"/>
+<text text-anchor="middle" x="411" y="-975.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical8 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge9" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_logical8</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M289.39,-633.16C293.06,-635.6 296.37,-638.51 299,-642 383.74,-754.58 243.6,-849.75 335,-957 335.75,-957.87 336.52,-958.71 337.33,-959.52"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="335.34,-962.41 345.34,-965.91 339.71,-956.94 335.34,-962.41"/>
+</g>
+<!-- proc~deallocate_rank1_real128 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node11" class="node">
+<title>proc~deallocate_rank1_real128</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node11"><a xlink:href="../proc/deallocate_rank1_real128.html" xlink:title="deallocate_rank1_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="486.5,-948 335.5,-948 335.5,-924 486.5,-924 486.5,-948"/>
+<text text-anchor="middle" x="411" y="-933.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real128 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge10" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real128</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M289.33,-633.21C293.01,-635.63 296.34,-638.53 299,-642 373.45,-739.14 254.81,-822.54 335,-915 335.75,-915.87 336.54,-916.7 337.35,-917.5"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="335.39,-920.41 345.41,-923.85 339.72,-914.91 335.39,-920.41"/>
+</g>
+<!-- proc~deallocate_rank1_real32 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node12" class="node">
+<title>proc~deallocate_rank1_real32</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node12"><a xlink:href="../proc/deallocate_rank1_real32.html" xlink:title="deallocate_rank1_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="483,-906 339,-906 339,-882 483,-882 483,-906"/>
+<text text-anchor="middle" x="411" y="-891.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real32 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge11" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real32</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M289.25,-633.27C292.94,-635.69 296.3,-638.56 299,-642 363.17,-723.72 266,-795.31 335,-873 335.88,-874 336.81,-874.94 337.78,-875.85"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="335.77,-878.72 345.85,-881.98 340,-873.15 335.77,-878.72"/>
+</g>
+<!-- proc~deallocate_rank1_real64 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node13" class="node">
+<title>proc~deallocate_rank1_real64</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node13"><a xlink:href="../proc/deallocate_rank1_real64.html" xlink:title="deallocate_rank1_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="483,-864 339,-864 339,-840 483,-840 483,-864"/>
+<text text-anchor="middle" x="411" y="-849.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank1_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real64 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge12" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank1_real64</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M288.65,-633.06C292.55,-635.51 296.13,-638.46 299,-642 352.93,-708.36 277.15,-768.03 335,-831 335.9,-831.98 336.84,-832.92 337.82,-833.81"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="335.86,-836.72 345.98,-839.86 340.03,-831.09 335.86,-836.72"/>
+</g>
+<!-- proc~deallocate_rank2_int16 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node14" class="node">
+<title>proc~deallocate_rank2_int16</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node14"><a xlink:href="../proc/deallocate_rank2_int16.html" xlink:title="deallocate_rank2_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="479.5,-822 342.5,-822 342.5,-798 479.5,-798 479.5,-822"/>
+<text text-anchor="middle" x="411" y="-807.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int16 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge13" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int16</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M288.47,-633.21C292.41,-635.64 296.03,-638.54 299,-642 342.77,-693.08 288.22,-740.66 335,-789 336.06,-790.09 337.17,-791.13 338.32,-792.12"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="336.34,-795 346.53,-797.88 340.36,-789.27 336.34,-795"/>
+</g>
+<!-- proc~deallocate_rank2_int32 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node15" class="node">
+<title>proc~deallocate_rank2_int32</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node15"><a xlink:href="../proc/deallocate_rank2_int32.html" xlink:title="deallocate_rank2_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="479.5,-780 342.5,-780 342.5,-756 479.5,-756 479.5,-780"/>
+<text text-anchor="middle" x="411" y="-765.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int32 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge14" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int32</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M287.41,-633.04C291.69,-635.51 295.69,-638.47 299,-642 332.75,-677.98 299.13,-713.13 335,-747 336.28,-748.21 337.63,-749.36 339.04,-750.43"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="337.29,-753.47 347.59,-755.93 341.07,-747.58 337.29,-753.47"/>
+</g>
+<!-- proc~deallocate_rank2_int64 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node16" class="node">
+<title>proc~deallocate_rank2_int64</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node16"><a xlink:href="../proc/deallocate_rank2_int64.html" xlink:title="deallocate_rank2_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="479.5,-738 342.5,-738 342.5,-714 479.5,-714 479.5,-738"/>
+<text text-anchor="middle" x="411" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int64 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge15" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int64</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M285.77,-633.12C290.52,-635.61 295.08,-638.55 299,-642 323.18,-663.33 309.57,-685.17 335,-705 336.82,-706.42 338.73,-707.74 340.71,-708.98"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="339.31,-712.2 349.78,-713.83 342.62,-706.03 339.31,-712.2"/>
+</g>
+<!-- proc~deallocate_rank2_int8 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node17" class="node">
+<title>proc~deallocate_rank2_int8</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node17"><a xlink:href="../proc/deallocate_rank2_int8.html" xlink:title="deallocate_rank2_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="476,-696 346,-696 346,-672 476,-672 476,-696"/>
+<text text-anchor="middle" x="411" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int8 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge16" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_int8</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M279.24,-633.01C285.83,-635.8 292.71,-638.87 299,-642 315.59,-650.24 317.94,-655.78 335,-663 339.98,-665.11 345.24,-667.07 350.56,-668.88"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="349.57,-672.24 360.17,-671.98 351.72,-665.58 349.57,-672.24"/>
+</g>
+<!-- proc~deallocate_rank2_logical1 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node18" class="node">
+<title>proc~deallocate_rank2_logical1</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node18"><a xlink:href="../proc/deallocate_rank2_logical1.html" xlink:title="deallocate_rank2_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="487,-654 335,-654 335,-630 487,-630 487,-654"/>
+<text text-anchor="middle" x="411" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical1 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge17" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical1</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M299.16,-627.59C307.42,-628.66 316.18,-629.8 325.01,-630.95"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="324.61,-634.43 334.98,-632.24 325.51,-627.48 324.61,-634.43"/>
+</g>
+<!-- proc~deallocate_rank2_logical4 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node19" class="node">
+<title>proc~deallocate_rank2_logical4</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node19"><a xlink:href="../proc/deallocate_rank2_logical4.html" xlink:title="deallocate_rank2_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="487,-612 335,-612 335,-588 487,-588 487,-612"/>
+<text text-anchor="middle" x="411" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical4 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge18" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical4</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M299.16,-614.41C307.42,-613.34 316.18,-612.2 325.01,-611.05"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="325.51,-614.52 334.98,-609.76 324.61,-607.57 325.51,-614.52"/>
+</g>
+<!-- proc~deallocate_rank2_logical8 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node20" class="node">
+<title>proc~deallocate_rank2_logical8</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node20"><a xlink:href="../proc/deallocate_rank2_logical8.html" xlink:title="deallocate_rank2_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="487,-570 335,-570 335,-546 487,-546 487,-570"/>
+<text text-anchor="middle" x="411" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical8 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge19" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_logical8</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M270.78,-608.81C287.96,-599.75 312.52,-587.52 335,-579 340.51,-576.91 346.31,-574.93 352.15,-573.07"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="353.43,-576.34 361.97,-570.07 351.39,-569.64 353.43,-576.34"/>
+</g>
+<!-- proc~deallocate_rank2_real128 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node21" class="node">
+<title>proc~deallocate_rank2_real128</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node21"><a xlink:href="../proc/deallocate_rank2_real128.html" xlink:title="deallocate_rank2_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="486.5,-528 335.5,-528 335.5,-504 486.5,-504 486.5,-528"/>
+<text text-anchor="middle" x="411" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real128 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge20" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real128</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M257.73,-608.76C272.19,-590.44 301.97,-555.99 335,-537 338.24,-535.14 341.65,-533.43 345.16,-531.87"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="346.66,-535.04 354.64,-528.08 344.05,-528.55 346.66,-535.04"/>
+</g>
+<!-- proc~deallocate_rank2_real32 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node22" class="node">
+<title>proc~deallocate_rank2_real32</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node22"><a xlink:href="../proc/deallocate_rank2_real32.html" xlink:title="deallocate_rank2_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="483,-486 339,-486 339,-462 483,-462 483,-486"/>
+<text text-anchor="middle" x="411" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real32 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge21" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real32</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M253.39,-608.85C264.18,-583.64 292.49,-525.42 335,-495 337.24,-493.4 339.6,-491.91 342.05,-490.54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="343.77,-493.6 351.22,-486.07 340.7,-487.31 343.77,-493.6"/>
+</g>
+<!-- proc~deallocate_rank2_real64 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node23" class="node">
+<title>proc~deallocate_rank2_real64</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node23"><a xlink:href="../proc/deallocate_rank2_real64.html" xlink:title="deallocate_rank2_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="483,-444 339,-444 339,-420 483,-420 483,-444"/>
+<text text-anchor="middle" x="411" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank2_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real64 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge22" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank2_real64</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M251.23,-608.71C258.77,-577.67 282.88,-495.5 335,-453 336.75,-451.58 338.58,-450.25 340.49,-449.01"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="342.21,-452.06 349.25,-444.14 338.81,-445.94 342.21,-452.06"/>
+</g>
+<!-- proc~deallocate_rank3_int16 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node24" class="node">
+<title>proc~deallocate_rank3_int16</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node24"><a xlink:href="../proc/deallocate_rank3_int16.html" xlink:title="deallocate_rank3_int16">
+<polygon fill="#d9534f" stroke="#d9534f" points="479.5,-402 342.5,-402 342.5,-378 479.5,-378 479.5,-402"/>
+<text text-anchor="middle" x="411" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank3_int16</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank3_int16 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge23" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank3_int16</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M249.81,-608.94C254.37,-573.09 272.81,-466.27 335,-411 336.35,-409.8 337.77,-408.66 339.25,-407.59"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="341.47,-410.33 348.19,-402.14 337.83,-404.35 341.47,-410.33"/>
+</g>
+<!-- proc~deallocate_rank3_int32 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node25" class="node">
+<title>proc~deallocate_rank3_int32</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node25"><a xlink:href="../proc/deallocate_rank3_int32.html" xlink:title="deallocate_rank3_int32">
+<polygon fill="#d9534f" stroke="#d9534f" points="479.5,-360 342.5,-360 342.5,-336 479.5,-336 479.5,-360"/>
+<text text-anchor="middle" x="411" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank3_int32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank3_int32 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge24" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank3_int32</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M248.88,-608.93C250.82,-568.61 262.68,-437.27 335,-369 336.28,-367.79 337.63,-366.64 339.04,-365.57"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="341.07,-368.42 347.6,-360.08 337.29,-362.53 341.07,-368.42"/>
+</g>
+<!-- proc~deallocate_rank3_int64 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node26" class="node">
+<title>proc~deallocate_rank3_int64</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node26"><a xlink:href="../proc/deallocate_rank3_int64.html" xlink:title="deallocate_rank3_int64">
+<polygon fill="#d9534f" stroke="#d9534f" points="479.5,-318 342.5,-318 342.5,-294 479.5,-294 479.5,-318"/>
+<text text-anchor="middle" x="411" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank3_int64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank3_int64 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge25" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank3_int64</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M248.2,-608.87C247.77,-564.38 252.45,-408.47 335,-327 336.11,-325.9 337.28,-324.86 338.49,-323.87"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="340.73,-326.58 347.06,-318.1 336.82,-320.78 340.73,-326.58"/>
+</g>
+<!-- proc~deallocate_rank3_int8 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node27" class="node">
+<title>proc~deallocate_rank3_int8</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node27"><a xlink:href="../proc/deallocate_rank3_int8.html" xlink:title="deallocate_rank3_int8">
+<polygon fill="#d9534f" stroke="#d9534f" points="476,-276 346,-276 346,-252 476,-252 476,-276"/>
+<text text-anchor="middle" x="411" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank3_int8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank3_int8 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge26" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank3_int8</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M250,-608.82C256.97,-554.3 287.8,-333.2 335,-285 336.06,-283.91 337.18,-282.88 338.34,-281.9"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="340.37,-284.75 346.58,-276.17 336.37,-279.01 340.37,-284.75"/>
+</g>
+<!-- proc~deallocate_rank3_logical1 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node28" class="node">
+<title>proc~deallocate_rank3_logical1</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node28"><a xlink:href="../proc/deallocate_rank3_logical1.html" xlink:title="deallocate_rank3_logical1">
+<polygon fill="#d9534f" stroke="#d9534f" points="487,-234 335,-234 335,-210 487,-210 487,-234"/>
+<text text-anchor="middle" x="411" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank3_logical1</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank3_logical1 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge27" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank3_logical1</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M249.62,-608.91C255.28,-550.5 282.52,-298.07 335,-243 336.05,-241.9 337.15,-240.85 338.3,-239.86"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="340.34,-242.7 346.47,-234.06 336.29,-237 340.34,-242.7"/>
+</g>
+<!-- proc~deallocate_rank3_logical4 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node29" class="node">
+<title>proc~deallocate_rank3_logical4</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node29"><a xlink:href="../proc/deallocate_rank3_logical4.html" xlink:title="deallocate_rank3_logical4">
+<polygon fill="#d9534f" stroke="#d9534f" points="487,-192 335,-192 335,-168 487,-168 487,-192"/>
+<text text-anchor="middle" x="411" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank3_logical4</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank3_logical4 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge28" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank3_logical4</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M249.33,-608.85C253.83,-546.48 277.25,-262.94 335,-201 335.91,-200.03 336.86,-199.1 337.84,-198.21"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="340.05,-200.93 346.04,-192.19 335.91,-195.29 340.05,-200.93"/>
+</g>
+<!-- proc~deallocate_rank3_logical8 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node30" class="node">
+<title>proc~deallocate_rank3_logical8</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node30"><a xlink:href="../proc/deallocate_rank3_logical8.html" xlink:title="deallocate_rank3_logical8">
+<polygon fill="#d9534f" stroke="#d9534f" points="487,-150 335,-150 335,-126 487,-126 487,-150"/>
+<text text-anchor="middle" x="411" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank3_logical8</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank3_logical8 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge29" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank3_logical8</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M249.08,-608.97C252.47,-543.22 271.9,-227.91 335,-159 335.9,-158.02 336.84,-157.08 337.82,-156.19"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="340.03,-158.9 345.97,-150.13 335.85,-153.28 340.03,-158.9"/>
+</g>
+<!-- proc~deallocate_rank3_real128 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node31" class="node">
+<title>proc~deallocate_rank3_real128</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node31"><a xlink:href="../proc/deallocate_rank3_real128.html" xlink:title="deallocate_rank3_real128">
+<polygon fill="#d9534f" stroke="#d9534f" points="486.5,-108 335.5,-108 335.5,-84 486.5,-84 486.5,-108"/>
+<text text-anchor="middle" x="411" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank3_real128</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank3_real128 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge30" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank3_real128</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M248.88,-608.81C251.29,-539.22 266.62,-192.81 335,-117 335.89,-116.01 336.83,-115.07 337.8,-114.17"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="340.02,-116.88 345.91,-108.07 335.81,-111.28 340.02,-116.88"/>
+</g>
+<!-- proc~deallocate_rank3_real32 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node32" class="node">
+<title>proc~deallocate_rank3_real32</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node32"><a xlink:href="../proc/deallocate_rank3_real32.html" xlink:title="deallocate_rank3_real32">
+<polygon fill="#d9534f" stroke="#d9534f" points="483,-66 339,-66 339,-42 483,-42 483,-66"/>
+<text text-anchor="middle" x="411" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank3_real32</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank3_real32 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge31" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank3_real32</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M248.7,-608.76C250.17,-535.74 261.29,-157.79 335,-75 335.89,-74.01 336.81,-73.06 337.78,-72.15"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="340,-74.86 345.86,-66.03 335.77,-69.28 340,-74.86"/>
+</g>
+<!-- proc~deallocate_rank3_real64 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node33" class="node">
+<title>proc~deallocate_rank3_real64</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node33"><a xlink:href="../proc/deallocate_rank3_real64.html" xlink:title="deallocate_rank3_real64">
+<polygon fill="#d9534f" stroke="#d9534f" points="483,-24 339,-24 339,0 483,0 483,-24"/>
+<text text-anchor="middle" x="411" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deallocate_rank3_real64</text>
+</a>
+</g>
+</g>
+<!-- interface~deallocate_array&#45;&gt;proc~deallocate_rank3_real64 -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge32" class="edge">
+<title>interface~deallocate_array&#45;&gt;proc~deallocate_rank3_real64</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M248.55,-608.83C249.13,-532.76 255.9,-122.83 335,-33 335.76,-32.14 336.55,-31.31 337.37,-30.51"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="339.73,-33.11 345.47,-24.2 335.43,-27.59 339.73,-33.11"/>
+</g>
+<!-- proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node34" class="node">
+<title>proc~raise_error</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node34"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="593,-633 523,-633 523,-609 593,-609 593,-633"/>
+<text text-anchor="middle" x="558" y="-618.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~deallocate_rank1_int16&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge33" class="edge">
+<title>proc~deallocate_rank1_int16&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff0000" d="M476.64,-1217.89C480.49,-1215.43 484.01,-1212.49 487,-1209 524.58,-1165.11 550.14,-744.81 555.81,-643.09"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="559.31,-643.2 556.36,-633.03 552.32,-642.82 559.31,-643.2"/>
+</g>
+<!-- proc~deallocate_rank1_int32&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge34" class="edge">
+<title>proc~deallocate_rank1_int32&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff3200" d="M476.6,-1175.86C480.46,-1173.4 483.99,-1170.48 487,-1167 556.28,-1086.83 558.06,-735.87 557.3,-643.4"/>
+<polygon fill="#ff3200" stroke="#ff3200" points="560.79,-643.18 557.19,-633.21 553.8,-643.25 560.79,-643.18"/>
+</g>
+<!-- proc~deallocate_rank1_int64&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge35" class="edge">
+<title>proc~deallocate_rank1_int64&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff6600" d="M476.56,-1133.82C480.43,-1131.38 483.98,-1128.46 487,-1125 551.02,-1051.7 556.69,-731.2 557.03,-643.34"/>
+<polygon fill="#ff6600" stroke="#ff6600" points="560.53,-643.18 557.05,-633.17 553.53,-643.17 560.53,-643.18"/>
+</g>
+<!-- proc~deallocate_rank1_int8&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge36" class="edge">
+<title>proc~deallocate_rank1_int8&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff9900" d="M476.17,-1092C480.19,-1089.51 483.86,-1086.55 487,-1083 545.83,-1016.48 555.23,-725.83 556.72,-643.06"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="560.22,-643.07 556.88,-633.01 553.22,-642.95 560.22,-643.07"/>
+</g>
+<!-- proc~deallocate_rank1_logical1&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge37" class="edge">
+<title>proc~deallocate_rank1_logical1&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ffcc00" d="M476.11,-1049.94C480.14,-1047.47 483.84,-1044.52 487,-1041 540.53,-981.36 553.6,-721.43 556.35,-643.29"/>
+<polygon fill="#ffcc00" stroke="#ffcc00" points="559.85,-643.24 556.68,-633.13 552.85,-643.01 559.85,-643.24"/>
+</g>
+<!-- proc~deallocate_rank1_logical4&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge38" class="edge">
+<title>proc~deallocate_rank1_logical4&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ffff00" d="M476.04,-1007.88C480.09,-1005.42 483.81,-1002.49 487,-999 535.29,-946.16 551.8,-716.44 555.89,-643.39"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="559.4,-643.24 556.44,-633.06 552.41,-642.86 559.4,-643.24"/>
+</g>
+<!-- proc~deallocate_rank1_logical8&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge39" class="edge">
+<title>proc~deallocate_rank1_logical8&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#cbff00" d="M475.95,-965.8C480.02,-963.36 483.77,-960.46 487,-957 530.08,-910.91 549.78,-711.18 555.31,-643.51"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="558.83,-643.4 556.13,-633.15 551.85,-642.85 558.83,-643.4"/>
+</g>
+<!-- proc~deallocate_rank1_real128&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge40" class="edge">
+<title>proc~deallocate_rank1_real128&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#99ff00" d="M475.49,-923.9C479.72,-921.45 483.63,-918.51 487,-915 524.91,-875.57 547.51,-705.31 554.58,-643.52"/>
+<polygon fill="#99ff00" stroke="#99ff00" points="558.09,-643.62 555.72,-633.3 551.14,-642.85 558.09,-643.62"/>
+</g>
+<!-- proc~deallocate_rank1_real32&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge41" class="edge">
+<title>proc~deallocate_rank1_real32&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#65ff00" d="M474.99,-881.96C479.39,-879.5 483.47,-876.54 487,-873 550.98,-808.89 557.75,-691.7 557.63,-643.06"/>
+<polygon fill="#65ff00" stroke="#65ff00" points="561.13,-642.96 557.5,-633 554.13,-643.05 561.13,-642.96"/>
+</g>
+<!-- proc~deallocate_rank1_real64&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge42" class="edge">
+<title>proc~deallocate_rank1_real64&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#33ff00" d="M474.44,-839.96C479.01,-837.5 483.28,-834.54 487,-831 540.9,-779.66 553.31,-685.79 556.16,-643.14"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="559.66,-643.18 556.71,-633 552.67,-642.79 559.66,-643.18"/>
+</g>
+<!-- proc~deallocate_rank2_int16&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge43" class="edge">
+<title>proc~deallocate_rank2_int16&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ff00" d="M473.8,-797.85C478.56,-795.41 483.05,-792.5 487,-789 530.96,-750.09 547.98,-679.18 554.01,-643.2"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="557.48,-643.65 555.55,-633.23 550.57,-642.58 557.48,-643.65"/>
+</g>
+<!-- proc~deallocate_rank2_int32&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge44" class="edge">
+<title>proc~deallocate_rank2_int32&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ff32" d="M472.26,-755.89C477.53,-753.45 482.54,-750.52 487,-747 521.31,-719.91 541.39,-671.12 550.68,-642.86"/>
+<polygon fill="#00ff32" stroke="#00ff32" points="554.08,-643.71 553.72,-633.12 547.4,-641.63 554.08,-643.71"/>
+</g>
+<!-- proc~deallocate_rank2_int64&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge45" class="edge">
+<title>proc~deallocate_rank2_int64&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ff66" d="M469.29,-713.92C475.51,-711.47 481.55,-708.53 487,-705 511.92,-688.86 532.52,-661.09 544.78,-641.92"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="547.83,-643.64 550.1,-633.29 541.87,-639.96 547.83,-643.64"/>
+</g>
+<!-- proc~deallocate_rank2_int8&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge46" class="edge">
+<title>proc~deallocate_rank2_int8&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ff99" d="M462.27,-671.94C470.66,-669.35 479.18,-666.37 487,-663 502.44,-656.35 518.6,-646.84 531.5,-638.56"/>
+<polygon fill="#00ff99" stroke="#00ff99" points="533.42,-641.48 539.86,-633.07 529.58,-635.63 533.42,-641.48"/>
+</g>
+<!-- proc~deallocate_rank2_logical1&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge47" class="edge">
+<title>proc~deallocate_rank2_logical1&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ffcb" d="M487.05,-631.13C495.89,-629.85 504.68,-628.58 512.9,-627.39"/>
+<polygon fill="#00ffcb" stroke="#00ffcb" points="513.56,-630.83 522.96,-625.93 512.56,-623.9 513.56,-630.83"/>
+</g>
+<!-- proc~deallocate_rank2_logical4&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge48" class="edge">
+<title>proc~deallocate_rank2_logical4&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00ffff" d="M487.05,-610.87C495.89,-612.15 504.68,-613.42 512.9,-614.61"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="512.56,-618.1 522.96,-616.07 513.56,-611.17 512.56,-618.1"/>
+</g>
+<!-- proc~deallocate_rank2_logical8&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge49" class="edge">
+<title>proc~deallocate_rank2_logical8&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#00cbff" d="M462.27,-570.06C470.66,-572.65 479.18,-575.63 487,-579 502.44,-585.65 518.6,-595.16 531.5,-603.44"/>
+<polygon fill="#00cbff" stroke="#00cbff" points="529.58,-606.37 539.86,-608.93 533.42,-600.52 529.58,-606.37"/>
+</g>
+<!-- proc~deallocate_rank2_real128&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge50" class="edge">
+<title>proc~deallocate_rank2_real128&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#0099ff" d="M469.29,-528.08C475.51,-530.53 481.55,-533.47 487,-537 511.92,-553.14 532.52,-580.91 544.78,-600.08"/>
+<polygon fill="#0099ff" stroke="#0099ff" points="541.87,-602.04 550.1,-608.71 547.83,-598.36 541.87,-602.04"/>
+</g>
+<!-- proc~deallocate_rank2_real32&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge51" class="edge">
+<title>proc~deallocate_rank2_real32&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#0066ff" d="M472.26,-486.11C477.53,-488.55 482.54,-491.48 487,-495 521.31,-522.09 541.39,-570.88 550.68,-599.14"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="547.4,-600.37 553.72,-608.88 554.08,-598.29 547.4,-600.37"/>
+</g>
+<!-- proc~deallocate_rank2_real64&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge52" class="edge">
+<title>proc~deallocate_rank2_real64&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#0033ff" d="M473.8,-444.15C478.56,-446.59 483.05,-449.5 487,-453 530.96,-491.91 547.98,-562.82 554.01,-598.8"/>
+<polygon fill="#0033ff" stroke="#0033ff" points="550.57,-599.42 555.55,-608.77 557.48,-598.35 550.57,-599.42"/>
+</g>
+<!-- proc~deallocate_rank3_int16&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge53" class="edge">
+<title>proc~deallocate_rank3_int16&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#0000ff" d="M474.44,-402.04C479.01,-404.5 483.28,-407.46 487,-411 540.9,-462.34 553.31,-556.21 556.16,-598.86"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="552.67,-599.21 556.71,-609 559.66,-598.82 552.67,-599.21"/>
+</g>
+<!-- proc~deallocate_rank3_int32&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge54" class="edge">
+<title>proc~deallocate_rank3_int32&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#3200ff" d="M474.99,-360.04C479.39,-362.5 483.47,-365.46 487,-369 550.98,-433.11 557.75,-550.3 557.63,-598.94"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="554.13,-598.95 557.5,-609 561.13,-599.04 554.13,-598.95"/>
+</g>
+<!-- proc~deallocate_rank3_int64&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge55" class="edge">
+<title>proc~deallocate_rank3_int64&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#6500ff" d="M475.49,-318.1C479.72,-320.55 483.63,-323.49 487,-327 524.91,-366.43 547.51,-536.69 554.58,-598.48"/>
+<polygon fill="#6500ff" stroke="#6500ff" points="551.14,-599.15 555.72,-608.7 558.09,-598.38 551.14,-599.15"/>
+</g>
+<!-- proc~deallocate_rank3_int8&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge56" class="edge">
+<title>proc~deallocate_rank3_int8&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#9900ff" d="M475.95,-276.2C480.02,-278.64 483.77,-281.54 487,-285 530.08,-331.09 549.78,-530.82 555.31,-598.49"/>
+<polygon fill="#9900ff" stroke="#9900ff" points="551.85,-599.15 556.13,-608.85 558.83,-598.6 551.85,-599.15"/>
+</g>
+<!-- proc~deallocate_rank3_logical1&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge57" class="edge">
+<title>proc~deallocate_rank3_logical1&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#cc00ff" d="M476.04,-234.12C480.09,-236.58 483.81,-239.51 487,-243 535.29,-295.84 551.8,-525.56 555.89,-598.61"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="552.41,-599.14 556.44,-608.94 559.4,-598.76 552.41,-599.14"/>
+</g>
+<!-- proc~deallocate_rank3_logical4&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge58" class="edge">
+<title>proc~deallocate_rank3_logical4&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff00ff" d="M476.11,-192.06C480.14,-194.53 483.84,-197.48 487,-201 540.53,-260.64 553.6,-520.57 556.35,-598.71"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="552.85,-598.99 556.68,-608.87 559.85,-598.76 552.85,-598.99"/>
+</g>
+<!-- proc~deallocate_rank3_logical8&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge59" class="edge">
+<title>proc~deallocate_rank3_logical8&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff00cb" d="M476.17,-150C480.19,-152.49 483.86,-155.45 487,-159 545.83,-225.52 555.23,-516.17 556.72,-598.94"/>
+<polygon fill="#ff00cb" stroke="#ff00cb" points="553.22,-599.05 556.88,-608.99 560.22,-598.93 553.22,-599.05"/>
+</g>
+<!-- proc~deallocate_rank3_real128&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge60" class="edge">
+<title>proc~deallocate_rank3_real128&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff0098" d="M476.56,-108.18C480.43,-110.62 483.98,-113.54 487,-117 551.02,-190.3 556.69,-510.8 557.03,-598.66"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="553.53,-598.83 557.05,-608.83 560.53,-598.82 553.53,-598.83"/>
+</g>
+<!-- proc~deallocate_rank3_real32&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge61" class="edge">
+<title>proc~deallocate_rank3_real32&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff0066" d="M476.6,-66.14C480.46,-68.6 483.99,-71.52 487,-75 556.28,-155.17 558.06,-506.13 557.3,-598.6"/>
+<polygon fill="#ff0066" stroke="#ff0066" points="553.8,-598.75 557.19,-608.79 560.79,-598.82 553.8,-598.75"/>
+</g>
+<!-- proc~deallocate_rank3_real64&#45;&gt;proc~raise_error -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge62" class="edge">
+<title>proc~deallocate_rank3_real64&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff0033" d="M476.64,-24.11C480.49,-26.57 484.01,-29.51 487,-33 524.58,-76.89 550.14,-497.19 555.81,-598.91"/>
+<polygon fill="#ff0033" stroke="#ff0033" points="552.32,-599.18 556.36,-608.97 559.31,-598.8 552.32,-599.18"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node35" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_proc~~destroy_type_solver_fgmres~~CallsGraph_node35"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="750,-673 629,-673 629,-649 750,-649 750,-673"/>
+<text text-anchor="middle" x="689.5" y="-658.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge63" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#ff0000" d="M593.02,-631.51C607.16,-635.88 623.85,-641.03 639.28,-645.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="638.61,-649.25 649.2,-648.86 640.68,-642.57 638.61,-649.25"/>
+</g>
+<!-- strip -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node36" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="840,-653 786,-653 786,-629 840,-629 840,-653"/>
+<text text-anchor="middle" x="813" y="-638.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge64" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M593.12,-623.7C640.75,-627.46 726.78,-634.26 775.6,-638.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="775.47,-641.62 785.71,-638.92 776.02,-634.64 775.47,-641.62"/>
+</g>
+<!-- to_string -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_node37" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="718.5,-593 660.5,-593 660.5,-569 718.5,-569 718.5,-593"/>
+<text text-anchor="middle" x="689.5" y="-578.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge65" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#ff0000" d="M593.02,-610.49C610.73,-605.02 632.42,-598.32 650.65,-592.69"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="651.86,-595.98 660.38,-589.69 649.79,-589.29 651.86,-595.98"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="proc~~destroy_type_solver_fgmres~~CallsGraph_edge66" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M750.18,-651.18C758.86,-649.75 767.57,-648.31 775.6,-646.99"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="776.4,-650.41 785.7,-645.33 775.27,-643.5 776.4,-650.41"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocdestroy_type_solver_fgmresCallsGraph = svgPanZoom('#procdestroy_type_solver_fgmresCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">destroy_type_solver_fgmres</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_solver_fgmres</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span>
+
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">ID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">name</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">name</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">destroy</span><span class="p">()</span>
+<span class="w">            </span><span class="k">end do</span>
+<span class="k">            deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">v</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">zv</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">zv</span><span class="p">)</span>
+<span class="w">                </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">zv</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">destroy</span><span class="p">()</span>
+<span class="w">            </span><span class="k">end do</span>
+<span class="k">            deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">zv</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        call </span><span class="n">self</span><span class="p">%</span><span class="n">r</span><span class="p">%</span><span class="n">destroy</span><span class="p">()</span>
+<span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">w</span><span class="p">%</span><span class="n">destroy</span><span class="p">()</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">h</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">g</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">cs</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">sn</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">deallocate_array</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">y</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">pc</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">self</span><span class="p">%</span><span class="n">pc</span><span class="p">%</span><span class="n">destroy</span><span class="p">()</span>
+<span class="w">            </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">pc</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SOLVER_STATUS</span><span class="p">%</span><span class="n">SUCCESS</span><span class="p">%</span><span class="n">ID</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">destroy_type_solver_fgmres</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-07-13 12:46 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

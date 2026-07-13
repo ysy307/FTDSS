@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.5% of total for derived types.</p>Including implementation: 17 statements,  0.1% of total for derived types.">17 statements</a>
+                 title="<p> 0.4% of total for derived types.</p>Including implementation: 18 statements,  0.1% of total for derived types.">18 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -136,12 +136,12 @@
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-absolute_tolerance~3">absolute_tolerance</a>
             <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-criterion">criterion</a>
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-initialized~9">initialized</a>
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-max_iterations~5">max_iterations</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-initialized~10">initialized</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-max_iterations~4">max_iterations</a>
             <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-norms_history">norms_history</a>
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-reference_value">reference_value</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-reference_value~3">reference_value</a>
             <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-relative_tolerance~3">relative_tolerance</a>
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-should_check">should_check</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#variable-should_check~2">should_check</a>
         </div>
       </div>
     </div>
@@ -168,12 +168,13 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-check_convergence~3">check_convergence</a>
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-destroy~18">destroy</a>
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-get_current_norm~3">get_current_norm</a>
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-get_tolerances~3">get_tolerances</a>
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-initialize~38">initialize</a>
-            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-reset~19">reset</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-check_convergence~2">check_convergence</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-destroy~21">destroy</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-get_current_norm~2">get_current_norm</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-get_tolerances~2">get_tolerances</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-initialize~39">initialize</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-reset~14">reset</a>
+            <a class="list-group-item" href="../type/type_convergence_criterion.html#boundprocedure-update_reference_value">update_reference_value</a>
         </div>
       </div>
     </div>
@@ -496,7 +497,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-initialized~9"></span>
+              <span class="anchor" id="variable-initialized~10"></span>
               logical,
             </td>
               <td>private</td>
@@ -513,7 +514,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-max_iterations~5"></span>
+              <span class="anchor" id="variable-max_iterations~4"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -551,7 +552,7 @@ Dimension: (num_norm_type, max_iteration)
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-reference_value"></span>
+              <span class="anchor" id="variable-reference_value~3"></span>
               real(kind=real64),
             </td>
               <td>private</td>
@@ -588,7 +589,7 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-should_check"></span>
+              <span class="anchor" id="variable-should_check~2"></span>
               logical,
             </td>
               <td>private</td>
@@ -616,7 +617,7 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-check_convergence~3"></span>
+      <span class="anchor" id="boundprocedure-check_convergence~2"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>check_convergence</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/check_convergence_criterion.html'>check_convergence_criterion</a>
@@ -721,7 +722,7 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-destroy~18"></span>
+      <span class="anchor" id="boundprocedure-destroy~21"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>destroy</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/destroy_type_convergence_criterion.html'>destroy_type_convergence_criterion</a>
@@ -776,7 +777,7 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_current_norm~3"></span>
+      <span class="anchor" id="boundprocedure-get_current_norm~2"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>get_current_norm</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/get_current_norm_convergence_criterion.html'>get_current_norm_convergence_criterion</a>
@@ -876,7 +877,7 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-get_tolerances~3"></span>
+      <span class="anchor" id="boundprocedure-get_tolerances~2"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>get_tolerances</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/get_tolerances_convergence_criterion.html'>get_tolerances_convergence_criterion</a>
@@ -961,7 +962,7 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~38"></span>
+      <span class="anchor" id="boundprocedure-initialize~39"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/initialize_type_convergence_criterion.html'>initialize_type_convergence_criterion</a>
@@ -1076,7 +1077,7 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-reset~19"></span>
+      <span class="anchor" id="boundprocedure-reset~14"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>reset</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/reset_criterion.html'>reset_criterion</a>
@@ -1128,6 +1129,76 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
   </div>
 
           </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-update_reference_value"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>update_reference_value</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/interface/update_reference_value_type_convergence_criterion.html'>update_reference_value_type_convergence_criterion</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                <h3>interface </h3>
+                    <h3>
+    private module subroutine update_reference_value_type_convergence_criterion(self, reference_value)  
+    <a href="../proc/update_reference_value_type_convergence_criterion.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h3>
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_convergence_criterion.html'>type_convergence_criterion</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>reference_value</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
       </section>
 
     <section>
@@ -1162,6 +1233,7 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">destroy</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">destroy_type_convergence_criterion</span>
 <span class="w">        </span><span class="c">! ---- Mutator ----</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">reset</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">reset_criterion</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">update_reference_value</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">update_reference_value_type_convergence_criterion</span>
 <span class="w">        </span><span class="c">! ---- Algorithm / Operation ----</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">check_convergence</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">check_convergence_criterion</span>
 <span class="w">        </span><span class="c">! ---- Inquiry ----</span>
@@ -1192,7 +1264,7 @@ Typically, this should be set to the characteristic physical scale (e.g., max-mi
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

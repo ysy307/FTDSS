@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.2% of total for derived types.</p>Including implementation: 47 statements,  0.2% of total for derived types.">9 statements</a>
+                 title="<p> 0.5% of total for derived types.</p>Including implementation: 112 statements,  0.4% of total for derived types.">20 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,10 +134,21 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-block_size">block_size</a>
-            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-id~124">id</a>
+            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-amg_drop_strategy">amg_drop_strategy</a>
+            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-amg_drop_tolerance">amg_drop_tolerance</a>
+            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-amg_max_agg_size">amg_max_agg_size</a>
+            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-amg_rebuild_frequency">amg_rebuild_frequency</a>
+            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-amg_rebuild_threshold">amg_rebuild_threshold</a>
+            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-amg_smoother_sweeps">amg_smoother_sweeps</a>
+            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-amg_smoother_type">amg_smoother_type</a>
+            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-amg_strength_threshold">amg_strength_threshold</a>
+            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-block_size~2">block_size</a>
+            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-id~14">id</a>
             <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-ilu_fill_level">ilu_fill_level</a>
-            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-num_nodes~9">num_nodes</a>
+            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-ilut_drop_tolerance">ilut_drop_tolerance</a>
+            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-ilut_max_fill">ilut_max_fill</a>
+            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-num_nodes~61">num_nodes</a>
+            <a class="list-group-item" href="../type/type_preconditioner_settings.html#variable-ssor_omega">ssor_omega</a>
         </div>
       </div>
     </div>
@@ -164,7 +175,7 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_preconditioner_settings.html#boundprocedure-set~2">set</a>
+            <a class="list-group-item" href="../type/type_preconditioner_settings.html#boundprocedure-set~17">set</a>
         </div>
       </div>
     </div>
@@ -204,7 +215,143 @@ Used to pass parameters like ID, system size, and block size to the factory.</p>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-block_size"></span>
+              <span class="anchor" id="variable-amg_drop_strategy"></span>
+              character(len=32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_drop_strategy</strong></td>
+<td> =</td>
+                <td>&#39;RELATIVE&#39;</td>
+            <td>
+                <p>AMG drop strategy: 'NONE' | 'RELATIVE' (default 'RELATIVE')</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-amg_drop_tolerance"></span>
+              real(kind=real64),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_drop_tolerance</strong></td>
+<td> =</td>
+                <td>1.0d-4</td>
+            <td>
+                <p>AMG drop tolerance for coarse matrix (default 1.0e-4)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-amg_max_agg_size"></span>
+              integer(kind=int32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_max_agg_size</strong></td>
+<td> =</td>
+                <td>8</td>
+            <td>
+                <p>AMG maximum aggregate size (default 8)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-amg_rebuild_frequency"></span>
+              integer(kind=int32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_rebuild_frequency</strong></td>
+<td> =</td>
+                <td>5</td>
+            <td>
+                <p>AMG rebuild frequency (number of steps, default 5)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-amg_rebuild_threshold"></span>
+              real(kind=real64),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_rebuild_threshold</strong></td>
+<td> =</td>
+                <td>1.0d-2</td>
+            <td>
+                <p>AMG rebuild threshold for relative residual increase (default 1.0e-2)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-amg_smoother_sweeps"></span>
+              integer(kind=int32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_smoother_sweeps</strong></td>
+<td> =</td>
+                <td>2</td>
+            <td>
+                <p>AMG smoother sweeps (default 2)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-amg_smoother_type"></span>
+              character(len=32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_smoother_type</strong></td>
+<td> =</td>
+                <td>&#39;JACOBI&#39;</td>
+            <td>
+                <p>AMG smoother type: 'JACOBI' | 'GS_FWD' | 'GS_BWD' | 'HYBRID' (default 'JACOBI')</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-amg_strength_threshold"></span>
+              real(kind=real64),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_strength_threshold</strong></td>
+<td> =</td>
+                <td>0.25d0</td>
+            <td>
+                <p>AMG strength threshold (default 0.25)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-block_size~2"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -221,7 +368,7 @@ Used to pass parameters like ID, system size, and block size to the factory.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-id~124"></span>
+              <span class="anchor" id="variable-id~14"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -255,7 +402,41 @@ Used to pass parameters like ID, system size, and block size to the factory.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-num_nodes~9"></span>
+              <span class="anchor" id="variable-ilut_drop_tolerance"></span>
+              real(kind=real64),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ilut_drop_tolerance</strong></td>
+<td> =</td>
+                <td>1.0d-3</td>
+            <td>
+                <p>ILUT drop tolerance (default 1.0e-3)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ilut_max_fill"></span>
+              integer(kind=int32),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ilut_max_fill</strong></td>
+<td> =</td>
+                <td>20</td>
+            <td>
+                <p>ILUT maximum fill-in per row (default 20)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-num_nodes~61"></span>
               integer(kind=int32),
             </td>
               <td>private</td>
@@ -268,6 +449,23 @@ Used to pass parameters like ID, system size, and block size to the factory.</p>
                 <td>-1</td>
             <td>
                 <p>Number of nodes (or block rows) in the system</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ssor_omega"></span>
+              real(kind=real64),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ssor_omega</strong></td>
+<td> =</td>
+                <td>1.0d0</td>
+            <td>
+                <p>SSOR relaxation parameter (default 1.0)</p>
             </td>
         </tr>
     </tbody>
@@ -283,7 +481,7 @@ Used to pass parameters like ID, system size, and block size to the factory.</p>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-set~2"></span>
+      <span class="anchor" id="boundprocedure-set~17"></span>
       <h3>
           procedure, public ::
   <strong>set</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/set_preconditioner_settings.html'>set_preconditioner_settings</a>
@@ -297,7 +495,7 @@ Used to pass parameters like ID, system size, and block size to the factory.</p>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/set_preconditioner_settings.html'>set_preconditioner_settings</a>(self, id, num_nodes, block_size, ilu_fillin_level)  
+    private  subroutine <a href='../proc/set_preconditioner_settings.html'>set_preconditioner_settings</a>(self, id, num_nodes, block_size, ilu_fillin_level, ssor_omega, amg_strength_threshold, amg_smoother_sweeps, amg_max_agg_size, amg_drop_tolerance, amg_drop_strategy, amg_smoother_type, amg_rebuild_frequency, amg_rebuild_threshold)  
 </h3>
     
 
@@ -389,6 +587,141 @@ Used to pass parameters like ID, system size, and block size to the factory.</p>
 <p>ILU fill-in level (optional, default 0)</p>
             </td>
         </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ssor_omega</strong></td>
+            <td>
+<p>SSOR relaxation parameter (optional, default 1.0)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_strength_threshold</strong></td>
+            <td>
+<p>Optional AMG strength threshold for SA-AMG.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_smoother_sweeps</strong></td>
+            <td>
+<p>Optional AMG smoother sweeps for SA-AMG.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_max_agg_size</strong></td>
+            <td>
+<p>Optional AMG maximum aggregate size for SA-AMG.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_drop_tolerance</strong></td>
+            <td>
+<p>Optional AMG coarse-matrix drop tolerance for SA-AMG.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_drop_strategy</strong></td>
+            <td>
+<p>Optional AMG drop strategy for SA-AMG.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_smoother_type</strong></td>
+            <td>
+<p>Optional AMG smoother type for SA-AMG.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_rebuild_frequency</strong></td>
+            <td>
+<p>Optional AMG rebuild frequency for SA-AMG.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_rebuild_threshold</strong></td>
+            <td>
+<p>Optional AMG rebuild threshold for SA-AMG.</p>
+            </td>
+        </tr>
     </tbody>
   </table>
 
@@ -412,6 +745,28 @@ Used to pass parameters like ID, system size, and block size to the factory.</p>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">block_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
 <span class="w">        </span><span class="c">!&gt; ILU fill-in level (for ILU preconditioners)</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ilu_fill_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="c">!&gt; SSOR relaxation parameter (default 1.0)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ssor_omega</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span>
+<span class="w">        </span><span class="c">!&gt; ILUT drop tolerance (default 1.0e-3)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ilut_drop_tolerance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d-3</span>
+<span class="w">        </span><span class="c">!&gt; ILUT maximum fill-in per row (default 20)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ilut_max_fill</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span>
+<span class="w">        </span><span class="c">!&gt; AMG strength threshold (default 0.25)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_strength_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.25d0</span>
+<span class="w">        </span><span class="c">!&gt; AMG smoother sweeps (default 2)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_smoother_sweeps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">        </span><span class="c">!&gt; AMG maximum aggregate size (default 8)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_max_agg_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span>
+<span class="w">        </span><span class="c">!&gt; AMG drop tolerance for coarse matrix (default 1.0e-4)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_drop_tolerance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d-4</span>
+<span class="w">        </span><span class="c">!&gt; AMG drop strategy: &#39;NONE&#39; | &#39;RELATIVE&#39; (default &#39;RELATIVE&#39;)</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_drop_strategy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;RELATIVE&#39;</span>
+<span class="w">        </span><span class="c">!&gt; AMG smoother type: &#39;JACOBI&#39; | &#39;GS_FWD&#39; | &#39;GS_BWD&#39; | &#39;HYBRID&#39; (default &#39;JACOBI&#39;)</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_smoother_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;JACOBI&#39;</span>
+<span class="w">        </span><span class="c">!&gt; AMG rebuild frequency (number of steps, default 5)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_rebuild_frequency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+<span class="w">        </span><span class="c">!&gt; AMG rebuild threshold for relative residual increase (default 1.0e-2)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_rebuild_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d-2</span>
 <span class="w">    </span><span class="k">contains</span>
 <span class="w">        </span><span class="c">!&gt; Set configuration parameters.</span>
 <span class="w">        </span><span class="k">procedure</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">set_preconditioner_settings</span>
@@ -438,7 +793,7 @@ Used to pass parameters like ID, system size, and block size to the factory.</p>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

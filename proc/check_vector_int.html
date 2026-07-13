@@ -92,19 +92,19 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">18 statements</a>
+                 title=" 0.0% of total for procedures.">20 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
               <i class="fa fa-code"></i>
-              <a href="../src/vector_int.F90"> Source File</a>
+              <a href="../src/vector_impl.fypp"> Source File</a>
             </li>
         </ul>
       </div>
       <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb justify-content-end mb-0">
-                <li class="breadcrumb-item"><a href='../sourcefile/vector_int.f90.html'>vector_int.F90</a></li>
+                <li class="breadcrumb-item"><a href='../sourcefile/vector_impl.fypp.html'>vector_impl.fypp</a></li>
                 <li class="breadcrumb-item"><a href='../module/algebra_vector_int.html'>algebra_vector_int</a></li>
             <li class="breadcrumb-item active" aria-current="page">check_vector_int</li>
           </ol>
@@ -146,12 +146,6 @@
   
   
   
-    <div class="card card-primary">
-      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
-      <div class="list-group">
-        <a class="list-group-item" href="../proc/check_vector_int.html#src">check_vector_int</a>
-      </div>
-    </div>
 
 
   </div>
@@ -179,7 +173,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1540"></span>
+              <span class="anchor" id="variable-self~926"></span>
               class(<a href='../type/type_vector_int.html'>type_vector_int</a>),
             </td>
 <td>intent(in)</td>
@@ -328,32 +322,6 @@ large graphs.</div>
 
 
     
-    <section>
-    <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">module subroutine </span><span class="n">check_vector_int</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
-<span class="w">        </span><span class="k">implicit none</span>
-<span class="k">        class</span><span class="p">(</span><span class="n">type_vector_int</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
-
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">is_initialized_vector</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-<span class="k">            write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;Error: Vector not initialized.&quot;</span>
-<span class="w">            </span><span class="k">return</span>
-<span class="k">        end if</span>
-<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">VECTOR_STATUS</span><span class="p">%</span><span class="n">SUCCESS</span><span class="p">)</span><span class="w"> </span><span class="k">return</span>
-<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">VECTOR_STATUS</span><span class="p">%</span><span class="n">OUT_OF_MEMORY</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-<span class="k">            write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;Error: Vector operation failed due to out of memory.&quot;</span>
-<span class="w">        </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">VECTOR_STATUS</span><span class="p">%</span><span class="n">ILL_OPERATIONS</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-<span class="k">            write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;Error: Vector operation failed due to illegal operation.&quot;</span>
-<span class="w">        </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">%</span><span class="n">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">VECTOR_STATUS</span><span class="p">%</span><span class="n">NOT_IMPLEMENTED</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-<span class="k">            write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;Error: Vector operation not implemented.&quot;</span>
-<span class="w">        </span><span class="k">else</span>
-<span class="k">            write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;Error: Vector operation failed due to unknown error.&quot;</span>
-<span class="w">        </span><span class="k">end if</span>
-
-<span class="k">    end subroutine </span><span class="n">check_vector_int</span>
-</pre></div>
-
-    </section>
-    <br>
     
     </div>
   </div>
@@ -373,7 +341,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

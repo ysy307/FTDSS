@@ -1,0 +1,903 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>calculate_analysis_etkf &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>calculate_analysis_etkf
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.1% of total for procedures.">127 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/etkf_solver.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/etkf_solver.f90.html'>etkf_solver.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/physics_governing_atmosphere_etkf.html'>physics_governing_atmosphere_etkf</a></li>
+            <li class="breadcrumb-item active" aria-current="page">calculate_analysis_etkf</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/calculate_analysis_etkf.html#src">calculate_analysis_etkf</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine calculate_analysis_etkf(self, ensemble, obs_manager, y_in, R_diag_in)  
+</h2>
+    
+
+    <p>Performs ETKF analysis and updates ensemble members in-place.</p>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/type_etkf_solver.html'>type_etkf_solver</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~856"></span>
+              class(<a href='../type/type_etkf_solver.html'>type_etkf_solver</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ensemble~2"></span>
+              type(<a href='../type/type_ensemble_manager.html'>type_ensemble_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ensemble</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-obs_manager~2"></span>
+              type(<a href='../type/type_observation_manager.html'>type_observation_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>obs_manager</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-y_in~2"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>y_in</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-r_diag_in"></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>R_diag_in</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calculate_analysis_etkf~~CallsGraph Pages: 1 -->
+<svg id="proccalculate_analysis_etkfCallsGraph" width="641pt" height="211pt"
+ viewBox="0.00 0.00 641.00 210.94" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calculate_analysis_etkf~~CallsGraph" class="graph" transform="scale(0.74 0.74) rotate(0) translate(4 280)">
+<title>proc~~calculate_analysis_etkf~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-280 859,-280 859,4 -4,4"/>
+<!-- proc~calculate_analysis_etkf -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_node1" class="node">
+<title>proc~calculate_analysis_etkf</title>
+<polygon fill="none" stroke="black" points="231,-150 0,-150 0,-126 231,-126 231,-150"/>
+<text text-anchor="middle" x="115.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_etkf_solver%calculate_analysis_etkf</text>
+</g>
+<!-- dgemm -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_node2" class="node">
+<title>dgemm</title>
+<polygon fill="#777777" stroke="#777777" points="455.5,-276 401.5,-276 401.5,-252 455.5,-252 455.5,-276"/>
+<text text-anchor="middle" x="428.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dgemm</text>
+</g>
+<!-- proc~calculate_analysis_etkf&#45;&gt;dgemm -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_edge1" class="edge">
+<title>proc~calculate_analysis_etkf&#45;&gt;dgemm</title>
+<path fill="none" stroke="#ff0000" d="M129.32,-150.26C153.82,-172.89 209.96,-220.9 267,-243 307.55,-258.71 357.73,-263.1 391.07,-264.12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="391.2,-267.62 401.27,-264.34 391.35,-260.62 391.2,-267.62"/>
+</g>
+<!-- dgemv -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_node3" class="node">
+<title>dgemv</title>
+<polygon fill="#777777" stroke="#777777" points="455.5,-234 401.5,-234 401.5,-210 455.5,-210 455.5,-234"/>
+<text text-anchor="middle" x="428.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dgemv</text>
+</g>
+<!-- proc~calculate_analysis_etkf&#45;&gt;dgemv -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_edge2" class="edge">
+<title>proc~calculate_analysis_etkf&#45;&gt;dgemv</title>
+<path fill="none" stroke="#ff0000" d="M139.79,-150.06C168.79,-164.52 220.23,-188.39 267,-201 308.75,-212.25 358.28,-217.56 391.17,-220.01"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="391.01,-223.51 401.23,-220.71 391.5,-216.53 391.01,-223.51"/>
+</g>
+<!-- dsyev -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_node4" class="node">
+<title>dsyev</title>
+<polygon fill="#777777" stroke="#777777" points="455.5,-192 401.5,-192 401.5,-168 455.5,-168 455.5,-192"/>
+<text text-anchor="middle" x="428.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dsyev</text>
+</g>
+<!-- proc~calculate_analysis_etkf&#45;&gt;dsyev -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_edge3" class="edge">
+<title>proc~calculate_analysis_etkf&#45;&gt;dsyev</title>
+<path fill="none" stroke="#ff0000" d="M201.65,-150.01C222.98,-152.98 245.82,-156.14 267,-159 309.72,-164.78 358.87,-171.17 391.41,-175.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="390.99,-178.84 401.36,-176.65 391.89,-171.9 390.99,-178.84"/>
+</g>
+<!-- proc~build_h_obs_manager -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_node5" class="node">
+<title>proc~build_h_obs_manager</title>
+<g id="a_proc~~calculate_analysis_etkf~~CallsGraph_node5"><a xlink:href="../proc/build_h_obs_manager.html" xlink:title="type_observation_manager%build_H_obs_manager">
+<polygon fill="#d9534f" stroke="#d9534f" points="571.5,-150 285.5,-150 285.5,-126 571.5,-126 571.5,-150"/>
+<text text-anchor="middle" x="428.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_observation_manager%build_H_obs_manager</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_analysis_etkf&#45;&gt;proc~build_h_obs_manager -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_edge4" class="edge">
+<title>proc~calculate_analysis_etkf&#45;&gt;proc~build_h_obs_manager</title>
+<path fill="none" stroke="#ff0000" d="M231.42,-138C245.69,-138 260.45,-138 275.17,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="275.35,-141.5 285.35,-138 275.35,-134.5 275.35,-141.5"/>
+</g>
+<!-- proc~compute_anomalies_ensemble -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_node6" class="node">
+<title>proc~compute_anomalies_ensemble</title>
+<g id="a_proc~~calculate_analysis_etkf~~CallsGraph_node6"><a xlink:href="../proc/compute_anomalies_ensemble.html" xlink:title="type_ensemble_manager%compute_anomalies_ensemble">
+<polygon fill="#d9534f" stroke="#d9534f" points="590,-108 267,-108 267,-84 590,-84 590,-108"/>
+<text text-anchor="middle" x="428.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ensemble_manager%compute_anomalies_ensemble</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_analysis_etkf&#45;&gt;proc~compute_anomalies_ensemble -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_edge5" class="edge">
+<title>proc~calculate_analysis_etkf&#45;&gt;proc~compute_anomalies_ensemble</title>
+<path fill="none" stroke="#ff0000" d="M201.65,-125.99C222.98,-123.02 245.82,-119.86 267,-117 285.62,-114.48 305.45,-111.85 324.61,-109.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="325.09,-112.8 334.55,-108.02 324.18,-105.86 325.09,-112.8"/>
+</g>
+<!-- proc~compute_mean_ensemble -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_node7" class="node">
+<title>proc~compute_mean_ensemble</title>
+<g id="a_proc~~calculate_analysis_etkf~~CallsGraph_node7"><a xlink:href="../proc/compute_mean_ensemble.html" xlink:title="type_ensemble_manager%compute_mean_ensemble">
+<polygon fill="#d9534f" stroke="#d9534f" points="577.5,-66 279.5,-66 279.5,-42 577.5,-42 577.5,-66"/>
+<text text-anchor="middle" x="428.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ensemble_manager%compute_mean_ensemble</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_analysis_etkf&#45;&gt;proc~compute_mean_ensemble -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_edge6" class="edge">
+<title>proc~calculate_analysis_etkf&#45;&gt;proc~compute_mean_ensemble</title>
+<path fill="none" stroke="#ff0000" d="M139.79,-125.94C168.79,-111.48 220.23,-87.61 267,-75 276.97,-72.31 287.39,-69.96 297.92,-67.91"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="298.84,-71.3 308.04,-66.03 297.57,-64.42 298.84,-71.3"/>
+</g>
+<!-- proc~destroy_atmos_state -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_node8" class="node">
+<title>proc~destroy_atmos_state</title>
+<g id="a_proc~~calculate_analysis_etkf~~CallsGraph_node8"><a xlink:href="../proc/destroy_atmos_state.html" xlink:title="type_atmos_state%destroy_atmos_state">
+<polygon fill="#d9534f" stroke="#d9534f" points="540.5,-24 316.5,-24 316.5,0 540.5,0 540.5,-24"/>
+<text text-anchor="middle" x="428.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_atmos_state%destroy_atmos_state</text>
+</a>
+</g>
+</g>
+<!-- proc~calculate_analysis_etkf&#45;&gt;proc~destroy_atmos_state -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_edge7" class="edge">
+<title>proc~calculate_analysis_etkf&#45;&gt;proc~destroy_atmos_state</title>
+<path fill="none" stroke="#ff0000" d="M129.32,-125.74C153.82,-103.11 209.96,-55.1 267,-33 279.44,-28.18 292.79,-24.43 306.28,-21.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="307,-24.93 316.11,-19.53 305.62,-18.07 307,-24.93"/>
+</g>
+<!-- proc~find_interp_indices_atm -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_node9" class="node">
+<title>proc~find_interp_indices_atm</title>
+<g id="a_proc~~calculate_analysis_etkf~~CallsGraph_node9"><a xlink:href="../proc/find_interp_indices_atm.html" xlink:title="find_interp_indices_atm">
+<polygon fill="#d9534f" stroke="#d9534f" points="810,-150 671,-150 671,-126 810,-126 810,-150"/>
+<text text-anchor="middle" x="740.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">find_interp_indices_atm</text>
+</a>
+</g>
+</g>
+<!-- proc~build_h_obs_manager&#45;&gt;proc~find_interp_indices_atm -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_edge8" class="edge">
+<title>proc~build_h_obs_manager&#45;&gt;proc~find_interp_indices_atm</title>
+<path fill="none" stroke="#00ff91" d="M571.8,-138C602.28,-138 633.43,-138 660.47,-138"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="660.63,-141.5 670.63,-138 660.63,-134.5 660.63,-141.5"/>
+</g>
+<!-- proc~initialize_atmos_state -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_node10" class="node">
+<title>proc~initialize_atmos_state</title>
+<g id="a_proc~~calculate_analysis_etkf~~CallsGraph_node10"><a xlink:href="../proc/initialize_atmos_state.html" xlink:title="type_atmos_state%initialize_atmos_state">
+<polygon fill="#d9534f" stroke="#d9534f" points="855,-66 626,-66 626,-42 855,-42 855,-66"/>
+<text text-anchor="middle" x="740.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_atmos_state%initialize_atmos_state</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_mean_ensemble&#45;&gt;proc~initialize_atmos_state -->
+<g id="proc~~calculate_analysis_etkf~~CallsGraph_edge9" class="edge">
+<title>proc~compute_mean_ensemble&#45;&gt;proc~initialize_atmos_state</title>
+<path fill="none" stroke="#4800ff" d="M577.69,-54C590.34,-54 603.05,-54 615.48,-54"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="615.85,-57.5 625.85,-54 615.85,-50.5 615.85,-57.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccalculate_analysis_etkfCallsGraph = svgPanZoom('#proccalculate_analysis_etkfCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~calculate_analysis_etkf~~CalledByGraph Pages: 1 -->
+<svg id="proccalculate_analysis_etkfCalledByGraph" width="641pt" height="16pt"
+ viewBox="0.00 0.00 641.00 16.18" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~calculate_analysis_etkf~~CalledByGraph" class="graph" transform="scale(0.51 0.51) rotate(0) translate(4 28)">
+<title>proc~~calculate_analysis_etkf~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 1264,-28 1264,4 -4,4"/>
+<!-- proc~calculate_analysis_etkf -->
+<g id="proc~~calculate_analysis_etkf~~CalledByGraph_node1" class="node">
+<title>proc~calculate_analysis_etkf</title>
+<polygon fill="none" stroke="black" points="1260,-24 1029,-24 1029,0 1260,0 1260,-24"/>
+<text text-anchor="middle" x="1144.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_etkf_solver%calculate_analysis_etkf</text>
+</g>
+<!-- proc~execute_assimilation_cycle -->
+<g id="proc~~calculate_analysis_etkf~~CalledByGraph_node2" class="node">
+<title>proc~execute_assimilation_cycle</title>
+<g id="a_proc~~calculate_analysis_etkf~~CalledByGraph_node2"><a xlink:href="../proc/execute_assimilation_cycle.html" xlink:title="type_assimilation_controller%execute_assimilation_cycle">
+<polygon fill="#d9534f" stroke="#d9534f" points="993,-24 678,-24 678,0 993,0 993,-24"/>
+<text text-anchor="middle" x="835.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_assimilation_controller%execute_assimilation_cycle</text>
+</a>
+</g>
+</g>
+<!-- proc~execute_assimilation_cycle&#45;&gt;proc~calculate_analysis_etkf -->
+<g id="proc~~calculate_analysis_etkf~~CalledByGraph_edge1" class="edge">
+<title>proc~execute_assimilation_cycle&#45;&gt;proc~calculate_analysis_etkf</title>
+<path fill="none" stroke="#ff0000" d="M993.15,-12C1001.66,-12 1010.16,-12 1018.54,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1018.7,-15.5 1028.7,-12 1018.7,-8.5 1018.7,-15.5"/>
+</g>
+<!-- proc~run_assimilation_ftcms -->
+<g id="proc~~calculate_analysis_etkf~~CalledByGraph_node3" class="node">
+<title>proc~run_assimilation_ftcms</title>
+<g id="a_proc~~calculate_analysis_etkf~~CalledByGraph_node3"><a xlink:href="../proc/run_assimilation_ftcms.html" xlink:title="run_assimilation_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="642,-24 508,-24 508,0 642,0 642,-24"/>
+<text text-anchor="middle" x="575" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_assimilation_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_assimilation_ftcms&#45;&gt;proc~execute_assimilation_cycle -->
+<g id="proc~~calculate_analysis_etkf~~CalledByGraph_edge2" class="edge">
+<title>proc~run_assimilation_ftcms&#45;&gt;proc~execute_assimilation_cycle</title>
+<path fill="none" stroke="#ff0000" d="M642.23,-12C650.39,-12 658.98,-12 667.83,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="667.92,-15.5 677.92,-12 667.92,-8.5 667.92,-15.5"/>
+</g>
+<!-- interface~run_assimilation_ftcms -->
+<g id="proc~~calculate_analysis_etkf~~CalledByGraph_node4" class="node">
+<title>interface~run_assimilation_ftcms</title>
+<g id="a_proc~~calculate_analysis_etkf~~CalledByGraph_node4"><a xlink:href="../interface/run_assimilation_ftcms.html" xlink:title="type_ftcms%run_assimilation_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="472,-24 270,-24 270,0 472,0 472,-24"/>
+<text text-anchor="middle" x="371" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_assimilation_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_assimilation_ftcms&#45;&gt;proc~run_assimilation_ftcms -->
+<g id="proc~~calculate_analysis_etkf~~CalledByGraph_edge3" class="edge">
+<title>interface~run_assimilation_ftcms&#45;&gt;proc~run_assimilation_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M472.11,-12C480.72,-12 489.33,-12 497.7,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="497.78,-15.5 507.78,-12 497.78,-8.5 497.78,-15.5"/>
+</g>
+<!-- proc~run_ftcms -->
+<g id="proc~~calculate_analysis_etkf~~CalledByGraph_node5" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_proc~~calculate_analysis_etkf~~CalledByGraph_node5"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 169,-24 169,0 234,0 234,-24"/>
+<text text-anchor="middle" x="201.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~run_assimilation_ftcms -->
+<g id="proc~~calculate_analysis_etkf~~CalledByGraph_edge4" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~run_assimilation_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M234.01,-12C241.73,-12 250.44,-12 259.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="259.77,-15.5 269.77,-12 259.77,-8.5 259.77,-15.5"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="proc~~calculate_analysis_etkf~~CalledByGraph_node6" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_proc~~calculate_analysis_etkf~~CalledByGraph_node6"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="133,-24 0,-24 0,0 133,0 133,-24"/>
+<text text-anchor="middle" x="66.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="proc~~calculate_analysis_etkf~~CalledByGraph_edge5" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M133.22,-12C141.87,-12 150.53,-12 158.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="158.89,-15.5 168.89,-12 158.89,-8.5 158.89,-15.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panproccalculate_analysis_etkfCalledByGraph = svgPanZoom('#proccalculate_analysis_etkfCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">calculate_analysis_etkf</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">ensemble</span><span class="p">,</span><span class="w"> </span><span class="n">obs_manager</span><span class="p">,</span><span class="w"> </span><span class="n">y_in</span><span class="p">,</span><span class="w"> </span><span class="n">R_diag_in</span><span class="p">)</span>
+<span class="w">        </span><span class="k">implicit none</span>
+<span class="k">        class</span><span class="p">(</span><span class="n">type_etkf_solver</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_ensemble_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ensemble</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_observation_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">obs_manager</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">y_in</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">R_diag_in</span><span class="p">(:)</span>
+
+<span class="w">        </span><span class="k">external</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dsyev</span><span class="p">,</span><span class="w"> </span><span class="n">dgemm</span><span class="p">,</span><span class="w"> </span><span class="n">dgemv</span>
+
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">n_state</span><span class="p">,</span><span class="w"> </span><span class="n">n_obs_loc</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">i</span>
+<span class="w">        </span><span class="c">! Ensemble matrices</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Af</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="w">          </span><span class="c">! n_state x n_ens anomaly</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">xf_bar</span><span class="p">(:)</span><span class="w">         </span><span class="c">! n_state</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">xa_bar</span><span class="p">(:)</span><span class="w">         </span><span class="c">! n_state</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Af_Y</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="w">        </span><span class="c">! n_obs x n_ens</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Af_Y_Rinv</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="w">   </span><span class="c">! n_obs x n_ens  (R^{-1} * Af_Y)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">C_mat</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="w">       </span><span class="c">! n_ens x n_ens</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">A_eig</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="w">       </span><span class="c">! n_ens x n_ens  (eigvec workspace)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">T_mat</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="w">       </span><span class="c">! n_ens x n_ens  transform</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">T2_mat</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="w">      </span><span class="c">! n_ens x n_ens  = T * T</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">T_col_scaled</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="c">! n_ens x n_ens  intermediate</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Xa_anom</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="w">     </span><span class="c">! n_state x n_ens</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">H_mat</span><span class="p">(:,</span><span class="w"> </span><span class="p">:)</span><span class="w">       </span><span class="c">! n_obs x n_state</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">eigval</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">work</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">y</span><span class="p">(:),</span><span class="w"> </span><span class="n">R_diag</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">d</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">wa</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">tmp_obs</span><span class="p">(:),</span><span class="w"> </span><span class="n">tmp_nens</span><span class="p">(:),</span><span class="w"> </span><span class="n">tmp_state</span><span class="p">(:)</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_atmos_state</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mean_state</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">info</span><span class="p">,</span><span class="w"> </span><span class="n">lwork</span>
+
+<span class="w">        </span><span class="n">n_ens</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">ensemble</span><span class="p">%</span><span class="n">n_members</span>
+<span class="w">        </span><span class="n">n_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">ensemble</span><span class="p">%</span><span class="n">n_nodes</span>
+<span class="w">        </span><span class="n">n_obs_loc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">y_in</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="n">n_obs_loc</span><span class="p">),</span><span class="w"> </span><span class="n">R_diag</span><span class="p">(</span><span class="n">n_obs_loc</span><span class="p">))</span>
+<span class="w">        </span><span class="n">y</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">y_in</span>
+<span class="w">        </span><span class="n">R_diag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">R_diag_in</span>
+
+<span class="w">        </span><span class="c">! Ensemble mean</span>
+<span class="w">        </span><span class="k">call </span><span class="n">ensemble</span><span class="p">%</span><span class="n">compute_mean</span><span class="p">(</span><span class="n">mean_state</span><span class="p">)</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">xf_bar</span><span class="p">(</span><span class="n">n_state</span><span class="p">))</span>
+<span class="w">        </span><span class="n">xf_bar</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">ensemble</span><span class="p">%</span><span class="n">n_nodes</span><span class="p">)</span><span class="w">                         </span><span class="o">=</span><span class="w"> </span><span class="n">mean_state</span><span class="p">%</span><span class="n">T</span>
+<span class="w">        </span><span class="n">xf_bar</span><span class="p">(</span><span class="n">ensemble</span><span class="p">%</span><span class="n">n_nodes</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">ensemble</span><span class="p">%</span><span class="n">n_nodes</span><span class="p">)</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">mean_state</span><span class="p">%</span><span class="n">q</span>
+<span class="w">        </span><span class="n">xf_bar</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">ensemble</span><span class="p">%</span><span class="n">n_nodes</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="n">n_state</span><span class="p">)</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="n">mean_state</span><span class="p">%</span><span class="n">U</span>
+
+<span class="w">        </span><span class="c">! Anomaly matrix Af (n_state x n_ens)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">ensemble</span><span class="p">%</span><span class="n">compute_anomalies</span><span class="p">(</span><span class="n">mean_state</span><span class="p">,</span><span class="w"> </span><span class="n">Af</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Observation operator H (n_obs x n_state)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">obs_manager</span><span class="p">%</span><span class="n">build_H</span><span class="p">(</span><span class="n">mean_state</span><span class="p">,</span><span class="w"> </span><span class="n">H_mat</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Af_Y = H * Af  (n_obs x n_ens)</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Af_Y</span><span class="p">(</span><span class="n">n_obs_loc</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">))</span>
+<span class="w">        </span><span class="k">call </span><span class="n">dgemm</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n_obs_loc</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">n_state</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">H_mat</span><span class="p">,</span><span class="w"> </span><span class="n">n_obs_loc</span><span class="p">,</span><span class="w"> </span><span class="n">Af</span><span class="p">,</span><span class="w"> </span><span class="n">n_state</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">Af_Y</span><span class="p">,</span><span class="w"> </span><span class="n">n_obs_loc</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Af_Y_Rinv = diag(1/R) * Af_Y  (n_obs x n_ens)</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Af_Y_Rinv</span><span class="p">(</span><span class="n">n_obs_loc</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">))</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_obs_loc</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">R_diag</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">Af_Y_Rinv</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="p">:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Af_Y</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="p">:)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">R_diag</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="w">            </span><span class="k">else</span>
+<span class="k">                </span><span class="n">Af_Y_Rinv</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="p">:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        end do</span>
+
+<span class="w">        </span><span class="c">! C = Af_Y^T * R^{-1} * Af_Y  (n_ens x n_ens)</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">C_mat</span><span class="p">(</span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">))</span>
+<span class="w">        </span><span class="k">call </span><span class="n">dgemm</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">n_obs_loc</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">Af_Y</span><span class="p">,</span><span class="w"> </span><span class="n">n_obs_loc</span><span class="p">,</span><span class="w"> </span><span class="n">Af_Y_Rinv</span><span class="p">,</span><span class="w"> </span><span class="n">n_obs_loc</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">C_mat</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Form (I + C/(n_ens-1)) for eigendecomposition</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">A_eig</span><span class="p">(</span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">))</span>
+<span class="w">        </span><span class="n">A_eig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">C_mat</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="kt">real</span><span class="p">(</span><span class="n">n_ens</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">real64</span><span class="p">)</span>
+<span class="w">        </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span>
+<span class="w">            </span><span class="n">A_eig</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_eig</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1.0d0</span>
+<span class="w">        </span><span class="k">end do</span>
+
+<span class="w">        </span><span class="c">! DSYEV: A_eig = Q * diag(eigval) * Q^T</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">eigval</span><span class="p">(</span><span class="n">n_ens</span><span class="p">))</span>
+<span class="w">        </span><span class="n">lwork</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">*</span><span class="n">n_ens</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">64</span><span class="p">)</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">work</span><span class="p">(</span><span class="n">lwork</span><span class="p">))</span>
+<span class="w">        </span><span class="k">call </span><span class="n">dsyev</span><span class="p">(</span><span class="s1">&#39;V&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;U&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">A_eig</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">eigval</span><span class="p">,</span><span class="w"> </span><span class="n">work</span><span class="p">,</span><span class="w"> </span><span class="n">lwork</span><span class="p">,</span><span class="w"> </span><span class="n">info</span><span class="p">)</span>
+<span class="w">        </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">work</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">info</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(A,I0)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;[DA] DSYEV failed, info=&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">info</span>
+<span class="w">            </span><span class="k">call </span><span class="n">clean_up</span><span class="p">()</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+<span class="w">        </span><span class="c">! A_eig now holds eigenvectors Q as columns</span>
+
+<span class="w">        </span><span class="c">! T_col_scaled(:,k) = Q(:,k) / sqrt(eigval(k))</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">T_col_scaled</span><span class="p">(</span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">))</span>
+<span class="w">        </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span>
+<span class="w">            </span><span class="n">T_col_scaled</span><span class="p">(:,</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_eig</span><span class="p">(:,</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">eigval</span><span class="p">(</span><span class="n">k</span><span class="p">),</span><span class="w"> </span><span class="mf">1.0d-14</span><span class="p">))</span>
+<span class="w">        </span><span class="k">end do</span>
+
+<span class="w">        </span><span class="c">! T = T_col_scaled * Q^T  (= (I + C/(n_ens-1))^{-1/2})</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">T_mat</span><span class="p">(</span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">))</span>
+<span class="w">        </span><span class="k">call </span><span class="n">dgemm</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;T&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">T_col_scaled</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">A_eig</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">T_mat</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! T2 = T * T  (= (I + C/(n_ens-1))^{-1})</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">T2_mat</span><span class="p">(</span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">))</span>
+<span class="w">        </span><span class="k">call </span><span class="n">dgemm</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">T_mat</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">T_mat</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">T2_mat</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Ensemble perturbation update: Xa_anom = Af * T  (n_state x n_ens)</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">Xa_anom</span><span class="p">(</span><span class="n">n_state</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">))</span>
+<span class="w">        </span><span class="k">call </span><span class="n">dgemm</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n_state</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">Af</span><span class="p">,</span><span class="w"> </span><span class="n">n_state</span><span class="p">,</span><span class="w"> </span><span class="n">T_mat</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">Xa_anom</span><span class="p">,</span><span class="w"> </span><span class="n">n_state</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Mean update</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">d</span><span class="p">(</span><span class="n">n_obs_loc</span><span class="p">),</span><span class="w"> </span><span class="n">tmp_obs</span><span class="p">(</span><span class="n">n_obs_loc</span><span class="p">),</span><span class="w"> </span><span class="n">tmp_nens</span><span class="p">(</span><span class="n">n_ens</span><span class="p">),</span><span class="w"> </span><span class="n">tmp_state</span><span class="p">(</span><span class="n">n_state</span><span class="p">),</span><span class="w"> </span><span class="n">wa</span><span class="p">(</span><span class="n">n_ens</span><span class="p">))</span>
+
+<span class="w">        </span><span class="c">! d = y - H * xf_bar</span>
+<span class="w">        </span><span class="k">call </span><span class="n">dgemv</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n_obs_loc</span><span class="p">,</span><span class="w"> </span><span class="n">n_state</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">H_mat</span><span class="p">,</span><span class="w"> </span><span class="n">n_obs_loc</span><span class="p">,</span><span class="w"> </span><span class="n">xf_bar</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">tmp_obs</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tmp_obs</span>
+
+<span class="w">        </span><span class="c">! R^{-1} * d</span>
+<span class="w">        </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_obs_loc</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">R_diag</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">tmp_obs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">R_diag</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="w">            </span><span class="k">else</span>
+<span class="k">                </span><span class="n">tmp_obs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        end do</span>
+
+<span class="w">        </span><span class="c">! Af_Y^T * (R^{-1} * d)  (n_ens vector)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">dgemv</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n_obs_loc</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">Af_Y</span><span class="p">,</span><span class="w"> </span><span class="n">n_obs_loc</span><span class="p">,</span><span class="w"> </span><span class="n">tmp_obs</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">tmp_nens</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! wa = T2 * tmp_nens / (n_ens-1)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">dgemv</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="kt">real</span><span class="p">(</span><span class="n">n_ens</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="n">T2_mat</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="n">tmp_nens</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">wa</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! xa_bar = xf_bar + Af * wa</span>
+<span class="w">        </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">xa_bar</span><span class="p">(</span><span class="n">n_state</span><span class="p">))</span>
+<span class="w">        </span><span class="k">call </span><span class="n">dgemv</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">n_state</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">Af</span><span class="p">,</span><span class="w"> </span><span class="n">n_state</span><span class="p">,</span><span class="w"> </span><span class="n">wa</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="n">tmp_state</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="n">xa_bar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xf_bar</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tmp_state</span>
+
+<span class="w">        </span><span class="c">! Reconstruct analysis ensemble</span>
+<span class="w">        </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n_ens</span>
+<span class="w">            </span><span class="n">ensemble</span><span class="p">%</span><span class="n">members</span><span class="p">(</span><span class="n">k</span><span class="p">)%</span><span class="n">T</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xa_bar</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">ensemble</span><span class="p">%</span><span class="n">n_nodes</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                   </span><span class="o">+</span><span class="w"> </span><span class="n">Xa_anom</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">ensemble</span><span class="p">%</span><span class="n">n_nodes</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">)</span>
+<span class="w">            </span><span class="n">ensemble</span><span class="p">%</span><span class="n">members</span><span class="p">(</span><span class="n">k</span><span class="p">)%</span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="n">xa_bar</span><span class="p">(</span><span class="n">ensemble</span><span class="p">%</span><span class="n">n_nodes</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">ensemble</span><span class="p">%</span><span class="n">n_nodes</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="n">Xa_anom</span><span class="p">(</span><span class="n">ensemble</span><span class="p">%</span><span class="n">n_nodes</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">ensemble</span><span class="p">%</span><span class="n">n_nodes</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">))</span>
+<span class="w">            </span><span class="n">ensemble</span><span class="p">%</span><span class="n">members</span><span class="p">(</span><span class="n">k</span><span class="p">)%</span><span class="n">U</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="mf">0.0d0</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="n">xa_bar</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">ensemble</span><span class="p">%</span><span class="n">n_nodes</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="n">n_state</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="n">Xa_anom</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">ensemble</span><span class="p">%</span><span class="n">n_nodes</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="n">n_state</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">))</span>
+<span class="w">        </span><span class="k">end do</span>
+
+<span class="k">        write</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(A)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;[DA] ETKF analysis completed.&#39;</span>
+<span class="w">        </span><span class="k">call </span><span class="n">clean_up</span><span class="p">()</span>
+
+<span class="w">    </span><span class="k">contains</span>
+<span class="k">        subroutine </span><span class="n">clean_up</span><span class="p">()</span>
+<span class="w">            </span><span class="k">implicit none</span>
+<span class="k">            if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">Af</span><span class="p">))</span><span class="w">           </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">Af</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">xf_bar</span><span class="p">))</span><span class="w">       </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">xf_bar</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">xa_bar</span><span class="p">))</span><span class="w">       </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">xa_bar</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">Af_Y</span><span class="p">))</span><span class="w">         </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">Af_Y</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">Af_Y_Rinv</span><span class="p">))</span><span class="w">    </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">Af_Y_Rinv</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">C_mat</span><span class="p">))</span><span class="w">        </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">C_mat</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">A_eig</span><span class="p">))</span><span class="w">        </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">A_eig</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">T_mat</span><span class="p">))</span><span class="w">        </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">T_mat</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">T2_mat</span><span class="p">))</span><span class="w">       </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">T2_mat</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">T_col_scaled</span><span class="p">))</span><span class="w"> </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">T_col_scaled</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">Xa_anom</span><span class="p">))</span><span class="w">      </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">Xa_anom</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">H_mat</span><span class="p">))</span><span class="w">        </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">H_mat</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">eigval</span><span class="p">))</span><span class="w">       </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">eigval</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">y</span><span class="p">))</span><span class="w">            </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">R_diag</span><span class="p">))</span><span class="w">       </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">R_diag</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">d</span><span class="p">))</span><span class="w">            </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">wa</span><span class="p">))</span><span class="w">           </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">wa</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">tmp_obs</span><span class="p">))</span><span class="w">      </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">tmp_obs</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">tmp_nens</span><span class="p">))</span><span class="w">     </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">tmp_nens</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">tmp_state</span><span class="p">))</span><span class="w">    </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">tmp_state</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">mean_state</span><span class="p">%</span><span class="n">destroy</span><span class="p">()</span>
+<span class="w">        </span><span class="k">end subroutine </span><span class="n">clean_up</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">calculate_analysis_etkf</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-07-13 12:46 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

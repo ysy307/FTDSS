@@ -11,6 +11,12 @@ module types_config_physics_gcc
     type, extends(abst_config_physics_model) :: type_config_gcc
         !> GCC model identification
         type(type_constant_id) :: gcc_model = type_constant_id("none", "none", -1)
+        !> Segregation potential SP0 [m/(s*K)], 0 = disabled
+        real(real64) :: segregation_potential = 0.0d0
+        !> Lower bound of freezing fringe [deg C]
+        real(real64) :: T_fringe_low = -1.0d0
+        !> Upper bound of freezing fringe [deg C]
+        real(real64) :: T_fringe_high = 0.0d0
     contains
         procedure, public, pass(self) :: copy => copy_config_gcc
         procedure, public, pass(self) :: reset => reset_config_gcc
@@ -27,6 +33,9 @@ contains
         select type (source)
         type is (type_config_gcc)
             call self%set(self%gcc_model, source%gcc_model)
+            self%segregation_potential = source%segregation_potential
+            self%T_fringe_low = source%T_fringe_low
+            self%T_fringe_high = source%T_fringe_high
         end select
     end subroutine copy_config_gcc
 
@@ -36,6 +45,9 @@ contains
 
         call reset_config_physics_model(self)
         self%gcc_model = type_constant_id("none", "none", -1)
+        self%segregation_potential = 0.0d0
+        self%T_fringe_low = -1.0d0
+        self%T_fringe_high = 0.0d0
     end subroutine reset_config_gcc
 
 end module types_config_physics_gcc

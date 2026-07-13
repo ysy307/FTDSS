@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">11 statements</a>
+                 title=" 0.0% of total for procedures.">13 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -159,7 +159,7 @@
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>private  subroutine output_history_output_manager(self, time, temperature, water_content, ice_content, vapor_content, pressure)  
+    <h2>private  subroutine output_history_output_manager(self, time, temperature, water_content, ice_content, vapor_content, pressure, water_flux, vapor_flux)  
 </h2>
     
 
@@ -180,7 +180,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~105"></span>
+              <span class="anchor" id="variable-self~961"></span>
               class(<a href='../type/type_output_manager.html'>type_output_manager</a>),
             </td>
 <td>intent(inout)</td>
@@ -195,7 +195,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-time"></span>
+              <span class="anchor" id="variable-time~5"></span>
               real(kind=real64),
             </td>
 <td>intent(in)</td>
@@ -210,7 +210,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-temperature~16"></span>
+              <span class="anchor" id="variable-temperature~23"></span>
               real(kind=real64),
             </td>
 <td>intent(in),</td>
@@ -225,7 +225,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-water_content~2"></span>
+              <span class="anchor" id="variable-water_content~6"></span>
               real(kind=real64),
             </td>
 <td>intent(in),</td>
@@ -255,7 +255,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-vapor_content~2"></span>
+              <span class="anchor" id="variable-vapor_content~8"></span>
               real(kind=real64),
             </td>
 <td>intent(in),</td>
@@ -270,7 +270,7 @@
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-pressure~7"></span>
+              <span class="anchor" id="variable-pressure~12"></span>
               real(kind=real64),
             </td>
 <td>intent(in),</td>
@@ -279,6 +279,36 @@
             </td>
             <td>::</td>
             <td><strong>pressure</strong>(:)</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-water_flux~11"></span>
+              type(<a href='../type/type_coordinate_array_dp.html'>type_coordinate_array_dp</a>),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>water_flux</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-vapor_flux~6"></span>
+              type(<a href='../type/type_coordinate_array_dp.html'>type_coordinate_array_dp</a>),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>vapor_flux</strong></td>
             <td>
                 
             </td>
@@ -787,7 +817,7 @@ large graphs.</div>
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">output_history_output_manager</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="nb">time</span><span class="p">,</span><span class="w"> </span><span class="n">temperature</span><span class="p">,</span><span class="w"> </span><span class="n">water_content</span><span class="p">,</span><span class="w"> </span><span class="n">ice_content</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">                                             </span><span class="n">vapor_content</span><span class="p">,</span><span class="w"> </span><span class="n">pressure</span><span class="p">)</span>
+<span class="w">                                             </span><span class="n">vapor_content</span><span class="p">,</span><span class="w"> </span><span class="n">pressure</span><span class="p">,</span><span class="w"> </span><span class="n">water_flux</span><span class="p">,</span><span class="w"> </span><span class="n">vapor_flux</span><span class="p">)</span>
 <span class="w">        </span><span class="k">implicit none</span>
 <span class="k">        class</span><span class="p">(</span><span class="n">type_output_manager</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">self</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">time</span>
@@ -796,13 +826,17 @@ large graphs.</div>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ice_content</span><span class="p">(:)</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">vapor_content</span><span class="p">(:)</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pressure</span><span class="p">(:)</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_coordinate_array_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">water_flux</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_coordinate_array_dp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">vapor_flux</span>
 
 <span class="w">        </span><span class="k">call </span><span class="n">self</span><span class="p">%</span><span class="n">observation</span><span class="p">%</span><span class="n">output_history</span><span class="p">(</span><span class="nb">time</span><span class="o">=</span><span class="nb">time</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
 <span class="w">                                             </span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
 <span class="w">                                             </span><span class="n">water_content</span><span class="o">=</span><span class="n">water_content</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
 <span class="w">                                             </span><span class="n">ice_content</span><span class="o">=</span><span class="n">ice_content</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
 <span class="w">                                             </span><span class="n">vapor_content</span><span class="o">=</span><span class="n">vapor_content</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">                                             </span><span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span><span class="p">)</span>
+<span class="w">                                             </span><span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                             </span><span class="n">water_flux</span><span class="o">=</span><span class="n">water_flux</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                                             </span><span class="n">vapor_flux</span><span class="o">=</span><span class="n">vapor_flux</span><span class="p">)</span>
 <span class="w">    </span><span class="k">end subroutine </span><span class="n">output_history_output_manager</span>
 </pre></div>
 
@@ -827,7 +861,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

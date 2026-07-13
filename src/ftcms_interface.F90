@@ -18,8 +18,18 @@ module app_ftcms
     use :: module_linalg
 
     use :: module_governing
+    use :: governing_atmosphere, only: type_da_config, type_assimilation_controller
     use :: module_solver
     implicit none
+
+    !> Physical-validity walls shared by the bounded solution update
+    !> (reflect_variables) and the acceptance guard of the nonlinear loop.
+    !> An iterate pinned at a wall is outside the model's validity and must
+    !> never be accepted as a converged step.
+    real(real64), parameter :: WALL_TEMP_MIN_C = -80.0d0
+    real(real64), parameter :: WALL_TEMP_MAX_C = 80.0d0
+    real(real64), parameter :: WALL_PRESS_MIN_PA = -1.0d7
+    real(real64), parameter :: WALL_PRESS_MAX_PA = 1.0d7
 
     type :: type_ftcms
         type(type_domain) :: domain
@@ -43,12 +53,56 @@ module app_ftcms
         type(type_bc_manager) :: bc(PHYSICS_TYPES%NUM_ID)
 
         class(abst_solver), allocatable :: solver
+        class(abst_solver), allocatable :: solver_thermal
 
+        integer(int32) :: current_physics_id = 0
         integer(int32) :: thermal_start_dof = 0
         integer(int32) :: hydraulic_start_dof = 0
+        logical :: hydraulic_has_dirichlet_bc = .false.
+        logical :: thermal_has_dirichlet_bc = .false.
+
+        ! Reference mean pressure captured from the initial condition.
+        ! Used to pin the null-mode of all-Neumann hydraulic systems without
+        ! distorting the absolute pressure level (WRF relies on absolute P).
+        logical :: hydraulic_ref_mean_set = .false.
+        real(real64) :: hydraulic_ref_mean = 0.0d0
+
+        ! DOF column scaling factors for variable non-dimensionalization
+        real(real64), allocatable :: col_scale(:)
+        real(real64), allocatable :: col_scale_inv(:)
+
+        ! Local-truncation-error estimate state for error-controlled ATS. Stores the
+        ! previous-step time derivative (ydot) per physics and the previous dt, used
+        ! by compute_lte_error to form the divided-difference (curvature) estimate.
+        real(real64), allocatable :: lte_ydot_prev_thermal(:)
+        real(real64), allocatable :: lte_ydot_prev_hydraulic(:)
+        real(real64) :: lte_prev_dt = 0.0d0
+        logical :: lte_has_prev = .false.
+
+        ! Anderson(1) acceleration state of the conserved coupled Picard loop:
+        ! the previous iterate and previous fixed-point increment of (T, p),
+        ! used by reflect_variables to form the depth-1 Anderson mixing.
+        ! Cleared at the start of every nonlinear loop.
+        real(real64), allocatable :: aa_T_prev(:)
+        real(real64), allocatable :: aa_P_prev(:)
+        real(real64), allocatable :: aa_duT_prev(:)
+        real(real64), allocatable :: aa_duP_prev(:)
+        logical :: aa_has_prev = .false.
+        ! Weighted norm of the previous fixed-point increment ||g_{k-1}||_W;
+        ! negative when unset. Safeguard: Anderson mixing is applied only while
+        ! this sequence is non-increasing (contracting fixed-point iteration).
+        real(real64) :: aa_gnorm_prev = -1.0d0
+
+        ! Unit of Output/solver_history.log: one record per time-step attempt
+        ! (step, time, dt, nonlinear iterations, accepted flag, omega, ||dQ||_W,
+        ! LTE estimate). -1 when the log is not open (non-root ranks).
+        integer(int32) :: solver_history_unit = -1
 
         type(type_control) :: control
         type(type_output_manager) :: output
+
+        type(type_assimilation_controller) :: assimilation
+        logical :: assimilation_enabled = .false.
 
     contains
         ! ---- Lifecycle ----
@@ -84,6 +138,9 @@ module app_ftcms
 
         ! --- Boundary Condition Procedures ---
         procedure, public, pass(self) :: apply_bc => apply_bc_ftcms
+        procedure, public, pass(self) :: prescribe_dirichlet => prescribe_dirichlet_ftcms
+        procedure, private, pass(self) :: freeze_physics_dofs => freeze_physics_dofs_ftcms
+        procedure, private, pass(self) :: zero_frozen_increment => zero_frozen_increment_ftcms
         procedure, private, pass(self) :: prescribe_essential_bc_generic
         procedure, private, pass(self) :: apply_natural_bc_generic
         procedure, private, pass(self) :: apply_essential_bc_generic
@@ -96,7 +153,12 @@ module app_ftcms
         procedure, private, pass(self) :: update_physical_properties_bulk => update_physical_properties_bulk_ftcms
 
         procedure, public, pass(self) :: reflect_variables => reflect_variables_ftcms
-
+        procedure, private, pass(self) :: apply_phase_change_temperature_correction => &
+            apply_phase_change_temperature_correction_ftcms
+        procedure, private, pass(self) :: update_nodal_phases => update_nodal_phases_ftcms
+        procedure, private, pass(self) :: compute_nodal_conserved => compute_nodal_conserved_ftcms
+        procedure, public, pass(self) :: compute_lte_error => compute_lte_error_ftcms
+        procedure, public, pass(self) :: nonlinear_residual_norm => nonlinear_residual_norm_ftcms
         procedure, public, pass(self) :: update_variables => update_variables_ftcms
         procedure, public, pass(self) :: assemble_local => assemble_local_ftcms
         procedure, public, pass(self) :: assemble => assemble_ftcms
@@ -110,9 +172,12 @@ module app_ftcms
 
         !> Solve a single time step including the nonlinear iteration loop
         procedure, public, pass(self) :: solve_time_step => solve_time_step_ftcms
+        procedure, private, pass(self) :: solve_time_step_staggered => solve_time_step_staggered_ftcms
         procedure, private, pass(self) :: solve_time_step_initial_setup => solve_time_step_initial_setup_ftcms
         procedure, private, pass(self) :: solve_time_step_setup => solve_time_step_setup_ftcms
         procedure, private, pass(self) :: solve_time_step_check_convergence => solve_time_step_check_convergence_ftcms
+        procedure, private, pass(self) :: solve_time_step_check_convergence_conserved => &
+            solve_time_step_check_convergence_conserved_ftcms
 
         procedure, public, pass(self) :: output_fields => output_fields_ftcms
         procedure, public, pass(self) :: output_history => output_history_ftcms
@@ -121,6 +186,7 @@ module app_ftcms
         procedure, public, pass(self) :: is_active_hydraulic => is_active_hydraulic_ftcms
 
         procedure, public, pass(self) :: run => run_ftcms
+        procedure, public, pass(self) :: run_assimilation => run_assimilation_ftcms
 
     end type type_ftcms
 
@@ -166,10 +232,29 @@ module app_ftcms
 
         end subroutine apply_bc_ftcms
 
-        module subroutine solve_ftcms(self)
+        module subroutine prescribe_dirichlet_ftcms(self)
             implicit none
             class(type_ftcms), intent(inout) :: self
 
+        end subroutine prescribe_dirichlet_ftcms
+
+        module subroutine freeze_physics_dofs_ftcms(self, physics_type)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            type(type_constant_id), intent(in) :: physics_type
+        end subroutine freeze_physics_dofs_ftcms
+
+        module subroutine zero_frozen_increment_ftcms(self, frozen_physics)
+            import :: type_ftcms, type_constant_id
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            type(type_constant_id), intent(in) :: frozen_physics
+        end subroutine zero_frozen_increment_ftcms
+
+        module subroutine solve_ftcms(self)
+            import :: type_ftcms
+            implicit none
+            class(type_ftcms), intent(inout) :: self
         end subroutine solve_ftcms
 
         module subroutine set_state_ftcms(self, node_id, element_id, state, calc_physics)
@@ -216,11 +301,52 @@ module app_ftcms
 
         end subroutine update_variables_ftcms
 
-        module subroutine reflect_variables_ftcms(self)
+        module subroutine reflect_variables_ftcms(self, step_scale)
             implicit none
             class(type_ftcms), intent(inout) :: self
+            real(real64), intent(in), optional :: step_scale
 
         end subroutine reflect_variables_ftcms
+
+        module subroutine update_nodal_phases_ftcms(self)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+        end subroutine update_nodal_phases_ftcms
+
+        !> Evaluate the per-node conserved quantities (volumetric enthalpy density
+        !> and pore-water effective density) at the current iterate, for the
+        !> conserved-quantity convergence norm and the Richardson error estimate.
+        module subroutine compute_nodal_conserved_ftcms(self, enthalpy, density)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            real(real64), allocatable, intent(inout) :: enthalpy(:)
+            real(real64), allocatable, intent(inout) :: density(:)
+        end subroutine compute_nodal_conserved_ftcms
+
+        !> Relative local-truncation-error estimate of the just-converged step, for
+        !> the error-controlled (PI) adaptive time stepping.
+        !>
+        !> Uses the divided-difference (curvature) estimate of the implicit-Euler
+        !> LTE: \( \text{LTE} \approx \lVert \dot y_n - \dot y_{n-1}\rVert\,
+        !> \Delta t_n^2/(\Delta t_n+\Delta t_{n-1}) \), normalized by \(\lVert y_n\rVert\)
+        !> to be dimensionless and self-scaling (no per-case absolute tolerances).
+        !> The temperature and pressure estimates are combined by a maximum.
+        !> Returns -1 on the first step (no previous derivative yet) so the caller
+        !> skips error control. Advances the stored previous derivative and dt.
+        module function compute_lte_error_ftcms(self) result(error_rel)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            real(real64) :: error_rel
+        end function compute_lte_error_ftcms
+
+        !> Euclidean norm of the assembled nonlinear conservation residual (energy
+        !> and water blocks combined), used as the merit function for the
+        !> backtracking line search that globalizes the modified-Picard step.
+        module function nonlinear_residual_norm_ftcms(self) result(rnorm)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            real(real64) :: rnorm
+        end function nonlinear_residual_norm_ftcms
 
         module subroutine calc_gradient_ftcms(self, values_vec, grad)
             implicit none
@@ -273,7 +399,7 @@ module app_ftcms
         end subroutine assemble_local_ftcms
         module subroutine assemble_initialize_ftcms(self, element_id, workspace, local_K_TT, local_K_TH, &
                                                     local_K_HH, local_K_HT, local_F_T, local_F_H, &
-                                                    coordinates, connectivity)
+                                                    coordinates, raw_coordinates, connectivity)
             implicit none
 
             class(type_ftcms), intent(inout) :: self
@@ -282,6 +408,7 @@ module app_ftcms
             type(type_matrix_dense), intent(inout), optional :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
             type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
             real(real64), allocatable, intent(inout) :: coordinates(:, :)
+            real(real64), allocatable, intent(inout) :: raw_coordinates(:, :)
             integer(int32), pointer, contiguous, intent(inout), optional :: connectivity(:)
         end subroutine assemble_initialize_ftcms
 
@@ -336,11 +463,20 @@ module app_ftcms
 
         end subroutine solve_time_step_setup_ftcms
 
-        module subroutine solve_time_step_check_convergence_ftcms(self)
+        module subroutine solve_time_step_check_convergence_ftcms(self, target_physics)
             implicit none
             class(type_ftcms), intent(inout), target :: self
+            type(type_constant_id), intent(in), optional :: target_physics
 
         end subroutine solve_time_step_check_convergence_ftcms
+
+        !> Conserved-quantity convergence check (PDF 6.2.4), evaluated on the updated
+        !> state: computes the nodal enthalpy/effective-density and per-block residual
+        !> norms and delegates the coupled decision to the control manager.
+        module subroutine solve_time_step_check_convergence_conserved_ftcms(self)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+        end subroutine solve_time_step_check_convergence_conserved_ftcms
 
         module subroutine solve_time_step_ftcms(self, is_step_converged)
             implicit none
@@ -348,6 +484,12 @@ module app_ftcms
             logical, intent(inout) :: is_step_converged
 
         end subroutine solve_time_step_ftcms
+
+        module subroutine solve_time_step_staggered_ftcms(self, is_step_converged)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            logical, intent(inout) :: is_step_converged
+        end subroutine solve_time_step_staggered_ftcms
 
         module subroutine output_fields_ftcms(self)
             implicit none
@@ -366,6 +508,20 @@ module app_ftcms
             class(type_ftcms), intent(inout) :: self
 
         end subroutine run_ftcms
+
+        module subroutine run_assimilation_ftcms(self, current_time, current_doy)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            real(real64), intent(in) :: current_time
+            real(real64), intent(in) :: current_doy
+        end subroutine run_assimilation_ftcms
+
+        module subroutine apply_phase_change_temperature_correction_ftcms(self, T_old, T_new)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            real(real64), intent(in) :: T_old(:)
+            real(real64), intent(inout) :: T_new(:)
+        end subroutine apply_phase_change_temperature_correction_ftcms
 
         module subroutine destroy_type_ftcms(self)
             implicit none

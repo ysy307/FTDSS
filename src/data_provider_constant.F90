@@ -19,7 +19,9 @@ contains
         class(type_bc_data_constant), intent(inout) :: self
         real(real64), intent(in) :: new_values(:)
 
-        return
+        integer(int32) :: n
+        n = min(size(new_values), size(self%constant_values))
+        if (n > 0) self%constant_values(1:n) = new_values(1:n)
     end subroutine update_data_constant
 
     module subroutine destroy_type_bc_data_constant(self)

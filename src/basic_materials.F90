@@ -38,6 +38,9 @@ submodule(io_input_basic) input_basic_materials
     character(*), parameter :: h_crit = "h_crit"
     character(*), parameter :: equilibrium_model = "equilibrium_model"
     character(*), parameter :: segregation = "segregation"
+    character(*), parameter :: segregation_potential_key = "segregation_potential"
+    character(*), parameter :: t_fringe_low_key = "T_fringe_low"
+    character(*), parameter :: t_fringe_high_key = "T_fringe_high"
     character(*), parameter :: unit = "unit"
     character(*), parameter :: valid_units(3) = [character(len=4) :: "cm", "m", "Pa"]
     character(*), parameter :: hydraulic_conductivity_model = "hydraulic_conductivity_model"
@@ -183,6 +186,18 @@ contains
             buffer(4) = segregation
             call get_json_value(json, join(buffer), self%materials(i_material)%phase_change%equilibrium_model%segregation, &
                                 is_required=.true., default_value=.false.)
+
+            buffer(3) = segregation_potential_key
+            call get_json_value(json, join(buffer(1:3)), self%materials(i_material)%phase_change%segregation_potential, &
+                                is_required=.false., default_value=0.0d0, valid_range=[0.0d0, huge(0.0d0)])
+
+            buffer(3) = t_fringe_low_key
+            call get_json_value(json, join(buffer(1:3)), self%materials(i_material)%phase_change%T_fringe_low, &
+                                is_required=.false., default_value=-1.0d0)
+
+            buffer(3) = t_fringe_high_key
+            call get_json_value(json, join(buffer(1:3)), self%materials(i_material)%phase_change%T_fringe_high, &
+                                is_required=.false., default_value=0.0d0)
 
             call read_materials_swcc(self, json, i_material)
             call read_materials_hydraulic_model(self, json, i_material)

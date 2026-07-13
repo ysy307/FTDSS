@@ -25,6 +25,7 @@ module core_types_discretization_dof_map
         procedure, public, pass(self) :: get_num_dofs_per_node => get_num_dofs_per_node_dof_map
         procedure, public, pass(self) :: get_num_dofs_of_physics => get_num_dofs_of_physics_dof_map
         procedure, public, pass(self) :: get_start_dof_index => get_start_dof_index_dof_map
+
         ! ---- Meta / Utility ----
         procedure, public, pass(self) :: display => display_dof_map
     end type type_dof_map
@@ -37,20 +38,23 @@ contains
 
         integer(int32) :: current_dof_index
 
-        self%num_dofs_of_physics(PHYSICS_TYPES%THERMAL%ID) = 1
-        self%num_dofs_of_physics(PHYSICS_TYPES%HYDRAULIC%ID) = 1
-        self%num_dofs_of_physics(PHYSICS_TYPES%MECHANICAL%ID) = 3
 
+        
+        self%start_dof_index(:) = 0
+        
         current_dof_index = 1
         if (active_dofs(PHYSICS_TYPES%THERMAL%ID)) then
+            self%num_dofs_of_physics(PHYSICS_TYPES%THERMAL%ID) = 1
             self%start_dof_index(PHYSICS_TYPES%THERMAL%ID) = current_dof_index
             current_dof_index = current_dof_index + self%num_dofs_of_physics(PHYSICS_TYPES%THERMAL%ID)
         end if
         if (active_dofs(PHYSICS_TYPES%HYDRAULIC%ID)) then
+            self%num_dofs_of_physics(PHYSICS_TYPES%HYDRAULIC%ID) = 1
             self%start_dof_index(PHYSICS_TYPES%HYDRAULIC%ID) = current_dof_index
             current_dof_index = current_dof_index + self%num_dofs_of_physics(PHYSICS_TYPES%HYDRAULIC%ID)
         end if
         if (active_dofs(PHYSICS_TYPES%MECHANICAL%ID)) then
+            self%num_dofs_of_physics(PHYSICS_TYPES%MECHANICAL%ID) = 3
             self%start_dof_index(PHYSICS_TYPES%MECHANICAL%ID) = current_dof_index
             current_dof_index = current_dof_index + self%num_dofs_of_physics(PHYSICS_TYPES%MECHANICAL%ID)
         end if
@@ -69,7 +73,7 @@ contains
     subroutine get_num_dofs_per_node_dof_map(self, num_dofs_per_node)
         implicit none
         class(type_dof_map), intent(in) :: self
-        integer(int32), intent(inout) :: num_dofs_per_node
+        integer(int32), intent(out) :: num_dofs_per_node
 
         num_dofs_per_node = self%num_dofs_per_node
     end subroutine get_num_dofs_per_node_dof_map
@@ -78,7 +82,7 @@ contains
         implicit none
         class(type_dof_map), intent(in) :: self
         type(type_constant_id), intent(in) :: physics_id
-        integer(int32), intent(inout) :: num_dof
+        integer(int32), intent(out) :: num_dof
 
         if (.not. PHYSICS_TYPES%is_valid(physics_id)) then
             num_dof = 0
@@ -93,7 +97,7 @@ contains
         implicit none
         class(type_dof_map), intent(in) :: self
         type(type_constant_id), intent(in) :: physics_id
-        integer(int32), intent(inout) :: start_dof_index
+        integer(int32), intent(out) :: start_dof_index
 
         if (.not. PHYSICS_TYPES%is_valid(physics_id)) then
             start_dof_index = 0

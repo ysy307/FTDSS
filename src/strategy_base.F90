@@ -34,4 +34,12 @@ contains
         end if
     end subroutine destroy_abst_bc
 
+    module subroutine update_provider_data_abst_bc(self, new_values)
+        implicit none
+        class(abst_bc), intent(inout) :: self
+        real(real64), intent(in) :: new_values(:)
+
+        if (allocated(self%provider)) call self%provider%update_data(new_values)
+    end subroutine update_provider_data_abst_bc
+
 end submodule strategy_base

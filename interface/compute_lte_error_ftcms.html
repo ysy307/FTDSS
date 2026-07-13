@@ -1,0 +1,908 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>compute_lte_error_ftcms &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>compute_lte_error_ftcms
+      <small>Interface</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.2% of total for procedures.">256 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/ftcms_interface.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/ftcms_interface.f90.html'>ftcms_interface.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/app_ftcms.html'>app_ftcms</a></li>
+            <li class="breadcrumb-item active" aria-current="page">compute_lte_error_ftcms</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+    <em>None</em>
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>interface</h2>
+      
+      <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~compute_lte_error_ftcms~~CallsGraph Pages: 1 -->
+<svg id="interfacecompute_lte_error_ftcmsCallsGraph" width="641pt" height="114pt"
+ viewBox="0.00 0.00 641.00 114.39" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph" class="graph" transform="scale(0.36 0.36) rotate(0) translate(4 314)">
+<title>interface~~compute_lte_error_ftcms~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-314 1778,-314 1778,4 -4,4"/>
+<!-- interface~compute_lte_error_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node1" class="node">
+<title>interface~compute_lte_error_ftcms</title>
+<polygon fill="none" stroke="black" points="212,-167 0,-167 0,-143 212,-143 212,-167"/>
+<text text-anchor="middle" x="106" y="-152.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_ftcms%compute_lte_error_ftcms</text>
+</g>
+<!-- proc~compute_lte_error_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node2" class="node">
+<title>proc~compute_lte_error_ftcms</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node2"><a xlink:href="../proc/compute_lte_error_ftcms.html" xlink:title="compute_lte_error_ftcms">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="393,-167 248,-167 248,-143 393,-143 393,-167"/>
+<text text-anchor="middle" x="320.5" y="-152.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_lte_error_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_lte_error_ftcms&#45;&gt;proc~compute_lte_error_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge1" class="edge">
+<title>interface~compute_lte_error_ftcms&#45;&gt;proc~compute_lte_error_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M212,-155C220.63,-155 229.26,-155 237.68,-155"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="237.83,-158.5 247.83,-155 237.83,-151.5 237.83,-158.5"/>
+</g>
+<!-- interface~is_active_hydraulic_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node3" class="node">
+<title>interface~is_active_hydraulic_ftcms</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node3"><a xlink:href="../interface/is_active_hydraulic_ftcms.html" xlink:title="type_ftcms%is_active_hydraulic_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="644,-300 429,-300 429,-276 644,-276 644,-300"/>
+<text text-anchor="middle" x="536.5" y="-285.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%is_active_hydraulic_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_lte_error_ftcms&#45;&gt;interface~is_active_hydraulic_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge2" class="edge">
+<title>proc~compute_lte_error_ftcms&#45;&gt;interface~is_active_hydraulic_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M330.75,-167.15C347.8,-188.7 386.36,-233.63 429,-258 439.66,-264.09 451.63,-269.01 463.6,-272.97"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="462.59,-276.32 473.18,-275.93 464.66,-269.63 462.59,-276.32"/>
+</g>
+<!-- interface~is_active_thermal_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node4" class="node">
+<title>interface~is_active_thermal_ftcms</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node4"><a xlink:href="../interface/is_active_thermal_ftcms.html" xlink:title="type_ftcms%is_active_thermal_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="640.5,-249 432.5,-249 432.5,-225 640.5,-225 640.5,-249"/>
+<text text-anchor="middle" x="536.5" y="-234.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%is_active_thermal_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_lte_error_ftcms&#45;&gt;interface~is_active_thermal_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge3" class="edge">
+<title>proc~compute_lte_error_ftcms&#45;&gt;interface~is_active_thermal_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M352.04,-167.06C373.53,-175.51 402.99,-187.04 429,-197 450.14,-205.1 473.7,-213.97 493.28,-221.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="492.24,-224.64 502.83,-224.86 494.69,-218.08 492.24,-224.64"/>
+</g>
+<!-- interface~vector_norm2 -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node5" class="node">
+<title>interface~vector_norm2</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node5"><a xlink:href="../interface/vector_norm2.html" xlink:title="vector_norm2">
+<polygon fill="#a7506f" stroke="#a7506f" points="580,-188 493,-188 493,-164 580,-164 580,-188"/>
+<text text-anchor="middle" x="536.5" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_norm2</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_lte_error_ftcms&#45;&gt;interface~vector_norm2 -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge4" class="edge">
+<title>proc~compute_lte_error_ftcms&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#ff0000" d="M393.06,-162.02C422.36,-164.9 455.67,-168.17 482.7,-170.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="482.44,-174.31 492.73,-171.8 483.12,-167.34 482.44,-174.31"/>
+</g>
+<!-- none~get_current -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node6" class="node">
+<title>none~get_current</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node6"><a xlink:href="../type/type_variable.html#boundprocedure-get_current" xlink:title="type_variable%get_current">
+<polygon fill="#a7506f" stroke="#a7506f" points="614,-146 459,-146 459,-122 614,-122 614,-146"/>
+<text text-anchor="middle" x="536.5" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%get_current</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_lte_error_ftcms&#45;&gt;none~get_current -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge5" class="edge">
+<title>proc~compute_lte_error_ftcms&#45;&gt;none~get_current</title>
+<path fill="none" stroke="#ff0000" d="M393.06,-147.98C410.9,-146.23 430.22,-144.33 448.7,-142.52"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="449.26,-145.98 458.87,-141.52 448.58,-139.01 449.26,-145.98"/>
+</g>
+<!-- proc~get_diff -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node7" class="node">
+<title>proc~get_diff</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node7"><a xlink:href="../proc/get_diff.html" xlink:title="type_variable%get_diff">
+<polygon fill="#d9534f" stroke="#d9534f" points="603.5,-95 469.5,-95 469.5,-71 603.5,-71 603.5,-95"/>
+<text text-anchor="middle" x="536.5" y="-80.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%get_diff</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_lte_error_ftcms&#45;&gt;proc~get_diff -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge6" class="edge">
+<title>proc~compute_lte_error_ftcms&#45;&gt;proc~get_diff</title>
+<path fill="none" stroke="#ff0000" d="M349.97,-143C371.47,-134.15 401.83,-122.11 429,-113 445.14,-107.59 462.86,-102.33 479.14,-97.77"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="480.36,-101.06 489.07,-95.02 478.5,-94.31 480.36,-101.06"/>
+</g>
+<!-- proc~get_dt_control -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node8" class="node">
+<title>proc~get_dt_control</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node8"><a xlink:href="../proc/get_dt_control.html" xlink:title="type_control%get_dt_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="618,-34 455,-34 455,-10 618,-10 618,-34"/>
+<text text-anchor="middle" x="536.5" y="-19.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control%get_dt_control</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_lte_error_ftcms&#45;&gt;proc~get_dt_control -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge7" class="edge">
+<title>proc~compute_lte_error_ftcms&#45;&gt;proc~get_dt_control</title>
+<path fill="none" stroke="#ff0000" d="M332.66,-142.89C351.09,-123.51 389.75,-85.33 429,-62 445.83,-52 465.6,-43.74 483.5,-37.38"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="484.91,-40.6 493.23,-34.04 482.64,-33.98 484.91,-40.6"/>
+</g>
+<!-- proc~is_active_hydraulic_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node13" class="node">
+<title>proc~is_active_hydraulic_ftcms</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node13"><a xlink:href="../proc/is_active_hydraulic_ftcms.html" xlink:title="is_active_hydraulic_ftcms">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="851.5,-310 703.5,-310 703.5,-286 851.5,-286 851.5,-310"/>
+<text text-anchor="middle" x="777.5" y="-295.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">is_active_hydraulic_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~is_active_hydraulic_ftcms&#45;&gt;proc~is_active_hydraulic_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge8" class="edge">
+<title>interface~is_active_hydraulic_ftcms&#45;&gt;proc~is_active_hydraulic_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M644.07,-292.46C660.51,-293.15 677.28,-293.85 693.12,-294.51"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="693.24,-298.02 703.37,-294.94 693.53,-291.03 693.24,-298.02"/>
+</g>
+<!-- proc~is_active_thermal_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node14" class="node">
+<title>proc~is_active_thermal_ftcms</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node14"><a xlink:href="../proc/is_active_thermal_ftcms.html" xlink:title="is_active_thermal_ftcms">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="847.5,-268 707.5,-268 707.5,-244 847.5,-244 847.5,-268"/>
+<text text-anchor="middle" x="777.5" y="-253.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">is_active_thermal_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~is_active_thermal_ftcms&#45;&gt;proc~is_active_thermal_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge9" class="edge">
+<title>interface~is_active_thermal_ftcms&#45;&gt;proc~is_active_thermal_ftcms</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M640.59,-245.2C659.48,-246.7 678.92,-248.24 696.99,-249.68"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="696.91,-253.18 707.16,-250.49 697.47,-246.21 696.91,-253.18"/>
+</g>
+<!-- proc~norm_2_native~2 -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node15" class="node">
+<title>proc~norm_2_native~2</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node15"><a xlink:href="../proc/norm_2_native~2.html" xlink:title="norm_2_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1066.5,-227 975.5,-227 975.5,-203 1066.5,-203 1066.5,-227"/>
+<text text-anchor="middle" x="1021" y="-212.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_native</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm2&#45;&gt;proc~norm_2_native~2 -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge10" class="edge">
+<title>interface~vector_norm2&#45;&gt;proc~norm_2_native~2</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M580.08,-183.34C608.34,-187.94 646.28,-193.63 680,-197 780.22,-207.02 897.64,-211.67 964.98,-213.67"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="965.25,-217.18 975.35,-213.97 965.45,-210.18 965.25,-217.18"/>
+</g>
+<!-- proc~norm_2_vector_dp -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node16" class="node">
+<title>proc~norm_2_vector_dp</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node16"><a xlink:href="../proc/norm_2_vector_dp.html" xlink:title="norm_2_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="833,-188 722,-188 722,-164 833,-164 833,-188"/>
+<text text-anchor="middle" x="777.5" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm2&#45;&gt;proc~norm_2_vector_dp -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge11" class="edge">
+<title>interface~vector_norm2&#45;&gt;proc~norm_2_vector_dp</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M580.23,-176C616.82,-176 670.07,-176 711.87,-176"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="711.96,-179.5 721.96,-176 711.96,-172.5 711.96,-179.5"/>
+</g>
+<!-- proc~get_current_scalar -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node10" class="node">
+<title>proc~get_current_scalar</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node10"><a xlink:href="../proc/get_current_scalar.html" xlink:title="type_variable%get_current_scalar">
+<polygon fill="#d9534f" stroke="#d9534f" points="874,-146 681,-146 681,-122 874,-122 874,-146"/>
+<text text-anchor="middle" x="777.5" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%get_current_scalar</text>
+</a>
+</g>
+</g>
+<!-- none~get_current&#45;&gt;proc~get_current_scalar -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge12" class="edge">
+<title>none~get_current&#45;&gt;proc~get_current_scalar</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M614.11,-134C632.05,-134 651.47,-134 670.44,-134"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="670.61,-137.5 680.61,-134 670.61,-130.5 670.61,-137.5"/>
+</g>
+<!-- proc~get_current_values -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node11" class="node">
+<title>proc~get_current_values</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node11"><a xlink:href="../proc/get_current_values.html" xlink:title="type_variable%get_current_values">
+<polygon fill="#d9534f" stroke="#d9534f" points="875,-104 680,-104 680,-80 875,-80 875,-104"/>
+<text text-anchor="middle" x="777.5" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%get_current_values</text>
+</a>
+</g>
+</g>
+<!-- none~get_current&#45;&gt;proc~get_current_values -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge13" class="edge">
+<title>none~get_current&#45;&gt;proc~get_current_values</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M605.99,-121.96C634.74,-116.91 668.34,-111.01 698.08,-105.78"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="698.76,-109.22 708,-104.04 697.55,-102.32 698.76,-109.22"/>
+</g>
+<!-- proc~assert_initialized -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node9" class="node">
+<title>proc~assert_initialized</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node9"><a xlink:href="../proc/assert_initialized.html" xlink:title="type_variable%assert_initialized">
+<polygon fill="#d9534f" stroke="#d9534f" points="1112.5,-114 929.5,-114 929.5,-90 1112.5,-90 1112.5,-114"/>
+<text text-anchor="middle" x="1021" y="-99.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_variable%assert_initialized</text>
+</a>
+</g>
+</g>
+<!-- proc~get_diff&#45;&gt;proc~assert_initialized -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge14" class="edge">
+<title>proc~get_diff&#45;&gt;proc~assert_initialized</title>
+<path fill="none" stroke="#0000ff" d="M603.66,-75.17C671.84,-68.38 781.13,-61.08 875,-71 905.3,-74.2 938.59,-81.07 965.61,-87.53"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="965.1,-91.01 975.65,-89.98 966.76,-84.21 965.1,-91.01"/>
+</g>
+<!-- proc~get_dt -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node12" class="node">
+<title>proc~get_dt</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node12"><a xlink:href="../proc/get_dt.html" xlink:title="type_time%get_dt">
+<polygon fill="#d9534f" stroke="#d9534f" points="831.5,-24 723.5,-24 723.5,0 831.5,0 831.5,-24"/>
+<text text-anchor="middle" x="777.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_time%get_dt</text>
+</a>
+</g>
+</g>
+<!-- proc~get_dt_control&#45;&gt;proc~get_dt -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge15" class="edge">
+<title>proc~get_dt_control&#45;&gt;proc~get_dt</title>
+<path fill="none" stroke="#ff00ff" d="M618.08,-18.63C649.11,-17.33 684.08,-15.87 713.25,-14.65"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="713.46,-18.14 723.31,-14.23 713.17,-11.15 713.46,-18.14"/>
+</g>
+<!-- proc~raise_error -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node20" class="node">
+<title>proc~raise_error</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node20"><a xlink:href="../proc/raise_error.html" xlink:title="raise_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="1319.5,-124 1249.5,-124 1249.5,-100 1319.5,-100 1319.5,-124"/>
+<text text-anchor="middle" x="1284.5" y="-109.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">raise_error</text>
+</a>
+</g>
+</g>
+<!-- proc~assert_initialized&#45;&gt;proc~raise_error -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge16" class="edge">
+<title>proc~assert_initialized&#45;&gt;proc~raise_error</title>
+<path fill="none" stroke="#ff0000" d="M1112.73,-105.47C1155.51,-107.11 1204.61,-108.98 1239.15,-110.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1239.25,-113.81 1249.38,-110.7 1239.52,-106.82 1239.25,-113.81"/>
+</g>
+<!-- proc~get_current_scalar&#45;&gt;proc~assert_initialized -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge17" class="edge">
+<title>proc~get_current_scalar&#45;&gt;proc~assert_initialized</title>
+<path fill="none" stroke="#ffbf00" d="M869.11,-121.99C885.41,-119.83 902.48,-117.57 919.05,-115.38"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="919.83,-118.8 929.28,-114.02 918.91,-111.86 919.83,-118.8"/>
+</g>
+<!-- proc~get_current_values&#45;&gt;proc~assert_initialized -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge18" class="edge">
+<title>proc~get_current_values&#45;&gt;proc~assert_initialized</title>
+<path fill="none" stroke="#7fff00" d="M875.34,-96.01C889.84,-96.61 904.82,-97.23 919.39,-97.83"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="919.27,-101.33 929.41,-98.25 919.56,-94.34 919.27,-101.33"/>
+</g>
+<!-- proc~is_physics_active_control -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node18" class="node">
+<title>proc~is_physics_active_control</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node18"><a xlink:href="../proc/is_physics_active_control.html" xlink:title="type_control%is_physics_active_control">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1131,-269 911,-269 911,-245 1131,-245 1131,-269"/>
+<text text-anchor="middle" x="1021" y="-254.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control%is_physics_active_control</text>
+</a>
+</g>
+</g>
+<!-- proc~is_active_hydraulic_ftcms&#45;&gt;proc~is_physics_active_control -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge19" class="edge">
+<title>proc~is_active_hydraulic_ftcms&#45;&gt;proc~is_physics_active_control</title>
+<path fill="none" stroke="#00ffff" d="M849.33,-285.98C877.46,-281.2 909.99,-275.68 939.05,-270.74"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="939.9,-274.15 949.18,-269.02 938.73,-267.25 939.9,-274.15"/>
+</g>
+<!-- proc~is_active_thermal_ftcms&#45;&gt;proc~is_physics_active_control -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge20" class="edge">
+<title>proc~is_active_thermal_ftcms&#45;&gt;proc~is_physics_active_control</title>
+<path fill="none" stroke="#003fff" d="M847.7,-256.29C864.29,-256.36 882.46,-256.43 900.6,-256.51"/>
+<polygon fill="#003fff" stroke="#003fff" points="900.65,-260.01 910.66,-256.55 900.68,-253.01 900.65,-260.01"/>
+</g>
+<!-- proc~norm_2_native -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node19" class="node">
+<title>proc~norm_2_native</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node19"><a xlink:href="../proc/norm_2_native.html" xlink:title="norm_2_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1330,-227 1239,-227 1239,-203 1330,-203 1330,-227"/>
+<text text-anchor="middle" x="1284.5" y="-212.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_native</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_2_native~2&#45;&gt;proc~norm_2_native -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge21" class="edge">
+<title>proc~norm_2_native~2&#45;&gt;proc~norm_2_native</title>
+<path fill="none" stroke="#7f00ff" d="M1066.66,-215C1111.37,-215 1180.26,-215 1228.36,-215"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1228.59,-218.5 1238.59,-215 1228.59,-211.5 1228.59,-218.5"/>
+</g>
+<!-- proc~norm_2_vector_dp&#45;&gt;proc~norm_2_native~2 -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge23" class="edge">
+<title>proc~norm_2_vector_dp&#45;&gt;proc~norm_2_native~2</title>
+<path fill="none" stroke="#ff00bf" d="M833.3,-184.85C872.73,-191.22 925.7,-199.77 965.14,-206.14"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="964.69,-209.61 975.12,-207.75 965.8,-202.7 964.69,-209.61"/>
+</g>
+<!-- interface~get_data_vector_dp -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node17" class="node">
+<title>interface~get_data_vector_dp</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node17"><a xlink:href="../interface/get_data_vector_dp.html" xlink:title="type_vector_dp%get_data_vector_dp">
+<polygon fill="#a7506f" stroke="#a7506f" points="1125,-185 917,-185 917,-161 1125,-161 1125,-185"/>
+<text text-anchor="middle" x="1021" y="-170.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vector_dp%get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_2_vector_dp&#45;&gt;interface~get_data_vector_dp -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge22" class="edge">
+<title>proc~norm_2_vector_dp&#45;&gt;interface~get_data_vector_dp</title>
+<path fill="none" stroke="#ff00bf" d="M833.3,-175.32C855.17,-175.05 881.2,-174.72 906.78,-174.41"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="906.98,-177.9 916.93,-174.28 906.89,-170.9 906.98,-177.9"/>
+</g>
+<!-- proc~get_data_vector_dp -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node22" class="node">
+<title>proc~get_data_vector_dp</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node22"><a xlink:href="../proc/get_data_vector_dp.html" xlink:title="get_data_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1343,-185 1226,-185 1226,-161 1343,-161 1343,-185"/>
+<text text-anchor="middle" x="1284.5" y="-170.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_data_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge24" class="edge">
+<title>interface~get_data_vector_dp&#45;&gt;proc~get_data_vector_dp</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1125.35,-173C1155.61,-173 1187.91,-173 1215.38,-173"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1215.66,-176.5 1225.66,-173 1215.66,-169.5 1215.66,-176.5"/>
+</g>
+<!-- proc~is_valid_physics_type -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node23" class="node">
+<title>proc~is_valid_physics_type</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node23"><a xlink:href="../proc/is_valid_physics_type.html" xlink:title="type_physics_types%is_valid_physics_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1402,-269 1167,-269 1167,-245 1402,-245 1402,-269"/>
+<text text-anchor="middle" x="1284.5" y="-254.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_types%is_valid_physics_type</text>
+</a>
+</g>
+</g>
+<!-- proc~is_physics_active_control&#45;&gt;proc~is_valid_physics_type -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge25" class="edge">
+<title>proc~is_physics_active_control&#45;&gt;proc~is_valid_physics_type</title>
+<path fill="none" stroke="#7fff00" d="M1131.01,-257C1139.47,-257 1148.05,-257 1156.62,-257"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1156.65,-260.5 1166.65,-257 1156.65,-253.5 1156.65,-260.5"/>
+</g>
+<!-- mpi_allreduce -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node21" class="node">
+<title>mpi_allreduce</title>
+<polygon fill="#777777" stroke="#777777" points="1603,-227 1515,-227 1515,-203 1603,-203 1603,-227"/>
+<text text-anchor="middle" x="1559" y="-212.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_allreduce</text>
+</g>
+<!-- proc~norm_2_native&#45;&gt;mpi_allreduce -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge26" class="edge">
+<title>proc~norm_2_native&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#00ffff" d="M1330.19,-215C1377.94,-215 1453.6,-215 1504.49,-215"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1504.63,-218.5 1514.63,-215 1504.63,-211.5 1504.63,-218.5"/>
+</g>
+<!-- proc~replace_placeholder -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node24" class="node">
+<title>proc~replace_placeholder</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node24"><a xlink:href="../proc/replace_placeholder.html" xlink:title="replace_placeholder">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1619.5,-184 1498.5,-184 1498.5,-160 1619.5,-160 1619.5,-184"/>
+<text text-anchor="middle" x="1559" y="-169.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">replace_placeholder</text>
+</a>
+</g>
+</g>
+<!-- proc~raise_error&#45;&gt;proc~replace_placeholder -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge27" class="edge">
+<title>proc~raise_error&#45;&gt;proc~replace_placeholder</title>
+<path fill="none" stroke="#7f00ff" d="M1319.71,-119.69C1350.61,-126.62 1397.33,-137.06 1438,-146 1455.49,-149.84 1474.43,-153.97 1491.97,-157.77"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1491.61,-161.27 1502.12,-159.97 1493.09,-154.43 1491.61,-161.27"/>
+</g>
+<!-- strip -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node25" class="node">
+<title>strip</title>
+<polygon fill="#777777" stroke="#777777" points="1772,-184 1718,-184 1718,-160 1772,-160 1772,-184"/>
+<text text-anchor="middle" x="1745" y="-169.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">strip</text>
+</g>
+<!-- proc~raise_error&#45;&gt;strip -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge28" class="edge">
+<title>proc~raise_error&#45;&gt;strip</title>
+<path fill="none" stroke="#7f00ff" d="M1319.65,-112.87C1388.52,-115.18 1548.68,-123.31 1680,-151 1689.33,-152.97 1699.2,-155.81 1708.33,-158.77"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1707.29,-162.11 1717.89,-162 1709.53,-155.48 1707.29,-162.11"/>
+</g>
+<!-- to_string -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node26" class="node">
+<title>to_string</title>
+<polygon fill="#777777" stroke="#777777" points="1588,-104 1530,-104 1530,-80 1588,-80 1588,-104"/>
+<text text-anchor="middle" x="1559" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_string</text>
+</g>
+<!-- proc~raise_error&#45;&gt;to_string -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge29" class="edge">
+<title>proc~raise_error&#45;&gt;to_string</title>
+<path fill="none" stroke="#7f00ff" d="M1319.74,-109.49C1370.79,-105.74 1466.57,-98.71 1519.83,-94.8"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="1520.17,-98.29 1529.88,-94.06 1519.66,-91.3 1520.17,-98.29"/>
+</g>
+<!-- proc~in_group_physics_type -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node27" class="node">
+<title>proc~in_group_physics_type</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CallsGraph_node27"><a xlink:href="../proc/in_group_physics_type.html" xlink:title="type_physics_types%in_group_physics_type">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="1680,-269 1438,-269 1438,-245 1680,-245 1680,-269"/>
+<text text-anchor="middle" x="1559" y="-254.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_physics_types%in_group_physics_type</text>
+</a>
+</g>
+</g>
+<!-- proc~is_valid_physics_type&#45;&gt;proc~in_group_physics_type -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge30" class="edge">
+<title>proc~is_valid_physics_type&#45;&gt;proc~in_group_physics_type</title>
+<path fill="none" stroke="#00ff00" d="M1402.25,-257C1410.57,-257 1418.99,-257 1427.38,-257"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1427.59,-260.5 1437.59,-257 1427.59,-253.5 1427.59,-260.5"/>
+</g>
+<!-- proc~replace_placeholder&#45;&gt;strip -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge31" class="edge">
+<title>proc~replace_placeholder&#45;&gt;strip</title>
+<path fill="none" stroke="#00ffff" d="M1619.74,-172C1648.75,-172 1682.67,-172 1707.73,-172"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1707.89,-175.5 1717.89,-172 1707.89,-168.5 1707.89,-175.5"/>
+</g>
+<!-- proc~in_group_physics_type&#45;&gt;strip -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge32" class="edge">
+<title>proc~in_group_physics_type&#45;&gt;strip</title>
+<path fill="none" stroke="#ff0000" d="M1658.58,-244.91C1666.02,-242.45 1673.24,-239.51 1680,-236 1700.05,-225.58 1717.76,-206.68 1729.44,-192.11"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1732.26,-194.18 1735.6,-184.12 1726.72,-189.91 1732.26,-194.18"/>
+</g>
+<!-- to_lower -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_node28" class="node">
+<title>to_lower</title>
+<polygon fill="#777777" stroke="#777777" points="1774,-269 1716,-269 1716,-245 1774,-245 1774,-269"/>
+<text text-anchor="middle" x="1745" y="-254.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">to_lower</text>
+</g>
+<!-- proc~in_group_physics_type&#45;&gt;to_lower -->
+<g id="interface~~compute_lte_error_ftcms~~CallsGraph_edge33" class="edge">
+<title>proc~in_group_physics_type&#45;&gt;to_lower</title>
+<path fill="none" stroke="#ff0000" d="M1680.16,-257C1689.16,-257 1697.77,-257 1705.58,-257"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1705.7,-260.5 1715.7,-257 1705.7,-253.5 1705.7,-260.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var paninterfacecompute_lte_error_ftcmsCallsGraph = svgPanZoom('#interfacecompute_lte_error_ftcmsCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: interface~~compute_lte_error_ftcms~~CalledByGraph Pages: 1 -->
+<svg id="interfacecompute_lte_error_ftcmsCalledByGraph" width="490pt" height="32pt"
+ viewBox="0.00 0.00 490.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="interface~~compute_lte_error_ftcms~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>interface~~compute_lte_error_ftcms~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 486,-28 486,4 -4,4"/>
+<!-- interface~compute_lte_error_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CalledByGraph_node1" class="node">
+<title>interface~compute_lte_error_ftcms</title>
+<polygon fill="none" stroke="black" points="482,-24 270,-24 270,0 482,0 482,-24"/>
+<text text-anchor="middle" x="376" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_ftcms%compute_lte_error_ftcms</text>
+</g>
+<!-- proc~run_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CalledByGraph_node2" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CalledByGraph_node2"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-24 169,-24 169,0 234,0 234,-24"/>
+<text text-anchor="middle" x="201.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~compute_lte_error_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CalledByGraph_edge1" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~compute_lte_error_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M234.14,-12C241.85,-12 250.56,-12 259.76,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="259.92,-15.5 269.92,-12 259.92,-8.5 259.92,-15.5"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CalledByGraph_node3" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_interface~~compute_lte_error_ftcms~~CalledByGraph_node3"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="133,-24 0,-24 0,0 133,0 133,-24"/>
+<text text-anchor="middle" x="66.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="interface~~compute_lte_error_ftcms~~CalledByGraph_edge2" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M133.22,-12C141.87,-12 150.53,-12 158.63,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="158.89,-15.5 168.89,-12 158.89,-8.5 158.89,-15.5"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+      <h2>public module function compute_lte_error_ftcms(self) result(error_rel)  
+    <a href="../proc/compute_lte_error_ftcms.html"><button type="button" class="btn btn-info depwarn">Implementation &rarr;</button></a>
+</h2>
+
+    
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-self~2143"></span>
+              class(<a href='../type/type_ftcms.html'>type_ftcms</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <h3>Return Value <span class="anchor" id="variable-error_rel~2"></span><small>real(kind=real64)</small></h3>
+    
+    <h3>Description</h3>
+    <p>Relative local-truncation-error estimate of the just-converged step, for
+the error-controlled (PI) adaptive time stepping.</p>
+<p>Uses the divided-difference (curvature) estimate of the implicit-Euler
+LTE: <script type="math/tex"> \text{LTE} \approx \lVert \dot y_n - \dot y_{n-1}\rVert\,
+\Delta t_n^2/(\Delta t_n+\Delta t_{n-1}) </script>, normalized by <script type="math/tex">\lVert y_n\rVert</script>
+to be dimensionless and self-scaling (no per-case absolute tolerances).
+The temperature and pressure estimates are combined by a maximum.
+Returns -1 on the first step (no previous derivative yet) so the caller
+skips error control. Advances the stored previous derivative and dt.</p>
+    <br>
+
+ </div>
+</div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-07-13 12:46 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

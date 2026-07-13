@@ -21,6 +21,22 @@ submodule(io_input_conditions) input_conditions_time_controls
     character(*), parameter :: scale_up = "scale_up"
     character(*), parameter :: scale_down = "scale_down"
     character(*), parameter :: scale_retry = "scale_retry"
+    character(*), parameter :: iteration_control = "iteration_control"
+    character(*), parameter :: iteration_count_min = "iteration_count_min"
+    character(*), parameter :: iteration_count_max = "iteration_count_max"
+    character(*), parameter :: time_step_scale_up = "time_step_scale_up"
+    character(*), parameter :: time_step_scale_down = "time_step_scale_down"
+    character(*), parameter :: time_step_scale_retry = "time_step_scale_retry"
+    character(*), parameter :: error_control = "error_control"
+    character(*), parameter :: error_control_is_active = "is_active"
+    character(*), parameter :: error_relative_tolerance = "error_relative_tolerance"
+    character(*), parameter :: proportional_gain = "proportional_gain"
+    character(*), parameter :: integral_gain = "integral_gain"
+    character(*), parameter :: safety_factor = "safety_factor"
+    character(*), parameter :: max_growth_rate = "max_growth_rate"
+    character(*), parameter :: solution_change_control = "solution_change_control"
+    character(*), parameter :: max_temperature_change_per_step = "max_temperature_change_per_step"
+    character(*), parameter :: max_relative_change_per_step = "max_relative_change_per_step"
     !!------------------------------------------------------------------------------------------------------------------------------
 
 contains
@@ -112,32 +128,99 @@ contains
         implicit none
         class(type_conditions), intent(inout) :: self
         type(json_file), intent(inout) :: json !! JSON parser
-        character(256) :: buffer(3) = [character(256) :: &
-                                       time_controls, adaptive_stepping, ""]
+        character(256) :: buffer(5)
+
+        buffer(1) = time_controls
+        buffer(2) = adaptive_stepping
+        buffer(3) = ""
+        buffer(4) = ""
+        buffer(5) = ""
 
         buffer(3) = is_active
-        call get_json_value(json, join(buffer), self%time_control%adaptive_stepping%is_active, &
+        call get_json_value(json, join(buffer(1:3)), self%time_control%adaptive_stepping%is_active, &
                             is_required=.true.)
 
+        ! Legacy flat keys (backward compatible)
         buffer(3) = iter_min
-        call get_json_value(json, join(buffer), self%time_control%adaptive_stepping%iter_min, &
-                            is_required=.true., valid_range=[1, huge(0)])
+        call get_json_value(json, join(buffer(1:3)), self%time_control%adaptive_stepping%iter_min, &
+                            is_required=.false., default_value=4, valid_range=[1, huge(0)])
 
         buffer(3) = iter_max
-        call get_json_value(json, join(buffer), self%time_control%adaptive_stepping%iter_max, &
-                            is_required=.true., valid_range=[1, huge(0)])
+        call get_json_value(json, join(buffer(1:3)), self%time_control%adaptive_stepping%iter_max, &
+                            is_required=.false., default_value=8, valid_range=[1, huge(0)])
 
         buffer(3) = scale_up
-        call get_json_value(json, join(buffer), self%time_control%adaptive_stepping%scale_up, &
-                            is_required=.true., valid_range=[1.0d0, huge(0.0d0)])
+        call get_json_value(json, join(buffer(1:3)), self%time_control%adaptive_stepping%scale_up, &
+                            is_required=.false., default_value=1.2d0, valid_range=[1.0d0, huge(0.0d0)])
 
         buffer(3) = scale_down
-        call get_json_value(json, join(buffer), self%time_control%adaptive_stepping%scale_down, &
-                            is_required=.true., valid_range=[epsilon(0.0d0), 1.0d0])
+        call get_json_value(json, join(buffer(1:3)), self%time_control%adaptive_stepping%scale_down, &
+                            is_required=.false., default_value=0.8d0, valid_range=[epsilon(0.0d0), 1.0d0])
 
         buffer(3) = scale_retry
-        call get_json_value(json, join(buffer), self%time_control%adaptive_stepping%scale_retry, &
-                            is_required=.true., valid_range=[epsilon(0.0d0), 1.0d0])
+        call get_json_value(json, join(buffer(1:3)), self%time_control%adaptive_stepping%scale_retry, &
+                            is_required=.false., default_value=0.5d0, valid_range=[epsilon(0.0d0), 1.0d0])
+
+        ! Hierarchical explicit keys (preferred)
+        buffer(3) = iteration_control
+        buffer(4) = iteration_count_min
+        call get_json_value(json, join(buffer(1:4)), self%time_control%adaptive_stepping%iter_min, &
+                            is_required=.false., default_value=self%time_control%adaptive_stepping%iter_min, &
+                            valid_range=[1, huge(0)])
+
+        buffer(4) = iteration_count_max
+        call get_json_value(json, join(buffer(1:4)), self%time_control%adaptive_stepping%iter_max, &
+                            is_required=.false., default_value=self%time_control%adaptive_stepping%iter_max, &
+                            valid_range=[1, huge(0)])
+
+        buffer(4) = time_step_scale_up
+        call get_json_value(json, join(buffer(1:4)), self%time_control%adaptive_stepping%scale_up, &
+                            is_required=.false., default_value=self%time_control%adaptive_stepping%scale_up, &
+                            valid_range=[1.0d0, huge(0.0d0)])
+
+        buffer(4) = time_step_scale_down
+        call get_json_value(json, join(buffer(1:4)), self%time_control%adaptive_stepping%scale_down, &
+                            is_required=.false., default_value=self%time_control%adaptive_stepping%scale_down, &
+                            valid_range=[epsilon(0.0d0), 1.0d0])
+
+        buffer(4) = time_step_scale_retry
+        call get_json_value(json, join(buffer(1:4)), self%time_control%adaptive_stepping%scale_retry, &
+                            is_required=.false., default_value=self%time_control%adaptive_stepping%scale_retry, &
+                            valid_range=[epsilon(0.0d0), 1.0d0])
+
+        buffer(3) = error_control
+        buffer(4) = error_control_is_active
+        call get_json_value(json, join(buffer(1:4)), self%time_control%adaptive_stepping%use_error_control, &
+                            is_required=.false., default_value=.true.)
+
+        buffer(4) = error_relative_tolerance
+        call get_json_value(json, join(buffer(1:4)), self%time_control%adaptive_stepping%error_relative_tolerance, &
+                            is_required=.false., default_value=1.0d-2, valid_range=[0.0d0, huge(0.0d0)])
+
+        buffer(4) = proportional_gain
+        call get_json_value(json, join(buffer(1:4)), self%time_control%adaptive_stepping%proportional_gain, &
+                            is_required=.false., default_value=0.10d0, valid_range=[0.0d0, huge(0.0d0)])
+
+        buffer(4) = integral_gain
+        call get_json_value(json, join(buffer(1:4)), self%time_control%adaptive_stepping%integral_gain, &
+                            is_required=.false., default_value=0.15d0, valid_range=[0.0d0, huge(0.0d0)])
+
+        buffer(4) = safety_factor
+        call get_json_value(json, join(buffer(1:4)), self%time_control%adaptive_stepping%safety_factor, &
+                            is_required=.false., default_value=0.9d0, valid_range=[0.0d0, huge(0.0d0)])
+
+        buffer(4) = max_growth_rate
+        call get_json_value(json, join(buffer(1:4)), self%time_control%adaptive_stepping%max_growth_rate, &
+                            is_required=.false., default_value=2.0d0, valid_range=[1.0d0, huge(0.0d0)])
+
+        buffer(3) = solution_change_control
+        buffer(4) = max_temperature_change_per_step
+        call get_json_value(json, join(buffer(1:4)), self%time_control%adaptive_stepping%max_temperature_change_per_step, &
+                            is_required=.false., default_value=5.0d0, valid_range=[0.0d0, huge(0.0d0)])
+
+        buffer(4) = max_relative_change_per_step
+        call get_json_value(json, join(buffer(1:4)), self%time_control%adaptive_stepping%max_relative_change_per_step, &
+                            is_required=.false., default_value=0.3d0, valid_range=[0.0d0, huge(0.0d0)])
     end subroutine read_time_ctrl_adaptive
 
     module subroutine display_time_controls(self)

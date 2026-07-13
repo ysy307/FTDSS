@@ -6,6 +6,7 @@ submodule(io_input_output_conditions) input_output_conditions_fields
     character(*), parameter :: field_output = "field_output"
     character(*), parameter :: valid_field_file_formats(3) = [character(len=16) :: "none", "vtk", "vtu"]
     character(*), parameter :: output_time_unit = "output_time_unit"
+    character(*), parameter :: output_time_offset_key = "output_time_offset"
     !!------------------------------------------------------------------------------------------------------------------------------
 contains
     module subroutine read_output_settings_fields(self, json)
@@ -26,6 +27,9 @@ contains
         buffer(2) = output_time_unit
         call get_json_value(json, join(buffer(1:2)), self%field_output%output_time_unit, &
                             is_required=.true., valid_list=valid_time_units)
+        buffer(2) = output_time_offset_key
+        call get_json_value(json, join(buffer(1:2)), self%field_output%output_time_offset, &
+                            is_required=.false., default_value=0.0d0)
         buffer(2) = output_interval
         buffer(3) = unit
         call get_json_value(json, join(buffer), self%field_output%output_interval_unit, &

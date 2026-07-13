@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.2% of total for derived types.</p>Including implementation: 7 statements,  0.0% of total for derived types.">7 statements</a>
+                 title="<p> 0.3% of total for derived types.</p>Including implementation: 15 statements,  0.1% of total for derived types.">15 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,11 +134,19 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_linear_solver.html#variable-amg_drop_strategy~3">amg_drop_strategy</a>
+            <a class="list-group-item" href="../type/type_linear_solver.html#variable-amg_drop_tolerance~3">amg_drop_tolerance</a>
+            <a class="list-group-item" href="../type/type_linear_solver.html#variable-amg_max_agg_size~3">amg_max_agg_size</a>
+            <a class="list-group-item" href="../type/type_linear_solver.html#variable-amg_rebuild_frequency~3">amg_rebuild_frequency</a>
+            <a class="list-group-item" href="../type/type_linear_solver.html#variable-amg_rebuild_threshold~3">amg_rebuild_threshold</a>
+            <a class="list-group-item" href="../type/type_linear_solver.html#variable-amg_smoother_sweeps~3">amg_smoother_sweeps</a>
+            <a class="list-group-item" href="../type/type_linear_solver.html#variable-amg_smoother_type~3">amg_smoother_type</a>
+            <a class="list-group-item" href="../type/type_linear_solver.html#variable-amg_strength_threshold~3">amg_strength_threshold</a>
             <a class="list-group-item" href="../type/type_linear_solver.html#variable-m_restarts">m_restarts</a>
-            <a class="list-group-item" href="../type/type_linear_solver.html#variable-max_iterations~14">max_iterations</a>
-            <a class="list-group-item" href="../type/type_linear_solver.html#variable-preconditioner_type~2">preconditioner_type</a>
-            <a class="list-group-item" href="../type/type_linear_solver.html#variable-solver_type~2">solver_type</a>
-            <a class="list-group-item" href="../type/type_linear_solver.html#variable-tolerance~5">tolerance</a>
+            <a class="list-group-item" href="../type/type_linear_solver.html#variable-max_iterations~20">max_iterations</a>
+            <a class="list-group-item" href="../type/type_linear_solver.html#variable-preconditioner_type~3">preconditioner_type</a>
+            <a class="list-group-item" href="../type/type_linear_solver.html#variable-solver_type~3">solver_type</a>
+            <a class="list-group-item" href="../type/type_linear_solver.html#variable-tolerance~9">tolerance</a>
         </div>
       </div>
     </div>
@@ -320,6 +328,142 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
+              <span class="anchor" id="variable-amg_drop_strategy~3"></span>
+              character(len=32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_drop_strategy</strong></td>
+<td> =</td>
+                <td>&#39;RELATIVE&#39;</td>
+            <td>
+                <p>Optional AMG drop strategy for SA-AMG; default 'RELATIVE'.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-amg_drop_tolerance~3"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_drop_tolerance</strong></td>
+<td> =</td>
+                <td>1.0d-4</td>
+            <td>
+                <p>Optional AMG coarse-matrix drop tolerance for SA-AMG; default 1.0e-4.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-amg_max_agg_size~3"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_max_agg_size</strong></td>
+<td> =</td>
+                <td>8</td>
+            <td>
+                <p>Optional AMG maximum aggregate size for SA-AMG; default 8.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-amg_rebuild_frequency~3"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_rebuild_frequency</strong></td>
+<td> =</td>
+                <td>5</td>
+            <td>
+                <p>Optional AMG rebuild frequency for SA-AMG; default 5.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-amg_rebuild_threshold~3"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_rebuild_threshold</strong></td>
+<td> =</td>
+                <td>1.0d-2</td>
+            <td>
+                <p>Optional AMG rebuild threshold for SA-AMG; default 1.0e-2.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-amg_smoother_sweeps~3"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_smoother_sweeps</strong></td>
+<td> =</td>
+                <td>2</td>
+            <td>
+                <p>Optional AMG smoother sweeps for SA-AMG; default 2.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-amg_smoother_type~3"></span>
+              character(len=32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_smoother_type</strong></td>
+<td> =</td>
+                <td>&#39;JACOBI&#39;</td>
+            <td>
+                <p>Optional AMG smoother type for SA-AMG; default 'JACOBI'.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-amg_strength_threshold~3"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>amg_strength_threshold</strong></td>
+<td> =</td>
+                <td>0.25d0</td>
+            <td>
+                <p>Optional AMG strength threshold for SA-AMG; default 0.25.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
               <span class="anchor" id="variable-m_restarts"></span>
               integer(kind=int32),
             </td>
@@ -329,15 +473,15 @@ large graphs.</div>
             </td>
             <td>::</td>
             <td><strong>m_restarts</strong></td>
-                <td></td>
-                <td></td>
+<td> =</td>
+                <td>30</td>
             <td>
                 
             </td>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-max_iterations~14"></span>
+              <span class="anchor" id="variable-max_iterations~20"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -354,7 +498,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-preconditioner_type~2"></span>
+              <span class="anchor" id="variable-preconditioner_type~3"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -371,7 +515,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-solver_type~2"></span>
+              <span class="anchor" id="variable-solver_type~3"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -388,7 +532,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-tolerance~5"></span>
+              <span class="anchor" id="variable-tolerance~9"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -419,7 +563,23 @@ large graphs.</div>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">preconditioner_type</span>
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">max_iterations</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">tolerance</span>
-<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">m_restarts</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">m_restarts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span>
+<span class="w">        </span><span class="c">!&gt; Optional AMG strength threshold for SA-AMG; default 0.25.</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_strength_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.25d0</span>
+<span class="w">        </span><span class="c">!&gt; Optional AMG smoother sweeps for SA-AMG; default 2.</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_smoother_sweeps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">        </span><span class="c">!&gt; Optional AMG maximum aggregate size for SA-AMG; default 8.</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_max_agg_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span>
+<span class="w">        </span><span class="c">!&gt; Optional AMG coarse-matrix drop tolerance for SA-AMG; default 1.0e-4.</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_drop_tolerance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d-4</span>
+<span class="w">        </span><span class="c">!&gt; Optional AMG drop strategy for SA-AMG; default &#39;RELATIVE&#39;.</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_drop_strategy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;RELATIVE&#39;</span>
+<span class="w">        </span><span class="c">!&gt; Optional AMG smoother type for SA-AMG; default &#39;JACOBI&#39;.</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_smoother_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;JACOBI&#39;</span>
+<span class="w">        </span><span class="c">!&gt; Optional AMG rebuild frequency for SA-AMG; default 5.</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_rebuild_frequency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+<span class="w">        </span><span class="c">!&gt; Optional AMG rebuild threshold for SA-AMG; default 1.0e-2.</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">amg_rebuild_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d-2</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_linear_solver</span>
 </pre></div>
 
@@ -443,7 +603,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

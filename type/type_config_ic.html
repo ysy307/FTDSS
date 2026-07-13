@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.2% of total for derived types.</p>Including implementation: 31 statements,  0.1% of total for derived types.">9 statements</a>
+                 title="<p> 0.2% of total for derived types.</p>Including implementation: 36 statements,  0.1% of total for derived types.">10 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,10 +134,11 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_config_ic.html#variable-active~4">active</a>
-            <a class="list-group-item" href="../type/type_config_ic.html#variable-ic_kind">ic_kind</a>
-            <a class="list-group-item" href="../type/type_config_ic.html#variable-physics_type~27">physics_type</a>
-            <a class="list-group-item" href="../type/type_config_ic.html#variable-value~56">value</a>
+            <a class="list-group-item" href="../type/type_config_ic.html#variable-active~11">active</a>
+            <a class="list-group-item" href="../type/type_config_ic.html#variable-ic_kind~2">ic_kind</a>
+            <a class="list-group-item" href="../type/type_config_ic.html#variable-physics_type~70">physics_type</a>
+            <a class="list-group-item" href="../type/type_config_ic.html#variable-value~122">value</a>
+            <a class="list-group-item" href="../type/type_config_ic.html#variable-values~41">values</a>
         </div>
       </div>
     </div>
@@ -164,9 +165,9 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_config_ic.html#boundprocedure-copy~15">copy</a>
-            <a class="list-group-item" href="../type/type_config_ic.html#boundprocedure-reset~22">reset</a>
-            <a class="list-group-item" href="../type/type_config_ic.html#boundprocedure-set~30">set</a>
+            <a class="list-group-item" href="../type/type_config_ic.html#boundprocedure-copy~31">copy</a>
+            <a class="list-group-item" href="../type/type_config_ic.html#boundprocedure-reset~44">reset</a>
+            <a class="list-group-item" href="../type/type_config_ic.html#boundprocedure-set~43">set</a>
         </div>
       </div>
     </div>
@@ -311,7 +312,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-active~4"></span>
+              <span class="anchor" id="variable-active~11"></span>
               logical,
             </td>
               <td>public</td>
@@ -328,7 +329,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-ic_kind"></span>
+              <span class="anchor" id="variable-ic_kind~2"></span>
               type(<a href='type_constant_id.html'>type_constant_id</a>),
             </td>
               <td>public</td>
@@ -345,7 +346,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-physics_type~27"></span>
+              <span class="anchor" id="variable-physics_type~70"></span>
               type(<a href='type_constant_id.html'>type_constant_id</a>),
             </td>
               <td>public</td>
@@ -362,7 +363,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-value~56"></span>
+              <span class="anchor" id="variable-value~122"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -375,6 +376,23 @@ large graphs.</div>
                 <td></td>
             <td>
                 <p>Initial condition value (for uniform type)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-values~41"></span>
+              real(kind=real64),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>values</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                <p>Per-node values read from VTU (for file type)</p>
             </td>
         </tr>
     </tbody>
@@ -390,7 +408,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-copy~15"></span>
+      <span class="anchor" id="boundprocedure-copy~31"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>copy</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/copy_config_ic.html'>copy_config_ic</a>
@@ -459,7 +477,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-reset~22"></span>
+      <span class="anchor" id="boundprocedure-reset~44"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>reset</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/reset_config_ic.html'>reset_config_ic</a>
@@ -513,7 +531,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-set~30"></span>
+      <span class="anchor" id="boundprocedure-set~43"></span>
       <h3>
           generic, public ::
   <strong>set</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int8'>set_int8</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int8_1d'>set_int8_1d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int8_2d'>set_int8_2d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int8_3d'>set_int8_3d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int32'>set_int32</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int32_1d'>set_int32_1d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int32_2d'>set_int32_2d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int32_3d'>set_int32_3d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_real64'>set_real64</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_real64_1d'>set_real64_1d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_real64_2d'>set_real64_2d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_real64_3d'>set_real64_3d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_logical'>set_logical</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_logical_1d'>set_logical_1d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_logical_2d'>set_logical_2d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_logical_3d'>set_logical_3d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_character'>set_character</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_character_1d'>set_character_1d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_character_2d'>set_character_2d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_character_3d'>set_character_3d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_constant_id'>set_constant_id</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_constant_ids'>set_constant_ids</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_constant_value'>set_constant_value</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_constant_values'>set_constant_values</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_coordinate_array_dp'>set_coordinate_array_dp</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_csr_index'>set_csr_index</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_coordinate_dp'>set_coordinate_dp</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_datetime'>set_datetime</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_datetimes'>set_datetimes</a>
@@ -2538,7 +2556,9 @@ large graphs.</div>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_constant_id</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ic_kind</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">type_constant_id</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <span class="w">        </span><span class="c">!&gt; Initial condition value (for uniform type)</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="k">value</span>
-<span class="k">    contains</span>
+<span class="w">        </span><span class="c">!&gt; Per-node values read from VTU (for file type)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">values</span><span class="p">(:)</span>
+<span class="w">    </span><span class="k">contains</span>
 
 <span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">copy</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">copy_config_ic</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">reset</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">reset_config_ic</span>
@@ -2566,7 +2586,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

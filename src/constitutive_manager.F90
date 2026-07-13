@@ -47,14 +47,19 @@ module physics_constitutive_manager
         procedure, public :: calc_latent_heat_fusion
         procedure, public :: calc_latent_heat_vaporization
         procedure, public :: calc_pressure_ice_water_derivative
-        procedure, public :: calc_cryogenic_suction
-        procedure, public :: calc_cryogenic_suction_derivatives
 
         procedure, public :: update_water_phases
         procedure, public :: calc_Kflh
         procedure, public :: calc_KlT
         procedure, public :: calc_Kvh
         procedure, public :: calc_KvT
+        procedure, public :: calc_cryo_suction_deriv_T
+        procedure, public :: calc_lscheme_capacity
+        procedure, public :: calc_suction_weights
+        procedure, public :: calc_segregation_sink
+        procedure, public :: calc_effective_segregation_sink
+        procedure, public :: is_segregation_active
+        procedure, public :: has_cryo_transport
 
     end type type_constitutive_manager
 
@@ -397,27 +402,6 @@ contains
         call self%models(self%materials_id_map(material_id))%calc_pressure_ice_water_derivative(state, deriv)
     end subroutine calc_pressure_ice_water_derivative
 
-    subroutine calc_cryogenic_suction(self, material_id, state, suction)
-        implicit none
-        class(type_constitutive_manager), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_state), intent(in) :: state
-        real(real64), intent(inout) :: suction
-
-        call self%models(self%materials_id_map(material_id))%calc_cryogenic_suction(state, suction)
-    end subroutine calc_cryogenic_suction
-
-    subroutine calc_cryogenic_suction_derivatives(self, material_id, state, deriv_dP, deriv_dT)
-        implicit none
-        class(type_constitutive_manager), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_state), intent(in) :: state
-        real(real64), intent(inout), optional :: deriv_dP
-        real(real64), intent(inout), optional :: deriv_dT
-
-        call self%models(self%materials_id_map(material_id))%calc_cryogenic_suction_derivatives(state, deriv_dP, deriv_dT)
-    end subroutine calc_cryogenic_suction_derivatives
-
     ! subroutine update_water_phases(self, material_id, state)
     subroutine update_water_phases(self, material_id, state)
         implicit none
@@ -467,5 +451,107 @@ contains
 
         call self%models(self%materials_id_map(material_id))%calc_KvT(state, KvT)
     end subroutine calc_KvT
+
+    subroutine calc_cryo_suction_deriv_T(self, material_id, state, deriv)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: deriv
+
+        call self%models(self%materials_id_map(material_id))%calc_cryo_suction_deriv_T(state, deriv)
+    end subroutine calc_cryo_suction_deriv_T
+
+    subroutine calc_lscheme_capacity(self, material_id, capacity)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        real(real64), intent(inout) :: capacity
+
+        call self%models(self%materials_id_map(material_id))%calc_lscheme_capacity(capacity)
+    end subroutine calc_lscheme_capacity
+
+    subroutine calc_suction_weights(self, material_id, state, w_cap, w_cryo)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: w_cap, w_cryo
+
+        call self%models(self%materials_id_map(material_id))%calc_suction_weights(state, w_cap, w_cryo)
+    end subroutine calc_suction_weights
+
+    subroutine calc_segregation_sink(self, material_id, state, grad_T_magnitude, S_seg)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(in) :: grad_T_magnitude
+        real(real64), intent(inout) :: S_seg
+
+        call self%models(self%materials_id_map(material_id))%calc_segregation_sink(state, grad_T_magnitude, S_seg)
+    end subroutine calc_segregation_sink
+
+    subroutine calc_effective_segregation_sink(self, material_id, state, grad_T_magnitude, dt, S_seg)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(in) :: grad_T_magnitude
+        real(real64), intent(in) :: dt
+        real(real64), intent(inout) :: S_seg
+
+        real(real64) :: S_seg_raw
+        real(real64) :: Qw, Qi_pore, porosity_val
+        real(real64) :: rho_w, rho_i, density_ratio
+        real(real64) :: delta_liquid_raw, delta_liquid_clamped, pore_space_left
+
+        S_seg = 0.0d0
+        if (grad_T_magnitude <= 0.0d0 .or. dt <= 0.0d0) return
+
+        S_seg_raw = 0.0d0
+        call self%calc_segregation_sink(material_id, state, grad_T_magnitude, S_seg_raw)
+        if (S_seg_raw <= 0.0d0) return
+
+        call state%water_content%get(Qw)
+        call state%ice_content%get(Qi_pore)
+        call state%porosity%get(porosity_val)
+        call self%calc_density_water(state, rho_w)
+        call self%calc_density_ice(state, rho_i)
+        if (rho_w <= tiny(1.0d0)) return
+        if (rho_i <= tiny(1.0d0)) return
+
+        density_ratio = rho_w / rho_i
+
+        ! Clamp the liquid-water intake consistently for all equations. S_seg is
+        ! a liquid-water-equivalent volumetric removal rate [1/s]; it cannot
+        ! consume more liquid than is present, and its ice-volume equivalent
+        ! cannot exceed the currently open pore space during this step.
+        delta_liquid_raw = S_seg_raw * dt
+        delta_liquid_clamped = min(delta_liquid_raw, max(Qw, 0.0d0))
+        pore_space_left = max(porosity_val - Qi_pore - max(Qw, 0.0d0), 0.0d0)
+        delta_liquid_clamped = min(delta_liquid_clamped, pore_space_left / density_ratio)
+        delta_liquid_clamped = max(delta_liquid_clamped, 0.0d0)
+
+        S_seg = delta_liquid_clamped / dt
+    end subroutine calc_effective_segregation_sink
+
+    function is_segregation_active(self, material_id) result(active)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        logical :: active
+
+        active = self%models(self%materials_id_map(material_id))%is_segregation_active()
+    end function is_segregation_active
+
+    pure function has_cryo_transport(self, material_id) result(active)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        logical :: active
+
+        active = self%models(self%materials_id_map(material_id))%has_cryo_transport()
+    end function has_cryo_transport
 
 end module physics_constitutive_manager

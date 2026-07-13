@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.5% of total for derived types.</p>Including implementation: 96 statements,  0.4% of total for derived types.">20 statements</a>
+                 title="<p> 0.6% of total for derived types.</p>Including implementation: 133 statements,  0.5% of total for derived types.">26 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,18 +134,23 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_ats.html#variable-active~3">active</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-dt_max~2">dt_max</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-dt_min~2">dt_min</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-iter_max~2">iter_max</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-iter_min~2">iter_min</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-active~2">active</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-dt_max">dt_max</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-dt_min">dt_min</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-error_prev">error_prev</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-error_rtol">error_rtol</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-iter_max">iter_max</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-iter_min">iter_min</a>
             <a class="list-group-item" href="../type/type_ats.html#variable-max_dt_per_step">max_dT_per_step</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-max_growth_rate~2">max_growth_rate</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-max_growth_rate">max_growth_rate</a>
             <a class="list-group-item" href="../type/type_ats.html#variable-max_relative_change">max_relative_change</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-safety_factor~2">safety_factor</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-scale_down~2">scale_down</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-scale_retry~2">scale_retry</a>
-            <a class="list-group-item" href="../type/type_ats.html#variable-scale_up~2">scale_up</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-pi_k_i">pi_k_i</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-pi_k_p">pi_k_p</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-safety_factor">safety_factor</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-scale_down">scale_down</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-scale_retry">scale_retry</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-scale_up">scale_up</a>
+            <a class="list-group-item" href="../type/type_ats.html#variable-use_error_control">use_error_control</a>
         </div>
       </div>
     </div>
@@ -173,9 +178,10 @@
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_ats.html#boundprocedure-calc_retry_dt">calc_retry_dt</a>
-            <a class="list-group-item" href="../type/type_ats.html#boundprocedure-initialize~27">initialize</a>
+            <a class="list-group-item" href="../type/type_ats.html#boundprocedure-initialize~28">initialize</a>
             <a class="list-group-item" href="../type/type_ats.html#boundprocedure-is_active~3">is_active</a>
             <a class="list-group-item" href="../type/type_ats.html#boundprocedure-limit_dt_by_solution_change">limit_dt_by_solution_change</a>
+            <a class="list-group-item" href="../type/type_ats.html#boundprocedure-pi_controller_dt">pi_controller_dt</a>
             <a class="list-group-item" href="../type/type_ats.html#boundprocedure-predict_next_dt">predict_next_dt</a>
         </div>
       </div>
@@ -339,7 +345,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-active~3"></span>
+              <span class="anchor" id="variable-active~2"></span>
               logical,
             </td>
               <td>public</td>
@@ -356,7 +362,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-dt_max~2"></span>
+              <span class="anchor" id="variable-dt_max"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -373,7 +379,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-dt_min~2"></span>
+              <span class="anchor" id="variable-dt_min"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -390,7 +396,41 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-iter_max~2"></span>
+              <span class="anchor" id="variable-error_prev"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>error_prev</strong></td>
+<td> =</td>
+                <td>1.0d0</td>
+            <td>
+                <p>Previous normalized error (state for the PI controller); 1.0 = on target.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-error_rtol"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>error_rtol</strong></td>
+<td> =</td>
+                <td>1.0d-2</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-iter_max"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -407,7 +447,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-iter_min~2"></span>
+              <span class="anchor" id="variable-iter_min"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -441,7 +481,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-max_growth_rate~2"></span>
+              <span class="anchor" id="variable-max_growth_rate"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -475,7 +515,41 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-safety_factor~2"></span>
+              <span class="anchor" id="variable-pi_k_i"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>pi_k_i</strong></td>
+<td> =</td>
+                <td>0.15d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-pi_k_p"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>pi_k_p</strong></td>
+<td> =</td>
+                <td>0.20d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-safety_factor"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -492,7 +566,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-scale_down~2"></span>
+              <span class="anchor" id="variable-scale_down"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -509,7 +583,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-scale_retry~2"></span>
+              <span class="anchor" id="variable-scale_retry"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -526,7 +600,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-scale_up~2"></span>
+              <span class="anchor" id="variable-scale_up"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -539,6 +613,23 @@ large graphs.</div>
                 <td>1.2d0</td>
             <td>
                 
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-use_error_control"></span>
+              logical,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>use_error_control</strong></td>
+<td> =</td>
+                <td>.false.</td>
+            <td>
+                <p>Error-controlled (PI) adaptive stepping. See type_config_time_ats.</p>
             </td>
         </tr>
     </tbody>
@@ -638,7 +729,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~27"></span>
+      <span class="anchor" id="boundprocedure-initialize~28"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/initialize_type_ats.html'>initialize_type_ats</a>
@@ -880,6 +971,105 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-pi_controller_dt"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>pi_controller_dt</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/pi_controller_dt.html'>pi_controller_dt</a>(self, current_dt, error_norm, next_dt)  
+</h3>
+    
+
+  <p>PI-controlled time step from a normalized local-truncation-error estimate.</p><a href="../proc/pi_controller_dt.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_ats.html'>type_ats</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_dt</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>error_norm</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>next_dt</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
       <span class="anchor" id="boundprocedure-predict_next_dt"></span>
       <h3>
           procedure, public, pass(self) ::
@@ -998,10 +1188,19 @@ large graphs.</div>
 
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">max_dT_per_step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">5.0d0</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">max_relative_change</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.3d0</span>
+
+<span class="w">        </span><span class="c">!&gt; Error-controlled (PI) adaptive stepping. See type_config_time_ats.</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">use_error_control</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pi_k_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.15d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pi_k_p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.20d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">error_rtol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d-2</span>
+<span class="w">        </span><span class="c">!&gt; Previous normalized error (state for the PI controller); 1.0 = on target.</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">error_prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d0</span>
 <span class="w">    </span><span class="k">contains</span>
 <span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_type_ats</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_active</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">is_active_ats</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">predict_next_dt</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pi_controller_dt</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_retry_dt</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">limit_dt_by_solution_change</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_ats</span>
@@ -1027,7 +1226,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

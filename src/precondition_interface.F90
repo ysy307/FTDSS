@@ -10,6 +10,14 @@ module numerical_solver_preconditioner
     public :: type_preconditioner_none
     public :: type_preconditioner_jacobi
     public :: type_preconditioner_iluk
+    public :: type_preconditioner_ssor
+    public :: type_preconditioner_ilut
+    public :: type_preconditioner_saamg
+    public :: type_preconditioner_iluc
+    public :: type_preconditioner_is
+    public :: type_preconditioner_sainv
+    public :: type_preconditioner_hybrid
+    public :: type_preconditioner_adds
 
     public :: type_preconditioner_settings
 
@@ -27,6 +35,28 @@ module numerical_solver_preconditioner
         integer(int32) :: block_size = -1
         !> ILU fill-in level (for ILU preconditioners)
         integer(int32) :: ilu_fill_level = 0
+        !> SSOR relaxation parameter (default 1.0)
+        real(real64) :: ssor_omega = 1.0d0
+        !> ILUT drop tolerance (default 1.0e-3)
+        real(real64) :: ilut_drop_tolerance = 1.0d-3
+        !> ILUT maximum fill-in per row (default 20)
+        integer(int32) :: ilut_max_fill = 20
+        !> AMG strength threshold (default 0.25)
+        real(real64) :: amg_strength_threshold = 0.25d0
+        !> AMG smoother sweeps (default 2)
+        integer(int32) :: amg_smoother_sweeps = 2
+        !> AMG maximum aggregate size (default 8)
+        integer(int32) :: amg_max_agg_size = 8
+        !> AMG drop tolerance for coarse matrix (default 1.0e-4)
+        real(real64) :: amg_drop_tolerance = 1.0d-4
+        !> AMG drop strategy: 'NONE' | 'RELATIVE' (default 'RELATIVE')
+        character(len=32) :: amg_drop_strategy = 'RELATIVE'
+        !> AMG smoother type: 'JACOBI' | 'GS_FWD' | 'GS_BWD' | 'HYBRID' (default 'JACOBI')
+        character(len=32) :: amg_smoother_type = 'JACOBI'
+        !> AMG rebuild frequency (number of steps, default 5)
+        integer(int32) :: amg_rebuild_frequency = 5
+        !> AMG rebuild threshold for relative residual increase (default 1.0e-2)
+        real(real64) :: amg_rebuild_threshold = 1.0d-2
     contains
         !> Set configuration parameters.
         procedure :: set => set_preconditioner_settings
@@ -48,6 +78,8 @@ module numerical_solver_preconditioner
         !> Internal status code
         integer(int32) :: status
     contains
+        procedure, pass(self), public :: is_success => is_success_preconditioner
+        procedure, pass(self), public :: get_status => get_status_preconditioner
         !> Initializes the preconditioner with given info.
         procedure(abst_preconditioner_initialize), pass(self), public, deferred :: initialize
         !> Sets up the preconditioner (e.g., computes factors) for a specific matrix.
@@ -248,6 +280,7 @@ module numerical_solver_preconditioner
         procedure :: setup => setup_preconditioner_iluk
         procedure, pass(self), private :: setup_csr_ilu0
         procedure, pass(self), private :: setup_bsr_ilu0
+        procedure, pass(self), private :: setup_bsr_point_ilu0
         procedure :: apply => apply_preconditioner_iluk
         procedure, pass(self), private :: apply_csr_ilu0
         procedure, pass(self), private :: apply_bsr_ilu0
@@ -279,6 +312,12 @@ module numerical_solver_preconditioner
             class(type_matrix_bsr), intent(in) :: A
         end subroutine setup_bsr_ilu0
 
+        module subroutine setup_bsr_point_ilu0(self, A)
+            implicit none
+            class(type_preconditioner_iluk), intent(inout) :: self
+            class(type_matrix_bsr), intent(in) :: A
+        end subroutine setup_bsr_point_ilu0
+
         module subroutine apply_preconditioner_iluk(self, r, z)
             implicit none
             class(type_preconditioner_iluk), intent(inout) :: self
@@ -306,10 +345,507 @@ module numerical_solver_preconditioner
         end subroutine destroy_preconditioner_iluk
     end interface
 
+    !
+    ! ==========================================================
+    ! SSOR Preconditioner
+    ! ==========================================================
+    !
+    !> Symmetric Successive Over-Relaxation (SSOR) preconditioner.
+    !> \( M = (D/\omega + L) (D/\omega)^{-1} (D/\omega + U) \)
+    !> Supports both point and block variants for BSR matrices.
+    type, extends(abst_preconditioner) :: type_preconditioner_ssor
+        !> Number of nodes (or total DOFs for point mode)
+        integer(int32) :: num_nodes = -1
+        !> Number of block rows
+        integer(int32) :: num_rows = -1
+        !> Block size
+        integer(int32) :: block_size = 1
+        !> Relaxation parameter omega (0 < omega < 2)
+        real(real64) :: omega = 1.0d0
+        !> Flag for block mode
+        logical :: is_block = .false.
+        !> LU factored diagonal blocks scaled by 1/omega (block mode)
+        real(real64), allocatable :: diag_blocks(:, :, :)
+        !> Pivot indices for diagonal block LU
+        integer(int32), allocatable :: diag_pivots(:, :)
+        !> Diagonal pointer (index of diagonal block in ind array)
+        integer(int32), allocatable :: diag_ptr(:)
+        !> Diagonal values (point mode)
+        type(type_vector_dp) :: diag_vals
+        !> Pointers to BSR sparsity arrays (valid during solve)
+        integer(int32), pointer :: a_ptr(:) => null()
+        integer(int32), pointer :: a_ind(:) => null()
+        real(real64), pointer :: a_val(:, :, :) => null()
+    contains
+        procedure :: initialize => initialize_preconditioner_ssor
+        procedure :: setup => setup_preconditioner_ssor
+        procedure, pass(self), private :: apply_point => apply_point_ssor
+        procedure, pass(self), private :: apply_block => apply_block_ssor
+        procedure :: apply => apply_preconditioner_ssor
+        procedure :: destroy => destroy_preconditioner_ssor
+    end type type_preconditioner_ssor
+
+    interface
+        module subroutine initialize_preconditioner_ssor(self, info)
+            implicit none
+            class(type_preconditioner_ssor), intent(inout) :: self
+            type(type_preconditioner_settings), intent(in) :: info
+        end subroutine initialize_preconditioner_ssor
+
+        module subroutine setup_preconditioner_ssor(self, A)
+            implicit none
+            class(type_preconditioner_ssor), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+        end subroutine setup_preconditioner_ssor
+
+        module subroutine apply_preconditioner_ssor(self, r, z)
+            implicit none
+            class(type_preconditioner_ssor), intent(inout) :: self
+            type(type_vector_dp), intent(in) :: r
+            type(type_vector_dp), intent(inout) :: z
+        end subroutine apply_preconditioner_ssor
+
+        module subroutine apply_point_ssor(self, r, z)
+            implicit none
+            class(type_preconditioner_ssor), intent(inout) :: self
+            type(type_vector_dp), intent(in) :: r
+            type(type_vector_dp), intent(inout) :: z
+        end subroutine apply_point_ssor
+
+        module subroutine apply_block_ssor(self, r, z)
+            implicit none
+            class(type_preconditioner_ssor), intent(inout) :: self
+            type(type_vector_dp), intent(in) :: r
+            type(type_vector_dp), intent(inout) :: z
+        end subroutine apply_block_ssor
+
+        module subroutine destroy_preconditioner_ssor(self)
+            implicit none
+            class(type_preconditioner_ssor), intent(inout) :: self
+        end subroutine destroy_preconditioner_ssor
+    end interface
+
+    !
+    ! ==========================================================
+    ! ILUT Preconditioner
+    ! ==========================================================
+    !
+    !> ILUT preconditioner: ILU with threshold dropping and fill-in control.
+    type, extends(abst_preconditioner) :: type_preconditioner_ilut
+        integer(int32) :: num_rows = -1
+        integer(int32) :: block_size = 1
+        logical :: is_block = .false.
+        real(real64) :: drop_tolerance = 1.0d-3
+        integer(int32) :: max_fill = 20
+        integer(int32), allocatable :: ptr(:)
+        integer(int32), allocatable :: ind(:)
+        integer(int32), allocatable :: diag_ptr(:)
+        real(real64), allocatable :: val_blocks(:, :, :)
+        integer(int32), allocatable :: diag_pivots(:, :)
+    contains
+        procedure :: initialize => initialize_preconditioner_ilut
+        procedure :: setup => setup_preconditioner_ilut
+        procedure, pass(self), private :: setup_bsr => setup_bsr_ilut
+        procedure :: apply => apply_preconditioner_ilut
+        procedure, pass(self), private :: apply_bsr => apply_bsr_ilut
+        procedure :: destroy => destroy_preconditioner_ilut
+    end type type_preconditioner_ilut
+
+    interface
+        module subroutine initialize_preconditioner_ilut(self, info)
+            implicit none
+            class(type_preconditioner_ilut), intent(inout) :: self
+            type(type_preconditioner_settings), intent(in) :: info
+        end subroutine initialize_preconditioner_ilut
+
+        module subroutine setup_preconditioner_ilut(self, A)
+            implicit none
+            class(type_preconditioner_ilut), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+        end subroutine setup_preconditioner_ilut
+
+        module subroutine setup_bsr_ilut(self, A)
+            implicit none
+            class(type_preconditioner_ilut), intent(inout) :: self
+            class(type_matrix_bsr), intent(in) :: A
+        end subroutine setup_bsr_ilut
+
+        module subroutine apply_preconditioner_ilut(self, r, z)
+            implicit none
+            class(type_preconditioner_ilut), intent(inout) :: self
+            type(type_vector_dp), intent(in) :: r
+            type(type_vector_dp), intent(inout) :: z
+        end subroutine apply_preconditioner_ilut
+
+        module subroutine apply_bsr_ilut(self, r, z)
+            implicit none
+            class(type_preconditioner_ilut), intent(inout) :: self
+            type(type_vector_dp), intent(in) :: r
+            type(type_vector_dp), intent(inout) :: z
+        end subroutine apply_bsr_ilut
+
+        module subroutine destroy_preconditioner_ilut(self)
+            implicit none
+            class(type_preconditioner_ilut), intent(inout) :: self
+        end subroutine destroy_preconditioner_ilut
+    end interface
+
+    !
+    ! ==========================================================
+    ! SA-AMG Preconditioner
+    ! ==========================================================
+    !
+    !> Two-level Smoothed Aggregation AMG preconditioner.
+    type, extends(abst_preconditioner) :: type_preconditioner_saamg
+        integer(int32) :: num_rows = -1
+        integer(int32) :: block_size = 1
+        logical :: is_block = .false.
+        integer(int32) :: bs_coarse = 1
+        real(real64) :: strength_threshold = 0.25d0
+        integer(int32) :: smoother_sweeps = 2
+        integer(int32) :: max_agg_size = 8
+        integer(int32) :: num_coarse = -1
+        character(len=32) :: smoother_type = 'JACOBI'
+        character(len=32) :: drop_strategy = 'RELATIVE'
+        real(real64) :: drop_tolerance = 1.0d-4
+        integer(int32) :: rebuild_frequency = 5
+        real(real64) :: rebuild_threshold = 1.0d-2
+        integer(int32) :: step_count = 0
+        real(real64) :: last_residual_norm = 0.0d0
+        logical :: is_symmetric_structure = .false.
+        !> Inverse of diagonal blocks (bs x bs x num_nodes)
+        real(real64), allocatable :: diag_inv(:, :, :)
+        !> Diagonal block positions in fine-grid matrix
+        integer(int32), allocatable :: fine_diag_ptr(:)
+        !> Prolongation P (BSR format: n_fine x n_coarse, block size bs x bs)
+        integer(int32), allocatable :: P_ptr(:), P_ind(:)
+        real(real64), allocatable :: P_val(:, :, :)
+        !> Restriction R = P^T (BSR format: n_coarse x n_fine, block size bs x bs)
+        integer(int32), allocatable :: R_ptr(:), R_ind(:)
+        real(real64), allocatable :: R_val(:, :, :)
+        !> Coarse grid matrix (BSR format: n_coarse x n_coarse, block size bs x bs)
+        integer(int32), allocatable :: Ac_ptr(:), Ac_ind(:)
+        real(real64), allocatable :: Ac_val(:, :, :)
+        !> LU factorization workspace (fallback to dense if needed)
+        real(real64), allocatable :: coarse_lu(:, :)
+        integer(int32), allocatable :: coarse_pivots(:)
+        !> Workspace
+        real(real64), allocatable :: work_fine(:), work_coarse(:), work_coarse_block(:, :)
+        !> Pointers to fine-grid BSR arrays
+        integer(int32), pointer :: a_ptr(:) => null()
+        integer(int32), pointer :: a_ind(:) => null()
+        real(real64), pointer :: a_val(:, :, :) => null()
+    contains
+        procedure :: initialize => initialize_preconditioner_saamg
+        procedure :: setup => setup_preconditioner_saamg
+        procedure :: apply => apply_preconditioner_saamg
+        procedure :: destroy => destroy_preconditioner_saamg
+    end type type_preconditioner_saamg
+
+    interface
+        module subroutine initialize_preconditioner_saamg(self, info)
+            implicit none
+            class(type_preconditioner_saamg), intent(inout) :: self
+            type(type_preconditioner_settings), intent(in) :: info
+        end subroutine initialize_preconditioner_saamg
+
+        module subroutine setup_preconditioner_saamg(self, A)
+            implicit none
+            class(type_preconditioner_saamg), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+        end subroutine setup_preconditioner_saamg
+
+        module subroutine apply_preconditioner_saamg(self, r, z)
+            implicit none
+            class(type_preconditioner_saamg), intent(inout) :: self
+            type(type_vector_dp), intent(in) :: r
+            type(type_vector_dp), intent(inout) :: z
+        end subroutine apply_preconditioner_saamg
+
+        module subroutine destroy_preconditioner_saamg(self)
+            implicit none
+            class(type_preconditioner_saamg), intent(inout) :: self
+        end subroutine destroy_preconditioner_saamg
+    end interface
+
+    !
+    ! ==========================================================
+    ! Crout ILU Preconditioner
+    ! ==========================================================
+    !
+    !> Crout ILU preconditioner with threshold dropping.
+    type, extends(abst_preconditioner) :: type_preconditioner_iluc
+        integer(int32) :: num_rows = -1
+        integer(int32) :: block_size = 1
+        logical :: is_block = .false.
+        real(real64) :: drop_tolerance = 1.0d-3
+        integer(int32), allocatable :: ptr(:), ind(:), diag_ptr(:)
+        real(real64), allocatable :: val_blocks(:, :, :)
+        integer(int32), allocatable :: diag_pivots(:, :)
+    contains
+        procedure :: initialize => initialize_preconditioner_iluc
+        procedure :: setup => setup_preconditioner_iluc
+        procedure, pass(self), private :: setup_bsr => setup_bsr_iluc
+        procedure :: apply => apply_preconditioner_iluc
+        procedure :: destroy => destroy_preconditioner_iluc
+    end type type_preconditioner_iluc
+
+    interface
+        module subroutine initialize_preconditioner_iluc(self, info)
+            implicit none
+            class(type_preconditioner_iluc), intent(inout) :: self
+            type(type_preconditioner_settings), intent(in) :: info
+        end subroutine initialize_preconditioner_iluc
+
+        module subroutine setup_preconditioner_iluc(self, A)
+            implicit none
+            class(type_preconditioner_iluc), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+        end subroutine setup_preconditioner_iluc
+
+        module subroutine setup_bsr_iluc(self, A)
+            implicit none
+            class(type_preconditioner_iluc), intent(inout) :: self
+            class(type_matrix_bsr), intent(in) :: A
+        end subroutine setup_bsr_iluc
+
+        module subroutine apply_preconditioner_iluc(self, r, z)
+            implicit none
+            class(type_preconditioner_iluc), intent(inout) :: self
+            type(type_vector_dp), intent(in) :: r
+            type(type_vector_dp), intent(inout) :: z
+        end subroutine apply_preconditioner_iluc
+
+        module subroutine destroy_preconditioner_iluc(self)
+            implicit none
+            class(type_preconditioner_iluc), intent(inout) :: self
+        end subroutine destroy_preconditioner_iluc
+    end interface
+
+    !
+    ! ==========================================================
+    ! I+S Approximate Inverse Preconditioner
+    ! ==========================================================
+    !
+    !> I+S preconditioner: z = (2I - D^{-1}A) r
+    type, extends(abst_preconditioner) :: type_preconditioner_is
+        integer(int32) :: num_rows = -1
+        integer(int32) :: block_size = 1
+        logical :: is_block = .false.
+        real(real64), allocatable :: diag_blocks(:, :, :)
+        integer(int32), allocatable :: diag_pivots(:, :)
+        integer(int32), allocatable :: diag_ptr(:)
+        real(real64), allocatable :: work(:)
+        integer(int32), pointer :: a_ptr(:) => null()
+        integer(int32), pointer :: a_ind(:) => null()
+        real(real64), pointer :: a_val(:, :, :) => null()
+    contains
+        procedure :: initialize => initialize_preconditioner_is
+        procedure :: setup => setup_preconditioner_is
+        procedure :: apply => apply_preconditioner_is
+        procedure :: destroy => destroy_preconditioner_is
+    end type type_preconditioner_is
+
+    interface
+        module subroutine initialize_preconditioner_is(self, info)
+            implicit none
+            class(type_preconditioner_is), intent(inout) :: self
+            type(type_preconditioner_settings), intent(in) :: info
+        end subroutine initialize_preconditioner_is
+
+        module subroutine setup_preconditioner_is(self, A)
+            implicit none
+            class(type_preconditioner_is), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+        end subroutine setup_preconditioner_is
+
+        module subroutine apply_preconditioner_is(self, r, z)
+            implicit none
+            class(type_preconditioner_is), intent(inout) :: self
+            type(type_vector_dp), intent(in) :: r
+            type(type_vector_dp), intent(inout) :: z
+        end subroutine apply_preconditioner_is
+
+        module subroutine destroy_preconditioner_is(self)
+            implicit none
+            class(type_preconditioner_is), intent(inout) :: self
+        end subroutine destroy_preconditioner_is
+    end interface
+
+    !
+    ! ==========================================================
+    ! SAINV Preconditioner
+    ! ==========================================================
+    !
+    !> Sparse Approximate Inverse preconditioner.
+    type, extends(abst_preconditioner) :: type_preconditioner_sainv
+        integer(int32) :: num_rows = -1
+        integer(int32) :: block_size = 1
+        logical :: is_block = .false.
+        real(real64) :: drop_tolerance = 1.0d-3
+        real(real64), allocatable :: diag_blocks(:, :, :)
+        integer(int32), allocatable :: diag_pivots(:, :)
+        integer(int32), allocatable :: diag_ptr(:)
+        real(real64), allocatable :: w_val(:, :, :)
+        real(real64), allocatable :: work(:)
+        integer(int32), pointer :: a_ptr(:) => null()
+        integer(int32), pointer :: a_ind(:) => null()
+        real(real64), pointer :: a_val(:, :, :) => null()
+    contains
+        procedure :: initialize => initialize_preconditioner_sainv
+        procedure :: setup => setup_preconditioner_sainv
+        procedure :: apply => apply_preconditioner_sainv
+        procedure :: destroy => destroy_preconditioner_sainv
+    end type type_preconditioner_sainv
+
+    interface
+        module subroutine initialize_preconditioner_sainv(self, info)
+            implicit none
+            class(type_preconditioner_sainv), intent(inout) :: self
+            type(type_preconditioner_settings), intent(in) :: info
+        end subroutine initialize_preconditioner_sainv
+
+        module subroutine setup_preconditioner_sainv(self, A)
+            implicit none
+            class(type_preconditioner_sainv), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+        end subroutine setup_preconditioner_sainv
+
+        module subroutine apply_preconditioner_sainv(self, r, z)
+            implicit none
+            class(type_preconditioner_sainv), intent(inout) :: self
+            type(type_vector_dp), intent(in) :: r
+            type(type_vector_dp), intent(inout) :: z
+        end subroutine apply_preconditioner_sainv
+
+        module subroutine destroy_preconditioner_sainv(self)
+            implicit none
+            class(type_preconditioner_sainv), intent(inout) :: self
+        end subroutine destroy_preconditioner_sainv
+    end interface
+
+    !
+    ! ==========================================================
+    ! Hybrid Preconditioner
+    ! ==========================================================
+    !
+    !> Hybrid preconditioner combining two preconditioners (SSOR + ILU).
+    type, extends(abst_preconditioner) :: type_preconditioner_hybrid
+        integer(int32) :: num_rows = -1
+        integer(int32) :: block_size = 1
+        logical :: is_block = .false.
+        class(abst_preconditioner), allocatable :: inner_pc
+        class(abst_preconditioner), allocatable :: outer_pc
+        type(type_vector_dp) :: work1, work2
+        integer(int32), pointer :: a_ptr(:) => null()
+        integer(int32), pointer :: a_ind(:) => null()
+        real(real64), pointer :: a_val(:, :, :) => null()
+    contains
+        procedure :: initialize => initialize_preconditioner_hybrid
+        procedure :: setup => setup_preconditioner_hybrid
+        procedure :: apply => apply_preconditioner_hybrid
+        procedure :: destroy => destroy_preconditioner_hybrid
+    end type type_preconditioner_hybrid
+
+    interface
+        module subroutine initialize_preconditioner_hybrid(self, info)
+            implicit none
+            class(type_preconditioner_hybrid), intent(inout) :: self
+            type(type_preconditioner_settings), intent(in) :: info
+        end subroutine initialize_preconditioner_hybrid
+
+        module subroutine setup_preconditioner_hybrid(self, A)
+            implicit none
+            class(type_preconditioner_hybrid), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+        end subroutine setup_preconditioner_hybrid
+
+        module subroutine apply_preconditioner_hybrid(self, r, z)
+            implicit none
+            class(type_preconditioner_hybrid), intent(inout) :: self
+            type(type_vector_dp), intent(in) :: r
+            type(type_vector_dp), intent(inout) :: z
+        end subroutine apply_preconditioner_hybrid
+
+        module subroutine destroy_preconditioner_hybrid(self)
+            implicit none
+            class(type_preconditioner_hybrid), intent(inout) :: self
+        end subroutine destroy_preconditioner_hybrid
+    end interface
+
+    !
+    ! ==========================================================
+    ! Additive Schwarz Preconditioner
+    ! ==========================================================
+    !
+    !> Additive Schwarz domain decomposition preconditioner.
+    type, extends(abst_preconditioner) :: type_preconditioner_adds
+        integer(int32) :: num_rows = -1
+        integer(int32) :: block_size = 1
+        logical :: is_block = .false.
+        integer(int32) :: num_domains = 1
+        integer(int32) :: overlap = 1
+        integer(int32), allocatable :: domain_start(:), domain_end(:)
+        real(real64), allocatable :: local_diag_blocks(:, :, :)
+        integer(int32), allocatable :: local_diag_pivots(:, :)
+        real(real64), allocatable :: work(:)
+        integer(int32), pointer :: a_ptr(:) => null()
+        integer(int32), pointer :: a_ind(:) => null()
+        real(real64), pointer :: a_val(:, :, :) => null()
+    contains
+        procedure :: initialize => initialize_preconditioner_adds
+        procedure :: setup => setup_preconditioner_adds
+        procedure :: apply => apply_preconditioner_adds
+        procedure :: destroy => destroy_preconditioner_adds
+    end type type_preconditioner_adds
+
+    interface
+        module subroutine initialize_preconditioner_adds(self, info)
+            implicit none
+            class(type_preconditioner_adds), intent(inout) :: self
+            type(type_preconditioner_settings), intent(in) :: info
+        end subroutine initialize_preconditioner_adds
+
+        module subroutine setup_preconditioner_adds(self, A)
+            implicit none
+            class(type_preconditioner_adds), intent(inout) :: self
+            class(abst_matrix), intent(in) :: A
+        end subroutine setup_preconditioner_adds
+
+        module subroutine apply_preconditioner_adds(self, r, z)
+            implicit none
+            class(type_preconditioner_adds), intent(inout) :: self
+            type(type_vector_dp), intent(in) :: r
+            type(type_vector_dp), intent(inout) :: z
+        end subroutine apply_preconditioner_adds
+
+        module subroutine destroy_preconditioner_adds(self)
+            implicit none
+            class(type_preconditioner_adds), intent(inout) :: self
+        end subroutine destroy_preconditioner_adds
+    end interface
+
 contains
 
+    logical function is_success_preconditioner(self)
+        implicit none
+        class(abst_preconditioner), intent(in) :: self
+
+        is_success_preconditioner = self%status == SOLVER_STATUS%SUCCESS%ID
+    end function is_success_preconditioner
+
+    integer(int32) function get_status_preconditioner(self)
+        implicit none
+        class(abst_preconditioner), intent(in) :: self
+
+        get_status_preconditioner = self%status
+    end function get_status_preconditioner
+
     !> Sets the preconditioner configuration settings.
-    subroutine set_preconditioner_settings(self, id, num_nodes, block_size, ilu_fillin_level)
+    subroutine set_preconditioner_settings(self, id, num_nodes, block_size, ilu_fillin_level, ssor_omega, &
+                                           amg_strength_threshold, amg_smoother_sweeps, amg_max_agg_size, &
+                                           amg_drop_tolerance, amg_drop_strategy, amg_smoother_type, &
+                                           amg_rebuild_frequency, amg_rebuild_threshold)
         implicit none
         !> Settings instance to be configured
         class(type_preconditioner_settings), intent(inout) :: self
@@ -321,6 +857,24 @@ contains
         integer(int32), intent(in), optional :: block_size
         !> ILU fill-in level (optional, default 0)
         integer(int32), intent(in), optional :: ilu_fillin_level
+        !> SSOR relaxation parameter (optional, default 1.0)
+        real(real64), intent(in), optional :: ssor_omega
+        !> Optional AMG strength threshold for SA-AMG.
+        real(real64), intent(in), optional :: amg_strength_threshold
+        !> Optional AMG smoother sweeps for SA-AMG.
+        integer(int32), intent(in), optional :: amg_smoother_sweeps
+        !> Optional AMG maximum aggregate size for SA-AMG.
+        integer(int32), intent(in), optional :: amg_max_agg_size
+        !> Optional AMG coarse-matrix drop tolerance for SA-AMG.
+        real(real64), intent(in), optional :: amg_drop_tolerance
+        !> Optional AMG drop strategy for SA-AMG.
+        character(len=*), intent(in), optional :: amg_drop_strategy
+        !> Optional AMG smoother type for SA-AMG.
+        character(len=*), intent(in), optional :: amg_smoother_type
+        !> Optional AMG rebuild frequency for SA-AMG.
+        integer(int32), intent(in), optional :: amg_rebuild_frequency
+        !> Optional AMG rebuild threshold for SA-AMG.
+        real(real64), intent(in), optional :: amg_rebuild_threshold
 
         self%ID = id
         select case (self%ID)
@@ -350,6 +904,53 @@ contains
                 self%ilu_fill_level = ilu_fillin_level
             else
                 self%ilu_fill_level = 0
+            end if
+        case (PRECONDITIONER_TYPES%SSOR%ID)
+            if (present(num_nodes)) then
+                self%num_nodes = num_nodes
+            else
+                self%num_nodes = -1
+            end if
+            if (present(block_size)) then
+                self%block_size = block_size
+            else
+                self%block_size = 1
+            end if
+            if (present(ssor_omega)) then
+                self%ssor_omega = ssor_omega
+            else
+                self%ssor_omega = 1.0d0
+            end if
+        case (PRECONDITIONER_TYPES%ILUT%ID)
+            if (present(num_nodes)) self%num_nodes = num_nodes
+            if (present(block_size)) then
+                self%block_size = block_size
+            else
+                self%block_size = 1
+            end if
+        case (PRECONDITIONER_TYPES%SAAMG%ID)
+            if (present(num_nodes)) self%num_nodes = num_nodes
+            if (present(block_size)) then
+                self%block_size = block_size
+            else
+                self%block_size = 1
+            end if
+            if (present(amg_strength_threshold)) self%amg_strength_threshold = amg_strength_threshold
+            if (present(amg_smoother_sweeps)) self%amg_smoother_sweeps = amg_smoother_sweeps
+            if (present(amg_max_agg_size)) self%amg_max_agg_size = amg_max_agg_size
+            if (present(amg_drop_tolerance)) self%amg_drop_tolerance = amg_drop_tolerance
+            if (present(amg_drop_strategy)) self%amg_drop_strategy = adjustl(amg_drop_strategy)
+            if (present(amg_smoother_type)) self%amg_smoother_type = adjustl(amg_smoother_type)
+            if (present(amg_rebuild_frequency)) self%amg_rebuild_frequency = amg_rebuild_frequency
+            if (present(amg_rebuild_threshold)) self%amg_rebuild_threshold = amg_rebuild_threshold
+        case (PRECONDITIONER_TYPES%ILUC%ID, PRECONDITIONER_TYPES%IS%ID, &
+              PRECONDITIONER_TYPES%SAINV%ID, PRECONDITIONER_TYPES%HYBRID%ID, &
+              PRECONDITIONER_TYPES%ADDS%ID)
+            if (present(num_nodes)) self%num_nodes = num_nodes
+            if (present(block_size)) then
+                self%block_size = block_size
+            else
+                self%block_size = 1
             end if
         end select
     end subroutine set_preconditioner_settings
@@ -383,19 +984,37 @@ contains
             call pc%initialize(info)
             ierr = pc%status
         case (PRECONDITIONER_TYPES%SSOR%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_preconditioner_ssor :: pc)
+            call pc%initialize(info)
+            ierr = pc%status
         case (PRECONDITIONER_TYPES%HYBRID%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_preconditioner_hybrid :: pc)
+            call pc%initialize(info)
+            ierr = pc%status
         case (PRECONDITIONER_TYPES%IS%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_preconditioner_is :: pc)
+            call pc%initialize(info)
+            ierr = pc%status
         case (PRECONDITIONER_TYPES%SAINV%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_preconditioner_sainv :: pc)
+            call pc%initialize(info)
+            ierr = pc%status
         case (PRECONDITIONER_TYPES%SAAMG%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_preconditioner_saamg :: pc)
+            call pc%initialize(info)
+            ierr = pc%status
         case (PRECONDITIONER_TYPES%ILUC%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_preconditioner_iluc :: pc)
+            call pc%initialize(info)
+            ierr = pc%status
         case (PRECONDITIONER_TYPES%ILUT%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+            allocate (type_preconditioner_ilut :: pc)
+            call pc%initialize(info)
+            ierr = pc%status
+        case (PRECONDITIONER_TYPES%ADDS%ID)
+            allocate (type_preconditioner_adds :: pc)
+            call pc%initialize(info)
+            ierr = pc%status
         end select
 
     end subroutine create_preconditioner

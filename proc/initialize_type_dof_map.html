@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title=" 0.0% of total for procedures.">23 statements</a>
+                 title=" 0.0% of total for procedures.">24 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -180,7 +180,7 @@
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~1670"></span>
+              <span class="anchor" id="variable-self~2272"></span>
               class(<a href='../type/type_dof_map.html'>type_dof_map</a>),
             </td>
 <td>intent(inout)</td>
@@ -353,21 +353,24 @@ large graphs.</div>
 
 <span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">current_dof_index</span>
 
-<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_dofs_of_physics</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">THERMAL</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
-<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_dofs_of_physics</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
-<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_dofs_of_physics</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">MECHANICAL</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
 
+<span class="w">        </span>
+<span class="w">        </span><span class="n">self</span><span class="p">%</span><span class="n">start_dof_index</span><span class="p">(:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span>
 <span class="w">        </span><span class="n">current_dof_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
 <span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">active_dofs</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">THERMAL</span><span class="p">%</span><span class="n">ID</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
-<span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">start_dof_index</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">THERMAL</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_dof_index</span>
+<span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">num_dofs_of_physics</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">THERMAL</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">start_dof_index</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">THERMAL</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_dof_index</span>
 <span class="w">            </span><span class="n">current_dof_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_dof_index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_dofs_of_physics</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">THERMAL</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
 <span class="w">        </span><span class="k">end if</span>
 <span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">active_dofs</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">%</span><span class="n">ID</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
-<span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">start_dof_index</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_dof_index</span>
+<span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">num_dofs_of_physics</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">start_dof_index</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_dof_index</span>
 <span class="w">            </span><span class="n">current_dof_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_dof_index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_dofs_of_physics</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">HYDRAULIC</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
 <span class="w">        </span><span class="k">end if</span>
 <span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">active_dofs</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">MECHANICAL</span><span class="p">%</span><span class="n">ID</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
-<span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">start_dof_index</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">MECHANICAL</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_dof_index</span>
+<span class="k">            </span><span class="n">self</span><span class="p">%</span><span class="n">num_dofs_of_physics</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">MECHANICAL</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">            </span><span class="n">self</span><span class="p">%</span><span class="n">start_dof_index</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">MECHANICAL</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_dof_index</span>
 <span class="w">            </span><span class="n">current_dof_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_dof_index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">self</span><span class="p">%</span><span class="n">num_dofs_of_physics</span><span class="p">(</span><span class="n">PHYSICS_TYPES</span><span class="p">%</span><span class="n">MECHANICAL</span><span class="p">%</span><span class="n">ID</span><span class="p">)</span>
 <span class="w">        </span><span class="k">end if</span>
 <span class="k">        </span><span class="n">self</span><span class="p">%</span><span class="n">num_dofs_per_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_dof_index</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
@@ -395,7 +398,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.5% of total for derived types.</p>Including implementation: 129 statements,  0.5% of total for derived types.">19 statements</a>
+                 title="<p> 0.5% of total for derived types.</p>Including implementation: 155 statements,  0.5% of total for derived types.">24 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,10 +134,11 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_models_manager.html#variable-gcc">gcc</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#variable-gcc~2">gcc</a>
             <a class="list-group-item" href="../type/type_models_manager.html#variable-hcf">hcf</a>
             <a class="list-group-item" href="../type/type_models_manager.html#variable-phase_manager">phase_manager</a>
-            <a class="list-group-item" href="../type/type_models_manager.html#variable-wrf">wrf</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#variable-segregation">segregation</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#variable-wrf~2">wrf</a>
         </div>
       </div>
     </div>
@@ -164,17 +165,21 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_kflh~9">calc_Kflh</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_kflh~2">calc_Kflh</a>
             <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_klt~2">calc_KlT</a>
-            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_kvt~3">calc_KvT</a>
-            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_kvh~3">calc_Kvh</a>
-            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_cryogenic_suction">calc_cryogenic_suction</a>
-            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_cryogenic_suction_derivatives">calc_cryogenic_suction_derivatives</a>
-            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_latent_heat_fusion">calc_latent_heat_fusion</a>
-            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_latent_heat_vaporization">calc_latent_heat_vaporization</a>
-            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_pressure_ice_water_derivative">calc_pressure_ice_water_derivative</a>
-            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-initialize~44">initialize</a>
-            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-update_water_phases">update_water_phases</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_kvt~2">calc_KvT</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_kvh~2">calc_Kvh</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_cryo_suction_deriv_t~2">calc_cryo_suction_deriv_T</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_latent_heat_fusion~3">calc_latent_heat_fusion</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_latent_heat_vaporization~4">calc_latent_heat_vaporization</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_lscheme_capacity~3">calc_lscheme_capacity</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_pressure_ice_water_derivative~2">calc_pressure_ice_water_derivative</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_segregation_sink~2">calc_segregation_sink</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-calc_suction_weights~2">calc_suction_weights</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-has_cryo_transport~2">has_cryo_transport</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-initialize~78">initialize</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-is_segregation_active~2">is_segregation_active</a>
+            <a class="list-group-item" href="../type/type_models_manager.html#boundprocedure-update_water_phases~4">update_water_phases</a>
         </div>
       </div>
     </div>
@@ -208,399 +213,415 @@
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: type~~type_models_manager~~InheritsGraph Pages: 1 -->
-<svg id="typetype_models_managerInheritsGraph" width="641pt" height="205pt"
- viewBox="0.00 0.00 641.00 205.14" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~type_models_manager~~InheritsGraph" class="graph" transform="scale(0.48 0.48) rotate(0) translate(4 421)">
+<svg id="typetype_models_managerInheritsGraph" width="641pt" height="200pt"
+ viewBox="0.00 0.00 641.00 200.14" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_models_manager~~InheritsGraph" class="graph" transform="scale(0.47 0.47) rotate(0) translate(4 420)">
 <title>type~~type_models_manager~~InheritsGraph</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-421 1324,-421 1324,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-420 1354,-420 1354,4 -4,4"/>
 <!-- type~type_models_manager -->
 <g id="type~~type_models_manager~~InheritsGraph_node1" class="node">
 <title>type~type_models_manager</title>
-<polygon fill="none" stroke="black" points="1320,-268 1186,-268 1186,-244 1320,-244 1320,-268"/>
-<text text-anchor="middle" x="1253" y="-253.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_models_manager</text>
+<polygon fill="none" stroke="black" points="1350,-217 1216,-217 1216,-193 1350,-193 1350,-217"/>
+<text text-anchor="middle" x="1283" y="-202.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_models_manager</text>
 </g>
 <!-- type~holder_gccs -->
 <g id="type~~type_models_manager~~InheritsGraph_node2" class="node">
 <title>type~holder_gccs</title>
 <g id="a_type~~type_models_manager~~InheritsGraph_node2"><a xlink:href="../type/holder_gccs.html" xlink:title="holder_gccs">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="1047.5,-302 971.5,-302 971.5,-278 1047.5,-278 1047.5,-302"/>
-<text text-anchor="middle" x="1009.5" y="-287.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_gccs</text>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1062.5,-175 986.5,-175 986.5,-151 1062.5,-151 1062.5,-175"/>
+<text text-anchor="middle" x="1024.5" y="-160.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_gccs</text>
 </a>
 </g>
 </g>
 <!-- type~type_models_manager&#45;&gt;type~holder_gccs -->
 <g id="type~~type_models_manager~~InheritsGraph_edge3" class="edge">
 <title>type~type_models_manager&#45;&gt;type~holder_gccs</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1185.69,-265.34C1145.27,-271.03 1094.57,-278.16 1058.12,-283.3"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="1057.18,-279.89 1047.77,-284.75 1058.16,-286.82 1057.18,-279.89"/>
-<text text-anchor="middle" x="1129.5" y="-280.4" font-family="Helvetica,sans-Serif" font-size="9.50">gcc</text>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1215.97,-193.97C1209.9,-192.96 1203.84,-191.96 1198,-191 1155.68,-184.04 1107.49,-176.23 1072.82,-170.63"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1072.95,-167.1 1062.52,-168.96 1071.84,-174.01 1072.95,-167.1"/>
+<text text-anchor="middle" x="1159.5" y="-193.4" font-family="Helvetica,sans-Serif" font-size="9.50">gcc</text>
 </g>
 <!-- type~holder_hcfs -->
 <g id="type~~type_models_manager~~InheritsGraph_node3" class="node">
 <title>type~holder_hcfs</title>
 <g id="a_type~~type_models_manager~~InheritsGraph_node3"><a xlink:href="../type/holder_hcfs.html" xlink:title="holder_hcfs">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="1046.5,-248 972.5,-248 972.5,-224 1046.5,-224 1046.5,-248"/>
-<text text-anchor="middle" x="1009.5" y="-233.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_hcfs</text>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1061.5,-217 987.5,-217 987.5,-193 1061.5,-193 1061.5,-217"/>
+<text text-anchor="middle" x="1024.5" y="-202.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_hcfs</text>
 </a>
 </g>
 </g>
 <!-- type~type_models_manager&#45;&gt;type~holder_hcfs -->
 <g id="type~~type_models_manager~~InheritsGraph_edge2" class="edge">
 <title>type~type_models_manager&#45;&gt;type~holder_hcfs</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1185.6,-245.04C1179.66,-244.27 1173.73,-243.57 1168,-243 1130.68,-239.29 1088.2,-237.55 1056.76,-236.73"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="1056.63,-233.23 1046.55,-236.48 1056.46,-240.22 1056.63,-233.23"/>
-<text text-anchor="middle" x="1129.5" y="-245.4" font-family="Helvetica,sans-Serif" font-size="9.50">hcf</text>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1215.94,-205C1170.75,-205 1111.95,-205 1071.72,-205"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1071.65,-201.5 1061.65,-205 1071.65,-208.5 1071.65,-201.5"/>
+<text text-anchor="middle" x="1159.5" y="-207.4" font-family="Helvetica,sans-Serif" font-size="9.50">hcf</text>
 </g>
-<!-- type~holder_wrfs -->
+<!-- type~holder_wrfs~2 -->
 <g id="type~~type_models_manager~~InheritsGraph_node4" class="node">
-<title>type~holder_wrfs</title>
-<g id="a_type~~type_models_manager~~InheritsGraph_node4"><a xlink:href="../type/holder_wrfs.html" xlink:title="holder_wrfs">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="1046.5,-350 972.5,-350 972.5,-326 1046.5,-326 1046.5,-350"/>
-<text text-anchor="middle" x="1009.5" y="-335.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_wrfs</text>
+<title>type~holder_wrfs~2</title>
+<g id="a_type~~type_models_manager~~InheritsGraph_node4"><a xlink:href="../type/holder_wrfs~2.html" xlink:title="holder_wrfs">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1061.5,-361 987.5,-361 987.5,-337 1061.5,-337 1061.5,-361"/>
+<text text-anchor="middle" x="1024.5" y="-346.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">holder_wrfs</text>
 </a>
 </g>
 </g>
-<!-- type~type_models_manager&#45;&gt;type~holder_wrfs -->
+<!-- type~type_models_manager&#45;&gt;type~holder_wrfs~2 -->
 <g id="type~~type_models_manager~~InheritsGraph_edge1" class="edge">
-<title>type~type_models_manager&#45;&gt;type~holder_wrfs</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1226.22,-268.01C1209.76,-275.43 1187.86,-284.87 1168,-292 1130.98,-305.28 1088.09,-317.62 1056.42,-326.16"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="1055.31,-322.84 1046.55,-328.8 1057.11,-329.6 1055.31,-322.84"/>
-<text text-anchor="middle" x="1129.5" y="-318.4" font-family="Helvetica,sans-Serif" font-size="9.50">wrf</text>
+<title>type~type_models_manager&#45;&gt;type~holder_wrfs~2</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1266.74,-217.09C1250.29,-229.82 1223.1,-250.06 1198,-265 1153.39,-291.54 1099.16,-316.9 1063.56,-332.68"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1061.78,-329.64 1054.04,-336.87 1064.6,-336.04 1061.78,-329.64"/>
+<text text-anchor="middle" x="1159.5" y="-306.4" font-family="Helvetica,sans-Serif" font-size="9.50">wrf</text>
 </g>
 <!-- type~type_phase_manager -->
 <g id="type~~type_models_manager~~InheritsGraph_node5" class="node">
 <title>type~type_phase_manager</title>
 <g id="a_type~~type_models_manager~~InheritsGraph_node5"><a xlink:href="../type/type_phase_manager.html" xlink:title="type_phase_manager">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="1073,-127 946,-127 946,-103 1073,-103 1073,-127"/>
-<text text-anchor="middle" x="1009.5" y="-112.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_phase_manager</text>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1088,-292 961,-292 961,-268 1088,-268 1088,-292"/>
+<text text-anchor="middle" x="1024.5" y="-277.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_phase_manager</text>
 </a>
 </g>
 </g>
 <!-- type~type_models_manager&#45;&gt;type~type_phase_manager -->
 <g id="type~~type_models_manager~~InheritsGraph_edge4" class="edge">
 <title>type~type_models_manager&#45;&gt;type~type_phase_manager</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1231.41,-243.98C1188.56,-218.96 1089.69,-161.23 1040.05,-132.25"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="1041.78,-129.21 1031.38,-127.19 1038.25,-135.26 1041.78,-129.21"/>
-<text text-anchor="middle" x="1129.5" y="-208.4" font-family="Helvetica,sans-Serif" font-size="9.50">phase_manager</text>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1240.79,-217.05C1196.01,-230.14 1124.42,-251.08 1076.22,-265.17"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1075.22,-261.81 1066.61,-267.98 1077.19,-268.53 1075.22,-261.81"/>
+<text text-anchor="middle" x="1159.5" y="-253.4" font-family="Helvetica,sans-Serif" font-size="9.50">phase_manager</text>
+</g>
+<!-- type~type_segregation_potential -->
+<g id="type~~type_models_manager~~InheritsGraph_node6" class="node">
+<title>type~type_segregation_potential</title>
+<g id="a_type~~type_models_manager~~InheritsGraph_node6"><a xlink:href="../type/type_segregation_potential.html" xlink:title="type_segregation_potential">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="1103,-133 946,-133 946,-109 1103,-109 1103,-133"/>
+<text text-anchor="middle" x="1024.5" y="-118.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_segregation_potential</text>
+</a>
+</g>
+</g>
+<!-- type~type_models_manager&#45;&gt;type~type_segregation_potential -->
+<g id="type~~type_models_manager~~InheritsGraph_edge5" class="edge">
+<title>type~type_models_manager&#45;&gt;type~type_segregation_potential</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1260.44,-192.91C1243.79,-183.97 1219.96,-171.99 1198,-164 1165.55,-152.18 1128.51,-142.48 1097.1,-135.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1097.63,-131.84 1087.11,-133.06 1096.1,-138.67 1097.63,-131.84"/>
+<text text-anchor="middle" x="1159.5" y="-166.4" font-family="Helvetica,sans-Serif" font-size="9.50">segregation</text>
 </g>
 <!-- type~abst_gcc -->
-<g id="type~~type_models_manager~~InheritsGraph_node7" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node8" class="node">
 <title>type~abst_gcc</title>
-<g id="a_type~~type_models_manager~~InheritsGraph_node7"><a xlink:href="../type/abst_gcc.html" xlink:title="abst_gcc">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="765.5,-375 706.5,-375 706.5,-351 765.5,-351 765.5,-375"/>
-<text text-anchor="middle" x="736" y="-360.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_gcc</text>
+<g id="a_type~~type_models_manager~~InheritsGraph_node8"><a xlink:href="../type/abst_gcc.html" xlink:title="abst_gcc">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="765.5,-24 706.5,-24 706.5,0 765.5,0 765.5,-24"/>
+<text text-anchor="middle" x="736" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_gcc</text>
 </a>
 </g>
 </g>
 <!-- type~holder_gccs&#45;&gt;type~abst_gcc -->
-<g id="type~~type_models_manager~~InheritsGraph_edge5" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge6" class="edge">
 <title>type~holder_gccs&#45;&gt;type~abst_gcc</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M971.32,-300C919.99,-313.8 827.87,-338.57 775.73,-352.59"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="774.61,-349.26 765.86,-355.24 776.43,-356.02 774.61,-349.26"/>
-<text text-anchor="middle" x="913" y="-320.4" font-family="Helvetica,sans-Serif" font-size="9.50">p</text>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M986.25,-155.81C973.15,-152.54 958.57,-148.02 946,-142 868.21,-104.78 866.14,-66.54 789,-28 784.69,-25.84 780.02,-23.91 775.32,-22.2"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="776.32,-18.84 765.72,-18.99 774.1,-25.48 776.32,-18.84"/>
+<text text-anchor="middle" x="913" y="-135.4" font-family="Helvetica,sans-Serif" font-size="9.50">p</text>
 </g>
 <!-- type~abst_hcf -->
-<g id="type~~type_models_manager~~InheritsGraph_node8" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node9" class="node">
 <title>type~abst_hcf</title>
-<g id="a_type~~type_models_manager~~InheritsGraph_node8"><a xlink:href="../type/abst_hcf.html" xlink:title="abst_hcf">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="872,-224 815,-224 815,-200 872,-200 872,-224"/>
-<text text-anchor="middle" x="843.5" y="-209.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf</text>
+<g id="a_type~~type_models_manager~~InheritsGraph_node9"><a xlink:href="../type/abst_hcf.html" xlink:title="abst_hcf">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="872,-216 815,-216 815,-192 872,-192 872,-216"/>
+<text text-anchor="middle" x="843.5" y="-201.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf</text>
 </a>
 </g>
 </g>
 <!-- type~holder_hcfs&#45;&gt;type~abst_hcf -->
-<g id="type~~type_models_manager~~InheritsGraph_edge6" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge7" class="edge">
 <title>type~holder_hcfs&#45;&gt;type~abst_hcf</title>
-<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M972.1,-230.67C945.44,-226.77 909.36,-221.49 882.36,-217.54"/>
-<polygon fill="#7fff00" stroke="#7fff00" points="882.54,-214.03 872.13,-216.04 881.52,-220.96 882.54,-214.03"/>
-<text text-anchor="middle" x="913" y="-226.4" font-family="Helvetica,sans-Serif" font-size="9.50">p</text>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M987.28,-204.8C956.85,-204.63 913.5,-204.39 882.56,-204.21"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="882.2,-200.71 872.18,-204.15 882.16,-207.71 882.2,-200.71"/>
+<text text-anchor="middle" x="913" y="-206.4" font-family="Helvetica,sans-Serif" font-size="9.50">p</text>
 </g>
-<!-- type~abst_wrf -->
-<g id="type~~type_models_manager~~InheritsGraph_node9" class="node">
-<title>type~abst_wrf</title>
-<g id="a_type~~type_models_manager~~InheritsGraph_node9"><a xlink:href="../type/abst_wrf.html" xlink:title="abst_wrf">
+<!-- type~abst_wrf~2 -->
+<g id="type~~type_models_manager~~InheritsGraph_node10" class="node">
+<title>type~abst_wrf~2</title>
+<g id="a_type~~type_models_manager~~InheritsGraph_node10"><a xlink:href="../type/abst_wrf~2.html" xlink:title="abst_wrf">
 <polygon fill="#5cb85c" stroke="#5cb85c" points="764.5,-404 707.5,-404 707.5,-380 764.5,-380 764.5,-404"/>
 <text text-anchor="middle" x="736" y="-389.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_wrf</text>
 </a>
 </g>
 </g>
-<!-- type~holder_wrfs&#45;&gt;type~abst_wrf -->
-<g id="type~~type_models_manager~~InheritsGraph_edge7" class="edge">
-<title>type~holder_wrfs&#45;&gt;type~abst_wrf</title>
-<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M972.45,-345.17C920.92,-355.42 826.7,-374.16 774.43,-384.56"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="773.68,-381.13 764.56,-386.52 775.05,-388 773.68,-381.13"/>
-<text text-anchor="middle" x="913" y="-361.4" font-family="Helvetica,sans-Serif" font-size="9.50">p</text>
+<!-- type~holder_wrfs~2&#45;&gt;type~abst_wrf~2 -->
+<g id="type~~type_models_manager~~InheritsGraph_edge8" class="edge">
+<title>type~holder_wrfs~2&#45;&gt;type~abst_wrf~2</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M987.21,-354.45C932.75,-362.62 830.37,-377.99 774.95,-386.3"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="774.22,-382.87 764.85,-387.82 775.26,-389.8 774.22,-382.87"/>
+<text text-anchor="middle" x="913" y="-369.4" font-family="Helvetica,sans-Serif" font-size="9.50">p</text>
 </g>
 <!-- type_fusion -->
-<g id="type~~type_models_manager~~InheritsGraph_node6" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node7" class="node">
 <title>type_fusion</title>
-<polygon fill="#5cb85c" stroke="#5cb85c" points="880,-87 807,-87 807,-63 880,-63 880,-87"/>
-<text text-anchor="middle" x="843.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_fusion</text>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="880,-332 807,-332 807,-308 880,-308 880,-332"/>
+<text text-anchor="middle" x="843.5" y="-317.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_fusion</text>
 </g>
 <!-- type~type_phase_manager&#45;&gt;type_fusion -->
-<g id="type~~type_models_manager~~InheritsGraph_edge8" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge9" class="edge">
 <title>type~type_phase_manager&#45;&gt;type_fusion</title>
-<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M983.36,-102.87C967.78,-95.9 947.15,-87.62 928,-83 915.95,-80.09 902.67,-78.23 890.32,-77.04"/>
-<polygon fill="#7f00ff" stroke="#7f00ff" points="890.47,-73.54 880.21,-76.2 889.89,-80.52 890.47,-73.54"/>
-<text text-anchor="middle" x="913" y="-85.4" font-family="Helvetica,sans-Serif" font-size="9.50">fusion</text>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M969.79,-292C944.38,-297.68 914.36,-304.39 890.08,-309.81"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="889.05,-306.46 880.06,-312.05 890.58,-313.29 889.05,-306.46"/>
+<text text-anchor="middle" x="913" y="-309.4" font-family="Helvetica,sans-Serif" font-size="9.50">fusion</text>
 </g>
 <!-- type~type_evaporation -->
-<g id="type~~type_models_manager~~InheritsGraph_node10" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node11" class="node">
 <title>type~type_evaporation</title>
-<g id="a_type~~type_models_manager~~InheritsGraph_node10"><a xlink:href="../type/type_evaporation.html" xlink:title="type_evaporation">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="789,-24 683,-24 683,0 789,0 789,-24"/>
-<text text-anchor="middle" x="736" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_evaporation</text>
+<g id="a_type~~type_models_manager~~InheritsGraph_node11"><a xlink:href="../type/type_evaporation.html" xlink:title="type_evaporation">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="789,-375 683,-375 683,-351 789,-351 789,-375"/>
+<text text-anchor="middle" x="736" y="-360.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_evaporation</text>
 </a>
 </g>
 </g>
 <!-- type~type_phase_manager&#45;&gt;type~type_evaporation -->
-<g id="type~~type_models_manager~~InheritsGraph_edge9" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge10" class="edge">
 <title>type~type_phase_manager&#45;&gt;type~type_evaporation</title>
-<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M945.69,-123.75C903.13,-126.38 847.47,-123.03 807,-96 792.78,-86.5 799.29,-75.65 789,-62 780.52,-50.75 769.45,-39.73 759.7,-30.91"/>
-<polygon fill="#7f00ff" stroke="#7f00ff" points="761.74,-28.04 751.92,-24.07 757.12,-33.3 761.74,-28.04"/>
-<text text-anchor="middle" x="913" y="-127.4" font-family="Helvetica,sans-Serif" font-size="9.50">evap</text>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M960.95,-268.55C913.76,-263.59 850.01,-265.19 807,-299 791.47,-311.21 801.81,-326.59 790.84,-343.2"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="788.05,-341.07 784.12,-350.9 793.33,-345.66 788.05,-341.07"/>
+<text text-anchor="middle" x="913" y="-269.4" font-family="Helvetica,sans-Serif" font-size="9.50">evap</text>
 </g>
 <!-- type~abst_constitutive -->
-<g id="type~~type_models_manager~~InheritsGraph_node11" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node12" class="node">
 <title>type~abst_constitutive</title>
-<g id="a_type~~type_models_manager~~InheritsGraph_node11"><a xlink:href="../type/abst_constitutive.html" xlink:title="abst_constitutive">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="484.5,-122 382.5,-122 382.5,-98 484.5,-98 484.5,-122"/>
-<text text-anchor="middle" x="433.5" y="-107.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_constitutive</text>
+<g id="a_type~~type_models_manager~~InheritsGraph_node12"><a xlink:href="../type/abst_constitutive.html" xlink:title="abst_constitutive">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="484.5,-174 382.5,-174 382.5,-150 484.5,-150 484.5,-174"/>
+<text text-anchor="middle" x="433.5" y="-159.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_constitutive</text>
 </a>
 </g>
 </g>
 <!-- type~abst_gcc&#45;&gt;type~abst_constitutive -->
-<g id="type~~type_models_manager~~InheritsGraph_edge10" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge11" class="edge">
 <title>type~abst_gcc&#45;&gt;type~abst_constitutive</title>
-<path fill="none" stroke="#cbff00" d="M706.47,-357.8C698.38,-355.41 689.91,-351.96 683,-347 671.88,-339.02 676.09,-330.03 665,-322 642.34,-305.59 626.36,-321.06 605,-303"/>
+<path fill="none" stroke="#cbff00" d="M706.35,-12.46C678.57,-14.12 636.16,-19.92 605,-39"/>
+<path fill="none" stroke="#cbff00" d="M603,-39C577.23,-54.78 561,-46.72 543,-71 518.44,-104.12 566.23,-162.09 525,-162"/>
+<path fill="none" stroke="#cbff00" d="M524,-162C514.54,-161.98 504.53,-161.97 494.75,-161.97"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="494.68,-158.47 484.68,-161.96 494.68,-165.47 494.68,-158.47"/>
 </g>
 <!-- type~abst_hcf&#45;&gt;type~abst_constitutive -->
-<g id="type~~type_models_manager~~InheritsGraph_edge16" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge17" class="edge">
 <title>type~abst_hcf&#45;&gt;type~abst_constitutive</title>
-<path fill="none" stroke="#00ff66" d="M837.09,-224.07C829.11,-240.29 812.55,-268.64 789,-282 753.2,-302.3 636.43,-329.57 605,-303"/>
-<path fill="none" stroke="#00ff66" d="M603,-303C580.57,-284.52 560.23,-300.4 543,-277 520.87,-246.94 560.96,-120.01 525,-110"/>
+<path fill="none" stroke="#00ff66" d="M839.06,-191.99C829.17,-157.8 800.6,-61.87 789,-53 756.43,-28.08 639.97,-17.59 605,-39"/>
 </g>
 <!-- type~abst_hcf_base -->
-<g id="type~~type_models_manager~~InheritsGraph_node12" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node13" class="node">
 <title>type~abst_hcf_base</title>
-<g id="a_type~~type_models_manager~~InheritsGraph_node12"><a xlink:href="../type/abst_hcf_base.html" xlink:title="abst_hcf_base">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="648,-268 560,-268 560,-244 648,-244 648,-268"/>
-<text text-anchor="middle" x="604" y="-253.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf_base</text>
+<g id="a_type~~type_models_manager~~InheritsGraph_node13"><a xlink:href="../type/abst_hcf_base.html" xlink:title="abst_hcf_base">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="648,-104 560,-104 560,-80 648,-80 648,-104"/>
+<text text-anchor="middle" x="604" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf_base</text>
 </a>
 </g>
 </g>
 <!-- type~abst_hcf&#45;&gt;type~abst_hcf_base -->
-<g id="type~~type_models_manager~~InheritsGraph_edge12" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge13" class="edge">
 <title>type~abst_hcf&#45;&gt;type~abst_hcf_base</title>
-<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M832.09,-224.41C822.25,-235.1 806.43,-249.75 789,-256 746.94,-271.07 695.93,-269.68 658.29,-265.31"/>
-<polygon fill="#00ff66" stroke="#00ff66" points="658.41,-261.79 648.05,-264.01 657.53,-268.74 658.41,-261.79"/>
-<text text-anchor="middle" x="736" y="-270.4" font-family="Helvetica,sans-Serif" font-size="9.50">base</text>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M839.15,-191.95C832.91,-172.01 817.49,-132.54 789,-114 750.38,-88.88 697.39,-84.98 658.19,-86.42"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="657.85,-82.93 648.04,-86.92 658.2,-89.92 657.85,-82.93"/>
+<text text-anchor="middle" x="736" y="-116.4" font-family="Helvetica,sans-Serif" font-size="9.50">base</text>
 </g>
 <!-- type~abst_hcf_impedance -->
-<g id="type~~type_models_manager~~InheritsGraph_node13" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node14" class="node">
 <title>type~abst_hcf_impedance</title>
-<g id="a_type~~type_models_manager~~InheritsGraph_node13"><a xlink:href="../type/abst_hcf_impedance.html" xlink:title="abst_hcf_impedance">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="665,-218 543,-218 543,-194 665,-194 665,-218"/>
-<text text-anchor="middle" x="604" y="-203.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf_impedance</text>
+<g id="a_type~~type_models_manager~~InheritsGraph_node14"><a xlink:href="../type/abst_hcf_impedance.html" xlink:title="abst_hcf_impedance">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="665,-258 543,-258 543,-234 665,-234 665,-258"/>
+<text text-anchor="middle" x="604" y="-243.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf_impedance</text>
 </a>
 </g>
 </g>
 <!-- type~abst_hcf&#45;&gt;type~abst_hcf_impedance -->
-<g id="type~~type_models_manager~~InheritsGraph_edge13" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge14" class="edge">
 <title>type~abst_hcf&#45;&gt;type~abst_hcf_impedance</title>
-<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M814.79,-211.3C780.82,-210.44 722.01,-208.96 675.28,-207.78"/>
-<polygon fill="#00ff66" stroke="#00ff66" points="675.29,-204.27 665.2,-207.52 675.11,-211.27 675.29,-204.27"/>
-<text text-anchor="middle" x="736" y="-212.4" font-family="Helvetica,sans-Serif" font-size="9.50">impedance</text>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M835.87,-216.23C824.82,-236.11 802.49,-273.95 789,-281 747.25,-302.83 728.85,-291.82 683,-281 674.29,-278.95 673.11,-275.78 665,-272 658.07,-268.77 650.63,-265.44 643.43,-262.28"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="644.4,-258.89 633.83,-258.11 641.61,-265.31 644.4,-258.89"/>
+<text text-anchor="middle" x="736" y="-295.4" font-family="Helvetica,sans-Serif" font-size="9.50">impedance</text>
 </g>
 <!-- type~abst_hcf_viscosity -->
-<g id="type~~type_models_manager~~InheritsGraph_node14" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node15" class="node">
 <title>type~abst_hcf_viscosity</title>
-<g id="a_type~~type_models_manager~~InheritsGraph_node14"><a xlink:href="../type/abst_hcf_viscosity.html" xlink:title="abst_hcf_viscosity">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="657.5,-164 550.5,-164 550.5,-140 657.5,-140 657.5,-164"/>
-<text text-anchor="middle" x="604" y="-149.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf_viscosity</text>
+<g id="a_type~~type_models_manager~~InheritsGraph_node15"><a xlink:href="../type/abst_hcf_viscosity.html" xlink:title="abst_hcf_viscosity">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="657.5,-216 550.5,-216 550.5,-192 657.5,-192 657.5,-216"/>
+<text text-anchor="middle" x="604" y="-201.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_hcf_viscosity</text>
 </a>
 </g>
 </g>
 <!-- type~abst_hcf&#45;&gt;type~abst_hcf_viscosity -->
-<g id="type~~type_models_manager~~InheritsGraph_edge14" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge15" class="edge">
 <title>type~abst_hcf&#45;&gt;type~abst_hcf_viscosity</title>
-<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M828.53,-199.93C818.29,-191.78 803.66,-181.54 789,-176 750.29,-161.39 704.12,-155.4 667.7,-153.05"/>
-<polygon fill="#00ff66" stroke="#00ff66" points="667.89,-149.56 657.71,-152.48 667.49,-156.55 667.89,-149.56"/>
-<text text-anchor="middle" x="736" y="-178.4" font-family="Helvetica,sans-Serif" font-size="9.50">viscosity</text>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M814.9,-210.79C806.62,-212.52 797.49,-214.14 789,-215 742.13,-219.77 730,-218.3 683,-215 678.14,-214.66 673.12,-214.2 668.08,-213.66"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="668.1,-210.14 657.76,-212.46 667.29,-217.09 668.1,-210.14"/>
+<text text-anchor="middle" x="736" y="-220.4" font-family="Helvetica,sans-Serif" font-size="9.50">viscosity</text>
 </g>
 <!-- type~type_config_hcf -->
-<g id="type~~type_models_manager~~InheritsGraph_node15" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node16" class="node">
 <title>type~type_config_hcf</title>
-<g id="a_type~~type_models_manager~~InheritsGraph_node15"><a xlink:href="../type/type_config_hcf.html" xlink:title="type_config_hcf">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="652,-355 556,-355 556,-331 652,-331 652,-355"/>
-<text text-anchor="middle" x="604" y="-340.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_config_hcf</text>
+<g id="a_type~~type_models_manager~~InheritsGraph_node16"><a xlink:href="../type/type_config_hcf.html" xlink:title="type_config_hcf">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="652,-352 556,-352 556,-328 652,-328 652,-352"/>
+<text text-anchor="middle" x="604" y="-337.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_config_hcf</text>
 </a>
 </g>
 </g>
 <!-- type~abst_hcf&#45;&gt;type~type_config_hcf -->
-<g id="type~~type_models_manager~~InheritsGraph_edge11" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge12" class="edge">
 <title>type~abst_hcf&#45;&gt;type~type_config_hcf</title>
-<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M839.91,-224.08C834.54,-245.92 820.04,-291.75 789,-314 778.73,-321.36 712.47,-330.54 662.37,-336.57"/>
-<polygon fill="#00ff66" stroke="#00ff66" points="661.79,-333.12 652.28,-337.77 662.62,-340.07 661.79,-333.12"/>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M835.04,-216.14C827.57,-228.49 815.93,-248.28 807,-266 798.04,-283.77 804.63,-294.68 789,-307 769.7,-322.2 708.88,-330.97 662.4,-335.59"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="662.04,-332.11 652.42,-336.54 662.7,-339.07 662.04,-332.11"/>
 <text text-anchor="middle" x="736" y="-335.4" font-family="Helvetica,sans-Serif" font-size="9.50">config</text>
 </g>
 <!-- type~type_hcf_vapor -->
-<g id="type~~type_models_manager~~InheritsGraph_node17" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node18" class="node">
 <title>type~type_hcf_vapor</title>
-<g id="a_type~~type_models_manager~~InheritsGraph_node17"><a xlink:href="../type/type_hcf_vapor.html" xlink:title="type_hcf_vapor">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="651,-122 557,-122 557,-98 651,-98 651,-122"/>
-<text text-anchor="middle" x="604" y="-107.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_vapor</text>
+<g id="a_type~~type_models_manager~~InheritsGraph_node18"><a xlink:href="../type/type_hcf_vapor.html" xlink:title="type_hcf_vapor">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="651,-174 557,-174 557,-150 651,-150 651,-174"/>
+<text text-anchor="middle" x="604" y="-159.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_hcf_vapor</text>
 </a>
 </g>
 </g>
 <!-- type~abst_hcf&#45;&gt;type~type_hcf_vapor -->
-<g id="type~~type_models_manager~~InheritsGraph_edge15" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge16" class="edge">
 <title>type~abst_hcf&#45;&gt;type~type_hcf_vapor</title>
-<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M837.76,-199.87C828.03,-175.69 805.36,-122.94 789,-113 751.02,-89.93 700.01,-91.04 661.33,-96.87"/>
-<polygon fill="#00ff66" stroke="#00ff66" points="660.56,-93.45 651.27,-98.53 661.71,-100.35 660.56,-93.45"/>
-<text text-anchor="middle" x="736" y="-115.4" font-family="Helvetica,sans-Serif" font-size="9.50">vapor</text>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M836.77,-191.88C828.64,-176.28 812.13,-149.92 789,-139 741.57,-116.61 679.97,-132.04 641.46,-146.21"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="639.8,-143.1 631.72,-149.96 642.31,-149.64 639.8,-143.1"/>
+<text text-anchor="middle" x="736" y="-141.4" font-family="Helvetica,sans-Serif" font-size="9.50">vapor</text>
 </g>
 <!-- type~type_config_wrf -->
-<g id="type~~type_models_manager~~InheritsGraph_node16" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node17" class="node">
 <title>type~type_config_wrf</title>
-<g id="a_type~~type_models_manager~~InheritsGraph_node16"><a xlink:href="../type/type_config_wrf.html" xlink:title="type_config_wrf">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="481.5,-399 385.5,-399 385.5,-375 481.5,-375 481.5,-399"/>
-<text text-anchor="middle" x="433.5" y="-384.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_config_wrf</text>
+<g id="a_type~~type_models_manager~~InheritsGraph_node17"><a xlink:href="../type/type_config_wrf.html" xlink:title="type_config_wrf">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="481.5,-398 385.5,-398 385.5,-374 481.5,-374 481.5,-398"/>
+<text text-anchor="middle" x="433.5" y="-383.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_config_wrf</text>
 </a>
 </g>
 </g>
-<!-- type~abst_wrf&#45;&gt;type~type_config_wrf -->
-<g id="type~~type_models_manager~~InheritsGraph_edge17" class="edge">
-<title>type~abst_wrf&#45;&gt;type~type_config_wrf</title>
-<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M707.27,-391.54C658.45,-390.73 556.22,-389.03 491.72,-387.95"/>
-<polygon fill="#0066ff" stroke="#0066ff" points="491.76,-384.45 481.7,-387.79 491.64,-391.45 491.76,-384.45"/>
+<!-- type~abst_wrf~2&#45;&gt;type~type_config_wrf -->
+<g id="type~~type_models_manager~~InheritsGraph_edge18" class="edge">
+<title>type~abst_wrf~2&#45;&gt;type~type_config_wrf</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M707.27,-391.45C658.45,-390.47 556.22,-388.43 491.72,-387.14"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="491.77,-383.64 481.7,-386.94 491.63,-390.64 491.77,-383.64"/>
 <text text-anchor="middle" x="604" y="-392.4" font-family="Helvetica,sans-Serif" font-size="9.50">config</text>
 </g>
 <!-- type~type_evaporation&#45;&gt;type~abst_constitutive -->
-<g id="type~~type_models_manager~~InheritsGraph_edge18" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge19" class="edge">
 <title>type~type_evaporation&#45;&gt;type~abst_constitutive</title>
-<path fill="none" stroke="#cc00ff" d="M687.65,-24.06C646.74,-36.02 587.37,-57.2 543,-89 533.01,-96.16 536.8,-113.46 525,-110"/>
-<path fill="none" stroke="#cc00ff" d="M524,-110C514.78,-107.43 504.81,-106.1 495,-105.56"/>
-<polygon fill="#cc00ff" stroke="#cc00ff" points="494.95,-102.06 484.86,-105.26 494.75,-109.05 494.95,-102.06"/>
+<path fill="none" stroke="#cc00ff" d="M688.99,-350.91C686.89,-349.73 684.88,-348.43 683,-347 671.21,-338.06 676.3,-328.54 665,-319 619.96,-280.98 579.55,-313.24 543,-267 528.32,-248.43 548.67,-162.05 525,-162"/>
 </g>
 <!-- type_iapws06 -->
-<g id="type~~type_models_manager~~InheritsGraph_node18" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node19" class="node">
 <title>type_iapws06</title>
-<polygon fill="#5cb85c" stroke="#5cb85c" points="231,-143 146,-143 146,-119 231,-119 231,-143"/>
-<text text-anchor="middle" x="188.5" y="-128.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iapws06</text>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="231,-195 146,-195 146,-171 231,-171 231,-195"/>
+<text text-anchor="middle" x="188.5" y="-180.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iapws06</text>
 </g>
 <!-- type~abst_constitutive&#45;&gt;type_iapws06 -->
-<g id="type~~type_models_manager~~InheritsGraph_edge20" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge21" class="edge">
 <title>type~abst_constitutive&#45;&gt;type_iapws06</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M382.44,-114.33C341.2,-117.89 282.93,-122.93 241.23,-126.53"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="240.67,-123.06 231.01,-127.41 241.27,-130.04 240.67,-123.06"/>
-<text text-anchor="middle" x="314" y="-125.4" font-family="Helvetica,sans-Serif" font-size="9.50">ice</text>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M382.44,-166.33C341.2,-169.89 282.93,-174.93 241.23,-178.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="240.67,-175.06 231.01,-179.41 241.27,-182.04 240.67,-175.06"/>
+<text text-anchor="middle" x="314" y="-176.4" font-family="Helvetica,sans-Serif" font-size="9.50">ice</text>
 </g>
 <!-- type_iapws97 -->
-<g id="type~~type_models_manager~~InheritsGraph_node19" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node20" class="node">
 <title>type_iapws97</title>
-<polygon fill="#5cb85c" stroke="#5cb85c" points="231,-101 146,-101 146,-77 231,-77 231,-101"/>
-<text text-anchor="middle" x="188.5" y="-86.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iapws97</text>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="231,-153 146,-153 146,-129 231,-129 231,-153"/>
+<text text-anchor="middle" x="188.5" y="-138.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iapws97</text>
 </g>
 <!-- type~abst_constitutive&#45;&gt;type_iapws97 -->
-<g id="type~~type_models_manager~~InheritsGraph_edge19" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge20" class="edge">
 <title>type~abst_constitutive&#45;&gt;type_iapws97</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M382.38,-103.33C369.56,-101.76 355.78,-100.2 343,-99 309.23,-95.83 271.18,-93.34 241.41,-91.64"/>
-<polygon fill="#ff0000" stroke="#ff0000" points="241.43,-88.14 231.25,-91.07 241.04,-95.13 241.43,-88.14"/>
-<text text-anchor="middle" x="314" y="-101.4" font-family="Helvetica,sans-Serif" font-size="9.50">water</text>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M382.38,-155.33C369.56,-153.76 355.78,-152.2 343,-151 309.23,-147.83 271.18,-145.34 241.41,-143.64"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="241.43,-140.14 231.25,-143.07 241.04,-147.13 241.43,-140.14"/>
+<text text-anchor="middle" x="314" y="-153.4" font-family="Helvetica,sans-Serif" font-size="9.50">water</text>
 </g>
 <!-- type~abst_hcf_base&#45;&gt;type~abst_hcf -->
-<g id="type~~type_models_manager~~InheritsGraph_edge21" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge22" class="edge">
 <title>type~abst_hcf_base&#45;&gt;type~abst_hcf</title>
-<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M648.18,-248.57C685.51,-242.08 740.88,-232.26 789,-223 794.11,-222.02 799.48,-220.95 804.77,-219.88"/>
-<polygon fill="#ffda00" stroke="#ffda00" points="805.66,-223.27 814.76,-217.84 804.26,-216.41 805.66,-223.27"/>
-<text text-anchor="middle" x="736" y="-244.4" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
+<path fill="none" stroke="#ffda00" stroke-dasharray="5,2" d="M630.07,-79.98C667.95,-63.76 740.48,-40.41 789,-73 798.56,-79.42 822.81,-146.7 835.11,-182.26"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="831.82,-183.45 838.38,-191.77 838.44,-181.17 831.82,-183.45"/>
+<text text-anchor="middle" x="736" y="-75.4" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
 </g>
 <!-- type~abst_hcf_impedance&#45;&gt;type~abst_hcf -->
-<g id="type~~type_models_manager~~InheritsGraph_edge22" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge23" class="edge">
 <title>type~abst_hcf_impedance&#45;&gt;type~abst_hcf</title>
-<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M665.41,-195.2C701.48,-190.45 748.09,-187.3 789,-194 794.25,-194.86 799.67,-196.16 804.96,-197.68"/>
-<polygon fill="#48ff00" stroke="#48ff00" points="804.3,-201.14 814.89,-200.81 806.41,-194.47 804.3,-201.14"/>
-<text text-anchor="middle" x="736" y="-196.4" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
+<path fill="none" stroke="#48ff00" stroke-dasharray="5,2" d="M665.33,-247.51C701.78,-246.93 748.81,-243.52 789,-232 797.84,-229.47 806.9,-225.39 814.99,-221.11"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="816.96,-224.02 823.98,-216.09 813.54,-217.91 816.96,-224.02"/>
+<text text-anchor="middle" x="736" y="-248.4" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
 </g>
 <!-- type~abst_hcf_viscosity&#45;&gt;type~abst_hcf -->
-<g id="type~~type_models_manager~~InheritsGraph_edge23" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge24" class="edge">
 <title>type~abst_hcf_viscosity&#45;&gt;type~abst_hcf</title>
-<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M638.94,-139.95C677.49,-128.41 741.24,-115.99 789,-140 809.82,-150.47 824.58,-173.3 833.25,-190.46"/>
-<polygon fill="#00ff91" stroke="#00ff91" points="830.21,-192.23 837.65,-199.78 836.54,-189.24 830.21,-192.23"/>
-<text text-anchor="middle" x="736" y="-142.4" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
+<path fill="none" stroke="#00ff91" stroke-dasharray="5,2" d="M657.62,-204C702.19,-204 765,-204 804.72,-204"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="804.79,-207.5 814.79,-204 804.79,-200.5 804.79,-207.5"/>
+<text text-anchor="middle" x="736" y="-206.4" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
 </g>
 <!-- type~type_config_hcf&#45;&gt;type~type_config_wrf -->
-<g id="type~~type_models_manager~~InheritsGraph_edge25" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge26" class="edge">
 <title>type~type_config_hcf&#45;&gt;type~type_config_wrf</title>
-<path fill="none" stroke="#0091ff" d="M524,-347C513.96,-348.35 514.87,-356.1 506,-361 499.09,-364.82 491.51,-368.27 483.95,-371.32"/>
-<polygon fill="#0091ff" stroke="#0091ff" points="482.52,-368.12 474.43,-374.97 485.02,-374.66 482.52,-368.12"/>
+<path fill="none" stroke="#0091ff" d="M524,-346C513.97,-347.47 514.87,-355.1 506,-360 499.09,-363.82 491.51,-367.27 483.95,-370.32"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="482.52,-367.12 474.43,-373.97 485.02,-373.66 482.52,-367.12"/>
 </g>
 <!-- type~type_constant_id -->
-<g id="type~~type_models_manager~~InheritsGraph_node21" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node22" class="node">
 <title>type~type_constant_id</title>
-<g id="a_type~~type_models_manager~~InheritsGraph_node21"><a xlink:href="../type/type_constant_id.html" xlink:title="type_constant_id">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="239.5,-367 137.5,-367 137.5,-343 239.5,-343 239.5,-367"/>
-<text text-anchor="middle" x="188.5" y="-352.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_constant_id</text>
+<g id="a_type~~type_models_manager~~InheritsGraph_node22"><a xlink:href="../type/type_constant_id.html" xlink:title="type_constant_id">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="239.5,-366 137.5,-366 137.5,-342 239.5,-342 239.5,-366"/>
+<text text-anchor="middle" x="188.5" y="-351.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_constant_id</text>
 </a>
 </g>
 </g>
 <!-- type~type_config_hcf&#45;&gt;type~type_constant_id -->
-<g id="type~~type_models_manager~~InheritsGraph_edge24" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge25" class="edge">
 <title>type~type_config_hcf&#45;&gt;type~type_constant_id</title>
-<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M555.86,-344.17C545.66,-344.77 534.94,-345.67 525,-347"/>
-<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M524,-347C472.86,-353.86 331.61,-355.05 249.95,-355.14"/>
-<polygon fill="#0091ff" stroke="#0091ff" points="249.8,-351.64 239.81,-355.14 249.81,-358.64 249.8,-351.64"/>
-<text text-anchor="middle" x="433.5" y="-356.4" font-family="Helvetica,sans-Serif" font-size="9.50">model, water_viscosity_model</text>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M555.86,-342.57C545.66,-343.42 534.94,-344.54 525,-346"/>
+<path fill="none" stroke="#0091ff" stroke-dasharray="5,2" d="M524,-346C472.88,-353.51 331.29,-354.44 249.64,-354.32"/>
+<polygon fill="#0091ff" stroke="#0091ff" points="249.51,-350.82 239.5,-354.3 249.5,-357.82 249.51,-350.82"/>
+<text text-anchor="middle" x="433.5" y="-355.4" font-family="Helvetica,sans-Serif" font-size="9.50">model, water_viscosity_model</text>
 </g>
 <!-- type~abst_config_physics_model -->
-<g id="type~~type_models_manager~~InheritsGraph_node20" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node21" class="node">
 <title>type~abst_config_physics_model</title>
-<g id="a_type~~type_models_manager~~InheritsGraph_node20"><a xlink:href="../type/abst_config_physics_model.html" xlink:title="abst_config_physics_model">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="267,-417 110,-417 110,-393 267,-393 267,-417"/>
-<text text-anchor="middle" x="188.5" y="-402.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config_physics_model</text>
+<g id="a_type~~type_models_manager~~InheritsGraph_node21"><a xlink:href="../type/abst_config_physics_model.html" xlink:title="abst_config_physics_model">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="267,-416 110,-416 110,-392 267,-392 267,-416"/>
+<text text-anchor="middle" x="188.5" y="-401.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config_physics_model</text>
 </a>
 </g>
 </g>
 <!-- type~type_config_wrf&#45;&gt;type~abst_config_physics_model -->
-<g id="type~~type_models_manager~~InheritsGraph_edge27" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge28" class="edge">
 <title>type~type_config_wrf&#45;&gt;type~abst_config_physics_model</title>
-<path fill="none" stroke="#4800ff" d="M385.36,-390.49C354.7,-392.76 313.78,-395.79 277.28,-398.5"/>
-<polygon fill="#4800ff" stroke="#4800ff" points="276.82,-395.02 267.11,-399.25 277.34,-402 276.82,-395.02"/>
+<path fill="none" stroke="#4800ff" d="M385.36,-389.49C354.7,-391.76 313.78,-394.79 277.28,-397.5"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="276.82,-394.02 267.11,-398.25 277.34,-401 276.82,-394.02"/>
 </g>
 <!-- type~type_config_wrf&#45;&gt;type~type_constant_id -->
-<g id="type~~type_models_manager~~InheritsGraph_edge26" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge27" class="edge">
 <title>type~type_config_wrf&#45;&gt;type~type_constant_id</title>
-<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M385.36,-380.79C346.72,-375.7 291.79,-368.47 249.93,-362.96"/>
-<polygon fill="#4800ff" stroke="#4800ff" points="250.23,-359.47 239.86,-361.63 249.32,-366.41 250.23,-359.47"/>
-<text text-anchor="middle" x="314" y="-376.4" font-family="Helvetica,sans-Serif" font-size="9.50">swcc_model</text>
+<path fill="none" stroke="#4800ff" stroke-dasharray="5,2" d="M385.36,-379.79C346.72,-374.7 291.79,-367.47 249.93,-361.96"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="250.23,-358.47 239.86,-360.63 249.32,-365.41 250.23,-358.47"/>
+<text text-anchor="middle" x="314" y="-375.4" font-family="Helvetica,sans-Serif" font-size="9.50">swcc_model</text>
 </g>
 <!-- type~type_hcf_vapor&#45;&gt;type~abst_hcf -->
-<g id="type~~type_models_manager~~InheritsGraph_edge28" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge29" class="edge">
 <title>type~type_hcf_vapor&#45;&gt;type~abst_hcf</title>
-<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M629.61,-97.85C644.63,-91.13 664.46,-83.44 683,-80 729.32,-71.4 750.37,-53.04 789,-80 808.02,-93.28 798.44,-107.44 807,-129 815.38,-150.11 825.65,-173.92 832.99,-190.6"/>
-<polygon fill="#ff00da" stroke="#ff00da" points="829.89,-192.25 837.13,-199.99 836.29,-189.42 829.89,-192.25"/>
-<text text-anchor="middle" x="736" y="-82.4" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
+<path fill="none" stroke="#ff00da" stroke-dasharray="5,2" d="M651.37,-167.69C688.72,-172.59 742.48,-180.4 789,-190 794.16,-191.06 799.56,-192.31 804.87,-193.62"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="804.31,-197.09 814.86,-196.18 806.04,-190.31 804.31,-197.09"/>
+<text text-anchor="middle" x="736" y="-192.4" font-family="Helvetica,sans-Serif" font-size="9.50">parent</text>
 </g>
 <!-- type~type_hcf_vapor&#45;&gt;type~abst_constitutive -->
-<g id="type~~type_models_manager~~InheritsGraph_edge29" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge30" class="edge">
 <title>type~type_hcf_vapor&#45;&gt;type~abst_constitutive</title>
-<path fill="none" stroke="#ff00da" d="M556.6,-114.3C546.05,-114.1 535.01,-112.93 525,-110"/>
+<path fill="none" stroke="#ff00da" d="M556.81,-162.03C546.35,-162.03 535.29,-162.02 525,-162"/>
 </g>
 <!-- type~abst_config -->
-<g id="type~~type_models_manager~~InheritsGraph_node22" class="node">
+<g id="type~~type_models_manager~~InheritsGraph_node23" class="node">
 <title>type~abst_config</title>
-<g id="a_type~~type_models_manager~~InheritsGraph_node22"><a xlink:href="../type/abst_config.html" xlink:title="abst_config">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="73,-417 0,-417 0,-393 73,-393 73,-417"/>
-<text text-anchor="middle" x="36.5" y="-402.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config</text>
+<g id="a_type~~type_models_manager~~InheritsGraph_node23"><a xlink:href="../type/abst_config.html" xlink:title="abst_config">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="73,-416 0,-416 0,-392 73,-392 73,-416"/>
+<text text-anchor="middle" x="36.5" y="-401.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">abst_config</text>
 </a>
 </g>
 </g>
 <!-- type~abst_config_physics_model&#45;&gt;type~abst_config -->
-<g id="type~~type_models_manager~~InheritsGraph_edge30" class="edge">
+<g id="type~~type_models_manager~~InheritsGraph_edge31" class="edge">
 <title>type~abst_config_physics_model&#45;&gt;type~abst_config</title>
-<path fill="none" stroke="#00ffff" d="M109.86,-405C100.72,-405 91.62,-405 83.12,-405"/>
-<polygon fill="#00ffff" stroke="#00ffff" points="83.09,-401.5 73.09,-405 83.09,-408.5 83.09,-401.5"/>
+<path fill="none" stroke="#00ffff" d="M109.86,-404C100.72,-404 91.62,-404 83.12,-404"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="83.09,-400.5 73.09,-404 83.09,-407.5 83.09,-400.5"/>
 </g>
 </g>
 </svg>
@@ -825,7 +846,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-gcc"></span>
+              <span class="anchor" id="variable-gcc~2"></span>
               type(<a href='holder_gccs.html'>holder_gccs</a>),
             </td>
               <td>private</td>
@@ -876,8 +897,25 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-wrf"></span>
-              type(<a href='holder_wrfs.html'>holder_wrfs</a>),
+              <span class="anchor" id="variable-segregation"></span>
+              type(<a href='type_segregation_potential.html'>type_segregation_potential</a>),
+            </td>
+              <td>private</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>segregation</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-wrf~2"></span>
+              type(<a href='holder_wrfs~2.html'>holder_wrfs</a>),
             </td>
               <td>private</td>
             <td>
@@ -904,7 +942,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc_kflh~9"></span>
+      <span class="anchor" id="boundprocedure-calc_kflh~2"></span>
       <h3>
           procedure, public ::
   <strong>calc_Kflh</strong>
@@ -914,7 +952,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_kflh.html'>calc_Kflh</a>(self, state, Kflh)  
+    private  subroutine <a href='../proc/calc_kflh~2.html'>calc_Kflh</a>(self, state, Kflh)  
 </h3>
     
 
@@ -998,7 +1036,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_klt.html'>calc_KlT</a>(self, state, KlT)  
+    private  subroutine <a href='../proc/calc_klt~2.html'>calc_KlT</a>(self, state, KlT)  
 </h3>
     
 
@@ -1072,7 +1110,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc_kvt~3"></span>
+      <span class="anchor" id="boundprocedure-calc_kvt~2"></span>
       <h3>
           procedure, public ::
   <strong>calc_KvT</strong>
@@ -1082,7 +1120,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_kvt.html'>calc_KvT</a>(self, state, KvT)  
+    private  subroutine <a href='../proc/calc_kvt~2.html'>calc_KvT</a>(self, state, KvT)  
 </h3>
     
 
@@ -1156,7 +1194,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc_kvh~3"></span>
+      <span class="anchor" id="boundprocedure-calc_kvh~2"></span>
       <h3>
           procedure, public ::
   <strong>calc_Kvh</strong>
@@ -1166,7 +1204,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_kvh.html'>calc_Kvh</a>(self, state, Kvh)  
+    private  subroutine <a href='../proc/calc_kvh~2.html'>calc_Kvh</a>(self, state, Kvh)  
 </h3>
     
 
@@ -1240,368 +1278,17 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc_cryogenic_suction"></span>
+      <span class="anchor" id="boundprocedure-calc_cryo_suction_deriv_t~2"></span>
       <h3>
           procedure, public ::
-  <strong>calc_cryogenic_suction</strong>
+  <strong>calc_cryo_suction_deriv_T</strong>
         
       </h3>
     </div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/calc_cryogenic_suction.html'>calc_cryogenic_suction</a>(self, state, suction)  
-</h3>
-    
-
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_models_manager.html'>type_models_manager</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              type(<a href='type_state.html'>type_state</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>state</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(inout)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>suction</strong></td>
-            <td>
-
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc_cryogenic_suction_derivatives"></span>
-      <h3>
-          procedure, public ::
-  <strong>calc_cryogenic_suction_derivatives</strong>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                    <h3>
-    private  subroutine <a href='../proc/calc_cryogenic_suction_derivatives.html'>calc_cryogenic_suction_derivatives</a>(self, state, deriv_dP, deriv_dT)  
-</h3>
-    
-
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_models_manager.html'>type_models_manager</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              type(<a href='type_state.html'>type_state</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>state</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(inout),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>deriv_dP</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(inout),</td>
-              <td>optional</td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>deriv_dT</strong></td>
-            <td>
-
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc_latent_heat_fusion"></span>
-      <h3>
-          procedure, public ::
-  <strong>calc_latent_heat_fusion</strong>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                    <h3>
-    private  subroutine <a href='../proc/calc_latent_heat_fusion.html'>calc_latent_heat_fusion</a>(self, state, L_fusion)  
-</h3>
-    
-
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_models_manager.html'>type_models_manager</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              type(<a href='type_state.html'>type_state</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>state</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(inout)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>L_fusion</strong></td>
-            <td>
-
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc_latent_heat_vaporization"></span>
-      <h3>
-          procedure, public ::
-  <strong>calc_latent_heat_vaporization</strong>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                    <h3>
-    private  subroutine <a href='../proc/calc_latent_heat_vaporization.html'>calc_latent_heat_vaporization</a>(self, state, L_vaporization)  
-</h3>
-    
-
-  
-
-  <h4>Arguments</h4>
-      <table class="table table-striped varlist">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              class(<a href='type_models_manager.html'>type_models_manager</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>self</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              type(<a href='type_state.html'>type_state</a>),
-            </td>
-<td>intent(in)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>state</strong></td>
-            <td>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <span class="anchor" ></span>
-              real(kind=real64),
-            </td>
-<td>intent(inout)</td>
-              <td></td>            <td>
-              
-            </td>
-            <td>::</td>
-            <td><strong>L_vaporization</strong></td>
-            <td>
-
-            </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-          </li>
-      </ul>
-  </div>
-
-          </div>
-          <div class="row">
-              <div class="card mt-3">
-    <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-calc_pressure_ice_water_derivative"></span>
-      <h3>
-          procedure, public ::
-  <strong>calc_pressure_ice_water_derivative</strong>
-        
-      </h3>
-    </div>
-      <ul class="list-group">
-          <li class="list-group-item">
-                    <h3>
-    private  subroutine <a href='../proc/calc_pressure_ice_water_derivative.html'>calc_pressure_ice_water_derivative</a>(self, state, deriv)  
+    private  subroutine <a href='../proc/calc_cryo_suction_deriv_t~2.html'>calc_cryo_suction_deriv_T</a>(self, state, deriv)  
 </h3>
     
 
@@ -1675,7 +1362,590 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~44"></span>
+      <span class="anchor" id="boundprocedure-calc_latent_heat_fusion~3"></span>
+      <h3>
+          procedure, public ::
+  <strong>calc_latent_heat_fusion</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_latent_heat_fusion~3.html'>calc_latent_heat_fusion</a>(self, state, L_fusion)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_models_manager.html'>type_models_manager</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>L_fusion</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_latent_heat_vaporization~4"></span>
+      <h3>
+          procedure, public ::
+  <strong>calc_latent_heat_vaporization</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_latent_heat_vaporization~4.html'>calc_latent_heat_vaporization</a>(self, state, L_vaporization)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_models_manager.html'>type_models_manager</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>L_vaporization</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_lscheme_capacity~3"></span>
+      <h3>
+          procedure, public ::
+  <strong>calc_lscheme_capacity</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_lscheme_capacity~2.html'>calc_lscheme_capacity</a>(self, capacity)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_models_manager.html'>type_models_manager</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>capacity</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_pressure_ice_water_derivative~2"></span>
+      <h3>
+          procedure, public ::
+  <strong>calc_pressure_ice_water_derivative</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_pressure_ice_water_derivative~2.html'>calc_pressure_ice_water_derivative</a>(self, state, deriv)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_models_manager.html'>type_models_manager</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>deriv</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_segregation_sink~2"></span>
+      <h3>
+          procedure, public ::
+  <strong>calc_segregation_sink</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_segregation_sink~2.html'>calc_segregation_sink</a>(self, state, grad_T_magnitude, S_seg)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_models_manager.html'>type_models_manager</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>grad_T_magnitude</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>S_seg</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-calc_suction_weights~2"></span>
+      <h3>
+          procedure, public ::
+  <strong>calc_suction_weights</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/calc_suction_weights~2.html'>calc_suction_weights</a>(self, state, w_cap, w_cryo)  
+</h3>
+    
+
+  <p>Weights of the generalized suction p_c<em> = max(P_aw, P_iw) with respect to its
+two contributions: w_cap = d(p_c</em>)/d(P_aw), w_cryo = d(p_c<em>)/d(P_iw). These are
+the fractions with which the capillary (grad p_w) and cryogenic (grad T) terms
+enter the Darcy flux driven by grad(p_c</em>) = grad(mu_w) (the chemical potential).
+Uses the same smooth max as the water-retention evaluation. With no cryogenic
+model (psi_cryo = 0) it returns w_cap = 1, w_cryo = 0 (ordinary unfrozen flow).</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_models_manager.html'>type_models_manager</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_state.html'>type_state</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>state</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>w_cap</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>w_cryo</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-has_cryo_transport~2"></span>
+      <h3>
+          procedure, public ::
+  <strong>has_cryo_transport</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/has_cryo_transport~2.html'>has_cryo_transport</a>(self) result(active)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_models_manager.html'>type_models_manager</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-initialize~78"></span>
       <h3>
           procedure, public ::
   <strong>initialize</strong>
@@ -1685,7 +1955,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/initialize.html'>initialize</a>(self, material_id, config_wrf, config_hcf, config_gcc, water, ice)  
+    private  subroutine <a href='../proc/initialize~3.html'>initialize</a>(self, material_id, config_wrf, config_hcf, config_gcc, water, ice)  
 </h3>
     
 
@@ -1819,7 +2089,66 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-update_water_phases"></span>
+      <span class="anchor" id="boundprocedure-is_segregation_active~2"></span>
+      <h3>
+          procedure, public ::
+  <strong>is_segregation_active</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private pure function <a href='../proc/is_segregation_active~2.html'>is_segregation_active</a>(self) result(active)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_models_manager.html'>type_models_manager</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <h4>
+    Return Value
+    <small>logical</small>
+    </h4>
+    
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-update_water_phases~4"></span>
       <h3>
           procedure, public ::
   <strong>update_water_phases</strong>
@@ -1829,7 +2158,7 @@ large graphs.</div>
       <ul class="list-group">
           <li class="list-group-item">
                     <h3>
-    private  subroutine <a href='../proc/update_water_phases.html'>update_water_phases</a>(self, state)  
+    private  subroutine <a href='../proc/update_water_phases~3.html'>update_water_phases</a>(self, state)  
 </h3>
     
 
@@ -1895,6 +2224,7 @@ large graphs.</div>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">holder_hcfs</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">hcf</span>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">holder_gccs</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">gcc</span>
 <span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_phase_manager</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">phase_manager</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_segregation_potential</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">segregation</span>
 <span class="w">    </span><span class="k">contains</span>
 <span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">update_water_phases</span>
@@ -1905,8 +2235,12 @@ large graphs.</div>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_latent_heat_fusion</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_latent_heat_vaporization</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_pressure_ice_water_derivative</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_cryogenic_suction</span>
-<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_cryogenic_suction_derivatives</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_cryo_suction_deriv_T</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_lscheme_capacity</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_suction_weights</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_segregation_sink</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_segregation_active</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">has_cryo_transport</span>
 <span class="w">    </span><span class="k">end type </span><span class="n">type_models_manager</span>
 </pre></div>
 
@@ -1930,7 +2264,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

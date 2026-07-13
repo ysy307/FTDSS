@@ -38,6 +38,24 @@ module types_config_control_time
         !> [Config] Absolute limits (Copies from time control for easy access) in Seconds
         real(real64) :: dt_min = 1.0d-5
         real(real64) :: dt_max = 1.0d+2
+
+        !> [Config] Error-controlled adaptive stepping (PI controller on a local
+        !> truncation-error estimate). This is the universal default behaviour when
+        !> ATS is active: the next dt is governed by a normalized accuracy estimate,
+        !> with the iteration count retained only as a robustness brake. These are
+        !> universal numerical constants (not case-specific tuning) and are therefore
+        !> fixed here rather than read from per-case input.
+        logical :: use_error_control = .true.
+        !> PI gains. For a first-order method (BDF1) the standard choices are
+        !> k_I ~ 0.3/(p+1) and k_P ~ 0.4/(p+1) with p=1.
+        real(real64) :: pi_k_i = 0.15d0
+        real(real64) :: pi_k_p = 0.20d0
+        !> Relative tolerance for the normalized LTE estimate (E<=1 is on target).
+        real(real64) :: error_rtol = 1.0d-2
+        !> Maximum absolute temperature change per step used by ATS limiter [K or C].
+        real(real64) :: max_dT_per_step = 5.0d0
+        !> Maximum relative state change per step used by ATS limiter [-].
+        real(real64) :: max_relative_change_per_step = 0.3d0
     contains
         procedure, public, pass(self) :: copy => copy_config_time_ats
         procedure, public, pass(self) :: reset => reset_config_time_ats
@@ -97,6 +115,12 @@ contains
             call self%set(self%max_growth_rate, source%max_growth_rate)
             call self%set(self%dt_min, source%dt_min)
             call self%set(self%dt_max, source%dt_max)
+            call self%set(self%use_error_control, source%use_error_control)
+            call self%set(self%pi_k_i, source%pi_k_i)
+            call self%set(self%pi_k_p, source%pi_k_p)
+            call self%set(self%error_rtol, source%error_rtol)
+            call self%set(self%max_dT_per_step, source%max_dT_per_step)
+            call self%set(self%max_relative_change_per_step, source%max_relative_change_per_step)
         class default
             call self%reset()
         end select
@@ -116,6 +140,12 @@ contains
         self%max_growth_rate = 2.0d0
         self%dt_min = 1.0d-5
         self%dt_max = 1.0d+2
+        self%use_error_control = .true.
+        self%pi_k_i = 0.15d0
+        self%pi_k_p = 0.20d0
+        self%error_rtol = 1.0d-2
+        self%max_dT_per_step = 5.0d0
+        self%max_relative_change_per_step = 0.3d0
     end subroutine reset_config_time_ats
 
 end module types_config_control_time

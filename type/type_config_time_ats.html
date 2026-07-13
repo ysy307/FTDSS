@@ -92,7 +92,7 @@
 
             <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
               <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
-                 title="<p> 0.4% of total for derived types.</p>Including implementation: 50 statements,  0.2% of total for derived types.">15 statements</a>
+                 title="<p> 0.5% of total for derived types.</p>Including implementation: 68 statements,  0.2% of total for derived types.">21 statements</a>
             </li>
 
             <li class="list-inline-item" id="source-file">
@@ -134,16 +134,22 @@
       </a>
       <div id="vars-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-active~2">active</a>
-            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-dt_max">dt_max</a>
-            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-dt_min">dt_min</a>
-            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-iter_max">iter_max</a>
-            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-iter_min">iter_min</a>
-            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-max_growth_rate">max_growth_rate</a>
-            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-safety_factor">safety_factor</a>
-            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-scale_down">scale_down</a>
-            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-scale_retry">scale_retry</a>
-            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-scale_up">scale_up</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-active~10">active</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-dt_max~2">dt_max</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-dt_min~2">dt_min</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-error_rtol~2">error_rtol</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-iter_max~4">iter_max</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-iter_min~4">iter_min</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-max_dt_per_step~2">max_dT_per_step</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-max_growth_rate~4">max_growth_rate</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-max_relative_change_per_step~3">max_relative_change_per_step</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-pi_k_i~2">pi_k_i</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-pi_k_p~2">pi_k_p</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-safety_factor~4">safety_factor</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-scale_down~4">scale_down</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-scale_retry~4">scale_retry</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-scale_up~4">scale_up</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#variable-use_error_control~3">use_error_control</a>
         </div>
       </div>
     </div>
@@ -170,9 +176,9 @@
       </a>
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
-            <a class="list-group-item" href="../type/type_config_time_ats.html#boundprocedure-copy~5">copy</a>
-            <a class="list-group-item" href="../type/type_config_time_ats.html#boundprocedure-reset~8">reset</a>
-            <a class="list-group-item" href="../type/type_config_time_ats.html#boundprocedure-set~24">set</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#boundprocedure-copy~30">copy</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#boundprocedure-reset~43">reset</a>
+            <a class="list-group-item" href="../type/type_config_time_ats.html#boundprocedure-set~42">set</a>
         </div>
       </div>
     </div>
@@ -301,7 +307,7 @@ large graphs.</div>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-active~2"></span>
+              <span class="anchor" id="variable-active~10"></span>
               logical,
             </td>
               <td>public</td>
@@ -318,7 +324,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-dt_max"></span>
+              <span class="anchor" id="variable-dt_max~2"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -335,7 +341,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-dt_min"></span>
+              <span class="anchor" id="variable-dt_min~2"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -352,7 +358,24 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-iter_max"></span>
+              <span class="anchor" id="variable-error_rtol~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>error_rtol</strong></td>
+<td> =</td>
+                <td>1.0d-2</td>
+            <td>
+                <p>Relative tolerance for the normalized LTE estimate (E&lt;=1 is on target).</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-iter_max~4"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -369,7 +392,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-iter_min"></span>
+              <span class="anchor" id="variable-iter_min~4"></span>
               integer(kind=int32),
             </td>
               <td>public</td>
@@ -386,7 +409,24 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-max_growth_rate"></span>
+              <span class="anchor" id="variable-max_dt_per_step~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max_dT_per_step</strong></td>
+<td> =</td>
+                <td>5.0d0</td>
+            <td>
+                <p>Maximum absolute temperature change per step used by ATS limiter [K or C].</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-max_growth_rate~4"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -403,7 +443,59 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-safety_factor"></span>
+              <span class="anchor" id="variable-max_relative_change_per_step~3"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>max_relative_change_per_step</strong></td>
+<td> =</td>
+                <td>0.3d0</td>
+            <td>
+                <p>Maximum relative state change per step used by ATS limiter [-].</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-pi_k_i~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>pi_k_i</strong></td>
+<td> =</td>
+                <td>0.15d0</td>
+            <td>
+                <p>PI gains. For a first-order method (BDF1) the standard choices are
+k_I ~ 0.3/(p+1) and k_P ~ 0.4/(p+1) with p=1.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-pi_k_p~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>pi_k_p</strong></td>
+<td> =</td>
+                <td>0.20d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-safety_factor~4"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -420,7 +512,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-scale_down"></span>
+              <span class="anchor" id="variable-scale_down~4"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -437,7 +529,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-scale_retry"></span>
+              <span class="anchor" id="variable-scale_retry~4"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -454,7 +546,7 @@ large graphs.</div>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-scale_up"></span>
+              <span class="anchor" id="variable-scale_up~4"></span>
               real(kind=real64),
             </td>
               <td>public</td>
@@ -467,6 +559,28 @@ large graphs.</div>
                 <td>1.2d0</td>
             <td>
                 <p>[Config] Scaling factors</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-use_error_control~3"></span>
+              logical,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>use_error_control</strong></td>
+<td> =</td>
+                <td>.true.</td>
+            <td>
+                <p>[Config] Error-controlled adaptive stepping (PI controller on a local
+truncation-error estimate). This is the universal default behaviour when
+ATS is active: the next dt is governed by a normalized accuracy estimate,
+with the iteration count retained only as a robustness brake. These are
+universal numerical constants (not case-specific tuning) and are therefore
+fixed here rather than read from per-case input.</p>
             </td>
         </tr>
     </tbody>
@@ -482,7 +596,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-copy~5"></span>
+      <span class="anchor" id="boundprocedure-copy~30"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>copy</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/copy_config_time_ats.html'>copy_config_time_ats</a>
@@ -551,7 +665,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-reset~8"></span>
+      <span class="anchor" id="boundprocedure-reset~43"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>reset</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/reset_config_time_ats.html'>reset_config_time_ats</a>
@@ -605,7 +719,7 @@ large graphs.</div>
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-set~24"></span>
+      <span class="anchor" id="boundprocedure-set~42"></span>
       <h3>
           generic, public ::
   <strong>set</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int8'>set_int8</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int8_1d'>set_int8_1d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int8_2d'>set_int8_2d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int8_3d'>set_int8_3d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int32'>set_int32</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int32_1d'>set_int32_1d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int32_2d'>set_int32_2d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_int32_3d'>set_int32_3d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_real64'>set_real64</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_real64_1d'>set_real64_1d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_real64_2d'>set_real64_2d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_real64_3d'>set_real64_3d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_logical'>set_logical</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_logical_1d'>set_logical_1d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_logical_2d'>set_logical_2d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_logical_3d'>set_logical_3d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_character'>set_character</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_character_1d'>set_character_1d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_character_2d'>set_character_2d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_character_3d'>set_character_3d</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_constant_id'>set_constant_id</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_constant_ids'>set_constant_ids</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_constant_value'>set_constant_value</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_constant_values'>set_constant_values</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_coordinate_array_dp'>set_coordinate_array_dp</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_csr_index'>set_csr_index</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_coordinate_dp'>set_coordinate_dp</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_datetime'>set_datetime</a>, <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/type/abst_config.html#boundprocedure-set_datetimes'>set_datetimes</a>
@@ -2640,6 +2754,24 @@ large graphs.</div>
 <span class="w">        </span><span class="c">!&gt; [Config] Absolute limits (Copies from time control for easy access) in Seconds</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dt_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d-5</span>
 <span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dt_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d+2</span>
+
+<span class="w">        </span><span class="c">!&gt; [Config] Error-controlled adaptive stepping (PI controller on a local</span>
+<span class="w">        </span><span class="c">!&gt; truncation-error estimate). This is the universal default behaviour when</span>
+<span class="w">        </span><span class="c">!&gt; ATS is active: the next dt is governed by a normalized accuracy estimate,</span>
+<span class="w">        </span><span class="c">!&gt; with the iteration count retained only as a robustness brake. These are</span>
+<span class="w">        </span><span class="c">!&gt; universal numerical constants (not case-specific tuning) and are therefore</span>
+<span class="w">        </span><span class="c">!&gt; fixed here rather than read from per-case input.</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">use_error_control</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="w">        </span><span class="c">!&gt; PI gains. For a first-order method (BDF1) the standard choices are</span>
+<span class="w">        </span><span class="c">!&gt; k_I ~ 0.3/(p+1) and k_P ~ 0.4/(p+1) with p=1.</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pi_k_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.15d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pi_k_p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.20d0</span>
+<span class="w">        </span><span class="c">!&gt; Relative tolerance for the normalized LTE estimate (E&lt;=1 is on target).</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">error_rtol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0d-2</span>
+<span class="w">        </span><span class="c">!&gt; Maximum absolute temperature change per step used by ATS limiter [K or C].</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">max_dT_per_step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">5.0d0</span>
+<span class="w">        </span><span class="c">!&gt; Maximum relative state change per step used by ATS limiter [-].</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">max_relative_change_per_step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.3d0</span>
 <span class="w">    </span><span class="k">contains</span>
 <span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">copy</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">copy_config_time_ats</span>
 <span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">reset</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">reset_config_time_ats</span>
@@ -2666,7 +2798,7 @@ large graphs.</div>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-03-15 13:15 +0000             </p>
+ on 2026-07-13 12:46 +0000             </p>
           </div>
         </div>
         <br>

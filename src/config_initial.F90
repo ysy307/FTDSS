@@ -16,6 +16,8 @@ module types_config_conditions_initial
         type(type_constant_id) :: ic_kind = type_constant_id("", "", -1)
         !> Initial condition value (for uniform type)
         real(real64) :: value
+        !> Per-node values read from VTU (for file type)
+        real(real64), allocatable :: values(:)
     contains
 
         procedure, public, pass(self) :: copy => copy_config_ic
@@ -37,6 +39,9 @@ contains
             call self%set(self%physics_type, source%physics_type)
             call self%set(self%ic_kind, source%ic_kind)
             call self%set(self%value, source%value)
+        if (allocated(source%values)) then
+            allocate (self%values, source=source%values)
+        end if
         class default
             call self%reset()
         end select
@@ -50,6 +55,7 @@ contains
         self%physics_type = type_constant_id("", "", -1)
         self%ic_kind = type_constant_id("", "", -1)
         self%value = 0.0d0
+        if (allocated(self%values)) deallocate (self%values)
 
     end subroutine reset_config_ic
 

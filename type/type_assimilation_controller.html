@@ -1,0 +1,2547 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>type_assimilation_controller &ndash; FTCMS </title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>type_assimilation_controller
+      <small>Derived Type</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title="<p> 1.1% of total for derived types.</p>Including implementation: 439 statements,  1.5% of total for derived types.">48 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/assimilation_controller.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/assimilation_controller.f90.html'>assimilation_controller.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/physics_governing_atmosphere_controller.html'>physics_governing_atmosphere_controller</a></li>
+            <li class="breadcrumb-item active" aria-current="page">type_assimilation_controller</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#vars-0"
+         aria-expanded="false" aria-controls="vars-0">
+         <h4 class="card-header bg-primary text-white">Variables</h4>
+      </a>
+      <div id="vars-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-pmax~2">Pmax</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-pmin~2">Pmin</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-pwater_curr">Pwater_curr</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-rl_down">Rl_down</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-rs">Rs</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-ta_last">Ta_last</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-ts_ast">Ts_ast</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-ua_last">Ua_last</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-albedo~2">albedo</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-bc_entity_hydraulic">bc_entity_hydraulic</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-bc_entity_thermal">bc_entity_thermal</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-ensemble">ensemble</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-eps_s">eps_s</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-etkf_solver">etkf_solver</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-has_first_obs">has_first_obs</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-is_initialized">is_initialized</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-last_log_time">last_log_time</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-latitude~2">latitude</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-log_interval_s">log_interval_s</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-log_io_unit">log_io_unit</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-longitude~2">longitude</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-n_upper_bc">n_upper_bc</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-obs_manager">obs_manager</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-precip">precip</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-qa_last">qa_last</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-r_s">r_s</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-tau_atm~2">tau_atm</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-upper_bc_records">upper_bc_records</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-utc_offset_hours~2">utc_offset_hours</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-z0~2">z0</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#variable-z_ref_u">z_ref_U</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+      <div class="card mb-4">
+      <a data-bs-toggle="collapse" href="#boundprocs-0"
+         aria-expanded="false" aria-controls="boundprocs-0">
+         <h4 class="card-header bg-primary text-white">Type-Bound Procedures</h4>
+      </a>
+      <div id="boundprocs-0" class="collapse">
+        <div class="list-group list-group-flush">
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#boundprocedure-apply_upper_bc">apply_upper_bc</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#boundprocedure-compute_friction_velocity">compute_friction_velocity</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#boundprocedure-compute_moisture_bc">compute_moisture_bc</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#boundprocedure-compute_surface_energy_balance">compute_surface_energy_balance</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#boundprocedure-compute_surface_energy_diag">compute_surface_energy_diag</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#boundprocedure-destroy~3">destroy</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#boundprocedure-execute_assimilation_cycle">execute_assimilation_cycle</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#boundprocedure-initialize~9">initialize</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#boundprocedure-propagate_atmosphere">propagate_atmosphere</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#boundprocedure-read_upper_bc">read_upper_bc</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#boundprocedure-set_surface_state">set_surface_state</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#boundprocedure-update_longwave_radiation">update_longwave_radiation</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#boundprocedure-update_solar_radiation">update_solar_radiation</a>
+            <a class="list-group-item" href="../type/type_assimilation_controller.html#boundprocedure-write_surface_log">write_surface_log</a>
+        </div>
+      </div>
+    </div>
+
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../type/type_assimilation_controller.html#src">type_assimilation_controller</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2 id="type-def-statement">
+        type, public :: type_assimilation_controller</h2>
+    <p>Orchestrates ETKF cycles and surface BC parameter updates.</p>
+<br>      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Inherits</h3>
+        </div>
+        <div class="card-body">
+          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: type~~type_assimilation_controller~~InheritsGraph Pages: 1 -->
+<svg id="typetype_assimilation_controllerInheritsGraph" width="636pt" height="158pt"
+ viewBox="0.00 0.00 636.00 158.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_assimilation_controller~~InheritsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 154)">
+<title>type~~type_assimilation_controller~~InheritsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-154 632,-154 632,4 -4,4"/>
+<!-- type~type_assimilation_controller -->
+<g id="type~~type_assimilation_controller~~InheritsGraph_node1" class="node">
+<title>type~type_assimilation_controller</title>
+<polygon fill="none" stroke="black" points="628,-87 467,-87 467,-63 628,-63 628,-87"/>
+<text text-anchor="middle" x="547.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_assimilation_controller</text>
+</g>
+<!-- type~type_ensemble_manager -->
+<g id="type~~type_assimilation_controller~~InheritsGraph_node2" class="node">
+<title>type~type_ensemble_manager</title>
+<g id="a_type~~type_assimilation_controller~~InheritsGraph_node2"><a xlink:href="../type/type_ensemble_manager.html" xlink:title="type_ensemble_manager">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="341,-150 193,-150 193,-126 341,-126 341,-150"/>
+<text text-anchor="middle" x="267" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ensemble_manager</text>
+</a>
+</g>
+</g>
+<!-- type~type_assimilation_controller&#45;&gt;type~type_ensemble_manager -->
+<g id="type~~type_assimilation_controller~~InheritsGraph_edge1" class="edge">
+<title>type~type_assimilation_controller&#45;&gt;type~type_ensemble_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M505.4,-87.11C488.07,-92.02 467.63,-97.57 449,-102 414.96,-110.09 377.02,-117.83 344.71,-124.04"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="344.04,-120.61 334.88,-125.92 345.35,-127.48 344.04,-120.61"/>
+<text text-anchor="middle" x="406.5" y="-122.4" font-family="Helvetica,sans-Serif" font-size="9.50">ensemble</text>
+</g>
+<!-- type~type_etkf_solver -->
+<g id="type~~type_assimilation_controller~~InheritsGraph_node3" class="node">
+<title>type~type_etkf_solver</title>
+<g id="a_type~~type_assimilation_controller~~InheritsGraph_node3"><a xlink:href="../type/type_etkf_solver.html" xlink:title="type_etkf_solver">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="316.5,-108 217.5,-108 217.5,-84 316.5,-84 316.5,-108"/>
+<text text-anchor="middle" x="267" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_etkf_solver</text>
+</a>
+</g>
+</g>
+<!-- type~type_assimilation_controller&#45;&gt;type~type_etkf_solver -->
+<g id="type~~type_assimilation_controller~~InheritsGraph_edge3" class="edge">
+<title>type~type_assimilation_controller&#45;&gt;type~type_etkf_solver</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M466.69,-81.02C422.09,-84.38 367.47,-88.5 326.8,-91.57"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="326.48,-88.08 316.77,-92.32 327.01,-95.06 326.48,-88.08"/>
+<text text-anchor="middle" x="406.5" y="-90.4" font-family="Helvetica,sans-Serif" font-size="9.50">etkf_solver</text>
+</g>
+<!-- type~type_observation_manager -->
+<g id="type~~type_assimilation_controller~~InheritsGraph_node4" class="node">
+<title>type~type_observation_manager</title>
+<g id="a_type~~type_assimilation_controller~~InheritsGraph_node4"><a xlink:href="../type/type_observation_manager.html" xlink:title="type_observation_manager">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="346,-66 188,-66 188,-42 346,-42 346,-66"/>
+<text text-anchor="middle" x="267" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_observation_manager</text>
+</a>
+</g>
+</g>
+<!-- type~type_assimilation_controller&#45;&gt;type~type_observation_manager -->
+<g id="type~~type_assimilation_controller~~InheritsGraph_edge2" class="edge">
+<title>type~type_assimilation_controller&#45;&gt;type~type_observation_manager</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M466.99,-65.65C460.9,-65.05 454.86,-64.49 449,-64 418.84,-61.47 385.8,-59.43 356.3,-57.87"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="356.19,-54.36 346.02,-57.33 355.83,-61.35 356.19,-54.36"/>
+<text text-anchor="middle" x="406.5" y="-66.4" font-family="Helvetica,sans-Serif" font-size="9.50">obs_manager</text>
+</g>
+<!-- type~type_upper_bc_record -->
+<g id="type~~type_assimilation_controller~~InheritsGraph_node5" class="node">
+<title>type~type_upper_bc_record</title>
+<g id="a_type~~type_assimilation_controller~~InheritsGraph_node5"><a xlink:href="../type/type_upper_bc_record.html" xlink:title="type_upper_bc_record">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="332,-24 202,-24 202,0 332,0 332,-24"/>
+<text text-anchor="middle" x="267" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_upper_bc_record</text>
+</a>
+</g>
+</g>
+<!-- type~type_assimilation_controller&#45;&gt;type~type_upper_bc_record -->
+<g id="type~~type_assimilation_controller~~InheritsGraph_edge4" class="edge">
+<title>type~type_assimilation_controller&#45;&gt;type~type_upper_bc_record</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M512.52,-62.97C493.93,-56.7 470.39,-49.27 449,-44 414.18,-35.43 375.05,-28.21 342.11,-22.82"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="342.52,-19.34 332.1,-21.2 341.41,-26.25 342.52,-19.34"/>
+<text text-anchor="middle" x="406.5" y="-46.4" font-family="Helvetica,sans-Serif" font-size="9.50">upper_bc_records</text>
+</g>
+<!-- type~type_atmos_state -->
+<g id="type~~type_assimilation_controller~~InheritsGraph_node6" class="node">
+<title>type~type_atmos_state</title>
+<g id="a_type~~type_assimilation_controller~~InheritsGraph_node6"><a xlink:href="../type/type_atmos_state.html" xlink:title="type_atmos_state">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="106,-150 0,-150 0,-126 106,-126 106,-150"/>
+<text text-anchor="middle" x="53" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_atmos_state</text>
+</a>
+</g>
+</g>
+<!-- type~type_ensemble_manager&#45;&gt;type~type_atmos_state -->
+<g id="type~~type_assimilation_controller~~InheritsGraph_edge5" class="edge">
+<title>type~type_ensemble_manager&#45;&gt;type~type_atmos_state</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M192.74,-138C167.82,-138 140.22,-138 116.24,-138"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="116.2,-134.5 106.2,-138 116.2,-141.5 116.2,-134.5"/>
+<text text-anchor="middle" x="147" y="-140.4" font-family="Helvetica,sans-Serif" font-size="9.50">members</text>
+</g>
+<!-- type~type_obs_record -->
+<g id="type~~type_assimilation_controller~~InheritsGraph_node7" class="node">
+<title>type~type_obs_record</title>
+<g id="a_type~~type_assimilation_controller~~InheritsGraph_node7"><a xlink:href="../type/type_obs_record.html" xlink:title="type_obs_record">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="103,-66 3,-66 3,-42 103,-42 103,-66"/>
+<text text-anchor="middle" x="53" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_obs_record</text>
+</a>
+</g>
+</g>
+<!-- type~type_observation_manager&#45;&gt;type~type_obs_record -->
+<g id="type~~type_assimilation_controller~~InheritsGraph_edge6" class="edge">
+<title>type~type_observation_manager&#45;&gt;type~type_obs_record</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M187.96,-54C163.28,-54 136.42,-54 113.27,-54"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="113.26,-50.5 103.26,-54 113.26,-57.5 113.26,-50.5"/>
+<text text-anchor="middle" x="147" y="-56.4" font-family="Helvetica,sans-Serif" font-size="9.50">records</text>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="InheritsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="186pt" height="32pt"
+ viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
+<!-- Type -->
+<g id="node1" class="node">
+<title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a derived type to the parent type which it
+extends. Dashed arrows point from a derived type to the other
+types it contains as a components, with a label listing the name(s) of
+said component(s).
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Inherited by</h3>
+        </div>
+        <div class="card-body">
+          <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: type~~type_assimilation_controller~~InheritedByGraph Pages: 1 -->
+<svg id="typetype_assimilation_controllerInheritedByGraph" width="335pt" height="32pt"
+ viewBox="0.00 0.00 335.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~type_assimilation_controller~~InheritedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>type~~type_assimilation_controller~~InheritedByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 331,-28 331,4 -4,4"/>
+<!-- type~type_assimilation_controller -->
+<g id="type~~type_assimilation_controller~~InheritedByGraph_node1" class="node">
+<title>type~type_assimilation_controller</title>
+<polygon fill="none" stroke="black" points="161,-24 0,-24 0,0 161,0 161,-24"/>
+<text text-anchor="middle" x="80.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">type_assimilation_controller</text>
+</g>
+<!-- type~type_ftcms -->
+<g id="type~~type_assimilation_controller~~InheritedByGraph_node2" class="node">
+<title>type~type_ftcms</title>
+<g id="a_type~~type_assimilation_controller~~InheritedByGraph_node2"><a xlink:href="../type/type_ftcms.html" xlink:title="type_ftcms">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="327,-24 257,-24 257,0 327,0 327,-24"/>
+<text text-anchor="middle" x="292" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms</text>
+</a>
+</g>
+</g>
+<!-- type~type_ftcms&#45;&gt;type~type_assimilation_controller -->
+<g id="type~~type_assimilation_controller~~InheritedByGraph_edge1" class="edge">
+<title>type~type_ftcms&#45;&gt;type~type_assimilation_controller</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M256.87,-12C233.64,-12 201.74,-12 171.51,-12"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="171.33,-8.5 161.33,-12 171.33,-15.5 171.33,-8.5"/>
+<text text-anchor="middle" x="209" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">assimilation</text>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#InheritedByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="InheritedByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="186pt" height="32pt"
+ viewBox="0.00 0.00 185.50 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 181.5,-28 181.5,4 -4,4"/>
+<!-- Type -->
+<g id="node1" class="node">
+<title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24 0,-24 0,0 54,0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="177.5,-24 72.5,-24 72.5,0 177.5,0 177.5,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a derived type to the parent type which it
+extends. Dashed arrows point from a derived type to the other
+types it contains as a components, with a label listing the name(s) of
+said component(s).
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    <br>
+
+    <section>
+    <h2>Components</h2>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Visibility</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+<th></th><th scope="col">Initial</th>        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-pmax~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Pmax</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-pmin~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Pmin</strong></td>
+<td> =</td>
+                <td>-1.0d5</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-pwater_curr"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Pwater_curr</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-rl_down"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Rl_down</strong></td>
+<td> =</td>
+                <td>300.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-rs"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Rs</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ta_last"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Ta_last</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ts_ast"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Ts_ast</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ua_last"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Ua_last</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-albedo~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>albedo</strong></td>
+<td> =</td>
+                <td>0.2d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_entity_hydraulic"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>bc_entity_hydraulic</strong></td>
+<td> =</td>
+                <td>3</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bc_entity_thermal"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>bc_entity_thermal</strong></td>
+<td> =</td>
+                <td>3</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ensemble"></span>
+              type(<a href='type_ensemble_manager.html'>type_ensemble_manager</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ensemble</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-eps_s"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>eps_s</strong></td>
+<td> =</td>
+                <td>0.95d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-etkf_solver"></span>
+              type(<a href='type_etkf_solver.html'>type_etkf_solver</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>etkf_solver</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-has_first_obs"></span>
+              logical,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>has_first_obs</strong></td>
+<td> =</td>
+                <td>.false.</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-is_initialized"></span>
+              logical,
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>is_initialized</strong></td>
+<td> =</td>
+                <td>.false.</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-last_log_time"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>last_log_time</strong></td>
+<td> =</td>
+                <td>-9999.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-latitude~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>latitude</strong></td>
+<td> =</td>
+                <td>35.67d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-log_interval_s"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>log_interval_s</strong></td>
+<td> =</td>
+                <td>300.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-log_io_unit"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>log_io_unit</strong></td>
+<td> =</td>
+                <td>-1</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-longitude~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>longitude</strong></td>
+<td> =</td>
+                <td>139.48d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-n_upper_bc"></span>
+              integer(kind=int32),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>n_upper_bc</strong></td>
+<td> =</td>
+                <td>0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-obs_manager"></span>
+              type(<a href='type_observation_manager.html'>type_observation_manager</a>),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>obs_manager</strong></td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-precip"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>precip</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-qa_last"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>qa_last</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-r_s"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>r_s</strong></td>
+<td> =</td>
+                <td>50.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-tau_atm~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>tau_atm</strong></td>
+<td> =</td>
+                <td>0.6d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-upper_bc_records"></span>
+              type(<a href='type_upper_bc_record.html'>type_upper_bc_record</a>),
+            </td>
+              <td>public,</td>
+            <td>
+              allocatable
+            </td>
+            <td>::</td>
+            <td><strong>upper_bc_records</strong>(:)</td>
+                <td></td>
+                <td></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-utc_offset_hours~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>utc_offset_hours</strong></td>
+<td> =</td>
+                <td>0.0d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-z0~2"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>z0</strong></td>
+<td> =</td>
+                <td>0.01d0</td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-z_ref_u"></span>
+              real(kind=real64),
+            </td>
+              <td>public</td>
+            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>z_ref_U</strong></td>
+<td> =</td>
+                <td>9.2d0</td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    </section>
+    <br>
+    
+
+
+      <section>
+        <h2>Type-Bound Procedures</h2>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-apply_upper_bc"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>apply_upper_bc</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/apply_upper_bc.html'>apply_upper_bc</a>(self, current_time)  
+</h3>
+    
+
+  <p>Sets the top node of every ensemble member to the ERA5 ML135 value at current_time.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_assimilation_controller.html'>type_assimilation_controller</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_time</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-compute_friction_velocity"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>compute_friction_velocity</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/compute_friction_velocity.html'>compute_friction_velocity</a>(self, Ua, u_ast, r_H, r_v)  
+</h3>
+    
+
+  <p>Computes friction velocity u_ast and aerodynamic resistances r_H, r_v.
+<script type="math/tex"> u_* = \kappa U / \ln(z/z_0) </script>, <script type="math/tex"> r_H = \ln^2(z/z_0)/(\kappa^2 U) </script>
+</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_assimilation_controller.html'>type_assimilation_controller</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Ua</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>u_ast</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>r_H</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>r_v</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-compute_moisture_bc"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>compute_moisture_bc</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/compute_moisture_bc.html'>compute_moisture_bc</a>(self, qa, Ua, q_potential)  
+</h3>
+    
+
+  <p>Computes net moisture flux q_potential [m/s] for seepage BC.
+Positive: net evaporation (drying); negative: net infiltration.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_assimilation_controller.html'>type_assimilation_controller</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>qa</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Ua</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>q_potential</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-compute_surface_energy_balance"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>compute_surface_energy_balance</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/compute_surface_energy_balance.html'>compute_surface_energy_balance</a>(self, Ta, qa, r_H, r_v, h_eff, G_ast, T_ref)  
+</h3>
+    
+
+  <p>Computes linearized Robin BC parameters from surface energy balance.
+Linearization is performed around <script type="math/tex"> T_a </script> (NOT <script type="math/tex"> T_s </script>) to avoid the
+self-referential loop <script type="math/tex"> T_\text{ref} = T_s + G^*/h </script> that drives G* -&gt; 0.
+<script type="math/tex"> G(T_a) = R_\text{net}(T_a) - L_v E(T_a) </script> (H=0 at <script type="math/tex"> T_s=T_a </script>)
+<script type="math/tex"> T_\text{ref} = T_a + G(T_a)/h_\text{eff} </script>
+G_ast is the diagnostic ground heat flux evaluated at the actual <script type="math/tex"> T_s </script>.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_assimilation_controller.html'>type_assimilation_controller</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Ta</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>qa</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>r_H</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>r_v</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>h_eff</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>G_ast</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>T_ref</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-compute_surface_energy_diag"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>compute_surface_energy_diag</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/compute_surface_energy_diag.html'>compute_surface_energy_diag</a>(self, Ta, qa, r_H, r_v, Rnet, H_flux, LvE, E_pot_ms)  
+</h3>
+    
+
+  <p>Same physics as compute_surface_energy_balance but returns diagnostic fluxes.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_assimilation_controller.html'>type_assimilation_controller</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Ta</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>qa</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>r_H</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>r_v</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Rnet</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>H_flux</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>LvE</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>E_pot_ms</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-destroy~3"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>destroy</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/destroy_da_controller.html'>destroy_da_controller</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/destroy_da_controller.html'>destroy_da_controller</a>(self)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_assimilation_controller.html'>type_assimilation_controller</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-execute_assimilation_cycle"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>execute_assimilation_cycle</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/execute_assimilation_cycle.html'>execute_assimilation_cycle</a>(self, current_time, current_doy, bc_thermal, bc_hydraulic)  
+</h3>
+    
+
+  <p>Main cycle: ETKF analysis -&gt; surface energy balance -&gt; BC update.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_assimilation_controller.html'>type_assimilation_controller</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_time</strong></td>
+            <td>
+<p>elapsed simulation time [s]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_doy</strong></td>
+            <td>
+<p>day of year (used for solar geometry)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_bc_manager.html'>type_bc_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>bc_thermal</strong></td>
+            <td>
+<p>bc_manager for thermal physics (ID=3 Robin)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_bc_manager.html'>type_bc_manager</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>bc_hydraulic</strong></td>
+            <td>
+<p>bc_manager for hydraulic physics (ID=3 Seepage)</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-initialize~9"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/initialize_da_controller.html'>initialize_da_controller</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/initialize_da_controller.html'>initialize_da_controller</a>(self, config, bc_entity_thermal, bc_entity_hydraulic)  
+</h3>
+    
+
+  
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_assimilation_controller.html'>type_assimilation_controller</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              type(<a href='type_da_config.html'>type_da_config</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>config</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>bc_entity_thermal</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>bc_entity_hydraulic</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-propagate_atmosphere"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>propagate_atmosphere</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/propagate_atmosphere.html'>propagate_atmosphere</a>(self, current_time)  
+</h3>
+    
+
+  <p>Performs physical propagation of the 1D atmospheric column using vertical diffusion.
+Uses an implicit (Backward Euler) scheme for stability with 300s time steps.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_assimilation_controller.html'>type_assimilation_controller</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_time</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-read_upper_bc"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>read_upper_bc</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/read_upper_bc.html'>read_upper_bc</a>(self, csv_filename, ref_datetime_str)  
+</h3>
+    
+
+  <p>Reads upper_bc.csv from FTCMS_PROJECT_PATH/Input/.
+Expected header: valid_time,T_upper,q_upper,U_upper</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_assimilation_controller.html'>type_assimilation_controller</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>csv_filename</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              character(len=*),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ref_datetime_str</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-set_surface_state"></span>
+      <h3>
+          procedure, public, pass(self) ::
+  <strong>set_surface_state</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/set_surface_state_controller.html'>set_surface_state_controller</a>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/set_surface_state_controller.html'>set_surface_state_controller</a>(self, Ts, Pwater)  
+</h3>
+    
+
+  <p>Updates surface temperature and water pressure from current FEM solution.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_assimilation_controller.html'>type_assimilation_controller</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Ts</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Pwater</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-update_longwave_radiation"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>update_longwave_radiation</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/update_longwave_radiation.html'>update_longwave_radiation</a>(self, Ta, qa)  
+</h3>
+    
+
+  <p>Estimates downwelling longwave radiation from Ta and qa (Brutsaert 1975).
+<script type="math/tex"> \varepsilon_a = 1.24\,(e_a/T_a)^{1/7} </script>, <script type="math/tex"> R_{l\downarrow} = \varepsilon_a \sigma T_a^4 </script>
+where <script type="math/tex"> e_a </script> [hPa] is the near-surface vapor pressure derived from specific humidity.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_assimilation_controller.html'>type_assimilation_controller</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Ta</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>qa</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-update_solar_radiation"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>update_solar_radiation</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/update_solar_radiation.html'>update_solar_radiation</a>(self, current_doy)  
+</h3>
+    
+
+  <p>Updates self%Rs using Spencer (1971) solar geometry.
+<script type="math/tex"> R_s = S_0 \max(0, \cos\theta_z) \tau </script>
+where <script type="math/tex">\theta_z</script> is solar zenith angle from orbital elements.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_assimilation_controller.html'>type_assimilation_controller</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_doy</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+          <div class="row">
+              <div class="card mt-3">
+    <div class="card-header codesum">
+      <span class="anchor" id="boundprocedure-write_surface_log"></span>
+      <h3>
+          procedure, private, pass(self) ::
+  <strong>write_surface_log</strong>
+        
+      </h3>
+    </div>
+      <ul class="list-group">
+          <li class="list-group-item">
+                    <h3>
+    private  subroutine <a href='../proc/write_surface_log.html'>write_surface_log</a>(self, current_time, current_doy, Ta, qa, Ua)  
+</h3>
+    
+
+  <p>Computes surface energy diagnostics and writes one row to the surface log CSV.</p>
+
+  <h4>Arguments</h4>
+      <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              class(<a href='type_assimilation_controller.html'>type_assimilation_controller</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>self</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_time</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>current_doy</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Ta</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>qa</strong></td>
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" ></span>
+              real(kind=real64),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>Ua</strong></td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+          </li>
+      </ul>
+  </div>
+
+          </div>
+      </section>
+
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">type_assimilation_controller</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_ensemble_manager</span><span class="p">)</span><span class="w">   </span><span class="kd">::</span><span class="w"> </span><span class="n">ensemble</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_observation_manager</span><span class="p">)</span><span class="kd">::</span><span class="w"> </span><span class="n">obs_manager</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_etkf_solver</span><span class="p">)</span><span class="w">        </span><span class="kd">::</span><span class="w"> </span><span class="n">etkf_solver</span>
+<span class="w">        </span><span class="c">! Upper boundary (ERA5 ML135) time series</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">type_upper_bc_record</span><span class="p">),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">upper_bc_records</span><span class="p">(:)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">n_upper_bc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="c">! Surface state updated externally before each cycle</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Ts_ast</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w">   </span><span class="c">! surface temperature [C]</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Pwater_curr</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w">   </span><span class="c">! surface water pressure [Pa]</span>
+<span class="w">        </span><span class="c">! Surface parameters</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">z0</span><span class="w">           </span><span class="o">=</span><span class="w"> </span><span class="mf">0.01d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">z_ref_U</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="mf">9.2d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">eps_s</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="mf">0.95d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">albedo</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="mf">0.2d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Pmin</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">1.0d5</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Pmax</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">r_s</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="mf">0.0d0</span><span class="w">  </span><span class="c">! stomatal resistance [s/m]</span>
+<span class="w">        </span><span class="c">! Radiation/precipitation state</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Rs</span><span class="w">           </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w">   </span><span class="c">! shortwave radiation [W/m2]</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">Rl_down</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="mf">0.0d0</span><span class="w"> </span><span class="c">! downward longwave radiation [W/m2]</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">precip</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w">   </span><span class="c">! precipitation rate [m/s]</span>
+<span class="w">        </span><span class="c">! Solar geometry parameters</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">latitude</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="mf">5.67d0</span><span class="w">  </span><span class="c">! deg N</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">longitude</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="mi">13</span><span class="mf">9.48d0</span><span class="w"> </span><span class="c">! deg E</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">tau_atm</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="mf">0.6d0</span><span class="w">    </span><span class="c">! clear-sky transmittance</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">utc_offset_hours</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span><span class="w"> </span><span class="c">! local time = UTC + offset</span>
+<span class="w">        </span><span class="c">! BC entity IDs</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">bc_entity_thermal</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">bc_entity_hydraulic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">        </span><span class="c">! Surface state log</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">log_io_unit</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w">   </span><span class="kd">::</span><span class="w"> </span><span class="n">last_log_time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">999</span><span class="mf">9.0d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w">   </span><span class="kd">::</span><span class="w"> </span><span class="n">log_interval_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="c">! Stored atmospheric state from last ETKF cycle (for inter-cycle logging)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w">   </span><span class="kd">::</span><span class="w"> </span><span class="n">Ta_last</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w">   </span><span class="kd">::</span><span class="w"> </span><span class="n">qa_last</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">real64</span><span class="p">)</span><span class="w">   </span><span class="kd">::</span><span class="w"> </span><span class="n">Ua_last</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0d0</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">has_first_obs</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">is_initialized</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="w">    </span><span class="k">contains</span>
+<span class="k">        procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">initialize</span><span class="w">         </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">initialize_da_controller</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">destroy</span><span class="w">            </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">destroy_da_controller</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">set_surface_state</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">set_surface_state_controller</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">public</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">execute_assimilation_cycle</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">propagate_atmosphere</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">read_upper_bc</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">apply_upper_bc</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">write_surface_log</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">compute_friction_velocity</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">compute_surface_energy_balance</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">compute_surface_energy_diag</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">compute_moisture_bc</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">update_solar_radiation</span>
+<span class="w">        </span><span class="k">procedure</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="p">,</span><span class="w"> </span><span class="k">pass</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">update_longwave_radiation</span>
+<span class="w">    </span><span class="k">end type </span><span class="n">type_assimilation_controller</span>
+</pre></div>
+
+    </section>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-07-13 12:46 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

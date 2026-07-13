@@ -10,7 +10,7 @@ contains
     !> Initializes the DIA matrix structure from a node-level sparsity pattern.
     !> Detects unique diagonals automatically from the provided row/col indices.
     !>
-    module subroutine initialize_type_matrix_dia(self, num_nodes, row, col, row_blocks, col_blocks)
+    module subroutine initialize_dia(self, num_nodes, row, col, row_blocks, col_blocks)
         implicit none
         class(type_matrix_dia), intent(inout) :: self
         integer(int32), intent(in) :: num_nodes
@@ -90,7 +90,7 @@ contains
 
         self%is_initialized_matrix = .true.
         self%status = MATRIX_STATUS%SUCCESS
-    end subroutine initialize_type_matrix_dia
+    end subroutine initialize_dia
 
     !>
     !> Deallocates all internal arrays of the DIA matrix object.
@@ -146,7 +146,7 @@ contains
             end do
         else
             ! No main diagonal stored, set to zero
-            call diagonal%set(VECTOR_OPS%INS, 0.0_real64)
+            call diagonal%set(VECTOR_OPS%INS, 0.0d0)
         end if
     end subroutine get_diagonal_dia
 
@@ -165,30 +165,6 @@ contains
     end function get_offsets_dia
 
     !>
-    !> Finds the diagonal index for a given row and col.
-    !> Returns -1 if the diagonal is not stored.
-    !>
-    pure module function find_dia(self, row, col) result(index)
-        implicit none
-        class(type_matrix_dia), intent(in) :: self
-        integer(int32), intent(in) :: row, col
-        integer(int32) :: index
-        integer(int32) :: target_offset, i
-
-        index = -1
-        target_offset = col - row
-
-        ! Linear search for the diagonal index
-        ! Since num_diags is small (e.g., 3 for tridiagonal), this is fast.
-        do i = 1, self%num_diags
-            if (self%offsets(i) == target_offset) then
-                index = i
-                return
-            end if
-        end do
-    end function find_dia
-
-    !>
     !> Sets a single value in the DIA matrix.
     !>
     module subroutine set_value_dia(self, op, row, col, value)
@@ -197,44 +173,41 @@ contains
         type(type_constant_id), intent(in) :: op
         integer(int32), intent(in) :: row, col
         real(real64), intent(in) :: value
-        integer(int32) :: diag_idx
+        error stop "Error: set_value is only permitted for dense matrix."
+    end subroutine set_value_dia
+
+    !> Sets a stored entry by its flat (column-major) position in val(:,:) (no search).
+    module subroutine set_value_at_dia(self, op, idx, value)
+        implicit none
+        class(type_matrix_dia), intent(inout), target :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: idx
+        real(real64), intent(in) :: value
+
+        real(real64), pointer, contiguous :: flat(:)
+        integer(int32) :: n
 
         if (.not. MATRIX_OPS%is_valid(op)) then
             self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
-        diag_idx = self%find(row, col)
-
-#ifdef USE_DEBUG
-        if (diag_idx > 0) then
-#endif
-            if (op == MATRIX_OPS%INS) then
-                self%val(row, diag_idx) = value
-            else if (op == MATRIX_OPS%ADD) then
-                self%val(row, diag_idx) = self%val(row, diag_idx) + value
-            else
-                self%status = MATRIX_STATUS%ILL_OPERATIONS
-            end if
-#ifdef USE_DEBUG
-        else
-            ! Attempted to set value in a non-allocated diagonal
+        n = size(self%val)
+        if (.not. value_in_range(idx, 1, n)) then
             self%status = MATRIX_STATUS%OUT_OF_MEMORY
+            return
         end if
-#endif
-    end subroutine set_value_dia
 
-    module subroutine set_value_block_dia(self, op, row, col, row_block, col_block, value)
-        implicit none
-        class(type_matrix_dia), intent(inout) :: self
-        type(type_constant_id), intent(in) :: op
-        integer(int32), intent(in) :: row, col
-        integer(int32), intent(in) :: row_block, col_block
-        real(real64), intent(in) :: value
-
-        ! DIA does not support blocks, treat as scalar
-        call self%set_value(op, row, col, value)
-    end subroutine set_value_block_dia
+        flat(1:n) => self%val
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
+            flat(idx) = value
+        case (MATRIX_OPS%ADD%ID)
+            flat(idx) = flat(idx) + value
+        case default
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end select
+    end subroutine set_value_at_dia
 
     !>
     !> Sets an entire row to a value (only for allocated diagonals).
@@ -246,46 +219,21 @@ contains
         integer(int32), intent(in) :: row
         real(real64), intent(in) :: value
         integer(int32), intent(in), optional :: row_block
-        integer(int32) :: i
 
         if (.not. MATRIX_OPS%is_valid(op)) then
             self%status = MATRIX_STATUS%ILL_OPERATIONS
             return
         end if
 
-        if (op == MATRIX_OPS%INS) then
-            do i = 1, self%num_diags
-                self%val(row, i) = value
-            end do
-        else if (op == MATRIX_OPS%ADD) then
-            do i = 1, self%num_diags
-                self%val(row, i) = self%val(row, i) + value
-            end do
-        else
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
+            self%val(row, :) = value
+        case (MATRIX_OPS%ADD%ID)
+            self%val(row, :) = self%val(row, :) + value
+        case default
             self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
+        end select
     end subroutine set_row_dia
-
-    module subroutine set_all_dia(self, op, value)
-        implicit none
-        class(type_matrix_dia), intent(inout) :: self
-        type(type_constant_id), intent(in) :: op
-        real(real64), intent(in) :: value
-
-        if (.not. MATRIX_OPS%is_valid(op)) then
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-            return
-        end if
-
-        if (op == MATRIX_OPS%INS) then
-            self%val(:, :) = value
-        else if (op == MATRIX_OPS%ADD) then
-            self%val(:, :) = self%val(:, :) + value
-        else
-            self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
-
-    end subroutine set_all_dia
 
     !>
     !> Scales the matrix.
@@ -313,15 +261,13 @@ contains
             return
         end if
 
-        !-------------------------------------------------
-        ! Symmetric Scaling: A_ij <- A_ij * alpha(i) * alpha(j)
-        !-------------------------------------------------
-        if (op == MATRIX_OPS%SCALE_SYMM_DIAG) then
+        select case (op%ID)
+        case (MATRIX_OPS%SCALE_SYMM_DIAG%ID)
+            ! A_ij <- A_ij * alpha(i) * alpha(j)
             !$omp parallel do default(shared) private(i, j, col_idx) schedule(static)
             do j = 1, self%num_diags
                 do i = 1, self%num_rows
                     col_idx = i + self%offsets(j)
-                    ! Check bounds for valid columns
                     if (col_idx >= 1 .and. col_idx <= self%num_cols) then
                         self%val(i, j) = self%val(i, j) * alpha_data(i) * alpha_data(col_idx)
                     end if
@@ -329,11 +275,8 @@ contains
             end do
             !$omp end parallel do
             self%status = MATRIX_STATUS%SUCCESS
-
-            !-------------------------------------------------
-            ! Jacobi Scaling: A_ij <- A_ij * alpha(i)
-            !-------------------------------------------------
-        else if (op == MATRIX_OPS%SCALE_JACOBI) then
+        case (MATRIX_OPS%SCALE_JACOBI%ID)
+            ! A_ij <- A_ij * alpha(i)
             !$omp parallel do default(shared) private(i, j) schedule(static)
             do j = 1, self%num_diags
                 do i = 1, self%num_rows
@@ -342,15 +285,15 @@ contains
             end do
             !$omp end parallel do
             self%status = MATRIX_STATUS%SUCCESS
-        else
+        case default
             self%status = MATRIX_STATUS%ILL_OPERATIONS
-        end if
+        end select
     end subroutine scale_dia
 
     module subroutine zero_all_dia(self)
         implicit none
         class(type_matrix_dia), intent(inout) :: self
-        self%val(:, :) = 0.0_real64
+        self%val(:, :) = 0.0d0
     end subroutine zero_all_dia
 
     module subroutine zero_row_dia(self, row, row_block)
@@ -359,7 +302,7 @@ contains
         integer(int32), intent(in) :: row
         integer(int32), intent(in), optional :: row_block
 
-        self%val(row, :) = 0.0_real64
+        self%val(row, :) = 0.0d0
     end subroutine zero_row_dia
 
     module subroutine display_dia(self, unit_in)
@@ -375,12 +318,50 @@ contains
             do j = 1, self%num_diags
                 col_idx = i + self%offsets(j)
                 if (col_idx >= 1 .and. col_idx <= self%num_cols) then
-                    if (abs(self%val(i, j)) > 1.0e-16_real64) then
+                    if (abs(self%val(i, j)) > 1.0d-16) then
                         write (u, '(2(i0, ", "), es16.8e3)') i, col_idx, self%val(i, j)
                     end if
                 end if
             end do
         end do
     end subroutine display_dia
+
+    module subroutine set_local_matrix_dia(self, op, n_local, indices, row_sys, col_sys, local_data)
+        implicit none
+        class(type_matrix_dia), intent(inout) :: self
+        type(type_constant_id), intent(in) :: op
+        integer(int32), intent(in) :: n_local
+        integer(int32), intent(in) :: indices(:, :)
+        integer(int32), intent(in) :: row_sys, col_sys
+        real(real64), dimension(:, :), intent(in) :: local_data
+        integer(int32) :: i, j, idx, r_idx, d_idx
+
+        select case (op%ID)
+        case (MATRIX_OPS%INS%ID)
+            do j = 1, n_local
+                do i = 1, n_local
+                    idx = indices(i, j)
+                    if (idx > 0) then
+                        r_idx = mod(idx - 1, self%num_rows) + 1
+                        d_idx = (idx - 1) / self%num_rows + 1
+                        self%val(r_idx, d_idx) = local_data(i, j)
+                    end if
+                end do
+            end do
+        case (MATRIX_OPS%ADD%ID)
+            do j = 1, n_local
+                do i = 1, n_local
+                    idx = indices(i, j)
+                    if (idx > 0) then
+                        r_idx = mod(idx - 1, self%num_rows) + 1
+                        d_idx = (idx - 1) / self%num_rows + 1
+                        self%val(r_idx, d_idx) = self%val(r_idx, d_idx) + local_data(i, j)
+                    end if
+                end do
+            end do
+        case default
+            self%status = MATRIX_STATUS%ILL_OPERATIONS
+        end select
+    end subroutine set_local_matrix_dia
 
 end submodule algebra_matrix_dia

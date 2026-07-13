@@ -85,6 +85,40 @@ contains
                         configs(num_active)%values(1, i) = physics_data%values(i)%values(1)
                         configs(num_active)%values(2, i) = physics_data%values(i)%values(2)
                     end do
+
+                case (HYDRAULIC_BC_TYPES%SEEPAGE%ID)
+                    configs(num_active)%num_variables = 3
+                    call allocate_array(configs(num_active)%time_points, &
+                                        configs(num_active)%num_time_points)
+                    call allocate_array(configs(num_active)%values, &
+                                        configs(num_active)%num_variables, &
+                                        configs(num_active)%num_time_points)
+
+                    do i = 1, configs(num_active)%num_time_points
+                        configs(num_active)%time_points(i) = physics_data%values(i)%time
+
+                        if (.not. allocated(physics_data%values(i)%values)) then
+                            error stop 'Seepage BC requires three values [q_pot m/s, Pmin Pa, Pmax Pa].'
+                        end if
+                        if (size(physics_data%values(i)%values) < 3) then
+                            error stop 'Seepage BC requires at least three values [q_pot m/s, Pmin Pa, Pmax Pa].'
+                        end if
+
+                        configs(num_active)%values(1, i) = physics_data%values(i)%values(1)
+                        configs(num_active)%values(2, i) = physics_data%values(i)%values(2)
+                        configs(num_active)%values(3, i) = physics_data%values(i)%values(3)
+                    end do
+
+                case (THERMAL_BC_TYPES%ATMOSPHERIC%ID, HYDRAULIC_BC_TYPES%ATMOSPHERIC%ID)
+                    ! Atmospheric BC: initialized to zeros; DA controller updates each cycle.
+                    configs(num_active)%num_variables = 3
+                    configs(num_active)%bc_data_kind = BC_DATA_PROVIDERS%CONSTANT
+                    configs(num_active)%num_time_points = 1
+                    call allocate_array(configs(num_active)%time_points, 1)
+                    call allocate_array(configs(num_active)%values, 3, 1)
+                    configs(num_active)%time_points(1) = 0.0d0
+                    configs(num_active)%values(:, 1) = 0.0d0
+
                 case default
                     configs(num_active)%num_variables = 0
                 end select
@@ -118,8 +152,23 @@ contains
             config%ic_kind = IC_METHODS%to_object(condition_data%type)
             if (config%ic_kind == IC_METHODS%UNIFORM) then
                 config%value = condition_data%value
-            else
-                ! Handle other IC methods if needed
+            else if (config%ic_kind == IC_METHODS%FROM_FILE) then
+                block
+                    integer(int32) :: k, field_idx
+                    field_idx = -1
+                    if (allocated(input%geometry%point_data_names)) then
+                        do k = 1, size(input%geometry%point_data_names)
+                            if (trim(input%geometry%point_data_names(k)) == &
+                                trim(condition_data%field_name)) then
+                                field_idx = k
+                                exit
+                            end if
+                        end do
+                    end if
+                    if (field_idx > 0) then
+                        allocate (config%values, source=input%geometry%vtk%point_field_values(:, field_idx))
+                    end if
+                end block
             end if
         end associate
 
@@ -132,7 +181,7 @@ contains
         type(type_config_acceleration), intent(inout) :: config
 
         config%num_dofs = input%geometry%vtk%num_points
-        config%method = ACCELERATION_METHODS%AITKEN
+        config%method = ACCELERATION_METHODS%NONE
         config%min_relaxation = 0.1d0
         config%max_relaxation = 1.0d0
 
@@ -172,11 +221,20 @@ contains
 
             if (config%active) then
                 call config%reset()
+                config%active = .true.
                 config%iter_min = time_control%adaptive_stepping%iter_min
                 config%iter_max = time_control%adaptive_stepping%iter_max
                 config%scale_up = time_control%adaptive_stepping%scale_up
                 config%scale_down = time_control%adaptive_stepping%scale_down
                 config%scale_retry = time_control%adaptive_stepping%scale_retry
+                config%use_error_control = time_control%adaptive_stepping%use_error_control
+                config%error_rtol = time_control%adaptive_stepping%error_relative_tolerance
+                config%pi_k_p = time_control%adaptive_stepping%proportional_gain
+                config%pi_k_i = time_control%adaptive_stepping%integral_gain
+                config%safety_factor = time_control%adaptive_stepping%safety_factor
+                config%max_growth_rate = time_control%adaptive_stepping%max_growth_rate
+                config%max_dT_per_step = time_control%adaptive_stepping%max_temperature_change_per_step
+                config%max_relative_change_per_step = time_control%adaptive_stepping%max_relative_change_per_step
 
                 time_unit = TIME_UNITS%to_object(time_control%time_stepping%unit)
                 time_conv_coeff = time_unit%value
