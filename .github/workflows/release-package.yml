@@ -53,7 +53,6 @@ jobs:
         if: steps.dependency-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
-          source /opt/intel/oneapi/setvars.sh
           cmake -S cmake/ci-dependencies -B CMakeBuild/ci-dependencies -G Ninja \
             -DFTCMS_DEPENDENCY_PREFIX="${DEPENDENCY_PREFIX}" \
             -DCMAKE_Fortran_COMPILER=ifx \
@@ -64,7 +63,6 @@ jobs:
       - name: Build release package
         shell: bash
         run: |
-          source /opt/intel/oneapi/setvars.sh
           cmake -S . -B CMakeBuild/release -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_Fortran_COMPILER=ifx \
