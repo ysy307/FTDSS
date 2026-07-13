@@ -170,11 +170,9 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: temperature_history
         real(real64), pointer, contiguous, dimension(:) :: pressure_history
         real(real64), pointer, contiguous, dimension(:) :: porosity_history
-        real(real64), pointer, contiguous, dimension(:) :: ice_history
         real(real64) :: Uj
         integer(int32) :: j, n_hist
 
-        nullify (ice_history)
         call state%get(temperature_history=temperature_history, &
                        pressure_history=pressure_history, &
                        porosity_history=porosity_history)
@@ -184,19 +182,6 @@ contains
         if (.not. associated(pressure_history)) return
         if (.not. associated(porosity_history)) return
         n_hist = min(size(bdf_coeffs), size(temperature_history), size(pressure_history), size(porosity_history))
-
-        ! A1 Clapeyron closure: when the state carries the prognostic ice
-        ! history (Gauss points of elements incident to a pressure-constrained
-        ! node only, see governing_base lerp_ice), each history level's ice is
-        ! substituted after the equilibrium recomputation below - at those
-        ! nodes P_hist = P_eq(T_hist), so the equilibrium yields ~0 ice and the
-        ! latent-heat content -Lf*rho_i*Qi would vanish from U_j. The j = 1
-        ! level needs no substitution: it evaluates `state` directly, whose
-        ! ice_content already IS the prognostic value plus the in-step local
-        ! phase change (see ftcms override_prognostic_ice) - the T-dependence
-        ! of that term is what carries the apparent (latent) heat capacity of
-        ! this residual. Unset history: bit-identical equilibrium path.
-        call state%ice_content_history%get(ice_history)
 
         ! Copy once: only T/P/porosity vary over the BDF history; the other state
         ! fields (e.g. clay fraction) are constant, so the deep copy is hoisted
@@ -214,16 +199,11 @@ contains
                 call local_state%pressure%set(pressure_history(j))
                 call local_state%porosity%set(porosity_history(j))
                 call self%update_water_phases(material_id, local_state)
-                if (associated(ice_history)) then
-                    if (j <= size(ice_history)) call local_state%ice_content%set(ice_history(j))
-                end if
                 call self%calc_enthalpy_density(material_id, local_state, Uj)
 
                 dU_dt = dU_dt + bdf_coeffs(j) * Uj
             end do
         end if
-
-        nullify (ice_history)
 
     end subroutine compute_transient_term_thermal
 
@@ -261,7 +241,6 @@ contains
         ! Secant variables
         real(real64) :: C_TT_current, C_TT_old, C_TT_secant, dT
         type(type_state) :: temp_state
-        real(real64), pointer, contiguous, dimension(:) :: ice_history
         integer(int32) :: use_scheme
         ! Minimum |T^m - T^n| for evaluating the chord heat capacity. Below this the
         ! tangent is the correct slope and the chord would be ill-conditioned.
@@ -355,21 +334,6 @@ contains
                 call temp_state%copy(state)
                 call temp_state%temperature%set(temperature_history(2))
                 call self%update_water_phases(material_id, temp_state)
-                ! A1 Clapeyron closure: the chord's lower point H(T^n, p^m)
-                ! must use the level-2 prognostic ice, not the equilibrium ice
-                ! recomputed above (which is ~0 under the pressure constraint).
-                ! The upper point C_TT_current already uses the current state
-                ! ice (prognostic + in-step local phase change), so with this
-                ! substitution the chord numerator spans exactly the latent
-                ! heat the residual dU/dt sees between the same two levels -
-                ! the chord-stabilized capacity stays consistent with the
-                ! Qi_state(T)-driven apparent heat capacity instead of
-                ! under-estimating it. Unset history: bit-identical.
-                call state%ice_content_history%get(ice_history)
-                if (associated(ice_history)) then
-                    if (size(ice_history) >= 2) call temp_state%ice_content%set(ice_history(2))
-                end if
-                nullify (ice_history)
                 call self%calc_enthalpy_density(material_id, temp_state, C_TT_old)
                 C_TT_secant = (C_TT_current - C_TT_old) / dT
 

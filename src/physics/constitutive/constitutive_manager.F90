@@ -53,7 +53,6 @@ module physics_constitutive_manager
         procedure, public :: calc_KlT
         procedure, public :: calc_Kvh
         procedure, public :: calc_KvT
-        procedure, public :: calc_cryo_suction
         procedure, public :: calc_cryo_suction_deriv_T
         procedure, public :: calc_lscheme_capacity
         procedure, public :: calc_suction_weights
@@ -452,16 +451,6 @@ contains
 
         call self%models(self%materials_id_map(material_id))%calc_KvT(state, KvT)
     end subroutine calc_KvT
-
-    subroutine calc_cryo_suction(self, material_id, state, psi_cryo)
-        implicit none
-        class(type_constitutive_manager), intent(in) :: self
-        integer(int32), intent(in) :: material_id
-        type(type_state), intent(in) :: state
-        real(real64), intent(inout) :: psi_cryo
-
-        call self%models(self%materials_id_map(material_id))%calc_cryo_suction(state, psi_cryo)
-    end subroutine calc_cryo_suction
 
     subroutine calc_cryo_suction_deriv_T(self, material_id, state, deriv)
         implicit none

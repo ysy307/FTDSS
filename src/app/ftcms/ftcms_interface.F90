@@ -98,63 +98,6 @@ module app_ftcms
         ! LTE estimate). -1 when the log is not open (non-root ranks).
         integer(int32) :: solver_history_unit = -1
 
-        ! Global mass-bias acceptance gate (conserved-mode nonlinear loop). Adds
-        ! |sum_i R_H,i| * dt <= mass_bias_tolerance * mass_ref as an AND condition
-        ! on top of the standard conserved-quantity convergence check, to prevent
-        ! the FEM partition-of-unity bias (Sigma R_H = net spurious mass rate,
-        ! valid when all hydraulic boundaries are zero-flux) from accumulating
-        ! over many accepted steps. See ftcms_solve.F90 for the acceptance logic
-        ! and ftcms_base.F90:compute_mass_reference_ftcms for M_ref. Off by
-        ! default; enabled per project via solver_settings.nonlinear_solver.
-        ! convergence.conserved.enable_mass_bias_gate.
-        real(real64) :: mass_ref = 0.0d0
-        real(real64) :: mass_bias_tolerance = 1.0d-6
-        logical :: enable_mass_bias_gate = .false.
-        ! Rate-form (Harlan/Hansson) freezing closure switch; mirrors the
-        ! constitutive module switch (models_phase_change_fusion) and gates the
-        ! nodal/GP ice-history plumbing below. Prototype: see
-        ! design_rate_form_closure.md.
-        logical :: enable_rate_form_freezing = .false.
-        ! Diagnostic only: last evaluated mass_bias/mass_ref ratio, logged to
-        ! solver_history.log regardless of enable_mass_bias_gate.
-        real(real64) :: mass_bias_ratio_last = 0.0d0
-
-        ! A1 prototype closure: prognostic ice content + Clapeyron pressure
-        ! constraint (see design memo referenced in basic_interface.F90). When
-        ! enabled, hydraulic-frozen nodes have their pressure DOF pinned each
-        ! nonlinear iteration to P_eq(T) = -psi_cryo(T) (ftcms_boundary.F90:
-        ! apply_clapeyron_pressure_constraint), and Qi is advanced from the
-        ! excluded mass residual accumulated INSIDE the nonlinear loop
-        ! (accumulate_prognostic_ice_flux; the fringe deposition dynamics is
-        ! stiff - K impedance shuts the inflow down on a sub-dt time scale -
-        ! so the ice/flux coupling must be solved implicitly as part of the
-        ! Picard fixed point, not applied explicitly after the step), then
-        ! finalized once per accepted step (apply_prognostic_ice_update)
-        ! instead of being re-derived every iteration from the equilibrium
-        ! Theta(psi_cap) closure. Off by default; bit-identical to the
-        ! pre-existing behavior when .false.
-        logical :: enable_clapeyron_pressure_constraint = .false.
-        !> Per-node active-set flag (pressure-constrained "frozen" state),
-        !> refreshed every nonlinear iteration. Size num_nodes.
-        logical, allocatable :: clapeyron_frozen_mask(:)
-        !> Raw hydraulic residual F_H saved at each constrained node immediately
-        !> before its row is overwritten by the constraint (i.e. before it would
-        !> otherwise be zeroed like a Dirichlet BC row); consumed by
-        !> apply_prognostic_ice_update to advance Qi. Size num_nodes.
-        real(real64), allocatable :: clapeyron_R_H_raw(:)
-        !> Lumped nodal control volume V_i = sum over incident elements of
-        !> (element measure / n_local_nodes), computed once at initialization.
-        real(real64), allocatable :: clapeyron_node_volume(:)
-        !> Within-step accumulator of the residual-driven (flux-transport) ice
-        !> increment at constrained nodes [volumetric ice fraction]. Advanced by
-        !> accumulate_prognostic_ice_flux every nonlinear iteration with the
-        !> conserved relaxation factor as damping; reset to zero at the start of
-        !> every time-step attempt. At the Picard fixed point the constrained
-        !> nodes' mass residual vanishes and the accumulator stops moving, i.e.
-        !> the frozen-node continuity equation is solved with Qi as the local
-        !> unknown. Size num_nodes.
-        real(real64), allocatable :: clapeyron_dQi_flux(:)
-
         type(type_control) :: control
         type(type_output_manager) :: output
 
@@ -198,7 +141,6 @@ module app_ftcms
         procedure, public, pass(self) :: prescribe_dirichlet => prescribe_dirichlet_ftcms
         procedure, private, pass(self) :: freeze_physics_dofs => freeze_physics_dofs_ftcms
         procedure, private, pass(self) :: zero_frozen_increment => zero_frozen_increment_ftcms
-        procedure, private, pass(self) :: apply_clapeyron_pressure_constraint => apply_clapeyron_pressure_constraint_ftcms
         procedure, private, pass(self) :: prescribe_essential_bc_generic
         procedure, private, pass(self) :: apply_natural_bc_generic
         procedure, private, pass(self) :: apply_essential_bc_generic
@@ -214,10 +156,7 @@ module app_ftcms
         procedure, private, pass(self) :: apply_phase_change_temperature_correction => &
             apply_phase_change_temperature_correction_ftcms
         procedure, private, pass(self) :: update_nodal_phases => update_nodal_phases_ftcms
-        procedure, private, pass(self) :: apply_prognostic_ice_update => apply_prognostic_ice_update_ftcms
-        procedure, private, pass(self) :: accumulate_prognostic_ice_flux => accumulate_prognostic_ice_flux_ftcms
         procedure, private, pass(self) :: compute_nodal_conserved => compute_nodal_conserved_ftcms
-        procedure, private, pass(self) :: compute_mass_reference => compute_mass_reference_ftcms
         procedure, public, pass(self) :: compute_lte_error => compute_lte_error_ftcms
         procedure, public, pass(self) :: nonlinear_residual_norm => nonlinear_residual_norm_ftcms
         procedure, public, pass(self) :: update_variables => update_variables_ftcms
@@ -312,21 +251,6 @@ module app_ftcms
             type(type_constant_id), intent(in) :: frozen_physics
         end subroutine zero_frozen_increment_ftcms
 
-        !> A1 prototype closure (see enable_clapeyron_pressure_constraint):
-        !> classify every hydraulic node as pressure-constrained ("frozen") when
-        !> psi_cryo(T) > psi_cap(P) or Qi > 0, and unconstrained otherwise. For
-        !> each constrained node, save the raw (pre-constraint) hydraulic residual
-        !> into clapeyron_R_H_raw, then prescribe P = P_eq(T) = -psi_cryo(T) by
-        !> writing the pressure DOF directly and zeroing the matrix row / RHS
-        !> exactly like a Dirichlet BC row (see apply_essential_bc_generic).
-        !> Called every nonlinear iteration from apply_bc (T moves each
-        !> iteration, so P_eq(T) must be re-prescribed). Monolithic coupling
-        !> only (no-op when staggered), matching freeze_physics_dofs_ftcms.
-        module subroutine apply_clapeyron_pressure_constraint_ftcms(self)
-            implicit none
-            class(type_ftcms), intent(inout) :: self
-        end subroutine apply_clapeyron_pressure_constraint_ftcms
-
         module subroutine solve_ftcms(self)
             import :: type_ftcms
             implicit none
@@ -389,41 +313,6 @@ module app_ftcms
             class(type_ftcms), intent(inout) :: self
         end subroutine update_nodal_phases_ftcms
 
-        !> A1 prototype closure (see enable_clapeyron_pressure_constraint):
-        !> advance the prognostic ice content Qi at every pressure-constrained
-        !> node, once per ACCEPTED step (called from run_ftcms right before
-        !> shift(), so the updated Qi becomes part of the BDF history propagated
-        !> into the next step). The new prognostic value is
-        !>   Qi_prog^{n+1} = [Qi_prog^n
-        !>                    + (rho_w/rho_i)*max(0, theta_w(T_n) - theta_w(T_conv))]
-        !>                   + Delta Qi
-        !> where the bracket is the accepted-iterate state ice (step-start
-        !> prognostic value plus the confirmed in-step local phase change - the
-        !> same closure the nonlinear loop assembled with, see
-        !> override_prognostic_ice in ftcms_base.F90) and Delta Qi is the pure
-        !> flux-transport increment from the excluded mass residual saved by
-        !> apply_clapeyron_pressure_constraint. See ftcms_base.F90 for the full
-        !> sign derivation of Delta Qi from R_H,i. Monolithic coupling only
-        !> (no-op when staggered).
-        module subroutine apply_prognostic_ice_update_ftcms(self)
-            implicit none
-            class(type_ftcms), intent(inout) :: self
-        end subroutine apply_prognostic_ice_update_ftcms
-
-        !> Accumulate the residual-driven ice increment at constrained nodes
-        !> inside the nonlinear loop (one call per Picard iteration):
-        !> \( dQi_i \mathrel{+}= \omega\,(\rho_w/\rho_i)\, R_{H,i}\, \Delta t / V_i \)
-        !> with \(\omega\) the conserved relaxation factor. The fringe ice
-        !> deposition is stiff (impedance shuts the inflow down on a sub-dt
-        !> time scale), so the coupling is solved implicitly as part of the
-        !> Picard fixed point: the accumulator stops moving exactly when the
-        !> constrained nodes' mass residual vanishes. Monolithic coupling only
-        !> (no-op when staggered or flag off).
-        module subroutine accumulate_prognostic_ice_flux_ftcms(self)
-            implicit none
-            class(type_ftcms), intent(inout) :: self
-        end subroutine accumulate_prognostic_ice_flux_ftcms
-
         !> Evaluate the per-node conserved quantities (volumetric enthalpy density
         !> and pore-water effective density) at the current iterate, for the
         !> conserved-quantity convergence norm and the Richardson error estimate.
@@ -433,16 +322,6 @@ module app_ftcms
             real(real64), allocatable, intent(inout) :: enthalpy(:)
             real(real64), allocatable, intent(inout) :: density(:)
         end subroutine compute_nodal_conserved_ftcms
-
-        !> One-time integral of the mixed water-equivalent content Theta over the
-        !> whole domain, M_ref = \( \int_\Omega \Theta \, d\Omega \), used as the
-        !> reference scale of the global mass-bias acceptance gate. See ftcms_base.F90
-        !> for the mathematical definition and the lumped-quadrature approximation used.
-        module function compute_mass_reference_ftcms(self) result(m_ref)
-            implicit none
-            class(type_ftcms), intent(inout) :: self
-            real(real64) :: m_ref
-        end function compute_mass_reference_ftcms
 
         !> Relative local-truncation-error estimate of the just-converged step, for
         !> the error-controlled (PI) adaptive time stepping.

@@ -9,6 +9,8 @@ option(BUILD_TESTING "Build the testing tree" OFF)
 option(ENABLE_OPENMP "Enable OpenMP support" ON)
 option(ENABLE_MKL "Enable MKL support" ON)
 option(ENABLE_MPI "Enable MPI support" ON)
+option(FTCMS_PORTABLE_BUILD "Avoid host-specific CPU instructions" OFF)
+option(FTCMS_BUNDLE_RUNTIME "Bundle non-system runtime libraries when installing" OFF)
 
 # 出力先ディレクトリを統一
 set(CMAKE_Fortran_MODULE_DIRECTORY ${PROJECT_BINARY_DIR}/.mod)
@@ -44,6 +46,57 @@ set_target_properties(FTCMS PROPERTIES LINKER_LANGUAGE Fortran)
 # 必要なフラグ（インクルードパスやOpenMP等）もターゲット経由で自動伝搬する
 target_link_libraries(FTCMS PRIVATE SOLVER::FTCMS)
 
+include(GNUInstallDirs)
+
+if(FTCMS_BUNDLE_RUNTIME)
+    set(ftcms_runtime_directories
+        ${CMAKE_Fortran_IMPLICIT_LINK_DIRECTORIES}
+        ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES}
+        ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES}
+    )
+    if(WIN32)
+        list(APPEND ftcms_runtime_directories "$ENV{PATH}")
+    endif()
+    list(REMOVE_DUPLICATES ftcms_runtime_directories)
+
+    install(TARGETS FTCMS
+        RUNTIME_DEPENDENCY_SET ftcms_runtime
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+
+    install(RUNTIME_DEPENDENCY_SET ftcms_runtime
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+        DIRECTORIES ${ftcms_runtime_directories}
+        PRE_EXCLUDE_REGEXES
+            "^api-ms-"
+            "^ext-ms-"
+            "^ld-linux"
+            "^libc\\.so"
+            "^libdl\\.so"
+            "^libgcc_s\\.so"
+            "^libm\\.so"
+            "^libpthread\\.so"
+            "^librt\\.so"
+            "^libstdc\\+\\+\\.so"
+        POST_EXCLUDE_REGEXES
+            ".*[Ww][Ii][Nn][Dd][Oo][Ww][Ss][/\\\\][Ss][Yy][Ss][Tt][Ee][Mm]32[/\\\\].*"
+    )
+
+    if(UNIX)
+        set_target_properties(FTCMS PROPERTIES
+            BUILD_WITH_INSTALL_RPATH ON
+            INSTALL_RPATH "$ORIGIN"
+        )
+    endif()
+else()
+    install(TARGETS FTCMS
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+endif()
+
+install(FILES cmake/package/README.md DESTINATION .)
+install(FILES LICENSE DESTINATION .)
+
 if(ENABLE_MPI AND MPI_Fortran_FOUND)
     target_link_libraries(FTCMS PRIVATE MPI::MPI_Fortran)
     add_custom_target(run
@@ -59,6 +112,11 @@ else()
     )
 endif()
 
+if(FTCMS_BUNDLE_RUNTIME AND UNIX AND NOT APPLE)
+    # Keep $ORIGIN effective for indirect Intel runtime dependencies.
+    target_link_libraries(FTCMS PRIVATE "-Wl,--disable-new-dtags")
+endif()
+
 # ====================================================================
 # 5. Testing
 # ====================================================================
@@ -66,3 +124,12 @@ if(BUILD_TESTING)
     enable_testing()
     add_subdirectory(test)
 endif()
+
+set(CPACK_PACKAGE_NAME "FTCMS")
+set(CPACK_PACKAGE_FILE_NAME "FTCMS-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
+if(WIN32)
+    set(CPACK_GENERATOR "ZIP")
+else()
+    set(CPACK_GENERATOR "TGZ")
+endif()
+include(CPack)

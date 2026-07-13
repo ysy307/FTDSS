@@ -17,20 +17,6 @@ module physics_governing_hydraulic
         integer(int32) :: computation_dimension
         logical :: enable_vapor_transport = .true.
         logical :: enable_fringe_subcell_quadrature = .true.
-        logical :: enable_fringe_K_averaging = .false.
-        !> Internodal (element-arithmetic) evaluation of the hydraulic
-        !> conductivity: D_HH and D_HT are evaluated at the element NODES and
-        !> arithmetically averaged over the element, instead of being evaluated
-        !> pointwise at the Gauss points. This is the flux discretization used by
-        !> the finite-difference/lumped codes the freezing model was calibrated
-        !> against (HYDRUS-1D): across a freezing fringe, where K falls by orders
-        !> of magnitude within one element, the Gauss-point (Galerkin) stiffness
-        !> is dominated by the small value and shuts the flux off, whereas the
-        !> arithmetic internodal average keeps the element conductance of the
-        !> order of the warm-side value, so liquid keeps migrating into the
-        !> already-frozen zone. Off by default (bit-identical to the pointwise
-        !> Galerkin evaluation).
-        logical :: enable_nodal_K_averaging = .false.
         real(real64), allocatable :: iteration_capacity_bound(:)
         type(type_constitutive_manager) :: physics
     contains
@@ -44,7 +30,6 @@ module physics_governing_hydraulic
         ! --- Coefficient Computation Procedures ---
         procedure, pass(self), public :: compute_diffusion_term => compute_diffusion_term_hydraulic
         procedure, pass(self), private :: compute_advective_term => compute_advective_term_hydraulic
-        procedure, pass(self), private :: compute_diffusion_term_K_averaged => compute_diffusion_term_K_averaged_hydraulic
 
         ! --- Coupling Coefficient Procedures ---
         procedure, pass(self), private :: compute_coupling_mass_term => compute_coupling_mass_term_hydraulic
@@ -60,8 +45,6 @@ module physics_governing_hydraulic
         procedure, pass(self), public :: update_water_phases => update_water_phases_hydraulic
         procedure, pass(self), public :: calc_effective_density => calc_effective_density_hydraulic
         procedure, pass(self), public :: calc_effective_density_value => calc_effective_density_value_hydraulic
-        procedure, pass(self), public :: calc_theta_value => calc_theta_value_hydraulic
-        procedure, pass(self), public :: calc_cryo_suction => calc_cryo_suction_hydraulic
 
         procedure, pass(self), private :: compute_C_eq => compute_C_eq_hydraulic
         procedure, pass(self), private :: compute_iteration_capacity => compute_iteration_capacity_hydraulic
@@ -119,44 +102,6 @@ module physics_governing_hydraulic
             type(type_state), intent(inout) :: state
             real(real64), intent(inout) :: V_H(:)
         end subroutine compute_advective_term_hydraulic
-
-        !> Path-averaged diffusion coefficients D_HH, D_HT over a nodal temperature range.
-        !>
-        !> \[ \langle D \rangle = \frac{1}{T_{max}-T_{min}} \int_{T_{min}}^{T_{max}} D(T; P, \phi, \dots) \, dT \]
-        !>
-        !> with all state variables other than \(T\) frozen at the values carried by
-        !> state_ref, and the water-phase equilibrium (update_water_phases) re-evaluated
-        !> at every sample temperature. Replaces the pointwise evaluation \(D(T_{gp})\) in
-        !> elements/subcells whose nodal \(T\) range straddles the steep impedance
-        !> transition \(Q(T)\) near \(T_{high}(p_w)\) (see fringe_transition_active in
-        !> hydraulic_matrix.F90), where the impedance \(10^{-\Omega Q(T)}\) is smooth in
-        !> \(T\) but too steep for the standard low-order element Gauss rule to resolve.
-        !>
-        !> Assumptions: state_ref carries a consistent (P, porosity, ...) state;
-        !> T_min <= T_max. Numerical guarantee: the underlying 5-point Gauss-Legendre
-        !> rule on [T_min, T_max] integrates polynomials of degree <= 9 in T exactly;
-        !> no closed-form error bound exists for the true (non-polynomial) impedance
-        !> profile. Cost: O(1) - 5 update_water_phases + compute_diffusion_term
-        !> (+ compute_coupling_diffusion_term when need_D_HT) evaluations, independent
-        !> of mesh size. Failure behavior: none (pure evaluation, no iteration).
-        module subroutine compute_diffusion_term_K_averaged_hydraulic(self, material_id, state_ref, T_min, T_max, &
-                                                                       need_D_HT, D_HH_avg, D_HT_avg)
-            implicit none
-            class(type_hydraulic), intent(in) :: self
-            integer(int32), intent(in) :: material_id
-            !> Reference state supplying all fixed (non-temperature) fields.
-            type(type_state), intent(in) :: state_ref
-            !> Lower bound of the nodal temperature range [degC].
-            real(real64), intent(in) :: T_min
-            !> Upper bound of the nodal temperature range [degC]; T_max >= T_min.
-            real(real64), intent(in) :: T_max
-            !> Skip the D_HT average (left at 0) when the coupling flux is not needed.
-            logical, intent(in) :: need_D_HT
-            !> Path-averaged D_HH [m/s per Pa-equivalent, see compute_diffusion_term].
-            real(real64), intent(inout) :: D_HH_avg
-            !> Path-averaged D_HT [see compute_coupling_diffusion_term]; 0 if .not. need_D_HT.
-            real(real64), intent(inout) :: D_HT_avg
-        end subroutine compute_diffusion_term_K_averaged_hydraulic
 
         ! --- Coupling Coefficient Interfaces ---
         module subroutine compute_coupling_mass_term_hydraulic(self, material_id, state, C_HT)
@@ -240,31 +185,6 @@ module physics_governing_hydraulic
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: rho_eff
         end subroutine calc_effective_density_value_hydraulic
-
-        !> Evaluate the mixed water-equivalent content Theta at the supplied state.
-        !> \[ \Theta = \theta_l + \frac{\rho_i}{\rho_l}\theta_i + \theta_v \] [-]
-        !> (volumetric liquid-water-equivalent fraction). This is the exact storage
-        !> variable whose BDF derivative is assembled into the hydraulic residual by
-        !> compute_transient_term_mixed; used to build the global mass-bias reference
-        !> M_ref = \int_\Omega \Theta \, d\Omega for the mass-bias acceptance gate.
-        !> Phase contents must already be consistent with (T, p_w).
-        module subroutine calc_theta_value_hydraulic(self, state, theta)
-            implicit none
-            class(type_hydraulic), intent(in) :: self
-            type(type_state), intent(in) :: state
-            real(real64), intent(inout) :: theta
-        end subroutine calc_theta_value_hydraulic
-
-        !> Cryogenic suction psi_cryo(T) [Pa] at the given material/state, used by
-        !> the A1 Clapeyron-pressure-constraint closure to evaluate the equilibrium
-        !> pressure P_eq(T) = -psi_cryo(T) prescribed at frozen-constrained nodes.
-        module subroutine calc_cryo_suction_hydraulic(self, material_id, state, psi_cryo)
-            implicit none
-            class(type_hydraulic), intent(in) :: self
-            integer(int32), intent(in) :: material_id
-            type(type_state), intent(in) :: state
-            real(real64), intent(inout) :: psi_cryo
-        end subroutine calc_cryo_suction_hydraulic
 
         !> Compute equivalent specific moisture capacity C_eq = dTheta/dP [1/Pa].
         !> \[ C_{eq} = \frac{\partial\theta_l}{\partial P}

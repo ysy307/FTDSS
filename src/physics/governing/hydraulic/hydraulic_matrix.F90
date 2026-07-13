@@ -39,19 +39,6 @@ contains
     !> C_eq, mixed transient, gravity advection, segregation sink) keep the
     !> standard Gauss rule in all elements.
     !>
-    !> ### Fringe K-averaging
-    !> Even away from \(\phi = 0\), K is not smooth enough for a low-order
-    !> pointwise Gauss rule: the impedance factor \(10^{-\Omega Q(T)}\) rises
-    !> steeply over a narrow band directly below \(T_{high}(p_w)\) on the frozen
-    !> side. When an element/subcell's nodal T range straddles that band
-    !> (fringe_transition_active), D_HH and D_HT are instead evaluated as their
-    !> 1D path average of K(T) over that range (compute_diffusion_term_K_averaged),
-    !> holding every other state variable fixed at the quadrature point's value.
-    !> This REPLACES the pointwise evaluation at the affected points only; the
-    !> weak form and the block Gauss-Seidel (T, p) lagging below are unchanged.
-    !> Controlled by enable_fringe_K_averaging (default on); disabling it restores
-    !> the pointwise rule everywhere.
-    !>
     !> ### Linearization of the T-p coupling
     !> The K_HT block is intentionally left zero: the cryosuction flux
     !> K2(D_HT)*T and the mixed storage dTheta/dt enter the RESIDUAL exactly,
@@ -95,18 +82,9 @@ contains
         real(real64) :: local_vec_res(workspace%num_fe_nodes)
         real(real64) :: work_sink(workspace%num_fe_gauss)
         real(real64) :: work_D_HT(workspace%num_fe_dimension, workspace%num_fe_dimension, workspace%num_fe_gauss)
-        real(real64) :: D_HH_node(workspace%num_fe_nodes), D_HT_node(workspace%num_fe_nodes)
-        real(real64) :: D_HH_elem, D_HT_elem
-        real(real64) :: D_node_tmp(workspace%num_fe_dimension, workspace%num_fe_dimension)
-        logical :: use_nodal_avg
         real(real64) :: work_matrix_coupling(workspace%num_fe_nodes, workspace%num_fe_nodes)
         real(real64) :: D_HT_tmp(workspace%num_fe_dimension, workspace%num_fe_dimension)
         logical :: thermal_target, coupling_flux_needed
-
-        ! --- Fringe K-averaging variables ---
-        logical :: use_K_averaging, fire_avg
-        real(real64) :: T_min_elem, T_max_elem, rho_w_probe, T_high_probe
-        real(real64) :: D_HH_avg, D_HT_avg
 
         n_nodes = workspace%num_fe_nodes
         n_gauss = workspace%num_fe_gauss
@@ -152,58 +130,6 @@ contains
         end if
 
         ! ----------------------------------------------------------------
-        ! 0b. Fringe K-averaging setup: element-level nodal T range, used to
-        !     decide (per Gauss/subcell point, since T_high depends on the
-        !     local P) whether the pointwise K(T) evaluation is replaced by
-        !     its 1D path average over that range. See fringe_transition_active.
-        ! ----------------------------------------------------------------
-        use_K_averaging = self%enable_fringe_K_averaging &
-                          .and. self%physics%has_cryo_transport(workspace%material_id)
-        T_min_elem = 0.0d0
-        T_max_elem = 0.0d0
-        if (use_K_averaging) then
-            T_min_elem = minval(workspace%T_node(1:n_nodes))
-            T_max_elem = maxval(workspace%T_node(1:n_nodes))
-        end if
-
-        ! ----------------------------------------------------------------
-        ! 0b. Internodal (element-arithmetic) conductivity.
-        !
-        ! D_HH and D_HT are evaluated at the element NODES and averaged over the
-        ! element, replacing the pointwise Gauss-point evaluation for the whole
-        ! element (the interface subcell split and the K(T) path average, both of
-        ! which refine the POINTWISE coefficient, are bypassed - they answer a
-        ! different question). Across a freezing fringe K drops by many orders of
-        ! magnitude within one element; the Galerkin stiffness built from
-        ! pointwise K is then dominated by the cold-side value and the element
-        ! conductance collapses, so liquid can no longer migrate into the frozen
-        ! zone once the front has passed. The arithmetic internodal average keeps
-        ! the element conductance of the order of the warm-side value, which is
-        ! the flux discretization of the finite-difference codes this freezing
-        ! model was calibrated against.
-        ! ----------------------------------------------------------------
-        use_nodal_avg = self%enable_nodal_K_averaging .and. self%physics%has_cryo_transport(workspace%material_id)
-        D_HH_elem = 0.0d0
-        D_HT_elem = 0.0d0
-        if (use_nodal_avg) then
-            do i = 1, n_nodes
-                D_node_tmp(:, :) = 0.0d0
-                call self%compute_diffusion_term(workspace%material_id, workspace%state(i), D_node_tmp)
-                D_HH_node(i) = D_node_tmp(1, 1)
-                D_HT_node(i) = 0.0d0
-                if (coupling_flux_needed) then
-                    D_node_tmp(:, :) = 0.0d0
-                    call self%compute_coupling_diffusion_term(workspace%material_id, workspace%state(i), D_node_tmp)
-                    D_HT_node(i) = D_node_tmp(1, 1)
-                end if
-            end do
-            D_HH_elem = sum(D_HH_node(1:n_nodes)) / real(n_nodes, real64)
-            if (coupling_flux_needed) D_HT_elem = sum(D_HT_node(1:n_nodes)) / real(n_nodes, real64)
-            is_cut = .false.
-            n_sub_qps = 0
-        end if
-
-        ! ----------------------------------------------------------------
         ! 1. Gauss loop: continuous-integrand terms at all Gauss points;
         !    diffusion coefficients only for uncut elements.
         ! ----------------------------------------------------------------
@@ -213,48 +139,16 @@ contains
             call self%compute_transient_term_mixed(workspace%material_id, workspace%state_gp(i), &
                                                    workspace%bdf_coeffs, workspace%work_d_dt(i))
 
-            if (use_nodal_avg) then
-                workspace%work_D(:, :, i) = 0.0d0
-                do d = 1, n_dim
-                    workspace%work_D(d, d, i) = D_HH_elem
-                end do
+            if (.not. is_cut) then
+                call self%compute_diffusion_term(workspace%material_id, workspace%state_gp(i), workspace%work_D(:, :, i))
+
                 if (coupling_flux_needed) then
+                    D_HT_tmp(:, :) = 0.0d0
+                    call self%compute_coupling_diffusion_term(workspace%material_id, &
+                                                              workspace%state_gp(i), D_HT_tmp)
                     do d = 1, n_dim
-                        work_D_HT(d, d, i) = D_HT_elem
+                        work_D_HT(d, d, i) = D_HT_tmp(1, 1)
                     end do
-                end if
-            else if (.not. is_cut) then
-                fire_avg = .false.
-                if (use_K_averaging) then
-                    call self%physics%calc_density_water(workspace%state_gp(i), rho_w_probe)
-                    call calc_T_high_celsius(workspace%P_gp(i), rho_w_probe, T_high_probe)
-                    fire_avg = fringe_transition_active(T_min_elem, T_max_elem, T_high_probe)
-                end if
-
-                if (fire_avg) then
-                    call self%compute_diffusion_term_K_averaged(workspace%material_id, workspace%state_gp(i), &
-                                                                 T_min_elem, T_max_elem, coupling_flux_needed, &
-                                                                 D_HH_avg, D_HT_avg)
-                    workspace%work_D(:, :, i) = 0.0d0
-                    do d = 1, n_dim
-                        workspace%work_D(d, d, i) = D_HH_avg
-                    end do
-                    if (coupling_flux_needed) then
-                        do d = 1, n_dim
-                            work_D_HT(d, d, i) = D_HT_avg
-                        end do
-                    end if
-                else
-                    call self%compute_diffusion_term(workspace%material_id, workspace%state_gp(i), workspace%work_D(:, :, i))
-
-                    if (coupling_flux_needed) then
-                        D_HT_tmp(:, :) = 0.0d0
-                        call self%compute_coupling_diffusion_term(workspace%material_id, &
-                                                                  workspace%state_gp(i), D_HT_tmp)
-                        do d = 1, n_dim
-                            work_D_HT(d, d, i) = D_HT_tmp(1, 1)
-                        end do
-                    end if
                 end if
             end if
 
@@ -338,33 +232,13 @@ contains
 
                 eff_weight_sub = sub_qps(q_s)%weight * abs(det_J_sub)
 
-                ! Cut elements already isolate the phi = 0 discontinuity via the
-                ! subcell split; the steep Q(T) impedance rise that motivates
-                ! K-averaging lives strictly on the frozen side of that boundary
-                ! (see hydraulic_matrix.F90 module header / design memo), so the
-                ! same element-level [T_min_elem, T_max_elem] trigger applies here
-                ! (no distinct per-subcell nodal T range is available: subcells
-                ! carry only quadrature points, not their own corner nodes).
-                fire_avg = .false.
-                if (use_K_averaging) then
-                    call self%physics%calc_density_water(state_sub, rho_w_probe)
-                    call calc_T_high_celsius(P_q_sub, rho_w_probe, T_high_probe)
-                    fire_avg = fringe_transition_active(T_min_elem, T_max_elem, T_high_probe)
-                end if
+                coeff_sub_mat(:, :) = 0.0d0
+                call self%compute_diffusion_term(workspace%material_id, state_sub, coeff_sub_mat)
+                D_HH_sub = coeff_sub_mat(1, 1)
 
-                if (fire_avg) then
-                    call self%compute_diffusion_term_K_averaged(workspace%material_id, state_sub, &
-                                                                 T_min_elem, T_max_elem, .true., &
-                                                                 D_HH_sub, D_HT_sub)
-                else
-                    coeff_sub_mat(:, :) = 0.0d0
-                    call self%compute_diffusion_term(workspace%material_id, state_sub, coeff_sub_mat)
-                    D_HH_sub = coeff_sub_mat(1, 1)
-
-                    coeff_sub_mat(:, :) = 0.0d0
-                    call self%compute_coupling_diffusion_term(workspace%material_id, state_sub, coeff_sub_mat)
-                    D_HT_sub = coeff_sub_mat(1, 1)
-                end if
+                coeff_sub_mat(:, :) = 0.0d0
+                call self%compute_coupling_diffusion_term(workspace%material_id, state_sub, coeff_sub_mat)
+                D_HT_sub = coeff_sub_mat(1, 1)
 
                 do j = 1, n_nodes
                     do i = 1, n_nodes
@@ -422,42 +296,5 @@ contains
         end if
 
     end subroutine assemble_local_picard_hydraulic
-
-    !> Decide whether the pointwise K(T) evaluation at an element/subcell is
-    !> replaced by its path average over the nodal range [T_min, T_max]
-    !> (see compute_diffusion_term_K_averaged_hydraulic).
-    !>
-    !> Fires when [T_min, T_max] overlaps the band (T_high - BAND_MARGIN_K, T_high)
-    !> below the freezing isotherm T_high(p_w), AND the element resolves more than
-    !> DT_FLOOR_K of temperature variation (elements narrower than that cannot alias
-    !> the transition, so the pointwise and averaged rules coincide to floating-point
-    !> precision and the extra evaluations would be wasted).
-    !>
-    !> Constants (no free parameters): the Hansson impedance factor used by this
-    !> model is \(10^{-\Omega Q(T)}\) with the calibrated exponent \(\Omega = 7\)
-    !> (see hcf_base.F90 calc_impedance_ratio doc; project/Mizo-xz-Convex/Input/
-    !> Basic.json sets impedance_factor = 7). Prior numerical investigation of this
-    !> model's Q(T) profile (see design memo) found the steep rise of Q from 0 to
-    !> ~1 concentrated within ~0.1 K directly below T_high, i.e. dQ/dT ~ 1/(0.1 K).
-    !> One decade of impedance change requires \(\Delta Q = 1/\Omega\), hence
-    !> \(\Delta T_{decade} = \Delta Q / (dQ/dT) \approx 0.1\,K/\Omega \approx 0.014\,K\);
-    !> DT_FLOOR_K = 0.02 K is that decade-width rounded up (conservative: fires only
-    !> when the element resolves at least one decade of impedance change).
-    !> BAND_MARGIN_K = 1.0 K is a 10x safety margin over the empirical 0.1 K
-    !> transition width, absorbing the nonlinearity of T_high(p_w) across element
-    !> nodes and the arbitrary placement of the mesh relative to the transition.
-    pure function fringe_transition_active(T_min, T_max, T_high) result(fire)
-        implicit none
-        real(real64), intent(in) :: T_min
-        real(real64), intent(in) :: T_max
-        real(real64), intent(in) :: T_high
-        logical :: fire
-
-        real(real64), parameter :: BAND_MARGIN_K = 1.0d0
-        real(real64), parameter :: DT_FLOOR_K = 0.02d0
-
-        fire = (T_min < T_high) .and. (T_max > T_high - BAND_MARGIN_K) .and. (T_max - T_min > DT_FLOOR_K)
-
-    end function fringe_transition_active
 
 end submodule hydraulic_matrix

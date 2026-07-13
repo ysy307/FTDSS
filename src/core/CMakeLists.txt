@@ -229,6 +229,10 @@ target_link_libraries(SOLVER_CORE
     VTK::IOLegacy
 )
 
+if(WIN32)
+    target_link_libraries(SOLVER_CORE PRIVATE Psapi)
+endif()
+
 # ============================================================
 # 6. Project-specific flags (existing functions kept)
 # ============================================================

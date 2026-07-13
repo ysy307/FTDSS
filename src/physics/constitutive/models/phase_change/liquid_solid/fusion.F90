@@ -15,18 +15,6 @@ module models_phase_change_fusion
     private
 
     public :: type_fusion
-    public :: set_rate_form_freezing
-    public :: rate_form_freezing_enabled
-
-    !> Global model-formulation switch for the rate-form (Harlan/Hansson 2004)
-    !> freezing closure: single retention curve theta(h) with h a free unknown
-    !> everywhere, prognostic ice advanced from the freezing-rate relation
-    !> dQi/dT = -(rho_w/rho_i) C(P) (Lf rho_w / T_K), and NO smooth-max
-    !> effective suction. Set exactly once at application initialization
-    !> (before any parallel region) and read-only afterwards; a module switch
-    !> instead of threading a config through every constitutive layer while the
-    !> closure is a prototype (see design_rate_form_closure.md).
-    logical, protected :: rate_form_freezing_enabled = .false.
 
     !>
     !> @brief Model for fusion (melting/freezing) physics.
@@ -91,15 +79,6 @@ contains
         self%ice => ice
     end subroutine initialize_type_fusion
 
-    !> One-time initialization-phase setter of the rate-form closure switch
-    !> (see the module header of rate_form_freezing_enabled).
-    subroutine set_rate_form_freezing(enabled)
-        implicit none
-        logical, intent(in) :: enabled
-
-        rate_form_freezing_enabled = enabled
-    end subroutine set_rate_form_freezing
-
     !---------------------------------------------------------------------------
     ! Ice Calculations
     !---------------------------------------------------------------------------
@@ -131,76 +110,6 @@ contains
 
         call state%temperature%get(temperature)
         call state%pressure%get(pressure)
-
-        ! Rate-form closure: prognostic ice advanced from the freezing-rate
-        ! relation (R1, design_rate_form_closure.md)
-        !   Qi = max(0, Qi_n - (rho_w/rho_i) C(P) (Lf rho_w / T_K) (T - T_n))
-        ! where (T_n, Qi_n) is the step-start state carried by the history
-        ! fields (level 2 = previous). Freezing is active when the cryogenic
-        ! suction exceeds the capillary suction (T < T_f(P)) or ice remains
-        ! from the previous step; melting is the same relation with rising T,
-        ! clipped at zero. States without history (probes, initialization)
-        ! keep their incoming ice content unchanged.
-        if (rate_form_freezing_enabled) then
-            block
-                real(real64), pointer, dimension(:), contiguous :: T_hist, Qi_hist
-                real(real64) :: T_n, Qi_n, T_K, dpsi, psi_shift
-                logical :: has_hist, freezing
-
-                nullify (T_hist); nullify (Qi_hist)
-                call state%temperature_history%get(T_hist)
-                call state%ice_content_history%get(Qi_hist)
-                has_hist = associated(T_hist) .and. associated(Qi_hist)
-                if (has_hist) has_hist = (size(T_hist) >= 2 .and. size(Qi_hist) >= 2)
-
-                if (.not. has_hist) then
-                    call state%ice_content%get(ice_content)
-                    ice_content = max(0.0d0, ice_content)
-                    return
-                end if
-                T_n = T_hist(2)
-                Qi_n = max(0.0d0, Qi_hist(2))
-
-                psi_cap = max(0.0d0, -pressure)
-                psi_cryo = 0.0d0
-                call self%gcc%calc(state, psi_cryo)
-                freezing = (psi_cryo > psi_cap) .or. (Qi_n > 0.0d0)
-                if (.not. freezing) then
-                    ice_content = 0.0d0
-                    return
-                end if
-
-                call self%calc_rho_water(state, rho_w)
-                call self%calc_rho_ice(state, rho_i)
-                if (rho_w <= tiny(1.0d0) .or. rho_i <= tiny(1.0d0)) then
-                    ice_content = Qi_n
-                    return
-                end if
-
-                ! Exact secant of the retention curve along the Clapeyron
-                ! suction shift, instead of the tangent C(h)*dT: the freezing
-                ! increment is the liquid that the retention curve releases when
-                ! the generalized suction rises from psi_cap to psi_cap + dpsi,
-                !   dpsi = (Lf rho_w / T_K) * (T_n - T)   [Pa, > 0 on cooling]
-                ! so   dQi = (rho_w/rho_i) * [theta(psi_cap) - theta(psi_cap+dpsi)].
-                ! The tangent form over-produces ice by a factor of a few on the
-                ! first freezing step of a node (C is evaluated before h has had
-                ! any chance to fall), and that spurious ice dumps its latent
-                ! heat into the column. The secant is exact for any step size and
-                ! reduces to the tangent as dpsi -> 0.
-                T_K = temperature + TtoK
-                if (T_K <= tiny(1.0d0)) T_K = TtoK
-                dpsi = (Lf0 * rho_w / T_K) * (T_n - temperature)
-                psi_shift = max(0.0d0, psi_cap + dpsi)
-                call self%wrf%calc(-psi_cap / (rho_std * g), theta_l_cap)
-                call self%wrf%calc(-psi_shift / (rho_std * g), theta_l_new)
-
-                ice_content = max(0.0d0, Qi_n + (rho_w / rho_i) * (theta_l_cap - theta_l_new))
-                call state%porosity%get(phi)
-                if (phi > 0.0d0) ice_content = min(ice_content, phi)
-            end block
-            return
-        end if
 
         if (temperature < 0.0d0) then
             call self%calc_rho_water(state, rho_w)
@@ -281,37 +190,6 @@ contains
 
         call state%temperature%get(temperature)
         call state%pressure%get(pressure)
-
-        ! Rate-form closure: dQi/dP = 0 (ice is prognostic, not a pointwise
-        ! function of P); dQi/dT is the freezing-rate coefficient of relation
-        ! (R1), which supplies the apparent latent-heat capacity to the
-        ! thermal side (Hansson 2004 Eq. [12]).
-        if (rate_form_freezing_enabled) then
-            block
-                real(real64) :: Qi_cur, dtheta_dh, dtheta_dP, T_K
-                logical :: freezing
-
-                dice_dP = 0.0d0
-                dice_dT = 0.0d0
-
-                psi_cap = max(0.0d0, -pressure)
-                call self%gcc%calc(state, psi_cryo)
-                call state%ice_content%get(Qi_cur)
-                freezing = (psi_cryo > psi_cap) .or. (Qi_cur > 0.0d0)
-                if (.not. freezing) return
-
-                call self%calc_rho_water(state, rho_w)
-                call self%calc_rho_ice(state, rho_i)
-                if (rho_w <= tiny(1.0d0) .or. rho_i <= tiny(1.0d0)) return
-
-                call self%wrf%deriv(-psi_cap / (rho_std * g), dtheta_dh)
-                dtheta_dP = dtheta_dh / (rho_std * g)
-                T_K = temperature + TtoK
-                if (T_K <= tiny(1.0d0)) T_K = TtoK
-                dice_dT = -(rho_w / rho_i) * dtheta_dP * (Lf0 * rho_w / T_K)
-            end block
-            return
-        end if
 
         if (temperature < 0.0d0) then
             call self%calc_rho_water(state, rho_w)
@@ -407,12 +285,6 @@ contains
             psi_cap = 0.0d0
         end if
 
-        ! Rate-form closure: theta_w = theta(h) at the free pressure.
-        if (rate_form_freezing_enabled) then
-            call self%wrf%calc(-psi_cap / (rho_std * g), water_content)
-            return
-        end if
-
         call self%gcc%calc(state, psi_cryo)
         call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
 
@@ -448,16 +320,6 @@ contains
         else
             psi_cap = 0.0d0
             d_psi_cap_dP = 0.0d0
-        end if
-
-        ! Rate-form closure: dtheta/dP = C(h) from the single retention curve
-        ! at the free pressure; the liquid content carries no direct T
-        ! dependence (the T coupling lives in the prognostic-ice rate).
-        if (rate_form_freezing_enabled) then
-            call self%wrf%deriv(-psi_cap / (rho_std * g), d_theta_liquid_dPress)
-            dwater_dP = d_theta_liquid_dPress * (-d_psi_cap_dP) / (rho_std * g)
-            dwater_dT = 0.0d0
-            return
         end if
 
         ! Cryogenic suction
@@ -497,13 +359,6 @@ contains
 
         call state%pressure%get(pressure)
         psi_cap = max(0.0d0, -pressure)
-
-        ! Rate-form closure: the liquid potential is the free pressure itself
-        ! (single retention curve, no cryogenic smooth-max).
-        if (rate_form_freezing_enabled) then
-            psi_eff = psi_cap
-            return
-        end if
 
         psi_cryo = 0.0d0
         call self%gcc%calc(state, psi_cryo)

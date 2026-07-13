@@ -18,12 +18,6 @@ contains
         self%aa_has_prev = .false.
         self%aa_gnorm_prev = -1.0d0
 
-        ! Prognostic-ice flux accumulator restarts from zero on every time-step
-        ! attempt (including dt-retry: Qi current is restored from previous
-        ! below, so the rejected attempt's partially accumulated ice is fully
-        ! discarded with it).
-        if (allocated(self%clapeyron_dQi_flux)) self%clapeyron_dQi_flux(:) = 0.0d0
-
         ! [Important] Compute solver must always be PICARD or NEWTON if not NONE.
         ! Even for linear config (where iter=1 is forced), Picard discretization 
         ! is often the base, but if explicitly NONE, we should respect it.
@@ -279,59 +273,6 @@ contains
                                                       residual_thermal, residual_hydraulic, &
                                                       check_thermal, check_hydraulic)
 
-        ! --------------------------------------------------------------------
-        ! Global mass-bias gate (AND condition on top of the standard conserved
-        ! check above).
-        !
-        ! By the FEM partition of unity (sum_i N_i = 1 pointwise), the nodal sum
-        ! of the hydraulic residual equals the volume integral of its continuous
-        ! integrand: sum_i R_H,i = int_Omega dTheta/dt dOmega - (boundary flux
-        ! contributions). The diffusion/advection/coupling terms integrate to
-        ! zero under the sum (their weak form is sum_i grad(N_i) . V = grad(1) . V
-        ! = 0 pointwise) except for whatever natural (Neumann/Robin) boundary
-        ! terms apply_bc adds on top; with all hydraulic boundaries at zero flux
-        ! (this project) that contribution is exactly zero, so sum_i R_H,i is the
-        ! net rate of change of total water content predicted by this Picard
-        ! iterate. Repeated acceptance of a biased iterate integrates
-        ! sum_i R_H,i * dt of spurious mass every step, which is the observed
-        ! multi-percent long-run drift; the per-block pointwise residual
-        ! tolerance cannot fix this because it is insensitive to the *global*
-        ! (fully cancelling) component of the residual.
-        !
-        ! Units: R_H,i is assembled by workspace%compute_R1(work_d_dt, ...) with
-        ! work_d_dt = dTheta/dt [1/s] (Theta = Qw + (rho_i/rho_w)*Qi + Qv is the
-        ! dimensionless mixed water-equivalent content), so R_H,i carries units of
-        ! [Theta * volume / s] = a volumetric water-equivalent flow rate. Hence
-        ! |sum_i R_H,i| * dt is a volumetric water-equivalent mass, directly
-        ! comparable to M_ref = int_Omega Theta dOmega [same Theta * volume units],
-        ! the total equivalent water volume in the domain at t=0 (see
-        ! compute_mass_reference_ftcms). This holds regardless of whether the mesh
-        ! is 2D (per-unit-thickness) or 3D: both R_H,i and M_ref are built from the
-        ! same element-integration machinery, so their units always match.
-        !
-        ! Only enforced when enable_mass_bias_gate is set (project must confirm
-        ! all hydraulic boundaries are zero-flux); the ratio is always recorded
-        ! for solver_history.log diagnostics regardless of the flag.
-        self%mass_bias_ratio_last = 0.0d0
-        if (check_hydraulic .and. allocated(residual_hydraulic) .and. self%mass_ref > 0.0d0) then
-            block
-                real(real64) :: dt_current, mass_bias
-                dt_current = 0.0d0
-                call self%control%get_dt(dt_current)
-                mass_bias = abs(sum(residual_hydraulic)) * dt_current
-                self%mass_bias_ratio_last = mass_bias / self%mass_ref
-
-                if (self%enable_mass_bias_gate .and. self%control%is_converged() .and. &
-                    self%mass_bias_ratio_last > self%mass_bias_tolerance) then
-                    ! Reject this iterate on the mass-bias criterion alone; the
-                    ! coupled decision (is_ok) is symmetric across active physics
-                    ! in check_convergence_conserved above, so both are reset here.
-                    if (check_thermal) call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
-                    call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
-                end if
-            end block
-        end if
-
         if (allocated(enthalpy)) deallocate (enthalpy)
         if (allocated(density)) deallocate (density)
         if (allocated(residual_thermal)) deallocate (residual_thermal)
@@ -476,13 +417,6 @@ contains
                 ! Update solution with relaxation (adaptive omega for conserved mode,
                 ! Aitken for legacy Picard, damped for Newton).
                 call self%reflect_variables()
-
-                ! A1 closure: absorb the constrained nodes' mass residual into
-                ! the prognostic ice with the same omega damping, BEFORE the
-                ! conserved check so the acceptance sees the deposited ice in
-                ! the density norm (no-op unless the Clapeyron constraint is
-                ! enabled).
-                call self%accumulate_prognostic_ice_flux()
 
                 ! Conserved-quantity convergence (PDF 6.2.4) on the updated state.
                 if (self%control%is_conserved()) call self%solve_time_step_check_convergence_conserved()
@@ -912,10 +846,9 @@ contains
                     omega_used = self%control%get_conserved_relaxation()
                     dq_norm_used = self%control%get_conserved_dq_norm()
                     write (self%solver_history_unit, &
-                           '(I13,1X,ES15.7,1X,ES12.5,1X,I8,1X,I9,1X,F9.5,1X,ES12.5,1X,ES12.5,1X,ES12.5)') &
+                           '(I13,1X,ES15.7,1X,ES12.5,1X,I8,1X,I9,1X,F9.5,1X,ES12.5,1X,ES12.5)') &
                         attempt_counter, time_s + dt_used, dt_used, iter_used, &
-                        merge(1, 0, is_step_converged), omega_used, dq_norm_used, lte_error, &
-                        self%mass_bias_ratio_last
+                        merge(1, 0, is_step_converged), omega_used, dq_norm_used, lte_error
                     flush (self%solver_history_unit)
                 end block
             end if
@@ -932,12 +865,6 @@ contains
                     write (*, '(A,I0,A,ES13.5,A,I0)') '   [STEP] converged: n=', step_counter, &
                         ', t[s]=', time_s, ', nonlinear_iter=', nl_iter
                 end if
-
-                ! A1 prototype closure: advance the prognostic ice content at
-                ! pressure-constrained nodes from the excluded mass residual,
-                ! before the variable history is shifted (no-op unless
-                ! enable_clapeyron_pressure_constraint is set).
-                call self%apply_prognostic_ice_update()
 
                 ! Shift variable history on convergence
                 call self%shift()

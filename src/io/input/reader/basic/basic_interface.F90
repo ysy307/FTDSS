@@ -43,20 +43,6 @@ module io_input_basic
         !> Interface-split subcell quadrature for elements cut by the freezing
         !> interface (parameter-free; disable only for A/B comparison runs).
         logical :: enable_fringe_subcell_quadrature = .true.
-        !> Path-averaged K evaluation across the nodal T range for elements/subcells
-        !> whose T range straddles the steep Q(T) impedance transition below
-        !> T_high(p_w) (parameter-free; disable only for A/B comparison runs).
-        logical :: enable_fringe_K_averaging = .false.
-        logical :: enable_rate_form_freezing = .false.
-        logical :: enable_nodal_K_averaging = .false.
-        !> A1 prototype closure: prescribe P = P_eq(T) = -psi_cryo(T) at hydraulic
-        !> nodes whose cryogenic suction exceeds the capillary suction (or which
-        !> already carry ice), and evolve ice content Qi as a prognostic variable
-        !> from the excluded mass residual instead of the equilibrium Theta(psi_cap)
-        !> closure. Off by default (bit-identical to current behavior when .false.);
-        !> see app/ftcms/ftcms_boundary.F90:apply_clapeyron_pressure_constraint and
-        !> app/ftcms/ftcms_base.F90:apply_prognostic_ice_update.
-        logical :: enable_clapeyron_pressure_constraint = .false.
         character(:), allocatable :: coupling_mode
         logical :: partitioning
     contains
@@ -254,12 +240,6 @@ module io_input_basic
         real(real64) :: atol_density = 1.0d-3
         real(real64) :: rtol_conserved = 1.0d-3
         real(real64) :: residual_eps = 1.0d-1
-        !> Global mass-bias acceptance gate (see FTCMS solve_time_step_check_convergence_conserved).
-        !> Requires |sum_i R_H,i| * dt <= mass_bias_tolerance * M_ref before a conserved-mode
-        !> iterate is accepted. Only valid when all hydraulic boundaries are zero-flux
-        !> (enable_mass_bias_gate must be set explicitly per project; default off).
-        real(real64) :: mass_bias_tolerance = 1.0d-6
-        logical :: enable_mass_bias_gate = .false.
     end type type_convergence
 
     type :: type_nonlinear_solver

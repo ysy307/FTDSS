@@ -1,0 +1,158 @@
+name: Build Release Packages
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      build_windows:
+        description: Build the experimental Windows package
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  linux-ifx:
+    name: Linux (ifx)
+    runs-on: ubuntu-24.04
+    container:
+      image: intel/oneapi-toolkit:2026.0.1-devel-ubuntu22.04
+      options: --user root
+    env:
+      DEPENDENCY_PREFIX: ${{ github.workspace }}/third_party/.local/intel
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        shell: bash
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ca-certificates git ninja-build python3-pip
+          python3 -m pip install --upgrade cmake fypp
+
+      - name: Restore compiled dependencies
+        id: dependency-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DEPENDENCY_PREFIX }}
+          key: dependencies-linux-ifx-2026.0.1-v1-${{ hashFiles('cmake/ci-dependencies/CMakeLists.txt') }}
+
+      - name: Build dependencies
+        if: steps.dependency-cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          source /opt/intel/oneapi/setvars.sh
+          cmake -S cmake/ci-dependencies -B CMakeBuild/ci-dependencies -G Ninja \
+            -DFTCMS_DEPENDENCY_PREFIX="${DEPENDENCY_PREFIX}" \
+            -DCMAKE_Fortran_COMPILER=ifx \
+            -DCMAKE_C_COMPILER=icx \
+            -DCMAKE_CXX_COMPILER=icpx
+          cmake --build CMakeBuild/ci-dependencies --parallel 2
+
+      - name: Build release package
+        shell: bash
+        run: |
+          source /opt/intel/oneapi/setvars.sh
+          cmake -S . -B CMakeBuild/release -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_Fortran_COMPILER=ifx \
+            -DCMAKE_C_COMPILER=icx \
+            -DCMAKE_CXX_COMPILER=icpx \
+            -DBUILD_TESTING=OFF \
+            -DFTCMS_PORTABLE_BUILD=ON \
+            -DFTCMS_BUNDLE_RUNTIME=ON
+          cmake --build CMakeBuild/release --target FTCMS --parallel 2
+          cpack --config CMakeBuild/release/CPackConfig.cmake \
+            -B dist -G TGZ \
+            -D CPACK_PACKAGE_FILE_NAME=FTCMS-linux-x86_64
+
+      - name: Upload Linux package
+        uses: actions/upload-artifact@v4
+        with:
+          name: FTCMS-linux-x86_64
+          path: dist/FTCMS-linux-x86_64.tar.gz
+          if-no-files-found: error
+          retention-days: 14
+
+  windows-ifx:
+    name: Windows (ifx, experimental)
+    if: github.event_name == 'workflow_dispatch' && inputs.build_windows
+    runs-on: windows-latest
+    env:
+      DEPENDENCY_PREFIX: ${{ github.workspace }}\third_party\.local\intel
+      ONEAPI_URL: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/4144bec3-82ce-4672-bd71-5c93a79cd5e7/intel-oneapi-toolkit-2026.1.0.191_offline.exe
+      ONEAPI_COMPONENTS: intel.oneapi.win.ifort-compiler:intel.oneapi.win.mkl.devel:intel.oneapi.win.mpi.devel
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Restore oneAPI
+        id: oneapi-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\Program Files (x86)\Intel\oneAPI\setvars-vcvarsall.bat
+            C:\Program Files (x86)\Intel\oneAPI\compiler
+            C:\Program Files (x86)\Intel\oneAPI\mkl
+            C:\Program Files (x86)\Intel\oneAPI\mpi
+          key: oneapi-windows-2026.1-v1
+
+      - name: Install oneAPI
+        if: steps.oneapi-cache.outputs.cache-hit != 'true'
+        shell: cmd
+        run: scripts\ci\install-oneapi-windows.bat "%ONEAPI_URL%" "%ONEAPI_COMPONENTS%"
+
+      - name: Install fypp
+        shell: cmd
+        run: python -m pip install fypp
+
+      - name: Restore compiled dependencies
+        id: dependency-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DEPENDENCY_PREFIX }}
+          key: dependencies-windows-ifx-2026.1-v1-${{ hashFiles('cmake/ci-dependencies/CMakeLists.txt') }}
+
+      - name: Build dependencies
+        if: steps.dependency-cache.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          call "C:\Program Files (x86)\Intel\oneAPI\setvars-vcvarsall.bat" vs2022
+          if errorlevel 1 exit /b 1
+          cmake -S cmake/ci-dependencies -B CMakeBuild/ci-dependencies -G Ninja -DFTCMS_DEPENDENCY_PREFIX="%DEPENDENCY_PREFIX%" -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl
+          if errorlevel 1 exit /b 1
+          cmake --build CMakeBuild/ci-dependencies --parallel 2
+          if errorlevel 1 exit /b 1
+
+      - name: Build release package
+        shell: cmd
+        run: |
+          call "C:\Program Files (x86)\Intel\oneAPI\setvars-vcvarsall.bat" vs2022
+          if errorlevel 1 exit /b 1
+          cmake -S . -B CMakeBuild/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DBUILD_TESTING=OFF -DFTCMS_PORTABLE_BUILD=ON -DFTCMS_BUNDLE_RUNTIME=ON
+          if errorlevel 1 exit /b 1
+          cmake --build CMakeBuild/release --target FTCMS --parallel 2
+          if errorlevel 1 exit /b 1
+          cpack --config CMakeBuild/release/CPackConfig.cmake -B dist -G ZIP -D CPACK_PACKAGE_FILE_NAME=FTCMS-windows-x86_64
+          if errorlevel 1 exit /b 1
+
+      - name: Upload Windows package
+        uses: actions/upload-artifact@v4
+        with:
+          name: FTCMS-windows-x86_64
+          path: dist/FTCMS-windows-x86_64.zip
+          if-no-files-found: error
+          retention-days: 14

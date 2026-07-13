@@ -12,10 +12,6 @@ submodule(io_input_basic) input_basic_analysis_controls
     character(*), parameter :: coupling_modes_strings(2) = [character(len=16) :: "staggered", "monolithic"]
     character(*), parameter :: partitioning = "partitioning"
     character(*), parameter :: enable_fringe_subcell_quadrature = "enable_fringe_subcell_quadrature"
-    character(*), parameter :: enable_fringe_K_averaging = "enable_fringe_K_averaging"
-    character(*), parameter :: enable_rate_form_freezing = "enable_rate_form_freezing"
-    character(*), parameter :: enable_nodal_K_averaging = "enable_nodal_K_averaging"
-    character(*), parameter :: enable_clapeyron_pressure_constraint = "enable_clapeyron_pressure_constraint"
     !!------------------------------------------------------------------------------------------------------------------------------
 contains
     module subroutine read_analysis_controls(self, json)
@@ -45,22 +41,6 @@ contains
         call get_json_value(json, join(buffer), self%analysis_controls%enable_fringe_subcell_quadrature, &
                     is_required=.false., default_value=.true.)
 
-        buffer(2) = enable_fringe_K_averaging
-        call get_json_value(json, join(buffer), self%analysis_controls%enable_fringe_K_averaging, &
-                    is_required=.false., default_value=.false.)
-
-        buffer(2) = enable_rate_form_freezing
-        call get_json_value(json, join(buffer), self%analysis_controls%enable_rate_form_freezing, &
-                    is_required=.false., default_value=.false.)
-
-        buffer(2) = enable_nodal_K_averaging
-        call get_json_value(json, join(buffer), self%analysis_controls%enable_nodal_K_averaging, &
-                    is_required=.false., default_value=.false.)
-
-        buffer(2) = enable_clapeyron_pressure_constraint
-        call get_json_value(json, join(buffer), self%analysis_controls%enable_clapeyron_pressure_constraint, &
-                    is_required=.false., default_value=.false.)
-
         if (.not. any(self%analysis_controls%is_active(:))) then
             call raise_error(ERROR_CODES%VAR_INVALID, opt=analysis_controls)
         end if
@@ -85,7 +65,6 @@ contains
         write (*, '(a)') "Enable Vapor Transport: "//to_string(self%enable_vapor_transport)
         write (*, '(a)') "Coupling Mode: "//strip(self%coupling_mode)
         write (*, '(a)') "Partitioning: "//to_string(self%partitioning)
-        write (*, '(a)') "Enable Clapeyron Pressure Constraint: "//to_string(self%enable_clapeyron_pressure_constraint)
 
     end subroutine display_analysis_controls
 end submodule input_basic_analysis_controls
