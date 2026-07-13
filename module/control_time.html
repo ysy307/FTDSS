@@ -220,10 +220,10 @@ Handles variable time steps, time unit conversions, and history management for h
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <ul class="list-inline">
-                  <li class="list-inline-item"><a href='module_core.html'>module_core</a></li>
                   <li class="list-inline-item"><a href='control_time_ats.html'>control_time_ats</a></li>
-                  <li class="list-inline-item">stdlib_optval</li>
+                  <li class="list-inline-item"><a href='module_core.html'>module_core</a></li>
                   <li class="list-inline-item"><a href='http://fortranwiki.org/fortran/show/iso_fortran_env'>iso_fortran_env</a></li>
+                  <li class="list-inline-item">stdlib_optval</li>
               </ul>
             </li>
             <li class="list-group-item">
@@ -3365,7 +3365,7 @@ Note: Coefficients include the $1/\Delta t$ scaling.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-config~97"></span>
+              <span class="anchor" id="variable-config~32"></span>
               type(<a href='../type/type_config_time.html'>type_config_time</a>),
             </td>
               <td>private</td>
@@ -3399,7 +3399,7 @@ Note: Coefficients include the $1/\Delta t$ scaling.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-current_time~46"></span>
+              <span class="anchor" id="variable-current_time~5"></span>
               real(kind=real64),
             </td>
               <td>private</td>
@@ -3416,7 +3416,7 @@ Note: Coefficients include the $1/\Delta t$ scaling.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-dt~10"></span>
+              <span class="anchor" id="variable-dt~2"></span>
               real(kind=real64),
             </td>
               <td>private</td>
@@ -3468,7 +3468,7 @@ for one step, but it must not permanently throttle ATS/fixed stepping.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-initialized~25"></span>
+              <span class="anchor" id="variable-initialized~3"></span>
               logical,
             </td>
               <td>private</td>
@@ -3516,12 +3516,12 @@ for one step, but it must not permanently throttle ATS/fixed stepping.</p>
               </tr>
               <tr>
                 <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/type_time.html#boundprocedure-display~36'>display</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/display_status.html'>display_status</a></td>
+  <strong><a href='../type/type_time.html#boundprocedure-display~12'>display</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/display_status.html'>display_status</a></td>
                   <td><p>Display current time status to standard output.</p></td>
               </tr>
               <tr>
                 <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/type_time.html#boundprocedure-get_bdf_coeffs~2'>get_bdf_coeffs</a></strong></td>
+  <strong><a href='../type/type_time.html#boundprocedure-get_bdf_coeffs'>get_bdf_coeffs</a></strong></td>
                   <td><p>Get BDF coefficients array.</p></td>
               </tr>
               <tr>
@@ -3531,7 +3531,7 @@ for one step, but it must not permanently throttle ATS/fixed stepping.</p>
               </tr>
               <tr>
                 <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/type_time.html#boundprocedure-get_dt~2'>get_dt</a></strong></td>
+  <strong><a href='../type/type_time.html#boundprocedure-get_dt'>get_dt</a></strong></td>
                   <td><p>Get current time step size.</p></td>
               </tr>
               <tr>
@@ -3541,22 +3541,22 @@ for one step, but it must not permanently throttle ATS/fixed stepping.</p>
               </tr>
               <tr>
                 <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/type_time.html#boundprocedure-get_time~2'>get_time</a></strong></td>
+  <strong><a href='../type/type_time.html#boundprocedure-get_time'>get_time</a></strong></td>
                   <td><p>Get current simulation time.</p></td>
               </tr>
               <tr>
                 <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/type_time.html#boundprocedure-initialize~121'>initialize</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/initialize_type_time.html'>initialize_type_time</a></td>
+  <strong><a href='../type/type_time.html#boundprocedure-initialize~15'>initialize</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/initialize_type_time.html'>initialize_type_time</a></td>
                   <td><p>Initialize time control settings from input.</p></td>
               </tr>
               <tr>
                 <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/type_time.html#boundprocedure-is_end_time~3'>is_end_time</a></strong></td>
+  <strong><a href='../type/type_time.html#boundprocedure-is_end_time'>is_end_time</a></strong></td>
                   <td><p>Check if simulation reached end time.</p></td>
               </tr>
               <tr>
                 <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/type_time.html#boundprocedure-is_initialized~18'>is_initialized</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_initialized_time.html'>is_initialized_time</a></td>
+  <strong><a href='../type/type_time.html#boundprocedure-is_initialized~4'>is_initialized</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_initialized_time.html'>is_initialized_time</a></td>
                   <td></td>
               </tr>
               <tr>
@@ -3566,7 +3566,7 @@ for one step, but it must not permanently throttle ATS/fixed stepping.</p>
               </tr>
               <tr>
                 <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/type_time.html#boundprocedure-is_min_dt~3'>is_min_dt</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_min_dt_reached.html'>is_min_dt_reached</a></td>
+  <strong><a href='../type/type_time.html#boundprocedure-is_min_dt'>is_min_dt</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_min_dt_reached.html'>is_min_dt_reached</a></td>
                   <td></td>
               </tr>
               <tr>
@@ -3576,7 +3576,7 @@ for one step, but it must not permanently throttle ATS/fixed stepping.</p>
               </tr>
               <tr>
                 <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/type_time.html#boundprocedure-shift~2'>shift</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/shift_time.html'>shift_time</a></td>
+  <strong><a href='../type/type_time.html#boundprocedure-shift'>shift</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/shift_time.html'>shift_time</a></td>
                   <td><p>Shift time history for the next step.</p></td>
               </tr>
               <tr>
@@ -3586,7 +3586,7 @@ for one step, but it must not permanently throttle ATS/fixed stepping.</p>
               </tr>
               <tr>
                 <td>  procedure, public, pass(self) ::
-  <strong><a href='../type/type_time.html#boundprocedure-update~7'>update</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/update_type_time.html'>update_type_time</a></td>
+  <strong><a href='../type/type_time.html#boundprocedure-update~2'>update</a></strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/update_type_time.html'>update_type_time</a></td>
                   <td></td>
               </tr>
               <tr>
@@ -3624,7 +3624,7 @@ for one step, but it must not permanently throttle ATS/fixed stepping.</p>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2302"></span>
+              <span class="anchor" id="variable-self~483"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(in)</td>
@@ -3669,7 +3669,7 @@ for one step, but it must not permanently throttle ATS/fixed stepping.</p>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2306"></span>
+              <span class="anchor" id="variable-self~487"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(in)</td>
@@ -3714,7 +3714,7 @@ for one step, but it must not permanently throttle ATS/fixed stepping.</p>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2299"></span>
+              <span class="anchor" id="variable-self~480"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(in)</td>
@@ -3759,7 +3759,7 @@ for one step, but it must not permanently throttle ATS/fixed stepping.</p>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2298"></span>
+              <span class="anchor" id="variable-self~479"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(in)</td>
@@ -3811,7 +3811,7 @@ Note: Coefficients <script type="math/tex"> \alpha_j </script> inherently includ
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2293"></span>
+              <span class="anchor" id="variable-self~474"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(inout)</td>
@@ -3851,7 +3851,7 @@ Note: Coefficients <script type="math/tex"> \alpha_j </script> inherently includ
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2303"></span>
+              <span class="anchor" id="variable-self~484"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(in)</td>
@@ -3866,7 +3866,7 @@ Note: Coefficients <script type="math/tex"> \alpha_j </script> inherently includ
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-unit_in~33"></span>
+              <span class="anchor" id="variable-unit_in~13"></span>
               integer(kind=int32),
             </td>
 <td>intent(in),</td>
@@ -3906,7 +3906,7 @@ Note: Coefficients <script type="math/tex"> \alpha_j </script> inherently includ
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2301"></span>
+              <span class="anchor" id="variable-self~482"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(in),</td>
@@ -3961,7 +3961,7 @@ Note: Coefficients <script type="math/tex"> \alpha_j </script> inherently includ
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2300"></span>
+              <span class="anchor" id="variable-self~481"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(in)</td>
@@ -3976,7 +3976,7 @@ Note: Coefficients <script type="math/tex"> \alpha_j </script> inherently includ
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-bdf_order~10"></span>
+              <span class="anchor" id="variable-bdf_order~4"></span>
               integer(kind=int32),
             </td>
 <td>intent(inout)</td>
@@ -4017,7 +4017,7 @@ If a target time unit is provided,  <code>dt</code> is converted accordingly.</p
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2295"></span>
+              <span class="anchor" id="variable-self~476"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(in)</td>
@@ -4032,7 +4032,7 @@ If a target time unit is provided,  <code>dt</code> is converted accordingly.</p
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-dt~11"></span>
+              <span class="anchor" id="variable-dt~3"></span>
               real(kind=real64),
             </td>
 <td>intent(inout)</td>
@@ -4047,7 +4047,7 @@ If a target time unit is provided,  <code>dt</code> is converted accordingly.</p
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-time_unit~4"></span>
+              <span class="anchor" id="variable-time_unit~2"></span>
               type(<a href='../type/type_constant_value.html'>type_constant_value</a>),
             </td>
 <td>intent(in),</td>
@@ -4087,7 +4087,7 @@ If a target time unit is provided,  <code>dt</code> is converted accordingly.</p
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2296"></span>
+              <span class="anchor" id="variable-self~477"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(in)</td>
@@ -4102,7 +4102,7 @@ If a target time unit is provided,  <code>dt</code> is converted accordingly.</p
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-end_time~2"></span>
+              <span class="anchor" id="variable-end_time"></span>
               real(kind=real64),
             </td>
 <td>intent(inout)</td>
@@ -4143,7 +4143,7 @@ If a target time unit is provided, the <code>current_time</code> is converted ac
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2294"></span>
+              <span class="anchor" id="variable-self~475"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(in)</td>
@@ -4158,7 +4158,7 @@ If a target time unit is provided, the <code>current_time</code> is converted ac
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-current_time~47"></span>
+              <span class="anchor" id="variable-current_time~6"></span>
               real(kind=real64),
             </td>
 <td>intent(inout)</td>
@@ -4173,7 +4173,7 @@ If a target time unit is provided, the <code>current_time</code> is converted ac
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-time_unit~3"></span>
+              <span class="anchor" id="variable-time_unit"></span>
               type(<a href='../type/type_constant_value.html'>type_constant_value</a>),
             </td>
 <td>intent(in),</td>
@@ -4213,7 +4213,7 @@ If a target time unit is provided, the <code>current_time</code> is converted ac
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2290"></span>
+              <span class="anchor" id="variable-self~471"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(inout)</td>
@@ -4228,7 +4228,7 @@ If a target time unit is provided, the <code>current_time</code> is converted ac
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-config_time~3"></span>
+              <span class="anchor" id="variable-config_time~2"></span>
               type(<a href='../type/type_config_time.html'>type_config_time</a>),
             </td>
 <td>intent(in)</td>
@@ -4243,7 +4243,7 @@ If a target time unit is provided, the <code>current_time</code> is converted ac
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-config_time_ats~4"></span>
+              <span class="anchor" id="variable-config_time_ats~2"></span>
               type(<a href='../type/type_config_time_ats.html'>type_config_time_ats</a>),
             </td>
 <td>intent(in)</td>
@@ -4284,7 +4284,7 @@ If a target time unit is provided, <code>dt</code> is converted accordingly befo
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2297"></span>
+              <span class="anchor" id="variable-self~478"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(inout)</td>
@@ -4314,7 +4314,7 @@ If a target time unit is provided, <code>dt</code> is converted accordingly befo
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-time_unit~5"></span>
+              <span class="anchor" id="variable-time_unit~3"></span>
               type(<a href='../type/type_constant_value.html'>type_constant_value</a>),
             </td>
 <td>intent(in),</td>
@@ -4355,7 +4355,7 @@ Also manages the ramping up of BDF order during initial steps.</p>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2291"></span>
+              <span class="anchor" id="variable-self~472"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(inout)</td>
@@ -4395,7 +4395,7 @@ Also manages the ramping up of BDF order during initial steps.</p>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2305"></span>
+              <span class="anchor" id="variable-self~486"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(inout)</td>
@@ -4450,7 +4450,7 @@ Also manages the ramping up of BDF order during initial steps.</p>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2292"></span>
+              <span class="anchor" id="variable-self~473"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(inout)</td>
@@ -4490,7 +4490,7 @@ Also manages the ramping up of BDF order during initial steps.</p>
     <tbody>
         <tr>
             <td>
-              <span class="anchor" id="variable-self~2304"></span>
+              <span class="anchor" id="variable-self~485"></span>
               class(<a href='../type/type_time.html'>type_time</a>),
             </td>
 <td>intent(inout)</td>
@@ -4505,7 +4505,7 @@ Also manages the ramping up of BDF order during initial steps.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-success~2"></span>
+              <span class="anchor" id="variable-success"></span>
               logical,
             </td>
 <td>intent(in)</td>
@@ -4520,7 +4520,7 @@ Also manages the ramping up of BDF order during initial steps.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-iter_count~3"></span>
+              <span class="anchor" id="variable-iter_count"></span>
               integer(kind=int32),
             </td>
 <td>intent(in)</td>
@@ -4550,7 +4550,7 @@ Also manages the ramping up of BDF order during initial steps.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-error_estimate~2"></span>
+              <span class="anchor" id="variable-error_estimate"></span>
               real(kind=real64),
             </td>
 <td>intent(in),</td>
@@ -4593,7 +4593,7 @@ Also manages the ramping up of BDF order during initial steps.</p>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-07-13 12:46 +0000             </p>
+ on 2026-07-13 13:05 +0000             </p>
           </div>
         </div>
         <br>
