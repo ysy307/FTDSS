@@ -31,8 +31,50 @@ module app_ftcms
     real(real64), parameter :: WALL_PRESS_MIN_PA = -1.0d7
     real(real64), parameter :: WALL_PRESS_MAX_PA = 1.0d7
 
+    !>
+    !> Static per-node table of the distinct materials among a node's
+    !> adjacent elements, built once after the domain is initialized (the
+    !> mesh and its material assignment are static for the lifetime of a
+    !> run). Consumed by update_nodal_phases to evaluate the constitutive
+    !> update once per distinct material per node, instead of once per
+    !> adjacent element.
+    !>
+    !> CSR-like layout keyed by node id: node i's entries occupy the range
+    !> ptr(i) : ptr(i+1)-1 in material_id / repr_element / measure_sum.
+    !> Nodes with no adjacent elements have an empty row (ptr(i) == ptr(i+1)).
+    !>
+    !> repr_element(k) is the highest-index adjacent element carrying
+    !> material_id(k): node->element adjacency is visited in ascending
+    !> element-id order, so repeatedly overwriting the representative for a
+    !> recurring material naturally leaves the highest-index one recorded.
+    !> When a node touches a single material (the common case), this row is
+    !> exactly the node's highest-index adjacent element overall, matching
+    !> the "last element wins" semantics of the original per-element loop.
+    !>
+    type :: type_node_material_table
+        !> Number of nodes the table was built for (0 if not yet built).
+        integer(int32) :: num_nodes = 0
+        !> Row pointers (size num_nodes + 1).
+        integer(int32), allocatable :: ptr(:)
+        !> Distinct material id for each (node, material) entry.
+        integer(int32), allocatable :: material_id(:)
+        !> Representative (highest-index) adjacent element for each entry.
+        integer(int32), allocatable :: repr_element(:)
+        !> Summed measure (volume/area) of adjacent elements sharing this material.
+        real(real64), allocatable :: measure_sum(:)
+    contains
+        ! ---- Lifecycle ----
+        procedure, pass(self), public :: initialize => initialize_node_material_table
+        procedure, pass(self), public :: destroy => destroy_node_material_table
+    end type type_node_material_table
+
     type :: type_ftcms
         type(type_domain) :: domain
+
+        !> Static per-node distinct-material table, built once from the
+        !> domain's node->element adjacency (see type_node_material_table).
+        !> Consumed by update_nodal_phases.
+        type(type_node_material_table) :: node_material_table
 
         type(type_variable) :: porosity
         type(type_variable) :: temperature
@@ -191,6 +233,27 @@ module app_ftcms
     end type type_ftcms
 
     interface
+        !> Build the per-node distinct-material table from the (already
+        !> initialized) domain's node->element adjacency. See
+        !> type_node_material_table for the storage layout and semantics.
+        !>
+        !> Computational complexity: O(N_nd * d) time and O(N_nd + E) memory,
+        !> where d is the maximum node degree and E is the total number of
+        !> distinct (node, material) entries (E <= sum of node degrees).
+        !> Failure behavior: a domain with zero nodes leaves the table empty
+        !> (num_nodes == 0); no error is raised.
+        module subroutine initialize_node_material_table(self, domain)
+            implicit none
+            class(type_node_material_table), intent(inout) :: self
+            type(type_domain), intent(in) :: domain
+        end subroutine initialize_node_material_table
+
+        !> Release the table's allocatable storage and reset it to empty.
+        module subroutine destroy_node_material_table(self)
+            implicit none
+            class(type_node_material_table), intent(inout) :: self
+        end subroutine destroy_node_material_table
+
         module subroutine initialize_type_ftcms(self)
             implicit none
             class(type_ftcms), intent(inout) :: self

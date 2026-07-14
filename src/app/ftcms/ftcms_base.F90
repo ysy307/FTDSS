@@ -105,6 +105,11 @@ contains
                                     input%basic%simulation_settings%calculate_type, config_control_manager%coupling_mode, &
                                     config_control_manager%compute_active)
 
+        ! The mesh (connectivity, materials, adjacency) is static for the run:
+        ! build the per-node distinct-material table once, right after the
+        ! domain is fully built, for use by update_nodal_phases.
+        call self%node_material_table%initialize(self%domain)
+
         call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, self%thermal_start_dof)
         call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, self%hydraulic_start_dof)
 
@@ -1379,24 +1384,181 @@ contains
         deallocate (processed)
     end subroutine apply_phase_change_temperature_correction_ftcms
 
+    !> Implementation strategy: two-pass CSR construction, mirroring
+    !> domain_adjacency_node_element's initialize (count-then-fill).
+    !>
+    !> Pass 1 walks each node's adjacent-element list (ascending element-id
+    !> order, from the CSR-backed node->element adjacency) and counts the
+    !> number of distinct materials touching that node, using a small
+    !> per-node scratch buffer sized to the node's degree. A prefix sum over
+    !> the counts yields the CSR row pointers.
+    !>
+    !> Pass 2 repeats the walk, this time writing each entry's material id,
+    !> accumulating measure_sum via domain%calc_measure, and overwriting
+    !> repr_element on every repeat visit of a material -- since the walk is
+    !> ascending, the value left after the loop is the highest-index element
+    !> of that material. Pass 2 uses the (now allocated) material_id row
+    !> itself as the scratch buffer for the linear "have we seen this
+    !> material yet" search, avoiding a second scratch allocation.
+    !>
+    !> Parallelization: none (serial, build-once cost; the mesh is static so
+    !> this pays for itself many times over across nonlinear iterations).
+    !> Memory: O(N_nd + E) as documented at the interface.
+    module subroutine initialize_node_material_table(self, domain)
+        implicit none
+        class(type_node_material_table), intent(inout) :: self
+        type(type_domain), intent(in) :: domain
+
+        integer(int32) :: num_nodes, i_node, j, k, n_neighbors, i_elem, material_id, n_distinct
+        integer(int32) :: cum_sum, total_entries, row_start
+        integer(int32), pointer, contiguous :: element_list(:)
+        integer(int32), allocatable :: local_material(:)
+        real(real64) :: measure
+
+        call self%destroy()
+        nullify (element_list)
+
+        call domain%get_num_nodes(num_nodes)
+        if (num_nodes <= 0) return
+
+        self%num_nodes = num_nodes
+        allocate (self%ptr(num_nodes + 1))
+        self%ptr = 0
+
+        ! --- Pass 1: count distinct materials per node (row sizes) ---
+        do i_node = 1, num_nodes
+            call domain%element_adjacency%get_list(i_node, element_list)
+            n_distinct = 0
+            if (associated(element_list)) then
+                n_neighbors = size(element_list)
+                if (allocated(local_material)) deallocate (local_material)
+                allocate (local_material(n_neighbors))
+                do j = 1, n_neighbors
+                    call domain%get_material_id(element_list(j), material_id)
+                    k = 1
+                    do while (k <= n_distinct)
+                        if (local_material(k) == material_id) exit
+                        k = k + 1
+                    end do
+                    if (k > n_distinct) then
+                        n_distinct = n_distinct + 1
+                        local_material(n_distinct) = material_id
+                    end if
+                end do
+            end if
+            self%ptr(i_node + 1) = n_distinct
+            nullify (element_list)
+        end do
+        if (allocated(local_material)) deallocate (local_material)
+
+        ! --- Prefix sum: distinct-material counts -> CSR row pointers ---
+        self%ptr(1) = 1
+        cum_sum = 1
+        do i_node = 1, num_nodes
+            cum_sum = cum_sum + self%ptr(i_node + 1)
+            self%ptr(i_node + 1) = cum_sum
+        end do
+        total_entries = cum_sum - 1
+
+        allocate (self%material_id(max(total_entries, 1)))
+        allocate (self%repr_element(max(total_entries, 1)))
+        allocate (self%measure_sum(max(total_entries, 1)))
+        self%material_id = 0
+        self%repr_element = 0
+        self%measure_sum = 0.0d0
+
+        ! --- Pass 2: fill entries ---
+        do i_node = 1, num_nodes
+            call domain%element_adjacency%get_list(i_node, element_list)
+            if (.not. associated(element_list)) cycle
+            n_neighbors = size(element_list)
+            row_start = self%ptr(i_node)
+            n_distinct = 0
+            do j = 1, n_neighbors
+                i_elem = element_list(j)
+                call domain%get_material_id(i_elem, material_id)
+                call domain%calc_measure(i_elem, measure)
+
+                k = 1
+                do while (k <= n_distinct)
+                    if (self%material_id(row_start + k - 1) == material_id) exit
+                    k = k + 1
+                end do
+                if (k > n_distinct) then
+                    n_distinct = n_distinct + 1
+                    self%material_id(row_start + n_distinct - 1) = material_id
+                end if
+                ! Ascending element order => the last overwrite is the
+                ! highest-index adjacent element of this material.
+                self%repr_element(row_start + k - 1) = i_elem
+                self%measure_sum(row_start + k - 1) = self%measure_sum(row_start + k - 1) + measure
+            end do
+            nullify (element_list)
+        end do
+
+    end subroutine initialize_node_material_table
+
+    module subroutine destroy_node_material_table(self)
+        implicit none
+        class(type_node_material_table), intent(inout) :: self
+
+        if (allocated(self%ptr)) deallocate (self%ptr)
+        if (allocated(self%material_id)) deallocate (self%material_id)
+        if (allocated(self%repr_element)) deallocate (self%repr_element)
+        if (allocated(self%measure_sum)) deallocate (self%measure_sum)
+        self%num_nodes = 0
+    end subroutine destroy_node_material_table
+
+    !> Implementation strategy: node-major loop over the precomputed
+    !> node_material_table (see type_node_material_table), replacing the
+    !> original element-major loop that visited every node once per adjacent
+    !> element and let the last (highest-index) visiting element's
+    !> set_state() result win.
+    !>
+    !> - Nodes with no adjacent elements (empty table row) are skipped,
+    !>   leaving their Qw/Qi/Qa/Qv untouched -- identical to the original
+    !>   loop, which never wrote a node with no incident element.
+    !> - Nodes touching a single material (m == 1, the common case) call
+    !>   set_state exactly once, at the table's representative element for
+    !>   that material (the highest-index adjacent element overall in this
+    !>   case). This exactly reproduces the original "last element wins"
+    !>   result while visiting the node only once.
+    !> - Nodes touching multiple materials (m > 1) call set_state once per
+    !>   distinct material and combine the results with a
+    !>   material-summed-measure weighted average. The is_set guard is
+    !>   applied per component and per material: a component's weighted
+    !>   average only includes materials where the constitutive update
+    !>   actually produced that component, and the nodal value is written
+    !>   only if at least one material produced it -- generalizing the
+    !>   original single-element is_set guard to the multi-material case.
+    !>
+    !> Cost: O(sum of distinct materials per node) set_state calls, versus
+    !> O(sum of node degrees) in the original loop (identical when every
+    !> node touches a single material, e.g. this project's mesh).
     module subroutine update_nodal_phases_ftcms(self)
         implicit none
         class(type_ftcms), intent(inout) :: self
 
-        integer(int32) :: i_elem, num_elem, i_local, node_id
-        integer(int32), pointer, contiguous :: connectivity(:)
+        integer(int32) :: node_id, num_nodes, row_start, row_end, m, k, repr_elem
         type(type_state) :: state
         real(real64) :: qw_val, qi_val, qa_val, qv_val
         logical :: qi_set, qw_set, qa_set, qv_set
+        real(real64) :: measure
+        real(real64) :: sum_qw, sum_qi, sum_qa, sum_qv
+        real(real64) :: wsum_qw, wsum_qi, wsum_qa, wsum_qv
+        logical :: any_qw, any_qi, any_qa, any_qv
 
-        nullify (connectivity)
-        call self%domain%get_num_fe(num_elem)
-        do i_elem = 1, num_elem
-            call self%domain%get_fe_connectivity(i_elem, connectivity)
-            do i_local = 1, size(connectivity)
-                node_id = connectivity(i_local)
-                if (node_id < 1) cycle
-                call self%set_state(node_id, i_elem, state, calc_physics=.true.)
+        call self%domain%get_num_nodes(num_nodes)
+
+        do node_id = 1, num_nodes
+            row_start = self%node_material_table%ptr(node_id)
+            row_end = self%node_material_table%ptr(node_id + 1) - 1
+            m = row_end - row_start + 1
+            if (m <= 0) cycle ! no adjacent elements: leave Q values untouched
+
+            if (m == 1) then
+                repr_elem = self%node_material_table%repr_element(row_start)
+                call self%set_state(node_id, repr_elem, state, calc_physics=.true.)
                 qi_set = .false.; qw_set = .false.; qa_set = .false.
                 qv_set = .false.
                 call state%ice_content%get(qi_val, qi_set)
@@ -1407,8 +1569,49 @@ contains
                 if (qw_set) call self%Qw%set_current(node_id, qw_val)
                 if (qa_set) call self%Qa%set_current(node_id, qa_val)
                 if (qv_set) call self%Qv%set_current(node_id, qv_val)
-            end do
-            nullify (connectivity)
+            else
+                sum_qw = 0.0d0; sum_qi = 0.0d0; sum_qa = 0.0d0; sum_qv = 0.0d0
+                wsum_qw = 0.0d0; wsum_qi = 0.0d0; wsum_qa = 0.0d0; wsum_qv = 0.0d0
+                any_qw = .false.; any_qi = .false.; any_qa = .false.; any_qv = .false.
+
+                do k = row_start, row_end
+                    repr_elem = self%node_material_table%repr_element(k)
+                    measure = self%node_material_table%measure_sum(k)
+                    call self%set_state(node_id, repr_elem, state, calc_physics=.true.)
+                    qi_set = .false.; qw_set = .false.; qa_set = .false.
+                    qv_set = .false.
+                    call state%ice_content%get(qi_val, qi_set)
+                    call state%water_content%get(qw_val, qw_set)
+                    call state%air_content%get(qa_val, qa_set)
+                    call state%vapor_content%get(qv_val, qv_set)
+
+                    if (qw_set) then
+                        sum_qw = sum_qw + qw_val * measure
+                        wsum_qw = wsum_qw + measure
+                        any_qw = .true.
+                    end if
+                    if (qi_set) then
+                        sum_qi = sum_qi + qi_val * measure
+                        wsum_qi = wsum_qi + measure
+                        any_qi = .true.
+                    end if
+                    if (qa_set) then
+                        sum_qa = sum_qa + qa_val * measure
+                        wsum_qa = wsum_qa + measure
+                        any_qa = .true.
+                    end if
+                    if (qv_set) then
+                        sum_qv = sum_qv + qv_val * measure
+                        wsum_qv = wsum_qv + measure
+                        any_qv = .true.
+                    end if
+                end do
+
+                if (any_qw .and. wsum_qw > epsilon(1.0d0)) call self%Qw%set_current(node_id, sum_qw / wsum_qw)
+                if (any_qi .and. wsum_qi > epsilon(1.0d0)) call self%Qi%set_current(node_id, sum_qi / wsum_qi)
+                if (any_qa .and. wsum_qa > epsilon(1.0d0)) call self%Qa%set_current(node_id, sum_qa / wsum_qa)
+                if (any_qv .and. wsum_qv > epsilon(1.0d0)) call self%Qv%set_current(node_id, sum_qv / wsum_qv)
+            end if
         end do
 
     end subroutine update_nodal_phases_ftcms
