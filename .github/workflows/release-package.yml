@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install build tools
         shell: bash
@@ -38,7 +38,7 @@ jobs:
 
       - name: Restore compiled dependencies
         id: dependency-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ env.DEPENDENCY_PREFIX }}
           key: dependencies-linux-ifx-2026.0.1-v1-${{ hashFiles('cmake/ci-dependencies/CMakeLists.txt') }}
@@ -71,7 +71,7 @@ jobs:
             -D CPACK_PACKAGE_FILE_NAME=FTCMS-linux-x86_64
 
       - name: Upload Linux package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: FTCMS-linux-x86_64
           path: dist/FTCMS-linux-x86_64.tar.gz
@@ -88,17 +88,17 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Restore oneAPI
         id: oneapi-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
-            C:\Program Files (x86)\Intel\oneAPI\setvars-vcvarsall.bat
+            C:\Program Files (x86)\Intel\oneAPI\setvars.bat
             C:\Program Files (x86)\Intel\oneAPI\compiler
             C:\Program Files (x86)\Intel\oneAPI\mkl
-          key: oneapi-windows-2026.1-v2
+          key: oneapi-windows-2026.1-v3
 
       - name: Install oneAPI
         if: steps.oneapi-cache.outputs.cache-hit != 'true'
@@ -111,7 +111,7 @@ jobs:
 
       - name: Restore compiled dependencies
         id: dependency-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ env.DEPENDENCY_PREFIX }}
           key: dependencies-windows-ifx-2026.1-v1-${{ hashFiles('cmake/ci-dependencies/CMakeLists.txt') }}
@@ -120,7 +120,7 @@ jobs:
         if: steps.dependency-cache.outputs.cache-hit != 'true'
         shell: cmd
         run: |
-          call "C:\Program Files (x86)\Intel\oneAPI\setvars-vcvarsall.bat" vs2022
+          call scripts\ci\setup-oneapi-windows.bat
           if errorlevel 1 exit /b 1
           cmake -S cmake/ci-dependencies -B CMakeBuild/ci-dependencies -G Ninja -DFTCMS_DEPENDENCY_PREFIX="%DEPENDENCY_PREFIX%" -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl
           if errorlevel 1 exit /b 1
@@ -130,7 +130,7 @@ jobs:
       - name: Build release package
         shell: cmd
         run: |
-          call "C:\Program Files (x86)\Intel\oneAPI\setvars-vcvarsall.bat" vs2022
+          call scripts\ci\setup-oneapi-windows.bat
           if errorlevel 1 exit /b 1
           cmake -S . -B CMakeBuild/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DBUILD_TESTING=OFF -DENABLE_MPI=OFF -DFTCMS_PORTABLE_BUILD=ON -DFTCMS_BUNDLE_RUNTIME=ON
           if errorlevel 1 exit /b 1
@@ -140,9 +140,37 @@ jobs:
           if errorlevel 1 exit /b 1
 
       - name: Upload Windows package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: FTCMS-windows-x86_64
           path: dist/FTCMS-windows-x86_64.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  package-bundle:
+    name: Bundle release packages
+    needs:
+      - linux-ifx
+      - windows-ifx
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Collect Linux and Windows packages
+        uses: actions/download-artifact@v7
+        with:
+          pattern: FTCMS-*-x86_64
+          path: release
+          merge-multiple: true
+
+      - name: Generate checksums
+        working-directory: release
+        shell: bash
+        run: sha256sum FTCMS-linux-x86_64.tar.gz FTCMS-windows-x86_64.zip > SHA256SUMS
+
+      - name: Upload combined release packages
+        uses: actions/upload-artifact@v6
+        with:
+          name: FTCMS-release-packages
+          path: release/*
           if-no-files-found: error
           retention-days: 14

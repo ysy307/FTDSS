@@ -30,18 +30,18 @@ jobs:
     steps:
       # Step 1: Check out the repository's code
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Step 2: Set up Python for installing dependencies
       # Using a dedicated setup action makes the environment more explicit.
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.10'
 
       # Step 3: Cache pip dependencies to speed up subsequent runs
       - name: Cache pip dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/pip
           # Create a unique key for the cache based on the runner's OS and the hash of the Ford version.
@@ -75,7 +75,7 @@ jobs:
       # Step 8: Upload the generated documentation as a build artifact.
       # This is useful for debugging and for previewing changes in pull requests.
       - name: Upload Documentation as Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: documentation
           path: ./docs/api-docs
