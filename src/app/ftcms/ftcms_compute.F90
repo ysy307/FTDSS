@@ -367,12 +367,23 @@ contains
 
     !> Calculate nodal gradient of a scalar field
     !>
-    !> Implementation: cache-based L2 (lumped mass) projection. The static
-    !> Gauss-point geometry (shape weights, global shape derivatives, lumped
-    !> nodal volume) comes from self%gradient_cache, built once at
-    !> initialization; only the field-dependent gather and accumulation run
-    !> per call. Loop order and arithmetic match the original direct
-    !> projection exactly (bit-identical results).
+    !> Implementation: cache-based L2 (lumped mass) projection as an
+    !> OpenMP-parallel node-centric gather. For each node, contributions are
+    !> gathered from its adjacent elements' Gauss points using the static
+    !> geometry cache (self%gradient_cache, built once at initialization);
+    !> only the field-dependent gather and accumulation run per call.
+    !>
+    !> Bit-identity with the serial element-scatter version: in the scatter,
+    !> each grad component of node j accumulates its terms in the order
+    !> "adjacent elements ascending, Gauss points ascending" (elements are
+    !> processed in ascending index order and each element contributes to
+    !> node j exactly once per Gauss point). The node->element adjacency
+    !> lists elements in ascending order, so the gather reproduces exactly
+    !> the same addition sequence per node; the per-Gauss-point gradient is
+    !> recomputed by the identical instruction sequence and the final
+    !> division uses the same cached lumped volume. Each iteration writes
+    !> only its own node entry, so the result is schedule-independent and
+    !> bit-identical to the serial projection.
     module subroutine calc_gradient_ftcms(self, values_vec, grad)
         implicit none
         class(type_ftcms), intent(inout) :: self
@@ -380,56 +391,88 @@ contains
         type(type_coordinate_array_dp), intent(inout) :: grad
 
         integer(int32), dimension(:), pointer, contiguous :: p_conn
-        real(real64), allocatable :: elem_u(:)
+        integer(int32), dimension(:), pointer, contiguous :: element_list
+        real(real64) :: elem_u(20)
         real(real64) :: gauss_grad(3)
+        real(real64) :: acc(3)
         real(real64) :: shape_weight
         integer(int32) :: num_elements, num_total_nodes, dim
         integer(int32) :: n_nodes_elem, n_gauss
-        integer(int32) :: i, p, k, d, global_nid, entry
+        integer(int32) :: i_node, j, i, p, k, k_local, entry, entry0
+        integer(int32) :: d
         real(real64) :: grad_component
+        logical :: has_x, has_y, has_z
 
-        nullify (p_conn)
         num_elements = self%gradient_cache%num_elements
         num_total_nodes = self%gradient_cache%num_nodes
         dim = self%gradient_cache%dim
         call grad%zero()
         if (num_elements <= 0) return
 
-        allocate (elem_u(20))
+        has_x = allocated(grad%x)
+        has_y = dim >= 2 .and. allocated(grad%y)
+        has_z = dim >= 3 .and. allocated(grad%z)
 
-        do i = 1, num_elements
-            call self%domain%get_fe_connectivity(i, p_conn)
-            n_nodes_elem = self%gradient_cache%num_nodes_elem(i)
-            n_gauss = self%gradient_cache%num_gauss(i)
-            elem_u(1:n_nodes_elem) = values_vec(p_conn(1:n_nodes_elem))
-            entry = self%gradient_cache%entry_ptr(i)
-            do p = 1, n_gauss
-                gauss_grad = 0.0d0
-                do d = 1, dim
-                    grad_component = 0.0d0
-                    do k = 1, n_nodes_elem
-                        grad_component = grad_component + elem_u(k) * self%gradient_cache%dpsi_dx(d, entry + k - 1)
-                    end do
-                    gauss_grad(d) = grad_component
-                end do
+        !$OMP PARALLEL DEFAULT(NONE) &
+        !$OMP SHARED(self, values_vec, grad, num_total_nodes, dim, has_x, has_y, has_z) &
+        !$OMP PRIVATE(i_node, j, i, p, k, k_local, d, entry, entry0, &
+        !$OMP         p_conn, element_list, elem_u, gauss_grad, acc, &
+        !$OMP         shape_weight, grad_component, n_nodes_elem, n_gauss)
+        nullify (p_conn, element_list)
+        !$OMP DO
+        do i_node = 1, num_total_nodes
+            call self%domain%element_adjacency%get_list(i_node, element_list)
+            if (.not. associated(element_list)) cycle ! isolated node: keep zero gradient
+
+            acc = 0.0d0
+            do j = 1, size(element_list)
+                i = element_list(j)
+                call self%domain%get_fe_connectivity(i, p_conn)
+                n_nodes_elem = self%gradient_cache%num_nodes_elem(i)
+                n_gauss = self%gradient_cache%num_gauss(i)
+                elem_u(1:n_nodes_elem) = values_vec(p_conn(1:n_nodes_elem))
+                ! Local index of this node within the element connectivity
+                k_local = 0
                 do k = 1, n_nodes_elem
-                    global_nid = p_conn(k)
-                    shape_weight = self%gradient_cache%shape_weight(entry + k - 1)
-                    if (allocated(grad%x)) grad%x(global_nid) = grad%x(global_nid) + shape_weight * gauss_grad(1)
-                    if (dim >= 2 .and. allocated(grad%y)) grad%y(global_nid) = grad%y(global_nid) + shape_weight * gauss_grad(2)
-                    if (dim >= 3 .and. allocated(grad%z)) grad%z(global_nid) = grad%z(global_nid) + shape_weight * gauss_grad(3)
+                    if (p_conn(k) == i_node) then
+                        k_local = k
+                        exit
+                    end if
                 end do
-                entry = entry + n_nodes_elem
+                nullify (p_conn)
+                if (k_local == 0) cycle ! adjacency/connectivity mismatch: no contribution
+
+                entry0 = self%gradient_cache%entry_ptr(i)
+                do p = 1, n_gauss
+                    entry = entry0 + (p - 1) * n_nodes_elem
+                    gauss_grad = 0.0d0
+                    do d = 1, dim
+                        grad_component = 0.0d0
+                        do k = 1, n_nodes_elem
+                            grad_component = grad_component + elem_u(k) * self%gradient_cache%dpsi_dx(d, entry + k - 1)
+                        end do
+                        gauss_grad(d) = grad_component
+                    end do
+                    shape_weight = self%gradient_cache%shape_weight(entry + k_local - 1)
+                    if (has_x) acc(1) = acc(1) + shape_weight * gauss_grad(1)
+                    if (has_y) acc(2) = acc(2) + shape_weight * gauss_grad(2)
+                    if (has_z) acc(3) = acc(3) + shape_weight * gauss_grad(3)
+                end do
             end do
-            nullify (p_conn)
-        end do
-        do k = 1, num_total_nodes
-            if (self%gradient_cache%nodal_vol(k) > epsilon(1.0d0)) then
-                if (allocated(grad%x)) grad%x(k) = grad%x(k) / self%gradient_cache%nodal_vol(k)
-                if (allocated(grad%y)) grad%y(k) = grad%y(k) / self%gradient_cache%nodal_vol(k)
-                if (allocated(grad%z)) grad%z(k) = grad%z(k) / self%gradient_cache%nodal_vol(k)
+            nullify (element_list)
+
+            if (self%gradient_cache%nodal_vol(i_node) > epsilon(1.0d0)) then
+                if (has_x) grad%x(i_node) = acc(1) / self%gradient_cache%nodal_vol(i_node)
+                if (has_y) grad%y(i_node) = acc(2) / self%gradient_cache%nodal_vol(i_node)
+                if (has_z) grad%z(i_node) = acc(3) / self%gradient_cache%nodal_vol(i_node)
+            else
+                if (has_x) grad%x(i_node) = acc(1)
+                if (has_y) grad%y(i_node) = acc(2)
+                if (has_z) grad%z(i_node) = acc(3)
             end if
         end do
+        !$OMP END DO
+        !$OMP END PARALLEL
     end subroutine calc_gradient_ftcms
 
     !> Calculate temperature gradient
