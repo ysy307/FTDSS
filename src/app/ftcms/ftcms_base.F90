@@ -696,13 +696,14 @@ contains
 
     end subroutine get_variable_residual_ftcms
 
-    module subroutine set_state_ftcms(self, node_id, element_id, state, calc_physics)
+    module subroutine set_state_ftcms(self, node_id, element_id, state, calc_physics, include_fluxes)
         implicit none
         class(type_ftcms), intent(inout) :: self
         integer(int32), intent(in) :: node_id
         integer(int32), intent(in) :: element_id
         type(type_state), intent(inout) :: state
         logical, intent(in), optional :: calc_physics
+        logical, intent(in), optional :: include_fluxes
 
         integer(int32) :: material_id
         integer(int32) :: bdf_order
@@ -711,12 +712,15 @@ contains
         type(type_coordinate_dp) :: grad_T, grad_P
         real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
 
-        logical :: do_calc
+        logical :: do_calc, do_fluxes
         logical :: temperature_set, pressure_set
 
         ! Default: compute physics (for backward compatibility)
         do_calc = .true.
         if (present(calc_physics)) do_calc = calc_physics
+        ! Default: compute fluxes (for backward compatibility)
+        do_fluxes = .true.
+        if (present(include_fluxes)) do_fluxes = include_fluxes
         call state%reset()
 
         call self%control%get_bdf_coeffs(bdf_order=bdf_order)
@@ -780,7 +784,7 @@ contains
         ! Run expensive physics computations only when flagged
         if (do_calc) then
             call self%domain%get_material_id(element_id, material_id)
-            call self%update_physical_properties(material_id, state)
+            call self%update_physical_properties(material_id, state, include_fluxes=do_fluxes)
         end if
 
     end subroutine set_state_ftcms
@@ -820,15 +824,21 @@ contains
     end subroutine set_states_from_connectivity_ftcms
 
     ! Update all physical quantities (phase, fluxes) for a given state
-    module subroutine update_physical_properties_ftcms(self, material_id, state)
+    module subroutine update_physical_properties_ftcms(self, material_id, state, include_fluxes)
         implicit none
         class(type_ftcms), intent(inout) :: self
         integer(int32), intent(in) :: material_id
         type(type_state), intent(inout) :: state
+        logical, intent(in), optional :: include_fluxes
 
         type(type_coordinate_dp) :: water_flux, vapor_flux
         type(type_coordinate_dp), pointer :: grad_T, grad_P
         type(type_coordinate_dp), target :: zero_grad
+        logical :: do_fluxes
+
+        ! Default: compute fluxes (for backward compatibility)
+        do_fluxes = .true.
+        if (present(include_fluxes)) do_fluxes = include_fluxes
 
         nullify (grad_T)
         nullify (grad_P)
@@ -836,6 +846,12 @@ contains
 
         ! 1. Phase change calculation (Ice/Water Content)
         call self%thermal%update_water_phases(material_id, state)
+
+        ! Phases-only mode: skip the flux evaluation entirely, leaving the
+        ! state's flux fields unset. Only valid for callers that never read
+        ! state%water_flux / state%vapor_flux afterwards (e.g. the nodal
+        ! phase update, which extracts phase contents only).
+        if (.not. do_fluxes) return
 
         ! 2. Flux calculation (used in advection and diffusion)
         if (self%control%is_target(PHYSICS_TYPES%HYDRAULIC, material_id)) then
@@ -1535,6 +1551,11 @@ contains
     !> Cost: O(sum of distinct materials per node) set_state calls, versus
     !> O(sum of node degrees) in the original loop (identical when every
     !> node touches a single material, e.g. this project's mesh).
+    !>
+    !> set_state is called in phases-only mode (include_fluxes=.false.):
+    !> only the phase contents Qw/Qi/Qa/Qv are read from the state here, so
+    !> the Darcy flux evaluation is skipped. Assembly and output build their
+    !> own states with fluxes included and are unaffected.
     module subroutine update_nodal_phases_ftcms(self)
         implicit none
         class(type_ftcms), intent(inout) :: self
@@ -1558,7 +1579,7 @@ contains
 
             if (m == 1) then
                 repr_elem = self%node_material_table%repr_element(row_start)
-                call self%set_state(node_id, repr_elem, state, calc_physics=.true.)
+                call self%set_state(node_id, repr_elem, state, calc_physics=.true., include_fluxes=.false.)
                 qi_set = .false.; qw_set = .false.; qa_set = .false.
                 qv_set = .false.
                 call state%ice_content%get(qi_val, qi_set)
@@ -1577,7 +1598,7 @@ contains
                 do k = row_start, row_end
                     repr_elem = self%node_material_table%repr_element(k)
                     measure = self%node_material_table%measure_sum(k)
-                    call self%set_state(node_id, repr_elem, state, calc_physics=.true.)
+                    call self%set_state(node_id, repr_elem, state, calc_physics=.true., include_fluxes=.false.)
                     qi_set = .false.; qw_set = .false.; qa_set = .false.
                     qv_set = .false.
                     call state%ice_content%get(qi_val, qi_set)

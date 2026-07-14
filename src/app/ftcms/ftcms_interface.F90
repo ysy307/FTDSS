@@ -320,13 +320,18 @@ module app_ftcms
             class(type_ftcms), intent(inout) :: self
         end subroutine solve_ftcms
 
-        module subroutine set_state_ftcms(self, node_id, element_id, state, calc_physics)
+        module subroutine set_state_ftcms(self, node_id, element_id, state, calc_physics, include_fluxes)
             implicit none
             class(type_ftcms), intent(inout) :: self
             integer(int32), intent(in) :: node_id
             integer(int32), intent(in) :: element_id
             type(type_state), intent(inout) :: state
             logical, intent(in), optional :: calc_physics
+            !> When .false. (and calc_physics applies), skip the Darcy flux
+            !> evaluation and leave state%water_flux / state%vapor_flux
+            !> unset. Only valid for callers that never read those fields.
+            !> Default .true. (full constitutive evaluation).
+            logical, intent(in), optional :: include_fluxes
         end subroutine set_state_ftcms
 
         module subroutine set_states_from_connectivity_ftcms(self, connectivity, element_id, states, calc_physics)
@@ -338,11 +343,15 @@ module app_ftcms
             logical, intent(in), optional :: calc_physics
         end subroutine set_states_from_connectivity_ftcms
 
-        module subroutine update_physical_properties_ftcms(self, material_id, state)
+        module subroutine update_physical_properties_ftcms(self, material_id, state, include_fluxes)
             implicit none
             class(type_ftcms), intent(inout) :: self
             integer(int32), intent(in) :: material_id
             type(type_state), intent(inout) :: state
+            !> When .false., perform the phase-change update only and skip
+            !> the Darcy flux evaluation, leaving state%water_flux /
+            !> state%vapor_flux unset. Default .true. (compute fluxes).
+            logical, intent(in), optional :: include_fluxes
         end subroutine update_physical_properties_ftcms
 
         module subroutine update_physical_properties_bulk_ftcms(self, material_id, states)
