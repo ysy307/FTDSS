@@ -200,9 +200,9 @@ contains
         implicit none
         class(type_field_array_dp), intent(inout) :: self
 
-        if (allocated(self%value)) then
-            deallocate (self%value)
-        end if
+        ! Keep the allocation: is_set is the sole validity flag, and the array
+        ! setter reuses (or resizes) the retained storage. Deallocating here put
+        ! an allocate/deallocate pair on every set_state call in the hot path.
         self%is_set = .false.
     end subroutine reset_field_array_dp
 
