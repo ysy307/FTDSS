@@ -136,13 +136,13 @@
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_time.html#variable-ats">ats</a>
             <a class="list-group-item" href="../type/type_time.html#variable-coeffs">coeffs</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-config~32">config</a>
+            <a class="list-group-item" href="../type/type_time.html#variable-config~19">config</a>
             <a class="list-group-item" href="../type/type_time.html#variable-current_bdf_order">current_bdf_order</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-current_time~5">current_time</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-dt~2">dt</a>
+            <a class="list-group-item" href="../type/type_time.html#variable-current_time~12">current_time</a>
+            <a class="list-group-item" href="../type/type_time.html#variable-dt~4">dt</a>
             <a class="list-group-item" href="../type/type_time.html#variable-dt_controller">dt_controller</a>
             <a class="list-group-item" href="../type/type_time.html#variable-dt_history">dt_history</a>
-            <a class="list-group-item" href="../type/type_time.html#variable-initialized~3">initialized</a>
+            <a class="list-group-item" href="../type/type_time.html#variable-initialized~8">initialized</a>
             <a class="list-group-item" href="../type/type_time.html#variable-time_old">time_old</a>
         </div>
       </div>
@@ -171,15 +171,15 @@
       <div id="boundprocs-0" class="collapse">
         <div class="list-group list-group-flush">
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-compute_bdf_coefficients">compute_bdf_coefficients</a>
-            <a class="list-group-item" href="../type/type_time.html#boundprocedure-display~12">display</a>
+            <a class="list-group-item" href="../type/type_time.html#boundprocedure-display~3">display</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-get_bdf_coeffs">get_bdf_coeffs</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-get_bdf_order">get_bdf_order</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-get_dt">get_dt</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-get_end_time">get_end_time</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-get_time">get_time</a>
-            <a class="list-group-item" href="../type/type_time.html#boundprocedure-initialize~15">initialize</a>
+            <a class="list-group-item" href="../type/type_time.html#boundprocedure-initialize~29">initialize</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-is_end_time">is_end_time</a>
-            <a class="list-group-item" href="../type/type_time.html#boundprocedure-is_initialized~4">is_initialized</a>
+            <a class="list-group-item" href="../type/type_time.html#boundprocedure-is_initialized~7">is_initialized</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-is_max_dt">is_max_dt</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-is_min_dt">is_min_dt</a>
             <a class="list-group-item" href="../type/type_time.html#boundprocedure-set_dt">set_dt</a>
@@ -506,7 +506,7 @@ Note: Coefficients include the $1/\Delta t$ scaling.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-config~32"></span>
+              <span class="anchor" id="variable-config~19"></span>
               type(<a href='type_config_time.html'>type_config_time</a>),
             </td>
               <td>private</td>
@@ -540,7 +540,7 @@ Note: Coefficients include the $1/\Delta t$ scaling.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-current_time~5"></span>
+              <span class="anchor" id="variable-current_time~12"></span>
               real(kind=real64),
             </td>
               <td>private</td>
@@ -557,7 +557,7 @@ Note: Coefficients include the $1/\Delta t$ scaling.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-dt~2"></span>
+              <span class="anchor" id="variable-dt~4"></span>
               real(kind=real64),
             </td>
               <td>private</td>
@@ -609,7 +609,7 @@ for one step, but it must not permanently throttle ATS/fixed stepping.</p>
         </tr>
         <tr>
             <td>
-              <span class="anchor" id="variable-initialized~3"></span>
+              <span class="anchor" id="variable-initialized~8"></span>
               logical,
             </td>
               <td>private</td>
@@ -714,7 +714,7 @@ Note: Coefficients <script type="math/tex"> \alpha_j </script> inherently includ
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-display~12"></span>
+      <span class="anchor" id="boundprocedure-display~3"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>display</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/display_status.html'>display_status</a>
@@ -1184,7 +1184,7 @@ If a target time unit is provided, the <code>current_time</code> is converted ac
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-initialize~15"></span>
+      <span class="anchor" id="boundprocedure-initialize~29"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>initialize</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/initialize_type_time.html'>initialize_type_time</a>
@@ -1335,7 +1335,7 @@ If a target time unit is provided, the <code>current_time</code> is converted ac
           <div class="row">
               <div class="card mt-3">
     <div class="card-header codesum">
-      <span class="anchor" id="boundprocedure-is_initialized~4"></span>
+      <span class="anchor" id="boundprocedure-is_initialized~7"></span>
       <h3>
           procedure, public, pass(self) ::
   <strong>is_initialized</strong> => <a href='/home/runner/work/FTCMS/FTCMS/docs/api-docs/proc/is_initialized_time.html'>is_initialized_time</a>
@@ -1990,7 +1990,7 @@ Also manages the ramping up of BDF order during initial steps.</p>
             <p class="text-end">
               Documentation generated by
               <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
- on 2026-07-13 13:05 +0000             </p>
+ on 2026-07-14 03:35 +0000             </p>
           </div>
         </div>
         <br>
