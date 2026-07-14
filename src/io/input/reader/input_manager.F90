@@ -1,6 +1,6 @@
 module io_input
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
-    use :: mpi_f08
+    use :: core_parallel_mpi
     use :: omp_lib
     use :: stdlib_strings, only:to_string, strip, ends_with
     use :: stdlib_logger

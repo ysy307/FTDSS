@@ -4,6 +4,10 @@
 
 add_library(SOLVER_CORE STATIC)
 
+target_sources(SOLVER_CORE PRIVATE
+    parallel_mpi.F90
+)
+
 # ============================================================
 # 1. Foundational Sources
 # ============================================================

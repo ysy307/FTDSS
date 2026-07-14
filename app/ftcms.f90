@@ -1,7 +1,7 @@
 program main
     use, intrinsic :: iso_fortran_env, only: int32, real64
 #ifdef _MPI
-    use :: mpi_f08
+    use :: core_parallel_mpi
 #endif
     use :: module_ftcms
 

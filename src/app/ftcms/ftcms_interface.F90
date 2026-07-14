@@ -1,7 +1,7 @@
 module app_ftcms
     use, intrinsic :: iso_fortran_env
     use :: omp_lib
-    use :: mpi_f08
+    use :: core_parallel_mpi
 
     use :: stdlib_optval, only:optval
     use :: stdlib_logger

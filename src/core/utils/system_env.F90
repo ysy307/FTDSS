@@ -1,6 +1,6 @@
 module core_utils_system_env
 #ifdef _MPI
-    use :: mpi_f08
+    use :: core_parallel_mpi
 #endif
     use, intrinsic :: iso_fortran_env, only: int32
     implicit none
