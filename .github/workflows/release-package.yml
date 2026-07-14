@@ -7,12 +7,6 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
-    inputs:
-      build_windows:
-        description: Build the Windows single-process package
-        required: false
-        default: false
-        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -86,7 +80,6 @@ jobs:
 
   windows-ifx:
     name: Windows (ifx, single process)
-    if: github.event_name == 'workflow_dispatch' && inputs.build_windows
     runs-on: windows-latest
     env:
       DEPENDENCY_PREFIX: ${{ github.workspace }}\third_party\.local\intel
