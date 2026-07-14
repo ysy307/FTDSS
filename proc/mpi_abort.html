@@ -1,0 +1,660 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>MPI_Abort &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>MPI_Abort
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">8 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/parallel_mpi.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/parallel_mpi.f90.html'>parallel_mpi.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_parallel_mpi.html'>core_parallel_mpi</a></li>
+            <li class="breadcrumb-item active" aria-current="page">MPI_Abort</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/mpi_abort.html#src">MPI_Abort</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>public  subroutine MPI_Abort(comm, error_code, ierror)  
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-comm~6"></span>
+              type(<a href='../type/mpi_comm.html'>MPI_Comm</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>comm</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-error_code~2"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>error_code</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ierror~6"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ierror</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~mpi_abort~~CalledByGraph Pages: 1 -->
+<svg id="procmpi_abortCalledByGraph" width="641pt" height="145pt"
+ viewBox="0.00 0.00 641.00 145.08" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~mpi_abort~~CalledByGraph" class="graph" transform="scale(0.4 0.4) rotate(0) translate(4 357)">
+<title>proc~~mpi_abort~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-357 1591,-357 1591,4 -4,4"/>
+<!-- proc~mpi_abort -->
+<g id="proc~~mpi_abort~~CalledByGraph_node1" class="node">
+<title>proc~mpi_abort</title>
+<polygon fill="none" stroke="black" points="1587,-86 1522,-86 1522,-62 1587,-62 1587,-86"/>
+<text text-anchor="middle" x="1554.5" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50">MPI_Abort</text>
+</g>
+<!-- proc~exchange_gids_and_build_indices -->
+<g id="proc~~mpi_abort~~CalledByGraph_node2" class="node">
+<title>proc~exchange_gids_and_build_indices</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node2"><a xlink:href="../proc/exchange_gids_and_build_indices.html" xlink:title="type_halo_communicator%exchange_gids_and_build_indices">
+<polygon fill="#d9534f" stroke="#d9534f" points="1052.5,-105 716.5,-105 716.5,-81 1052.5,-81 1052.5,-105"/>
+<text text-anchor="middle" x="884.5" y="-90.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_halo_communicator%exchange_gids_and_build_indices</text>
+</a>
+</g>
+</g>
+<!-- proc~exchange_gids_and_build_indices&#45;&gt;proc~mpi_abort -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge1" class="edge">
+<title>proc~exchange_gids_and_build_indices&#45;&gt;proc~mpi_abort</title>
+<path fill="none" stroke="#ff0000" d="M1052.77,-88.24C1205.93,-83.89 1421.99,-77.74 1511.82,-75.19"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1511.98,-78.68 1521.88,-74.9 1511.78,-71.69 1511.98,-78.68"/>
+</g>
+<!-- proc~handle_mpi_error -->
+<g id="proc~~mpi_abort~~CalledByGraph_node4" class="node">
+<title>proc~handle_mpi_error</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node4"><a xlink:href="../proc/handle_mpi_error.html" xlink:title="handle_mpi_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="1234,-167 1128,-167 1128,-143 1234,-143 1234,-167"/>
+<text text-anchor="middle" x="1181" y="-152.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">handle_mpi_error</text>
+</a>
+</g>
+</g>
+<!-- proc~exchange_gids_and_build_indices&#45;&gt;proc~handle_mpi_error -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge11" class="edge">
+<title>proc~exchange_gids_and_build_indices&#45;&gt;proc~handle_mpi_error</title>
+<path fill="none" stroke="#00ffff" d="M1010.66,-105.02C1027.01,-107.5 1043.47,-110.47 1059,-114 1086.82,-120.33 1117.23,-130.64 1140.6,-139.35"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1139.57,-142.7 1150.16,-142.96 1142.05,-136.15 1139.57,-142.7"/>
+</g>
+<!-- proc~handle_fatal_sort_error -->
+<g id="proc~~mpi_abort~~CalledByGraph_node3" class="node">
+<title>proc~handle_fatal_sort_error</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node3"><a xlink:href="../proc/handle_fatal_sort_error.html" xlink:title="handle_fatal_sort_error">
+<polygon fill="#d9534f" stroke="#d9534f" points="1462.5,-66 1326.5,-66 1326.5,-42 1462.5,-42 1462.5,-66"/>
+<text text-anchor="middle" x="1394.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">handle_fatal_sort_error</text>
+</a>
+</g>
+</g>
+<!-- proc~handle_fatal_sort_error&#45;&gt;proc~mpi_abort -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge2" class="edge">
+<title>proc~handle_fatal_sort_error&#45;&gt;proc~mpi_abort</title>
+<path fill="none" stroke="#ff0000" d="M1462.51,-62.48C1479.18,-64.59 1496.58,-66.8 1511.65,-68.7"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1511.31,-72.19 1521.67,-69.97 1512.19,-65.24 1511.31,-72.19"/>
+</g>
+<!-- proc~handle_mpi_error&#45;&gt;proc~mpi_abort -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge3" class="edge">
+<title>proc~handle_mpi_error&#45;&gt;proc~mpi_abort</title>
+<path fill="none" stroke="#ff0000" d="M1234.23,-151.9C1295.72,-147.13 1400.3,-135.45 1486,-108 1499.21,-103.77 1513.03,-97.23 1524.69,-91.02"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1526.46,-94.04 1533.53,-86.15 1523.08,-87.91 1526.46,-94.04"/>
+</g>
+<!-- proc~initialize_type_input -->
+<g id="proc~~mpi_abort~~CalledByGraph_node5" class="node">
+<title>proc~initialize_type_input</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node5"><a xlink:href="../proc/initialize_type_input.html" xlink:title="type_input%initialize_type_input">
+<polygon fill="#d9534f" stroke="#d9534f" points="1486,-24 1303,-24 1303,0 1486,0 1486,-24"/>
+<text text-anchor="middle" x="1394.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input%initialize_type_input</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_input&#45;&gt;proc~mpi_abort -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge4" class="edge">
+<title>proc~initialize_type_input&#45;&gt;proc~mpi_abort</title>
+<path fill="none" stroke="#ff0000" d="M1459.1,-24.05C1468.28,-26.57 1477.49,-29.53 1486,-33 1500.92,-39.08 1516.36,-48.21 1528.7,-56.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1526.84,-59.29 1537.09,-61.98 1530.76,-53.48 1526.84,-59.29"/>
+</g>
+<!-- proc~build_communication_schedule -->
+<g id="proc~~mpi_abort~~CalledByGraph_node6" class="node">
+<title>proc~build_communication_schedule</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node6"><a xlink:href="../proc/build_communication_schedule.html" xlink:title="type_halo_communicator%build_communication_schedule">
+<polygon fill="#d9534f" stroke="#d9534f" points="674,-105 349,-105 349,-81 674,-81 674,-105"/>
+<text text-anchor="middle" x="511.5" y="-90.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_halo_communicator%build_communication_schedule</text>
+</a>
+</g>
+</g>
+<!-- proc~build_communication_schedule&#45;&gt;proc~exchange_gids_and_build_indices -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge5" class="edge">
+<title>proc~build_communication_schedule&#45;&gt;proc~exchange_gids_and_build_indices</title>
+<path fill="none" stroke="#ff0000" d="M674.15,-93C684.73,-93 695.41,-93 706.06,-93"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="706.26,-96.5 716.26,-93 706.26,-89.5 706.26,-96.5"/>
+</g>
+<!-- proc~exchange_communication_plan -->
+<g id="proc~~mpi_abort~~CalledByGraph_node9" class="node">
+<title>proc~exchange_communication_plan</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node9"><a xlink:href="../proc/exchange_communication_plan.html" xlink:title="type_halo_communicator%exchange_communication_plan">
+<polygon fill="#d9534f" stroke="#d9534f" points="1047.5,-147 721.5,-147 721.5,-123 1047.5,-123 1047.5,-147"/>
+<text text-anchor="middle" x="884.5" y="-132.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_halo_communicator%exchange_communication_plan</text>
+</a>
+</g>
+</g>
+<!-- proc~build_communication_schedule&#45;&gt;proc~exchange_communication_plan -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge18" class="edge">
+<title>proc~build_communication_schedule&#45;&gt;proc~exchange_communication_plan</title>
+<path fill="none" stroke="#00ff91" d="M618.81,-105.04C665.29,-110.3 719.93,-116.48 767.46,-121.86"/>
+<polygon fill="#00ff91" stroke="#00ff91" points="767.16,-125.35 777.49,-123 767.95,-118.4 767.16,-125.35"/>
+</g>
+<!-- proc~quicksort_rank_lid_gid_triplets -->
+<g id="proc~~mpi_abort~~CalledByGraph_node12" class="node">
+<title>proc~quicksort_rank_lid_gid_triplets</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node12"><a xlink:href="../proc/quicksort_rank_lid_gid_triplets.html" xlink:title="quicksort_rank_lid_gid_triplets">
+<polygon fill="#d9534f" stroke="#d9534f" points="1267,-66 1095,-66 1095,-42 1267,-42 1267,-66"/>
+<text text-anchor="middle" x="1181" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">quicksort_rank_lid_gid_triplets</text>
+</a>
+</g>
+</g>
+<!-- proc~build_communication_schedule&#45;&gt;proc~quicksort_rank_lid_gid_triplets -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge20" class="edge">
+<title>proc~build_communication_schedule&#45;&gt;proc~quicksort_rank_lid_gid_triplets</title>
+<path fill="none" stroke="#ff00da" d="M613.11,-80.97C644.14,-77.62 678.45,-74.28 710,-72 839.66,-62.63 989.82,-57.96 1084.83,-55.76"/>
+<polygon fill="#ff00da" stroke="#ff00da" points="1085.08,-59.25 1095,-55.53 1084.92,-52.25 1085.08,-59.25"/>
+</g>
+<!-- proc~setup_local_sorted_nodes -->
+<g id="proc~~mpi_abort~~CalledByGraph_node15" class="node">
+<title>proc~setup_local_sorted_nodes</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node15"><a xlink:href="../proc/setup_local_sorted_nodes.html" xlink:title="type_halo_communicator%setup_local_sorted_nodes">
+<polygon fill="#d9534f" stroke="#d9534f" points="1031.5,-25 737.5,-25 737.5,-1 1031.5,-1 1031.5,-25"/>
+<text text-anchor="middle" x="884.5" y="-10.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_halo_communicator%setup_local_sorted_nodes</text>
+</a>
+</g>
+</g>
+<!-- proc~build_communication_schedule&#45;&gt;proc~setup_local_sorted_nodes -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge21" class="edge">
+<title>proc~build_communication_schedule&#45;&gt;proc~setup_local_sorted_nodes</title>
+<path fill="none" stroke="#00ff66" d="M551.14,-80.98C590.72,-69.01 654.18,-50.77 710,-39 732.33,-34.29 756.44,-30.11 779.39,-26.56"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="780.13,-29.98 789.49,-25.02 779.08,-23.06 780.13,-29.98"/>
+</g>
+<!-- proc~exchange_and_operate_scalar_impl -->
+<g id="proc~~mpi_abort~~CalledByGraph_node7" class="node">
+<title>proc~exchange_and_operate_scalar_impl</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node7"><a xlink:href="../proc/exchange_and_operate_scalar_impl.html" xlink:title="type_halo_communicator%exchange_and_operate_scalar_impl">
+<polygon fill="#d9534f" stroke="#d9534f" points="1058.5,-311 710.5,-311 710.5,-287 1058.5,-287 1058.5,-311"/>
+<text text-anchor="middle" x="884.5" y="-296.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_halo_communicator%exchange_and_operate_scalar_impl</text>
+</a>
+</g>
+</g>
+<!-- proc~exchange_and_operate_scalar_impl&#45;&gt;proc~handle_mpi_error -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge8" class="edge">
+<title>proc~exchange_and_operate_scalar_impl&#45;&gt;proc~handle_mpi_error</title>
+<path fill="none" stroke="#00ffff" d="M927.34,-286.94C963.23,-275.86 1015.84,-257.88 1059,-236 1094.95,-217.78 1133.05,-190.84 1156.68,-173.11"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1158.85,-175.86 1164.7,-167.02 1154.62,-170.28 1158.85,-175.86"/>
+</g>
+<!-- proc~exchange_and_operate_vector_impl -->
+<g id="proc~~mpi_abort~~CalledByGraph_node8" class="node">
+<title>proc~exchange_and_operate_vector_impl</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node8"><a xlink:href="../proc/exchange_and_operate_vector_impl.html" xlink:title="type_halo_communicator%exchange_and_operate_vector_impl">
+<polygon fill="#d9534f" stroke="#d9534f" points="1059,-227 710,-227 710,-203 1059,-203 1059,-227"/>
+<text text-anchor="middle" x="884.5" y="-212.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_halo_communicator%exchange_and_operate_vector_impl</text>
+</a>
+</g>
+</g>
+<!-- proc~exchange_and_operate_vector_impl&#45;&gt;proc~handle_mpi_error -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge9" class="edge">
+<title>proc~exchange_and_operate_vector_impl&#45;&gt;proc~handle_mpi_error</title>
+<path fill="none" stroke="#00ffff" d="M980.44,-202.96C1006.06,-199.12 1033.69,-194.43 1059,-189 1083.33,-183.78 1109.99,-176.46 1132.08,-169.96"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1133.3,-173.24 1141.89,-167.03 1131.3,-166.54 1133.3,-173.24"/>
+</g>
+<!-- proc~exchange_communication_plan&#45;&gt;proc~handle_mpi_error -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge10" class="edge">
+<title>proc~exchange_communication_plan&#45;&gt;proc~handle_mpi_error</title>
+<path fill="none" stroke="#00ffff" d="M1047.83,-146.02C1072.58,-147.7 1096.76,-149.35 1117.52,-150.76"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1117.53,-154.27 1127.74,-151.45 1118.01,-147.28 1117.53,-154.27"/>
+</g>
+<!-- proc~initialize_halo_communicator -->
+<g id="proc~~mpi_abort~~CalledByGraph_node10" class="node">
+<title>proc~initialize_halo_communicator</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node10"><a xlink:href="../proc/initialize_halo_communicator.html" xlink:title="type_halo_communicator%initialize_halo_communicator">
+<polygon fill="#d9534f" stroke="#d9534f" points="313,-146 0,-146 0,-122 313,-122 313,-146"/>
+<text text-anchor="middle" x="156.5" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_halo_communicator%initialize_halo_communicator</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_halo_communicator&#45;&gt;proc~handle_mpi_error -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge12" class="edge">
+<title>proc~initialize_halo_communicator&#45;&gt;proc~handle_mpi_error</title>
+<path fill="none" stroke="#00ffff" d="M313.14,-141.85C423.81,-147.03 575.99,-153.33 710,-156 865.08,-159.09 903.89,-156.64 1059,-156 1078.05,-155.92 1098.8,-155.77 1117.64,-155.61"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1117.92,-159.11 1127.89,-155.52 1117.86,-152.11 1117.92,-159.11"/>
+</g>
+<!-- proc~initialize_halo_communicator&#45;&gt;proc~build_communication_schedule -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge13" class="edge">
+<title>proc~initialize_halo_communicator&#45;&gt;proc~build_communication_schedule</title>
+<path fill="none" stroke="#ff0000" d="M261.03,-121.98C303.68,-117.02 353.24,-111.27 396.89,-106.2"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="397.45,-109.65 406.98,-105.02 396.64,-102.7 397.45,-109.65"/>
+</g>
+<!-- proc~quicksort_gid_lid_pairs -->
+<g id="proc~~mpi_abort~~CalledByGraph_node11" class="node">
+<title>proc~quicksort_gid_lid_pairs</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node11"><a xlink:href="../proc/quicksort_gid_lid_pairs.html" xlink:title="quicksort_gid_lid_pairs">
+<polygon fill="#d9534f" stroke="#d9534f" points="1247.5,-24 1114.5,-24 1114.5,0 1247.5,0 1247.5,-24"/>
+<text text-anchor="middle" x="1181" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">quicksort_gid_lid_pairs</text>
+</a>
+</g>
+</g>
+<!-- proc~quicksort_gid_lid_pairs&#45;&gt;proc~handle_fatal_sort_error -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge6" class="edge">
+<title>proc~quicksort_gid_lid_pairs&#45;&gt;proc~handle_fatal_sort_error</title>
+<path fill="none" stroke="#7fff00" d="M1242.61,-24.04C1267.72,-29.02 1297.01,-34.84 1323.07,-40.01"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1322.39,-43.45 1332.88,-41.96 1323.76,-36.58 1322.39,-43.45"/>
+</g>
+<!-- proc~quicksort_rank_lid_gid_triplets&#45;&gt;proc~handle_fatal_sort_error -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge7" class="edge">
+<title>proc~quicksort_rank_lid_gid_triplets&#45;&gt;proc~handle_fatal_sort_error</title>
+<path fill="none" stroke="#7fff00" d="M1267.11,-54C1283.31,-54 1300.17,-54 1316.11,-54"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1316.44,-57.5 1326.44,-54 1316.44,-50.5 1316.44,-57.5"/>
+</g>
+<!-- proc~assemble_scalar -->
+<g id="proc~~mpi_abort~~CalledByGraph_node13" class="node">
+<title>proc~assemble_scalar</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node13"><a xlink:href="../proc/assemble_scalar.html" xlink:title="type_halo_communicator%assemble_scalar">
+<polygon fill="#d9534f" stroke="#d9534f" points="634.5,-353 388.5,-353 388.5,-329 634.5,-329 634.5,-353"/>
+<text text-anchor="middle" x="511.5" y="-338.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_halo_communicator%assemble_scalar</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_scalar&#45;&gt;proc~exchange_and_operate_scalar_impl -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge14" class="edge">
+<title>proc~assemble_scalar&#45;&gt;proc~exchange_and_operate_scalar_impl</title>
+<path fill="none" stroke="#ffda00" d="M618.81,-328.96C665.29,-323.7 719.93,-317.52 767.46,-312.14"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="767.95,-315.6 777.49,-311 767.16,-308.65 767.95,-315.6"/>
+</g>
+<!-- proc~assemble_vector -->
+<g id="proc~~mpi_abort~~CalledByGraph_node14" class="node">
+<title>proc~assemble_vector</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node14"><a xlink:href="../proc/assemble_vector.html" xlink:title="type_halo_communicator%assemble_vector">
+<polygon fill="#d9534f" stroke="#d9534f" points="635,-269 388,-269 388,-245 635,-245 635,-269"/>
+<text text-anchor="middle" x="511.5" y="-254.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_halo_communicator%assemble_vector</text>
+</a>
+</g>
+</g>
+<!-- proc~assemble_vector&#45;&gt;proc~exchange_and_operate_vector_impl -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge16" class="edge">
+<title>proc~assemble_vector&#45;&gt;proc~exchange_and_operate_vector_impl</title>
+<path fill="none" stroke="#48ff00" d="M618.81,-244.96C665.29,-239.7 719.93,-233.52 767.46,-228.14"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="767.95,-231.6 777.49,-227 767.16,-224.65 767.95,-231.6"/>
+</g>
+<!-- proc~setup_local_sorted_nodes&#45;&gt;proc~quicksort_gid_lid_pairs -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge19" class="edge">
+<title>proc~setup_local_sorted_nodes&#45;&gt;proc~quicksort_gid_lid_pairs</title>
+<path fill="none" stroke="#4800ff" d="M1031.89,-12.5C1056.81,-12.42 1081.77,-12.33 1103.9,-12.26"/>
+<polygon fill="#4800ff" stroke="#4800ff" points="1104.21,-15.76 1114.19,-12.22 1104.18,-8.76 1104.21,-15.76"/>
+</g>
+<!-- proc~update_scalar -->
+<g id="proc~~mpi_abort~~CalledByGraph_node16" class="node">
+<title>proc~update_scalar</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node16"><a xlink:href="../proc/update_scalar.html" xlink:title="type_halo_communicator%update_scalar">
+<polygon fill="#d9534f" stroke="#d9534f" points="627.5,-311 395.5,-311 395.5,-287 627.5,-287 627.5,-311"/>
+<text text-anchor="middle" x="511.5" y="-296.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_halo_communicator%update_scalar</text>
+</a>
+</g>
+</g>
+<!-- proc~update_scalar&#45;&gt;proc~exchange_and_operate_scalar_impl -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge15" class="edge">
+<title>proc~update_scalar&#45;&gt;proc~exchange_and_operate_scalar_impl</title>
+<path fill="none" stroke="#ffda00" d="M627.6,-299C650.69,-299 675.5,-299 700.25,-299"/>
+<polygon fill="#ffda00" stroke="#ffda00" points="700.47,-302.5 710.47,-299 700.47,-295.5 700.47,-302.5"/>
+</g>
+<!-- proc~update_vector -->
+<g id="proc~~mpi_abort~~CalledByGraph_node17" class="node">
+<title>proc~update_vector</title>
+<g id="a_proc~~mpi_abort~~CalledByGraph_node17"><a xlink:href="../proc/update_vector.html" xlink:title="type_halo_communicator%update_vector">
+<polygon fill="#d9534f" stroke="#d9534f" points="628.5,-227 394.5,-227 394.5,-203 628.5,-203 628.5,-227"/>
+<text text-anchor="middle" x="511.5" y="-212.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_halo_communicator%update_vector</text>
+</a>
+</g>
+</g>
+<!-- proc~update_vector&#45;&gt;proc~exchange_and_operate_vector_impl -->
+<g id="proc~~mpi_abort~~CalledByGraph_edge17" class="edge">
+<title>proc~update_vector&#45;&gt;proc~exchange_and_operate_vector_impl</title>
+<path fill="none" stroke="#48ff00" d="M628.61,-215C651.31,-215 675.63,-215 699.9,-215"/>
+<polygon fill="#48ff00" stroke="#48ff00" points="699.93,-218.5 709.93,-215 699.93,-211.5 699.93,-218.5"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocmpi_abortCalledByGraph = svgPanZoom('#procmpi_abortCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">MPI_Abort</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span><span class="w"> </span><span class="n">error_code</span><span class="p">,</span><span class="w"> </span><span class="n">ierror</span><span class="p">)</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">MPI_Comm</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">comm</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">error_code</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ierror</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">ierror</span><span class="p">))</span><span class="w"> </span><span class="n">ierror</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">error_code</span>
+<span class="w">        </span><span class="k">write</span><span class="w"> </span><span class="p">(</span><span class="n">error_unit</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;(A,I0)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;FTCMS aborted with error code &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">error_code</span>
+<span class="w">        </span><span class="k">error stop</span>
+<span class="k">    end subroutine </span><span class="n">MPI_Abort</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-07-14 07:48 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

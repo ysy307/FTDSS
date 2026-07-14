@@ -5,7 +5,7 @@
 !>
 module domain_base_fe
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
-    use :: mpi_f08
+    use :: core_parallel_mpi
     use :: stdlib_logger
     use :: stdlib_strings
     use :: stdlib_optval, only:optval

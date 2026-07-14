@@ -1,0 +1,1932 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This solver can calculate freezing/thawing processes in the soil integrated heat and water transport.">
+    <meta name="author" content="Kikuchi Shun" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>mpi_allreduce_int32 &ndash; FTCMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">FTCMS </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="../page/index.html">Read Me</a></li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>mpi_allreduce_int32
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.0% of total for procedures.">11 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/parallel_mpi.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/parallel_mpi.f90.html'>parallel_mpi.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/core_parallel_mpi.html'>core_parallel_mpi</a></li>
+            <li class="breadcrumb-item active" aria-current="page">mpi_allreduce_int32</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/mpi_allreduce_int32.html#src">mpi_allreduce_int32</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine mpi_allreduce_int32(send_buffer, receive_buffer, count, datatype, operation, comm, ierror)  
+</h2>
+    
+
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-send_buffer"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>send_buffer</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-receive_buffer"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>receive_buffer</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-count~11"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>count</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-datatype~3"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>datatype</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-operation"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>operation</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-comm~5"></span>
+              type(<a href='../type/mpi_comm.html'>MPI_Comm</a>),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>comm</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ierror~5"></span>
+              integer(kind=int32),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>ierror</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~mpi_allreduce_int32~~CalledByGraph Pages: 1 -->
+<svg id="procmpi_allreduce_int32CalledByGraph" width="641pt" height="152pt"
+ viewBox="0.00 0.00 641.00 151.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph" class="graph" transform="scale(0.11 0.11) rotate(0) translate(4 1322)">
+<title>proc~~mpi_allreduce_int32~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1322 5606,-1322 5606,4 -4,4"/>
+<!-- proc~mpi_allreduce_int32 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node1" class="node">
+<title>proc~mpi_allreduce_int32</title>
+<polygon fill="none" stroke="black" points="5602,-213 5482,-213 5482,-189 5602,-189 5602,-213"/>
+<text text-anchor="middle" x="5542" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50">mpi_allreduce_int32</text>
+</g>
+<!-- interface~mpi_allreduce -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node2" class="node">
+<title>interface~mpi_allreduce</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node2"><a xlink:href="../interface/mpi_allreduce.html" xlink:title="MPI_Allreduce">
+<polygon fill="#a7506f" stroke="#a7506f" points="5446,-213 5360,-213 5360,-189 5446,-189 5446,-213"/>
+<text text-anchor="middle" x="5403" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">MPI_Allreduce</text>
+</a>
+</g>
+</g>
+<!-- interface~mpi_allreduce&#45;&gt;proc~mpi_allreduce_int32 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge1" class="edge">
+<title>interface~mpi_allreduce&#45;&gt;proc~mpi_allreduce_int32</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M5446.22,-201C5454.3,-201 5462.96,-201 5471.63,-201"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="5471.79,-204.5 5481.79,-201 5471.79,-197.5 5471.79,-204.5"/>
+</g>
+<!-- proc~dot_mkl -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node3" class="node">
+<title>proc~dot_mkl</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node3"><a xlink:href="../proc/dot_mkl.html" xlink:title="dot_mkl">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="5287.5,-402 5232.5,-402 5232.5,-378 5287.5,-378 5287.5,-402"/>
+<text text-anchor="middle" x="5260" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dot_mkl</text>
+</a>
+</g>
+</g>
+<!-- proc~dot_mkl&#45;&gt;interface~mpi_allreduce -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge2" class="edge">
+<title>proc~dot_mkl&#45;&gt;interface~mpi_allreduce</title>
+<path fill="none" stroke="#ff0000" d="M5287.65,-386.1C5299.91,-383.14 5313.94,-377.98 5324,-369 5368.56,-329.21 5389.52,-258.69 5397.67,-223"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="5401.12,-223.63 5399.8,-213.12 5394.27,-222.16 5401.12,-223.63"/>
+</g>
+<!-- proc~dot_native~2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node4" class="node">
+<title>proc~dot_native~2</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node4"><a xlink:href="../proc/dot_native~2.html" xlink:title="dot_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="5294,-360 5226,-360 5226,-336 5294,-336 5294,-360"/>
+<text text-anchor="middle" x="5260" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dot_native</text>
+</a>
+</g>
+</g>
+<!-- proc~dot_native~2&#45;&gt;interface~mpi_allreduce -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge3" class="edge">
+<title>proc~dot_native~2&#45;&gt;interface~mpi_allreduce</title>
+<path fill="none" stroke="#ff0000" d="M5294.22,-341.59C5304.52,-338.44 5315.41,-333.79 5324,-327 5359.23,-299.14 5382.68,-250.69 5394.04,-222.68"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="5397.3,-223.95 5397.67,-213.37 5390.78,-221.41 5397.3,-223.95"/>
+</g>
+<!-- proc~norm_1_mkl -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node5" class="node">
+<title>proc~norm_1_mkl</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node5"><a xlink:href="../proc/norm_1_mkl.html" xlink:title="norm_1_mkl">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="5299,-318 5221,-318 5221,-294 5299,-294 5299,-318"/>
+<text text-anchor="middle" x="5260" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_1_mkl</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_1_mkl&#45;&gt;interface~mpi_allreduce -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge4" class="edge">
+<title>proc~norm_1_mkl&#45;&gt;interface~mpi_allreduce</title>
+<path fill="none" stroke="#ff0000" d="M5299.05,-296.72C5307.64,-293.72 5316.44,-289.87 5324,-285 5350.29,-268.07 5373.69,-240.28 5387.84,-221.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="5390.8,-223.23 5393.85,-213.08 5385.14,-219.11 5390.8,-223.23"/>
+</g>
+<!-- proc~norm_1_native~2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node6" class="node">
+<title>proc~norm_1_native~2</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node6"><a xlink:href="../proc/norm_1_native~2.html" xlink:title="norm_1_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="5305.5,-108 5214.5,-108 5214.5,-84 5305.5,-84 5305.5,-108"/>
+<text text-anchor="middle" x="5260" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_1_native</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_1_native~2&#45;&gt;interface~mpi_allreduce -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge5" class="edge">
+<title>proc~norm_1_native~2&#45;&gt;interface~mpi_allreduce</title>
+<path fill="none" stroke="#ff0000" d="M5305.67,-107.76C5312.07,-110.32 5318.38,-113.38 5324,-117 5350.29,-133.93 5373.69,-161.72 5387.84,-180.66"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="5385.14,-182.89 5393.85,-188.92 5390.8,-178.77 5385.14,-182.89"/>
+</g>
+<!-- proc~norm_2_mkl -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node7" class="node">
+<title>proc~norm_2_mkl</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node7"><a xlink:href="../proc/norm_2_mkl.html" xlink:title="norm_2_mkl">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="5299,-234 5221,-234 5221,-210 5299,-210 5299,-234"/>
+<text text-anchor="middle" x="5260" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_mkl</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_2_mkl&#45;&gt;interface~mpi_allreduce -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge6" class="edge">
+<title>proc~norm_2_mkl&#45;&gt;interface~mpi_allreduce</title>
+<path fill="none" stroke="#ff0000" d="M5299.16,-216.32C5314.69,-214 5332.9,-211.29 5349.64,-208.8"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="5350.47,-212.21 5359.84,-207.28 5349.44,-205.29 5350.47,-212.21"/>
+</g>
+<!-- proc~norm_2_native~2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node8" class="node">
+<title>proc~norm_2_native~2</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node8"><a xlink:href="../proc/norm_2_native~2.html" xlink:title="norm_2_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="5305.5,-276 5214.5,-276 5214.5,-252 5305.5,-252 5305.5,-276"/>
+<text text-anchor="middle" x="5260" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_native</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_2_native~2&#45;&gt;interface~mpi_allreduce -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge7" class="edge">
+<title>proc~norm_2_native~2&#45;&gt;interface~mpi_allreduce</title>
+<path fill="none" stroke="#ff0000" d="M5300.71,-251.92C5308.52,-249.22 5316.59,-246.2 5324,-243 5340.68,-235.79 5358.57,-226.3 5373.01,-218.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="5375.01,-221.04 5381.95,-213.04 5371.53,-214.97 5375.01,-221.04"/>
+</g>
+<!-- proc~norm_inf_mkl -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node9" class="node">
+<title>proc~norm_inf_mkl</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node9"><a xlink:href="../proc/norm_inf_mkl.html" xlink:title="norm_inf_mkl">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="5302.5,-150 5217.5,-150 5217.5,-126 5302.5,-126 5302.5,-150"/>
+<text text-anchor="middle" x="5260" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_inf_mkl</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_inf_mkl&#45;&gt;interface~mpi_allreduce -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge8" class="edge">
+<title>proc~norm_inf_mkl&#45;&gt;interface~mpi_allreduce</title>
+<path fill="none" stroke="#ff0000" d="M5300.71,-150.08C5308.52,-152.78 5316.59,-155.8 5324,-159 5340.68,-166.21 5358.57,-175.7 5373.01,-183.85"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="5371.53,-187.03 5381.95,-188.96 5375.01,-180.96 5371.53,-187.03"/>
+</g>
+<!-- proc~norm_inf_native~2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node10" class="node">
+<title>proc~norm_inf_native~2</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node10"><a xlink:href="../proc/norm_inf_native~2.html" xlink:title="norm_inf_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="5309,-192 5211,-192 5211,-168 5309,-168 5309,-192"/>
+<text text-anchor="middle" x="5260" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_inf_native</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_inf_native~2&#45;&gt;interface~mpi_allreduce -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge9" class="edge">
+<title>proc~norm_inf_native~2&#45;&gt;interface~mpi_allreduce</title>
+<path fill="none" stroke="#ff0000" d="M5309.13,-187.17C5322.23,-189.12 5336.47,-191.24 5349.78,-193.22"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="5349.34,-196.7 5359.74,-194.71 5350.37,-189.77 5349.34,-196.7"/>
+</g>
+<!-- proc~type_vtk_vtk_initialize -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node11" class="node">
+<title>proc~type_vtk_vtk_initialize</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node11"><a xlink:href="../proc/type_vtk_vtk_initialize.html" xlink:title="type_vtk_vtk_initialize">
+<polygon fill="#d9534f" stroke="#d9534f" points="5323.5,-66 5196.5,-66 5196.5,-42 5323.5,-42 5323.5,-66"/>
+<text text-anchor="middle" x="5260" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk_vtk_initialize</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_vtk_initialize&#45;&gt;interface~mpi_allreduce -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge10" class="edge">
+<title>proc~type_vtk_vtk_initialize&#45;&gt;interface~mpi_allreduce</title>
+<path fill="none" stroke="#ff0000" d="M5309.27,-66.11C5314.53,-68.56 5319.57,-71.5 5324,-75 5359.23,-102.86 5382.68,-151.31 5394.04,-179.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="5390.78,-180.59 5397.67,-188.63 5397.3,-178.05 5390.78,-180.59"/>
+</g>
+<!-- proc~type_vtk_vtu_initialize -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node12" class="node">
+<title>proc~type_vtk_vtu_initialize</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node12"><a xlink:href="../proc/type_vtk_vtu_initialize.html" xlink:title="type_vtk_vtu_initialize">
+<polygon fill="#d9534f" stroke="#d9534f" points="5324,-24 5196,-24 5196,0 5324,0 5324,-24"/>
+<text text-anchor="middle" x="5260" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk_vtu_initialize</text>
+</a>
+</g>
+</g>
+<!-- proc~type_vtk_vtu_initialize&#45;&gt;interface~mpi_allreduce -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge11" class="edge">
+<title>proc~type_vtk_vtu_initialize&#45;&gt;interface~mpi_allreduce</title>
+<path fill="none" stroke="#ff0000" d="M5310.64,-24.08C5315.48,-26.53 5320.04,-29.47 5324,-33 5368.56,-72.79 5389.52,-143.31 5397.67,-179"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="5394.27,-179.84 5399.8,-188.88 5401.12,-178.37 5394.27,-179.84"/>
+</g>
+<!-- interface~type_vtk_vtk_initialize -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node13" class="node">
+<title>interface~type_vtk_vtk_initialize</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node13"><a xlink:href="../interface/type_vtk_vtk_initialize.html" xlink:title="type_vtk%type_vtk_vtk_initialize">
+<polygon fill="#a7506f" stroke="#a7506f" points="5159.5,-66 4978.5,-66 4978.5,-42 5159.5,-42 5159.5,-66"/>
+<text text-anchor="middle" x="5069" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk%type_vtk_vtk_initialize</text>
+</a>
+</g>
+</g>
+<!-- interface~type_vtk_vtk_initialize&#45;&gt;proc~type_vtk_vtk_initialize -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge16" class="edge">
+<title>interface~type_vtk_vtk_initialize&#45;&gt;proc~type_vtk_vtk_initialize</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M5159.52,-54C5168.5,-54 5177.55,-54 5186.32,-54"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="5186.49,-57.5 5196.49,-54 5186.49,-50.5 5186.49,-57.5"/>
+</g>
+<!-- interface~type_vtk_vtu_initialize -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node14" class="node">
+<title>interface~type_vtk_vtu_initialize</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node14"><a xlink:href="../interface/type_vtk_vtu_initialize.html" xlink:title="type_vtk%type_vtk_vtu_initialize">
+<polygon fill="#a7506f" stroke="#a7506f" points="5160,-24 4978,-24 4978,0 5160,0 5160,-24"/>
+<text text-anchor="middle" x="5069" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_vtk%type_vtk_vtu_initialize</text>
+</a>
+</g>
+</g>
+<!-- interface~type_vtk_vtu_initialize&#45;&gt;proc~type_vtk_vtu_initialize -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge17" class="edge">
+<title>interface~type_vtk_vtu_initialize&#45;&gt;proc~type_vtk_vtu_initialize</title>
+<path fill="none" stroke="#ff0098" stroke-dasharray="5,2" d="M5160.07,-12C5168.66,-12 5177.29,-12 5185.69,-12"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="5185.79,-15.5 5195.79,-12 5185.79,-8.5 5185.79,-15.5"/>
+</g>
+<!-- proc~dot_native -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node15" class="node">
+<title>proc~dot_native</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node15"><a xlink:href="../proc/dot_native.html" xlink:title="dot_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="5103,-774 5035,-774 5035,-750 5103,-750 5103,-774"/>
+<text text-anchor="middle" x="5069" y="-759.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dot_native</text>
+</a>
+</g>
+</g>
+<!-- proc~dot_native&#45;&gt;proc~dot_native~2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge12" class="edge">
+<title>proc~dot_native&#45;&gt;proc~dot_native~2</title>
+<path fill="none" stroke="#ff9900" d="M5078.54,-749.6C5096.68,-722.63 5139.07,-656.08 5160,-594 5192.36,-498.04 5130.46,-446.21 5196,-369 5201.36,-362.69 5208.67,-358.27 5216.41,-355.17"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="5217.57,-358.47 5225.97,-352.01 5215.38,-351.82 5217.57,-358.47"/>
+</g>
+<!-- proc~norm_1_native -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node16" class="node">
+<title>proc~norm_1_native</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node16"><a xlink:href="../proc/norm_1_native.html" xlink:title="norm_1_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="5114.5,-108 5023.5,-108 5023.5,-84 5114.5,-84 5114.5,-108"/>
+<text text-anchor="middle" x="5069" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_1_native</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_1_native&#45;&gt;proc~norm_1_native~2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge13" class="edge">
+<title>proc~norm_1_native&#45;&gt;proc~norm_1_native~2</title>
+<path fill="none" stroke="#33ff00" d="M5114.79,-96C5141.53,-96 5175.68,-96 5204.04,-96"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="5204.2,-99.5 5214.2,-96 5204.2,-92.5 5204.2,-99.5"/>
+</g>
+<!-- proc~norm_2_native -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node17" class="node">
+<title>proc~norm_2_native</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node17"><a xlink:href="../proc/norm_2_native.html" xlink:title="norm_2_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="5114.5,-585 5023.5,-585 5023.5,-561 5114.5,-561 5114.5,-585"/>
+<text text-anchor="middle" x="5069" y="-570.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_native</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_2_native&#45;&gt;proc~norm_2_native~2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge14" class="edge">
+<title>proc~norm_2_native&#45;&gt;proc~norm_2_native~2</title>
+<path fill="none" stroke="#00ffff" d="M5071.74,-560.85C5078.68,-516.96 5108.35,-365.05 5196,-285 5198.8,-282.44 5201.93,-280.19 5205.25,-278.21"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="5207.04,-281.23 5214.39,-273.6 5203.89,-274.98 5207.04,-281.23"/>
+</g>
+<!-- proc~norm_inf_native -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node18" class="node">
+<title>proc~norm_inf_native</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node18"><a xlink:href="../proc/norm_inf_native.html" xlink:title="norm_inf_native">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="5118,-190 5020,-190 5020,-166 5118,-166 5118,-190"/>
+<text text-anchor="middle" x="5069" y="-175.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_inf_native</text>
+</a>
+</g>
+</g>
+<!-- proc~norm_inf_native&#45;&gt;proc~norm_inf_native~2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge15" class="edge">
+<title>proc~norm_inf_native&#45;&gt;proc~norm_inf_native~2</title>
+<path fill="none" stroke="#3200ff" d="M5118.18,-178.51C5143.28,-178.78 5174.18,-179.1 5200.63,-179.38"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="5200.87,-182.88 5210.91,-179.49 5200.94,-175.89 5200.87,-182.88"/>
+</g>
+<!-- interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node19" class="node">
+<title>interface~vector_dot</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node19"><a xlink:href="../interface/vector_dot.html" xlink:title="vector_dot">
+<polygon fill="#a7506f" stroke="#a7506f" points="4617,-814 4548,-814 4548,-790 4617,-790 4617,-814"/>
+<text text-anchor="middle" x="4582.5" y="-799.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_dot</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_dot&#45;&gt;proc~dot_native -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge21" class="edge">
+<title>interface~vector_dot&#45;&gt;proc~dot_native</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M4617.21,-801.47C4680.87,-800.2 4823.04,-796.02 4942,-783 4969.78,-779.96 5000.73,-774.82 5025.01,-770.39"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="5025.78,-773.81 5034.98,-768.55 5024.51,-766.93 5025.78,-773.81"/>
+</g>
+<!-- proc~dot_vector_dp -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node23" class="node">
+<title>proc~dot_vector_dp</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node23"><a xlink:href="../proc/dot_vector_dp.html" xlink:title="dot_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="4898.5,-774 4810.5,-774 4810.5,-750 4898.5,-750 4898.5,-774"/>
+<text text-anchor="middle" x="4854.5" y="-759.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dot_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_dot&#45;&gt;proc~dot_vector_dp -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge84" class="edge">
+<title>interface~vector_dot&#45;&gt;proc~dot_vector_dp</title>
+<path fill="none" stroke="#00ffa9" stroke-dasharray="5,2" d="M4617.15,-797.01C4662.97,-790.23 4745.49,-778 4799.88,-769.94"/>
+<polygon fill="#00ffa9" stroke="#00ffa9" points="4800.66,-773.37 4810.03,-768.44 4799.63,-766.44 4800.66,-773.37"/>
+</g>
+<!-- interface~vector_norm1 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node20" class="node">
+<title>interface~vector_norm1</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node20"><a xlink:href="../interface/vector_norm1.html" xlink:title="vector_norm1">
+<polygon fill="#a7506f" stroke="#a7506f" points="4626,-68 4539,-68 4539,-44 4626,-44 4626,-68"/>
+<text text-anchor="middle" x="4582.5" y="-53.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_norm1</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm1&#45;&gt;proc~norm_1_native -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge23" class="edge">
+<title>interface~vector_norm1&#45;&gt;proc~norm_1_native</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M4626.08,-61.49C4663.23,-66.14 4718.61,-72.71 4767,-77 4852.91,-84.62 4952.88,-90.3 5013.25,-93.38"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="5013.16,-96.88 5023.32,-93.89 5013.51,-89.89 5013.16,-96.88"/>
+</g>
+<!-- proc~norm_1_vector_dp -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node25" class="node">
+<title>proc~norm_1_vector_dp</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node25"><a xlink:href="../proc/norm_1_vector_dp.html" xlink:title="norm_1_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="4910,-68 4799,-68 4799,-44 4910,-44 4910,-68"/>
+<text text-anchor="middle" x="4854.5" y="-53.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_1_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm1&#45;&gt;proc~norm_1_vector_dp -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge86" class="edge">
+<title>interface~vector_norm1&#45;&gt;proc~norm_1_vector_dp</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M4626.28,-56C4669.96,-56 4738.32,-56 4788.65,-56"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="4788.79,-59.5 4798.79,-56 4788.79,-52.5 4788.79,-59.5"/>
+</g>
+<!-- interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node21" class="node">
+<title>interface~vector_norm2</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node21"><a xlink:href="../interface/vector_norm2.html" xlink:title="vector_norm2">
+<polygon fill="#a7506f" stroke="#a7506f" points="4626,-625 4539,-625 4539,-601 4626,-601 4626,-625"/>
+<text text-anchor="middle" x="4582.5" y="-610.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_norm2</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm2&#45;&gt;proc~norm_2_native -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge25" class="edge">
+<title>interface~vector_norm2&#45;&gt;proc~norm_2_native</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M4626.12,-612.29C4693.41,-610.81 4828.31,-606.45 4942,-594 4965.51,-591.43 4991.31,-587.35 5013.4,-583.47"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="5014.04,-586.91 5023.27,-581.71 5012.81,-580.02 5014.04,-586.91"/>
+</g>
+<!-- proc~norm_2_vector_dp -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node26" class="node">
+<title>proc~norm_2_vector_dp</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node26"><a xlink:href="../proc/norm_2_vector_dp.html" xlink:title="norm_2_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="4910,-585 4799,-585 4799,-561 4910,-561 4910,-585"/>
+<text text-anchor="middle" x="4854.5" y="-570.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_2_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norm2&#45;&gt;proc~norm_2_vector_dp -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge87" class="edge">
+<title>interface~vector_norm2&#45;&gt;proc~norm_2_vector_dp</title>
+<path fill="none" stroke="#aa00ff" stroke-dasharray="5,2" d="M4626.28,-606.66C4669.96,-600.19 4738.32,-590.06 4788.65,-582.61"/>
+<polygon fill="#aa00ff" stroke="#aa00ff" points="4789.41,-586.03 4798.79,-581.11 4788.38,-579.11 4789.41,-586.03"/>
+</g>
+<!-- interface~vector_norminf -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node22" class="node">
+<title>interface~vector_norminf</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node22"><a xlink:href="../interface/vector_norminf.html" xlink:title="vector_norminf">
+<polygon fill="#a7506f" stroke="#a7506f" points="4629.5,-150 4535.5,-150 4535.5,-126 4629.5,-126 4629.5,-150"/>
+<text text-anchor="middle" x="4582.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">vector_norminf</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norminf&#45;&gt;proc~norm_inf_native -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge27" class="edge">
+<title>interface~vector_norminf&#45;&gt;proc~norm_inf_native</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M4629.81,-143.96C4666.88,-148.57 4720.21,-154.85 4767,-159 4851.31,-166.48 4949.16,-172.09 5009.83,-175.21"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="5009.82,-178.71 5019.98,-175.72 5010.17,-171.72 5009.82,-178.71"/>
+</g>
+<!-- proc~norm_inf_vector_dp -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node27" class="node">
+<title>proc~norm_inf_vector_dp</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node27"><a xlink:href="../proc/norm_inf_vector_dp.html" xlink:title="norm_inf_vector_dp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="4913.5,-150 4795.5,-150 4795.5,-126 4913.5,-126 4913.5,-150"/>
+<text text-anchor="middle" x="4854.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">norm_inf_vector_dp</text>
+</a>
+</g>
+</g>
+<!-- interface~vector_norminf&#45;&gt;proc~norm_inf_vector_dp -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge88" class="edge">
+<title>interface~vector_norminf&#45;&gt;proc~norm_inf_vector_dp</title>
+<path fill="none" stroke="#ff00aa" stroke-dasharray="5,2" d="M4629.61,-138C4672.35,-138 4736.51,-138 4785.2,-138"/>
+<polygon fill="#ff00aa" stroke="#ff00aa" points="4785.34,-141.5 4795.34,-138 4785.34,-134.5 4785.34,-141.5"/>
+</g>
+<!-- proc~dot_vector_dp&#45;&gt;proc~dot_native -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge20" class="edge">
+<title>proc~dot_vector_dp&#45;&gt;proc~dot_native</title>
+<path fill="none" stroke="#00ff00" d="M4898.5,-762C4935.15,-762 4987.58,-762 5024.39,-762"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="5024.81,-765.5 5034.81,-762 5024.81,-758.5 5024.81,-765.5"/>
+</g>
+<!-- proc~initialize_type_input_geometry -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node24" class="node">
+<title>proc~initialize_type_input_geometry</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node24"><a xlink:href="../proc/initialize_type_input_geometry.html" xlink:title="initialize_type_input_geometry">
+<polygon fill="#d9534f" stroke="#d9534f" points="4942,-25 4767,-25 4767,-1 4942,-1 4942,-25"/>
+<text text-anchor="middle" x="4854.5" y="-10.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">initialize_type_input_geometry</text>
+</a>
+</g>
+</g>
+<!-- proc~initialize_type_input_geometry&#45;&gt;interface~type_vtk_vtk_initialize -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge18" class="edge">
+<title>proc~initialize_type_input_geometry&#45;&gt;interface~type_vtk_vtk_initialize</title>
+<path fill="none" stroke="#ff0000" d="M4917.82,-25.02C4942.26,-29.74 4970.45,-35.18 4995.77,-40.06"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4995.2,-43.52 5005.68,-41.98 4996.52,-36.64 4995.2,-43.52"/>
+</g>
+<!-- proc~initialize_type_input_geometry&#45;&gt;interface~type_vtk_vtu_initialize -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge19" class="edge">
+<title>proc~initialize_type_input_geometry&#45;&gt;interface~type_vtk_vtu_initialize</title>
+<path fill="none" stroke="#ffff00" d="M4942.24,-12.59C4950.56,-12.55 4959.05,-12.51 4967.49,-12.47"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="4967.76,-15.97 4977.74,-12.42 4967.73,-8.97 4967.76,-15.97"/>
+</g>
+<!-- proc~norm_1_vector_dp&#45;&gt;proc~norm_1_native -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge22" class="edge">
+<title>proc~norm_1_vector_dp&#45;&gt;proc~norm_1_native</title>
+<path fill="none" stroke="#00ffff" d="M4910.22,-66.3C4941.96,-72.27 4981.79,-79.77 5013.49,-85.74"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="5013,-89.21 5023.47,-87.62 5014.29,-82.33 5013,-89.21"/>
+</g>
+<!-- proc~norm_2_vector_dp&#45;&gt;proc~norm_2_native -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge24" class="edge">
+<title>proc~norm_2_vector_dp&#45;&gt;proc~norm_2_native</title>
+<path fill="none" stroke="#0000ff" d="M4910.22,-573C4941.82,-573 4981.44,-573 5013.08,-573"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="5013.47,-576.5 5023.47,-573 5013.47,-569.5 5013.47,-576.5"/>
+</g>
+<!-- proc~norm_inf_vector_dp&#45;&gt;proc~norm_inf_native -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge26" class="edge">
+<title>proc~norm_inf_vector_dp&#45;&gt;proc~norm_inf_native</title>
+<path fill="none" stroke="#ff00ff" d="M4913.57,-148.93C4943.49,-154.56 4979.87,-161.41 5009.81,-167.05"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="5009.22,-170.5 5019.7,-168.91 5010.52,-163.62 5009.22,-170.5"/>
+</g>
+<!-- interface~initialize_type_input_geometry -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node28" class="node">
+<title>interface~initialize_type_input_geometry</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node28"><a xlink:href="../interface/initialize_type_input_geometry.html" xlink:title="type_input_geometry%initialize_type_input_geometry">
+<polygon fill="#a7506f" stroke="#a7506f" points="4731,-25 4434,-25 4434,-1 4731,-1 4731,-25"/>
+<text text-anchor="middle" x="4582.5" y="-10.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_input_geometry%initialize_type_input_geometry</text>
+</a>
+</g>
+</g>
+<!-- interface~initialize_type_input_geometry&#45;&gt;proc~initialize_type_input_geometry -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge85" class="edge">
+<title>interface~initialize_type_input_geometry&#45;&gt;proc~initialize_type_input_geometry</title>
+<path fill="none" stroke="#00a9ff" stroke-dasharray="5,2" d="M4731.14,-13C4739.8,-13 4748.4,-13 4756.78,-13"/>
+<polygon fill="#00a9ff" stroke="#00a9ff" points="4756.89,-16.5 4766.89,-13 4756.89,-9.5 4756.89,-16.5"/>
+</g>
+<!-- proc~block_residual_norm -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node29" class="node">
+<title>proc~block_residual_norm</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node29"><a xlink:href="../proc/block_residual_norm.html" xlink:title="block_residual_norm">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="3382.5,-232 3260.5,-232 3260.5,-208 3382.5,-208 3382.5,-232"/>
+<text text-anchor="middle" x="3321.5" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">block_residual_norm</text>
+</a>
+</g>
+</g>
+<!-- proc~block_residual_norm&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge53" class="edge">
+<title>proc~block_residual_norm&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M3382.71,-218.01C3596.7,-211.4 4312.3,-193.61 4398,-248 4524.52,-328.29 4567.19,-524.66 4578.24,-590.83"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4574.82,-591.63 4579.85,-600.95 4581.74,-590.53 4574.82,-591.63"/>
+</g>
+<!-- proc~check_convergence_criterion -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node30" class="node">
+<title>proc~check_convergence_criterion</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node30"><a xlink:href="../proc/check_convergence_criterion.html" xlink:title="check_convergence_criterion">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="4359.5,-66 4190.5,-66 4190.5,-42 4359.5,-42 4359.5,-66"/>
+<text text-anchor="middle" x="4275" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">check_convergence_criterion</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_criterion&#45;&gt;interface~vector_norm1 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge52" class="edge">
+<title>proc~check_convergence_criterion&#45;&gt;interface~vector_norm1</title>
+<path fill="none" stroke="#ffaa00" d="M4359.88,-54.55C4413.75,-54.9 4482.06,-55.35 4528.51,-55.65"/>
+<polygon fill="#ffaa00" stroke="#ffaa00" points="4528.63,-59.15 4538.65,-55.72 4528.68,-52.15 4528.63,-59.15"/>
+</g>
+<!-- proc~check_convergence_criterion&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge54" class="edge">
+<title>proc~check_convergence_criterion&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4359.71,-56.24C4373.67,-59.85 4387.13,-65.72 4398,-75 4419.05,-92.96 4544.13,-492.6 4574.74,-591.17"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4571.47,-592.44 4577.77,-600.95 4578.15,-590.37 4571.47,-592.44"/>
+</g>
+<!-- proc~check_convergence_criterion&#45;&gt;interface~vector_norminf -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge82" class="edge">
+<title>proc~check_convergence_criterion&#45;&gt;interface~vector_norminf</title>
+<path fill="none" stroke="#00ff00" d="M4356.78,-66.02C4370.61,-68.62 4384.78,-71.62 4398,-75 4448.47,-87.92 4504.94,-108.23 4541.74,-122.28"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="4540.52,-125.56 4551.11,-125.88 4543.04,-119.03 4540.52,-125.56"/>
+</g>
+<!-- proc~compute_lte_error_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node31" class="node">
+<title>proc~compute_lte_error_ftcms</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node31"><a xlink:href="../proc/compute_lte_error_ftcms.html" xlink:title="compute_lte_error_ftcms">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="3666,-272 3521,-272 3521,-248 3666,-248 3666,-272"/>
+<text text-anchor="middle" x="3593.5" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_lte_error_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_lte_error_ftcms&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge55" class="edge">
+<title>proc~compute_lte_error_ftcms&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M3666.1,-257.47C3851.38,-251.47 4336.44,-239.59 4398,-277 4516.96,-349.29 4564.09,-528.17 4577.3,-590.86"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4573.91,-591.74 4579.32,-600.85 4580.77,-590.35 4573.91,-591.74"/>
+</g>
+<!-- proc~compute_relaxation_acceleration_aitken -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node32" class="node">
+<title>proc~compute_relaxation_acceleration_aitken</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node32"><a xlink:href="../proc/compute_relaxation_acceleration_aitken.html" xlink:title="compute_relaxation_acceleration_aitken">
+<polygon fill="#d9534f" stroke="#d9534f" points="4389.5,-1276 4160.5,-1276 4160.5,-1252 4389.5,-1252 4389.5,-1276"/>
+<text text-anchor="middle" x="4275" y="-1261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_relaxation_acceleration_aitken</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_relaxation_acceleration_aitken&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge28" class="edge">
+<title>proc~compute_relaxation_acceleration_aitken&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4384.19,-1251.9C4389.08,-1249.36 4393.72,-1246.42 4398,-1243 4537.03,-1132.06 4571.9,-897.45 4579.56,-824.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4583.04,-824.61 4580.53,-814.32 4576.07,-823.93 4583.04,-824.61"/>
+</g>
+<!-- proc~compute_relaxation_acceleration_anderson -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node33" class="node">
+<title>proc~compute_relaxation_acceleration_anderson</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node33"><a xlink:href="../proc/compute_relaxation_acceleration_anderson.html" xlink:title="compute_relaxation_acceleration_anderson">
+<polygon fill="#d9534f" stroke="#d9534f" points="4398,-1318 4152,-1318 4152,-1294 4398,-1294 4398,-1318"/>
+<text text-anchor="middle" x="4275" y="-1303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_relaxation_acceleration_anderson</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_relaxation_acceleration_anderson&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge29" class="edge">
+<title>proc~compute_relaxation_acceleration_anderson&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4384.61,-1293.91C4389.35,-1291.37 4393.85,-1288.42 4398,-1285 4547.79,-1161.6 4575.46,-901.78 4580.44,-824.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4583.94,-824.39 4581.02,-814.21 4576.95,-823.99 4583.94,-824.39"/>
+</g>
+<!-- proc~nonlinear_residual_norm_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node34" class="node">
+<title>proc~nonlinear_residual_norm_ftcms</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node34"><a xlink:href="../proc/nonlinear_residual_norm_ftcms.html" xlink:title="nonlinear_residual_norm_ftcms">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="4364.5,-192 4185.5,-192 4185.5,-168 4364.5,-168 4364.5,-192"/>
+<text text-anchor="middle" x="4275" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">nonlinear_residual_norm_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~nonlinear_residual_norm_ftcms&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge56" class="edge">
+<title>proc~nonlinear_residual_norm_ftcms&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4364.5,-188.45C4376.61,-192.47 4388.22,-198.12 4398,-206 4526.31,-309.47 4568.07,-521.89 4578.54,-590.85"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4575.11,-591.59 4580,-600.99 4582.03,-590.59 4575.11,-591.59"/>
+</g>
+<!-- proc~solve_type_solver_bicg -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node35" class="node">
+<title>proc~solve_type_solver_bicg</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node35"><a xlink:href="../proc/solve_type_solver_bicg.html" xlink:title="solve_type_solver_bicg">
+<polygon fill="#d9534f" stroke="#d9534f" points="4342,-478 4208,-478 4208,-454 4342,-454 4342,-478"/>
+<text text-anchor="middle" x="4275" y="-463.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicg</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicg&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge30" class="edge">
+<title>proc~solve_type_solver_bicg&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4342.03,-463.91C4362.2,-466.52 4382.99,-473 4398,-487 4447.19,-532.88 4402.92,-574.35 4434,-634 4466.41,-696.19 4526.55,-754.29 4559.13,-783.08"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4556.95,-785.82 4566.78,-789.76 4561.55,-780.55 4556.95,-785.82"/>
+</g>
+<!-- proc~solve_type_solver_bicg&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge57" class="edge">
+<title>proc~solve_type_solver_bicg&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4342.03,-472.06C4360.59,-475.17 4380.48,-479.88 4398,-487 4463.07,-513.45 4528.24,-565.86 4560.57,-594.03"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4558.61,-596.97 4568.43,-600.96 4563.25,-591.72 4558.61,-596.97"/>
+</g>
+<!-- proc~solve_type_solver_bicgsafe -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node36" class="node">
+<title>proc~solve_type_solver_bicgsafe</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node36"><a xlink:href="../proc/solve_type_solver_bicgsafe.html" xlink:title="solve_type_solver_bicgsafe">
+<polygon fill="#d9534f" stroke="#d9534f" points="4353.5,-436 4196.5,-436 4196.5,-412 4353.5,-412 4353.5,-436"/>
+<text text-anchor="middle" x="4275" y="-421.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicgsafe</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicgsafe&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge31" class="edge">
+<title>proc~solve_type_solver_bicgsafe&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4353.58,-423.3C4370.04,-426.71 4386.04,-433.25 4398,-445 4459,-504.93 4396.47,-557.17 4434,-634 4464.78,-697.01 4525.59,-754.77 4558.71,-783.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4556.6,-786.1 4566.49,-789.9 4561.13,-780.77 4556.6,-786.1"/>
+</g>
+<!-- proc~solve_type_solver_bicgsafe&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge58" class="edge">
+<title>proc~solve_type_solver_bicgsafe&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4353.59,-430.52C4368.81,-433.67 4384.3,-438.28 4398,-445 4471.96,-481.27 4537.56,-556.73 4566.21,-592.87"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4563.46,-595.03 4572.38,-600.76 4568.98,-590.72 4563.46,-595.03"/>
+</g>
+<!-- proc~solve_type_solver_bicgstab -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node37" class="node">
+<title>proc~solve_type_solver_bicgstab</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node37"><a xlink:href="../proc/solve_type_solver_bicgstab.html" xlink:title="solve_type_solver_bicgstab">
+<polygon fill="#d9534f" stroke="#d9534f" points="4353.5,-150 4196.5,-150 4196.5,-126 4353.5,-126 4353.5,-150"/>
+<text text-anchor="middle" x="4275" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicgstab</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicgstab&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge32" class="edge">
+<title>proc~solve_type_solver_bicgstab&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4353.62,-136.16C4370.38,-139.54 4386.5,-146.36 4398,-159 4469.22,-237.32 4392.96,-536.42 4434,-634 4461.05,-698.32 4522.84,-755.15 4557.25,-783.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4555.38,-786.28 4565.36,-789.81 4559.76,-780.82 4555.38,-786.28"/>
+</g>
+<!-- proc~solve_type_solver_bicgstab&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge59" class="edge">
+<title>proc~solve_type_solver_bicgstab&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4353.59,-139.41C4369.58,-142.81 4385.37,-148.81 4398,-159 4540.27,-273.71 4573,-515.89 4579.83,-590.59"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4576.36,-591.06 4580.69,-600.73 4583.34,-590.47 4576.36,-591.06"/>
+</g>
+<!-- proc~solve_type_solver_bicgstab&#45;&gt;interface~vector_norminf -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge83" class="edge">
+<title>proc~solve_type_solver_bicgstab&#45;&gt;interface~vector_norminf</title>
+<path fill="none" stroke="#00ff00" d="M4353.88,-138C4407.24,-138 4476.8,-138 4524.91,-138"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="4525.14,-141.5 4535.14,-138 4525.14,-134.5 4525.14,-141.5"/>
+</g>
+<!-- proc~solve_type_solver_bicgstab_l -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node38" class="node">
+<title>proc~solve_type_solver_bicgstab_l</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node38"><a xlink:href="../proc/solve_type_solver_bicgstab_l.html" xlink:title="solve_type_solver_bicgstab_l">
+<polygon fill="#d9534f" stroke="#d9534f" points="4357.5,-394 4192.5,-394 4192.5,-370 4357.5,-370 4357.5,-394"/>
+<text text-anchor="middle" x="4275" y="-379.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicgstab_l</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicgstab_l&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge33" class="edge">
+<title>proc~solve_type_solver_bicgstab_l&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4357.65,-381.86C4372.75,-385.49 4387.15,-391.97 4398,-403 4470.89,-477.05 4389.97,-539.88 4434,-634 4463.72,-697.52 4524.96,-755.07 4558.43,-783.43"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4556.38,-786.28 4566.3,-790 4560.87,-780.9 4556.38,-786.28"/>
+</g>
+<!-- proc~solve_type_solver_bicgstab_l&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge60" class="edge">
+<title>proc~solve_type_solver_bicgstab_l&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4357.74,-388.13C4371.74,-391.37 4385.72,-396.11 4398,-403 4481.21,-449.71 4545.06,-548.97 4570.04,-592.18"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4567.05,-594.01 4575.03,-600.97 4573.14,-590.55 4567.05,-594.01"/>
+</g>
+<!-- proc~solve_type_solver_bicr -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node39" class="node">
+<title>proc~solve_type_solver_bicr</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node39"><a xlink:href="../proc/solve_type_solver_bicr.html" xlink:title="solve_type_solver_bicr">
+<polygon fill="#d9534f" stroke="#d9534f" points="4341,-1234 4209,-1234 4209,-1210 4341,-1210 4341,-1234"/>
+<text text-anchor="middle" x="4275" y="-1219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicr</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicr&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge34" class="edge">
+<title>proc~solve_type_solver_bicr&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4341.17,-1222.25C4361.06,-1219.47 4381.89,-1213.37 4398,-1201 4526.29,-1102.44 4567.98,-893.15 4578.49,-824.4"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4581.99,-824.67 4579.96,-814.27 4575.06,-823.66 4581.99,-824.67"/>
+</g>
+<!-- proc~solve_type_solver_bicr&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge61" class="edge">
+<title>proc~solve_type_solver_bicr&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4341.14,-1225.67C4362.1,-1223.36 4383.61,-1216.67 4398,-1201 4461.37,-1132.01 4397.26,-867.17 4434,-781 4461.36,-716.82 4523.03,-659.93 4557.33,-631.75"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4559.84,-634.22 4565.42,-625.21 4555.44,-628.77 4559.84,-634.22"/>
+</g>
+<!-- proc~solve_type_solver_bicrsafe -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node40" class="node">
+<title>proc~solve_type_solver_bicrsafe</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node40"><a xlink:href="../proc/solve_type_solver_bicrsafe.html" xlink:title="solve_type_solver_bicrsafe">
+<polygon fill="#d9534f" stroke="#d9534f" points="4352,-1192 4198,-1192 4198,-1168 4352,-1168 4352,-1192"/>
+<text text-anchor="middle" x="4275" y="-1177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicrsafe</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicrsafe&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge35" class="edge">
+<title>proc~solve_type_solver_bicrsafe&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4352.28,-1177.86C4368.52,-1174.52 4384.75,-1168.73 4398,-1159 4515.91,-1072.44 4563.83,-887.83 4577.26,-824.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4580.76,-824.52 4579.32,-814.03 4573.9,-823.13 4580.76,-824.52"/>
+</g>
+<!-- proc~solve_type_solver_bicrsafe&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge62" class="edge">
+<title>proc~solve_type_solver_bicrsafe&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4352.18,-1181.93C4369.4,-1178.64 4386.09,-1171.84 4398,-1159 4455.37,-1097.12 4400.54,-858.46 4434,-781 4461.67,-716.95 4523.21,-660.01 4557.41,-631.78"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4559.92,-634.25 4565.48,-625.24 4555.51,-628.82 4559.92,-634.25"/>
+</g>
+<!-- proc~solve_type_solver_bicrstab -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node41" class="node">
+<title>proc~solve_type_solver_bicrstab</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node41"><a xlink:href="../proc/solve_type_solver_bicrstab.html" xlink:title="solve_type_solver_bicrstab">
+<polygon fill="#d9534f" stroke="#d9534f" points="4352,-1150 4198,-1150 4198,-1126 4352,-1126 4352,-1150"/>
+<text text-anchor="middle" x="4275" y="-1135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_bicrstab</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_bicrstab&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge36" class="edge">
+<title>proc~solve_type_solver_bicrstab&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4352.23,-1135.27C4368.38,-1131.95 4384.58,-1126.32 4398,-1117 4505.67,-1042.24 4559.23,-882.27 4575.76,-823.9"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4579.14,-824.79 4578.42,-814.22 4572.39,-822.94 4579.14,-824.79"/>
+</g>
+<!-- proc~solve_type_solver_bicrstab&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge63" class="edge">
+<title>proc~solve_type_solver_bicrstab&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4352.07,-1139.84C4369.3,-1136.54 4386.02,-1129.77 4398,-1117 4449.38,-1062.24 4403.82,-849.76 4434,-781 4462.04,-717.11 4523.43,-660.11 4557.51,-631.82"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4560.01,-634.3 4565.55,-625.27 4555.59,-628.88 4560.01,-634.3"/>
+</g>
+<!-- proc~solve_type_solver_cg -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node42" class="node">
+<title>proc~solve_type_solver_cg</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node42"><a xlink:href="../proc/solve_type_solver_cg.html" xlink:title="solve_type_solver_cg">
+<polygon fill="#d9534f" stroke="#d9534f" points="4337,-1108 4213,-1108 4213,-1084 4337,-1084 4337,-1108"/>
+<text text-anchor="middle" x="4275" y="-1093.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_cg</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_cg&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge37" class="edge">
+<title>proc~solve_type_solver_cg&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4337.23,-1095.04C4357.85,-1092.33 4380.14,-1086.57 4398,-1075 4495.53,-1011.83 4553.95,-876.6 4573.81,-823.78"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4577.21,-824.68 4577.37,-814.08 4570.64,-822.27 4577.21,-824.68"/>
+</g>
+<!-- proc~solve_type_solver_cg&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge64" class="edge">
+<title>proc~solve_type_solver_cg&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4337.02,-1099.76C4359.11,-1097.81 4382.44,-1091.34 4398,-1075 4443.4,-1027.34 4407.09,-841.07 4434,-781 4462.53,-717.33 4523.72,-660.24 4557.64,-631.88"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4560.14,-634.36 4565.64,-625.31 4555.69,-628.95 4560.14,-634.36"/>
+</g>
+<!-- proc~solve_type_solver_cgs -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node43" class="node">
+<title>proc~solve_type_solver_cgs</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node43"><a xlink:href="../proc/solve_type_solver_cgs.html" xlink:title="solve_type_solver_cgs">
+<polygon fill="#d9534f" stroke="#d9534f" points="4340,-1066 4210,-1066 4210,-1042 4340,-1042 4340,-1066"/>
+<text text-anchor="middle" x="4275" y="-1051.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_cgs</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_cgs&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge38" class="edge">
+<title>proc~solve_type_solver_cgs&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4340.17,-1051.74C4359.78,-1048.81 4380.71,-1043.24 4398,-1033 4485.85,-980.94 4548.16,-869.86 4571.43,-823.27"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4574.66,-824.62 4575.92,-814.1 4568.38,-821.54 4574.66,-824.62"/>
+</g>
+<!-- proc~solve_type_solver_cgs&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge65" class="edge">
+<title>proc~solve_type_solver_cgs&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4340.01,-1057.28C4361.13,-1054.99 4383.02,-1048.41 4398,-1033 4476.85,-951.87 4386.71,-883.78 4434,-781 4463.16,-717.61 4524.1,-660.41 4557.81,-631.96"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4560.3,-634.44 4565.76,-625.36 4555.83,-629.05 4560.3,-634.44"/>
+</g>
+<!-- proc~solve_type_solver_cocg -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node44" class="node">
+<title>proc~solve_type_solver_cocg</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node44"><a xlink:href="../proc/solve_type_solver_cocg.html" xlink:title="solve_type_solver_cocg">
+<polygon fill="#d9534f" stroke="#d9534f" points="4343.5,-1024 4206.5,-1024 4206.5,-1000 4343.5,-1000 4343.5,-1024"/>
+<text text-anchor="middle" x="4275" y="-1009.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_cocg</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_cocg&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge39" class="edge">
+<title>proc~solve_type_solver_cocg&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4343.68,-1008.03C4362.07,-1004.94 4381.46,-999.72 4398,-991 4476.44,-949.63 4541.32,-862.51 4568.19,-822.67"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4571.15,-824.53 4573.76,-814.26 4565.32,-820.66 4571.15,-824.53"/>
+</g>
+<!-- proc~solve_type_solver_cocg&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge66" class="edge">
+<title>proc~solve_type_solver_cocg&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4343.58,-1014.58C4363.48,-1011.92 4383.72,-1005.29 4398,-991 4464.94,-924.02 4393.23,-866.47 4434,-781 4464.2,-717.7 4525.25,-660.07 4558.55,-631.63"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4560.99,-634.16 4566.39,-625.04 4556.48,-628.8 4560.99,-634.16"/>
+</g>
+<!-- proc~solve_type_solver_cocr -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node45" class="node">
+<title>proc~solve_type_solver_cocr</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node45"><a xlink:href="../proc/solve_type_solver_cocr.html" xlink:title="solve_type_solver_cocr">
+<polygon fill="#d9534f" stroke="#d9534f" points="4342.5,-982 4207.5,-982 4207.5,-958 4342.5,-958 4342.5,-982"/>
+<text text-anchor="middle" x="4275" y="-967.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_cocr</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_cocr&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge40" class="edge">
+<title>proc~solve_type_solver_cocr&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4342.7,-964.71C4361.17,-961.61 4380.85,-956.72 4398,-949 4467.32,-917.8 4532.88,-854.21 4563.48,-821.86"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4566.23,-824.05 4570.49,-814.35 4561.11,-819.27 4566.23,-824.05"/>
+</g>
+<!-- proc~solve_type_solver_cocr&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge67" class="edge">
+<title>proc~solve_type_solver_cocr&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4342.59,-972.31C4362.67,-969.68 4383.27,-963.14 4398,-949 4453.08,-896.11 4399.7,-849.23 4434,-781 4465.5,-718.34 4526.01,-660.44 4558.89,-631.8"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4561.31,-634.33 4566.62,-625.16 4556.75,-629.02 4561.31,-634.33"/>
+</g>
+<!-- proc~solve_type_solver_cr -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node46" class="node">
+<title>proc~solve_type_solver_cr</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node46"><a xlink:href="../proc/solve_type_solver_cr.html" xlink:title="solve_type_solver_cr">
+<polygon fill="#d9534f" stroke="#d9534f" points="4336,-940 4214,-940 4214,-916 4336,-916 4336,-940"/>
+<text text-anchor="middle" x="4275" y="-925.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_cr</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_cr&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge41" class="edge">
+<title>proc~solve_type_solver_cr&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4336.02,-921.92C4356.12,-918.78 4378.38,-914.05 4398,-907 4458.56,-885.23 4522.24,-844.03 4556.36,-820.22"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4558.62,-822.91 4564.78,-814.28 4554.59,-817.19 4558.62,-822.91"/>
+</g>
+<!-- proc~solve_type_solver_cr&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge68" class="edge">
+<title>proc~solve_type_solver_cr&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4336.05,-930.4C4357.89,-928.26 4381.29,-922 4398,-907 4441.34,-868.1 4406.11,-832.13 4434,-781 4467.59,-719.44 4527.24,-661.08 4559.43,-632.08"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4561.85,-634.62 4566.99,-625.35 4557.2,-629.39 4561.85,-634.62"/>
+</g>
+<!-- proc~solve_type_solver_crs -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node47" class="node">
+<title>proc~solve_type_solver_crs</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node47"><a xlink:href="../proc/solve_type_solver_crs.html" xlink:title="solve_type_solver_crs">
+<polygon fill="#d9534f" stroke="#d9534f" points="4338.5,-898 4211.5,-898 4211.5,-874 4338.5,-874 4338.5,-898"/>
+<text text-anchor="middle" x="4275" y="-883.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_crs</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_crs&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge42" class="edge">
+<title>proc~solve_type_solver_crs&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4338.79,-877.17C4357.93,-873.95 4378.95,-869.88 4398,-865 4448.47,-852.08 4504.94,-831.77 4541.74,-817.72"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4543.04,-820.97 4551.11,-814.12 4540.52,-814.44 4543.04,-820.97"/>
+</g>
+<!-- proc~solve_type_solver_crs&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge69" class="edge">
+<title>proc~solve_type_solver_crs&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4338.53,-886.87C4359.27,-884.31 4381.3,-878.18 4398,-865 4429.88,-839.84 4412.33,-815.35 4434,-781 4471.44,-721.63 4529.59,-662.31 4560.51,-632.59"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4563.28,-634.78 4568.11,-625.35 4558.45,-629.71 4563.28,-634.78"/>
+</g>
+<!-- proc~solve_type_solver_fgmres -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node48" class="node">
+<title>proc~solve_type_solver_fgmres</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node48"><a xlink:href="../proc/solve_type_solver_fgmres.html" xlink:title="solve_type_solver_fgmres">
+<polygon fill="#d9534f" stroke="#d9534f" points="4349,-856 4201,-856 4201,-832 4349,-832 4349,-856"/>
+<text text-anchor="middle" x="4275" y="-841.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_fgmres</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_fgmres&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge43" class="edge">
+<title>proc~solve_type_solver_fgmres&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4349.17,-833.94C4408.01,-825.85 4488.69,-814.76 4537.85,-808"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4538.41,-811.46 4547.84,-806.63 4537.46,-804.52 4538.41,-811.46"/>
+</g>
+<!-- proc~solve_type_solver_fgmres&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge70" class="edge">
+<title>proc~solve_type_solver_fgmres&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4349.14,-839.79C4365.96,-836.59 4383.23,-831.38 4398,-823 4419.38,-810.86 4417.89,-799.57 4434,-781 4480.69,-727.17 4536.28,-664.15 4563.98,-632.8"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4566.71,-634.99 4570.72,-625.18 4561.47,-630.36 4566.71,-634.99"/>
+</g>
+<!-- proc~solve_type_solver_gmres -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node49" class="node">
+<title>proc~solve_type_solver_gmres</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node49"><a xlink:href="../proc/solve_type_solver_gmres.html" xlink:title="solve_type_solver_gmres">
+<polygon fill="#d9534f" stroke="#d9534f" points="4347.5,-814 4202.5,-814 4202.5,-790 4347.5,-790 4347.5,-814"/>
+<text text-anchor="middle" x="4275" y="-799.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge44" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4347.63,-802C4406.57,-802 4488.22,-802 4537.81,-802"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4537.89,-805.5 4547.89,-802 4537.89,-798.5 4537.89,-805.5"/>
+</g>
+<!-- proc~solve_type_solver_gmres&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge71" class="edge">
+<title>proc~solve_type_solver_gmres&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4347.81,-796.6C4364.86,-793.46 4382.56,-788.57 4398,-781 4471.96,-744.73 4537.56,-669.27 4566.21,-633.13"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4568.98,-635.28 4572.38,-625.24 4563.46,-630.97 4568.98,-635.28"/>
+</g>
+<!-- proc~solve_type_solver_gpbicg -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node50" class="node">
+<title>proc~solve_type_solver_gpbicg</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node50"><a xlink:href="../proc/solve_type_solver_gpbicg.html" xlink:title="solve_type_solver_gpbicg">
+<polygon fill="#d9534f" stroke="#d9534f" points="4349,-772 4201,-772 4201,-748 4349,-748 4349,-772"/>
+<text text-anchor="middle" x="4275" y="-757.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_gpbicg</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gpbicg&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge45" class="edge">
+<title>proc~solve_type_solver_gpbicg&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4349.17,-770.06C4408.01,-778.15 4488.69,-789.24 4537.85,-796"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4537.46,-799.48 4547.84,-797.37 4538.41,-792.54 4537.46,-799.48"/>
+</g>
+<!-- proc~solve_type_solver_gpbicg&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge72" class="edge">
+<title>proc~solve_type_solver_gpbicg&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4349.04,-752.7C4365.52,-749.61 4382.67,-745.23 4398,-739 4463.07,-712.55 4528.24,-660.14 4560.57,-631.97"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4563.25,-634.28 4568.43,-625.04 4558.61,-629.03 4563.25,-634.28"/>
+</g>
+<!-- proc~solve_type_solver_gpbicr -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node51" class="node">
+<title>proc~solve_type_solver_gpbicr</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node51"><a xlink:href="../proc/solve_type_solver_gpbicr.html" xlink:title="solve_type_solver_gpbicr">
+<polygon fill="#d9534f" stroke="#d9534f" points="4347.5,-730 4202.5,-730 4202.5,-706 4347.5,-706 4347.5,-730"/>
+<text text-anchor="middle" x="4275" y="-715.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_gpbicr</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gpbicr&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge46" class="edge">
+<title>proc~solve_type_solver_gpbicr&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4347.69,-728.37C4364.32,-731.32 4381.86,-734.87 4398,-739 4448.47,-751.92 4504.94,-772.23 4541.74,-786.28"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4540.52,-789.56 4551.11,-789.88 4543.04,-783.03 4540.52,-789.56"/>
+</g>
+<!-- proc~solve_type_solver_gpbicr&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge73" class="edge">
+<title>proc~solve_type_solver_gpbicr&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4347.7,-708.84C4364.4,-705.84 4381.98,-701.95 4398,-697 4454.08,-679.66 4515.34,-649.04 4550.99,-629.95"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4552.78,-632.96 4559.91,-625.13 4549.45,-626.8 4552.78,-632.96"/>
+</g>
+<!-- proc~solve_type_solver_gs -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node52" class="node">
+<title>proc~solve_type_solver_gs</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node52"><a xlink:href="../proc/solve_type_solver_gs.html" xlink:title="solve_type_solver_gs">
+<polygon fill="#d9534f" stroke="#d9534f" points="4337,-108 4213,-108 4213,-84 4337,-84 4337,-108"/>
+<text text-anchor="middle" x="4275" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_gs</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_gs&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge74" class="edge">
+<title>proc~solve_type_solver_gs&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4337.03,-94.44C4358.35,-96.81 4381.14,-102.99 4398,-117 4475.87,-181.72 4555.77,-503.11 4576.4,-590.84"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4573.04,-591.84 4578.72,-600.78 4579.86,-590.25 4573.04,-591.84"/>
+</g>
+<!-- proc~solve_type_solver_idr1 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node53" class="node">
+<title>proc~solve_type_solver_idr1</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node53"><a xlink:href="../proc/solve_type_solver_idr1.html" xlink:title="solve_type_solver_idr1">
+<polygon fill="#d9534f" stroke="#d9534f" points="4341.5,-688 4208.5,-688 4208.5,-664 4341.5,-664 4341.5,-688"/>
+<text text-anchor="middle" x="4275" y="-673.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_idr1</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_idr1&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge47" class="edge">
+<title>proc~solve_type_solver_idr1&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4341.67,-683C4360.22,-686.12 4380.2,-690.6 4398,-697 4458.56,-718.77 4522.24,-759.97 4556.36,-783.78"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4554.59,-786.81 4564.78,-789.72 4558.62,-781.09 4554.59,-786.81"/>
+</g>
+<!-- proc~solve_type_solver_idr1&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge75" class="edge">
+<title>proc~solve_type_solver_idr1&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4341.65,-665.38C4359.93,-662.23 4379.77,-658.65 4398,-655 4442.23,-646.14 4492.11,-634.62 4528.69,-625.89"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4529.72,-629.24 4538.63,-623.51 4528.09,-622.44 4529.72,-629.24"/>
+</g>
+<!-- proc~solve_type_solver_idr_s -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node54" class="node">
+<title>proc~solve_type_solver_idr_s</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node54"><a xlink:href="../proc/solve_type_solver_idr_s.html" xlink:title="solve_type_solver_idr_s">
+<polygon fill="#d9534f" stroke="#d9534f" points="4343,-646 4207,-646 4207,-622 4343,-622 4343,-646"/>
+<text text-anchor="middle" x="4275" y="-631.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_idr_s</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_idr_s&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge48" class="edge">
+<title>proc~solve_type_solver_idr_s&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4343.01,-639.34C4361.4,-642.44 4380.95,-647.33 4398,-655 4467.32,-686.2 4532.88,-749.79 4563.48,-782.14"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4561.11,-784.73 4570.49,-789.65 4566.23,-779.95 4561.11,-784.73"/>
+</g>
+<!-- proc~solve_type_solver_idr_s&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge76" class="edge">
+<title>proc~solve_type_solver_idr_s&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4343.04,-629.39C4398.75,-625.56 4476.94,-620.19 4528.38,-616.65"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4528.88,-620.13 4538.62,-615.95 4528.4,-613.14 4528.88,-620.13"/>
+</g>
+<!-- proc~solve_type_solver_jacobi_iter -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node55" class="node">
+<title>proc~solve_type_solver_jacobi_iter</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node55"><a xlink:href="../proc/solve_type_solver_jacobi_iter.html" xlink:title="solve_type_solver_jacobi_iter">
+<polygon fill="#d9534f" stroke="#d9534f" points="4358.5,-352 4191.5,-352 4191.5,-328 4358.5,-328 4358.5,-352"/>
+<text text-anchor="middle" x="4275" y="-337.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_jacobi_iter</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_jacobi_iter&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge77" class="edge">
+<title>proc~solve_type_solver_jacobi_iter&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4358.58,-345.31C4372.43,-348.65 4386.13,-353.63 4398,-361 4490.7,-418.6 4551.22,-541.82 4572.74,-591.54"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4569.61,-593.14 4576.73,-600.98 4576.06,-590.41 4569.61,-593.14"/>
+</g>
+<!-- proc~solve_type_solver_minres -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node56" class="node">
+<title>proc~solve_type_solver_minres</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node56"><a xlink:href="../proc/solve_type_solver_minres.html" xlink:title="solve_type_solver_minres">
+<polygon fill="#d9534f" stroke="#d9534f" points="4349,-604 4201,-604 4201,-580 4349,-580 4349,-604"/>
+<text text-anchor="middle" x="4275" y="-589.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_minres</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_minres&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge49" class="edge">
+<title>proc~solve_type_solver_minres&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4349.1,-596.94C4365.83,-600.11 4383.08,-605.13 4398,-613 4476.44,-654.37 4541.32,-741.49 4568.19,-781.33"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4565.32,-783.34 4573.76,-789.74 4571.15,-779.47 4565.32,-783.34"/>
+</g>
+<!-- proc~solve_type_solver_minres&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge78" class="edge">
+<title>proc~solve_type_solver_minres&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4349.17,-597.03C4404.38,-600.83 4478.83,-605.94 4528.42,-609.35"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4528.39,-612.86 4538.6,-610.05 4528.87,-605.87 4528.39,-612.86"/>
+</g>
+<!-- proc~solve_type_solver_orthomin -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node57" class="node">
+<title>proc~solve_type_solver_orthomin</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node57"><a xlink:href="../proc/solve_type_solver_orthomin.html" xlink:title="solve_type_solver_orthomin">
+<polygon fill="#d9534f" stroke="#d9534f" points="4355,-562 4195,-562 4195,-538 4355,-538 4355,-562"/>
+<text text-anchor="middle" x="4275" y="-547.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_orthomin</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_orthomin&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge50" class="edge">
+<title>proc~solve_type_solver_orthomin&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4355.15,-553.26C4370.34,-556.65 4385.41,-562.18 4398,-571 4424.41,-589.5 4415.27,-607.75 4434,-634 4474.98,-691.42 4532.12,-751.99 4561.82,-782.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4559.58,-785.01 4569.09,-789.67 4564.56,-780.09 4559.58,-785.01"/>
+</g>
+<!-- proc~solve_type_solver_orthomin&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge79" class="edge">
+<title>proc~solve_type_solver_orthomin&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4349.67,-562.01C4365.63,-564.8 4382.41,-567.88 4398,-571 4442.23,-579.86 4492.11,-591.38 4528.69,-600.11"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4528.09,-603.56 4538.63,-602.49 4529.72,-596.76 4528.09,-603.56"/>
+</g>
+<!-- proc~solve_type_solver_sor -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node58" class="node">
+<title>proc~solve_type_solver_sor</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node58"><a xlink:href="../proc/solve_type_solver_sor.html" xlink:title="solve_type_solver_sor">
+<polygon fill="#d9534f" stroke="#d9534f" points="4339,-310 4211,-310 4211,-286 4339,-286 4339,-310"/>
+<text text-anchor="middle" x="4275" y="-295.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_sor</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_sor&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge80" class="edge">
+<title>proc~solve_type_solver_sor&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4339.02,-298.83C4359.21,-301.6 4380.79,-307.43 4398,-319 4500.54,-387.9 4556.63,-535.39 4574.83,-591.09"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4571.6,-592.49 4577.96,-600.96 4578.27,-590.37 4571.6,-592.49"/>
+</g>
+<!-- proc~solve_type_solver_tfqmr -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node59" class="node">
+<title>proc~solve_type_solver_tfqmr</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node59"><a xlink:href="../proc/solve_type_solver_tfqmr.html" xlink:title="solve_type_solver_tfqmr">
+<polygon fill="#d9534f" stroke="#d9534f" points="4345.5,-520 4204.5,-520 4204.5,-496 4345.5,-496 4345.5,-520"/>
+<text text-anchor="middle" x="4275" y="-505.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_type_solver_tfqmr</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_type_solver_tfqmr&#45;&gt;interface~vector_dot -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge51" class="edge">
+<title>proc~solve_type_solver_tfqmr&#45;&gt;interface~vector_dot</title>
+<path fill="none" stroke="#ff0000" d="M4345.74,-507.37C4364.47,-510.35 4383.52,-516.67 4398,-529 4435.56,-560.99 4409.26,-591.32 4434,-634 4469.35,-694.98 4528.78,-753.99 4560.33,-783.13"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="4557.97,-785.72 4567.72,-789.88 4562.7,-780.55 4557.97,-785.72"/>
+</g>
+<!-- proc~solve_type_solver_tfqmr&#45;&gt;interface~vector_norm2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge81" class="edge">
+<title>proc~solve_type_solver_tfqmr&#45;&gt;interface~vector_norm2</title>
+<path fill="none" stroke="#aaff00" d="M4345.77,-516.81C4363.05,-519.87 4381.37,-523.86 4398,-529 4454.08,-546.34 4515.34,-576.96 4550.99,-596.05"/>
+<polygon fill="#aaff00" stroke="#aaff00" points="4549.45,-599.2 4559.91,-600.87 4552.78,-593.04 4549.45,-599.2"/>
+</g>
+<!-- interface~check_convergence_criterion -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node60" class="node">
+<title>interface~check_convergence_criterion</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node60"><a xlink:href="../interface/check_convergence_criterion.html" xlink:title="type_convergence_criterion%check_convergence_criterion">
+<polygon fill="#a7506f" stroke="#a7506f" points="4077,-87 3749,-87 3749,-63 4077,-63 4077,-87"/>
+<text text-anchor="middle" x="3913" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_criterion%check_convergence_criterion</text>
+</a>
+</g>
+</g>
+<!-- interface~check_convergence_criterion&#45;&gt;proc~check_convergence_criterion -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge90" class="edge">
+<title>interface~check_convergence_criterion&#45;&gt;proc~check_convergence_criterion</title>
+<path fill="none" stroke="#ff5f00" stroke-dasharray="5,2" d="M4077.15,-65.48C4112.4,-63.43 4148.52,-61.32 4180.04,-59.48"/>
+<polygon fill="#ff5f00" stroke="#ff5f00" points="4180.33,-62.97 4190.11,-58.89 4179.92,-55.98 4180.33,-62.97"/>
+</g>
+<!-- interface~compute_lte_error_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node61" class="node">
+<title>interface~compute_lte_error_ftcms</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node61"><a xlink:href="../interface/compute_lte_error_ftcms.html" xlink:title="type_ftcms%compute_lte_error_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="482,-267 270,-267 270,-243 482,-243 482,-267"/>
+<text text-anchor="middle" x="376" y="-252.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%compute_lte_error_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_lte_error_ftcms&#45;&gt;proc~compute_lte_error_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge91" class="edge">
+<title>interface~compute_lte_error_ftcms&#45;&gt;proc~compute_lte_error_ftcms</title>
+<path fill="none" stroke="#ff8f00" stroke-dasharray="5,2" d="M482.04,-256.68C582.04,-258.13 736.77,-260 871,-260 871,-260 871,-260 2988.5,-260 3175.28,-260 3394.56,-260 3510.68,-260"/>
+<polygon fill="#ff8f00" stroke="#ff8f00" points="3510.91,-263.5 3520.91,-260 3510.91,-256.5 3510.91,-263.5"/>
+</g>
+<!-- interface~compute_relaxation_acceleration_aitken -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node62" class="node">
+<title>interface~compute_relaxation_acceleration_aitken</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node62"><a xlink:href="../interface/compute_relaxation_acceleration_aitken.html" xlink:title="type_acceleration_aitken%compute_relaxation_acceleration_aitken">
+<polygon fill="#a7506f" stroke="#a7506f" points="4099,-1276 3727,-1276 3727,-1252 4099,-1252 4099,-1276"/>
+<text text-anchor="middle" x="3913" y="-1261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_acceleration_aitken%compute_relaxation_acceleration_aitken</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_relaxation_acceleration_aitken&#45;&gt;proc~compute_relaxation_acceleration_aitken -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge92" class="edge">
+<title>interface~compute_relaxation_acceleration_aitken&#45;&gt;proc~compute_relaxation_acceleration_aitken</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M4099.01,-1264C4116.29,-1264 4133.51,-1264 4150.03,-1264"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="4150.22,-1267.5 4160.22,-1264 4150.22,-1260.5 4150.22,-1267.5"/>
+</g>
+<!-- interface~compute_relaxation_acceleration_anderson -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node63" class="node">
+<title>interface~compute_relaxation_acceleration_anderson</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node63"><a xlink:href="../interface/compute_relaxation_acceleration_anderson.html" xlink:title="type_acceleration_anderson%compute_relaxation_acceleration_anderson">
+<polygon fill="#a7506f" stroke="#a7506f" points="4116,-1318 3710,-1318 3710,-1294 4116,-1294 4116,-1318"/>
+<text text-anchor="middle" x="3913" y="-1303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_acceleration_anderson%compute_relaxation_acceleration_anderson</text>
+</a>
+</g>
+</g>
+<!-- interface~compute_relaxation_acceleration_anderson&#45;&gt;proc~compute_relaxation_acceleration_anderson -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge93" class="edge">
+<title>interface~compute_relaxation_acceleration_anderson&#45;&gt;proc~compute_relaxation_acceleration_anderson</title>
+<path fill="none" stroke="#ffef00" stroke-dasharray="5,2" d="M4116.1,-1306C4124.64,-1306 4133.12,-1306 4141.46,-1306"/>
+<polygon fill="#ffef00" stroke="#ffef00" points="4141.54,-1309.5 4151.54,-1306 4141.54,-1302.5 4141.54,-1309.5"/>
+</g>
+<!-- interface~nonlinear_residual_norm_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node64" class="node">
+<title>interface~nonlinear_residual_norm_ftcms</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node64"><a xlink:href="../interface/nonlinear_residual_norm_ftcms.html" xlink:title="type_ftcms%nonlinear_residual_norm_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="4036.5,-192 3789.5,-192 3789.5,-168 4036.5,-168 4036.5,-192"/>
+<text text-anchor="middle" x="3913" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%nonlinear_residual_norm_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~nonlinear_residual_norm_ftcms&#45;&gt;proc~nonlinear_residual_norm_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge94" class="edge">
+<title>interface~nonlinear_residual_norm_ftcms&#45;&gt;proc~nonlinear_residual_norm_ftcms</title>
+<path fill="none" stroke="#dfff00" stroke-dasharray="5,2" d="M4036.63,-180C4081.81,-180 4132.38,-180 4175.19,-180"/>
+<polygon fill="#dfff00" stroke="#dfff00" points="4175.33,-183.5 4185.33,-180 4175.33,-176.5 4175.33,-183.5"/>
+</g>
+<!-- interface~solve_type_solver_bicgstab -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node65" class="node">
+<title>interface~solve_type_solver_bicgstab</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node65"><a xlink:href="../interface/solve_type_solver_bicgstab.html" xlink:title="type_solver_bicgstab%solve_type_solver_bicgstab">
+<polygon fill="#a7506f" stroke="#a7506f" points="4051.5,-150 3774.5,-150 3774.5,-126 4051.5,-126 4051.5,-150"/>
+<text text-anchor="middle" x="3913" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_bicgstab%solve_type_solver_bicgstab</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_type_solver_bicgstab&#45;&gt;proc~solve_type_solver_bicgstab -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge95" class="edge">
+<title>interface~solve_type_solver_bicgstab&#45;&gt;proc~solve_type_solver_bicgstab</title>
+<path fill="none" stroke="#4fff00" stroke-dasharray="5,2" d="M4051.64,-138C4096.84,-138 4145.82,-138 4186.27,-138"/>
+<polygon fill="#4fff00" stroke="#4fff00" points="4186.36,-141.5 4196.36,-138 4186.36,-134.5 4186.36,-141.5"/>
+</g>
+<!-- interface~solve_type_solver_gmres -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node66" class="node">
+<title>interface~solve_type_solver_gmres</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node66"><a xlink:href="../interface/solve_type_solver_gmres.html" xlink:title="type_solver_gmres%solve_type_solver_gmres">
+<polygon fill="#a7506f" stroke="#a7506f" points="4039.5,-814 3786.5,-814 3786.5,-790 4039.5,-790 4039.5,-814"/>
+<text text-anchor="middle" x="3913" y="-799.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_solver_gmres%solve_type_solver_gmres</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_type_solver_gmres&#45;&gt;proc~solve_type_solver_gmres -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge96" class="edge">
+<title>interface~solve_type_solver_gmres&#45;&gt;proc~solve_type_solver_gmres</title>
+<path fill="none" stroke="#000fff" stroke-dasharray="5,2" d="M4039.66,-802C4090.29,-802 4147.26,-802 4192.34,-802"/>
+<polygon fill="#000fff" stroke="#000fff" points="4192.36,-805.5 4202.36,-802 4192.36,-798.5 4192.36,-805.5"/>
+</g>
+<!-- proc~check_conserved_convergence_control -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node67" class="node">
+<title>proc~check_conserved_convergence_control</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node67"><a xlink:href="../proc/check_conserved_convergence_control.html" xlink:title="check_conserved_convergence_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="3098.5,-232 2876.5,-232 2876.5,-208 3098.5,-208 3098.5,-232"/>
+<text text-anchor="middle" x="2987.5" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">check_conserved_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- proc~check_conserved_convergence_control&#45;&gt;proc~block_residual_norm -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge89" class="edge">
+<title>proc~check_conserved_convergence_control&#45;&gt;proc~block_residual_norm</title>
+<path fill="none" stroke="#ff2f00" d="M3098.59,-220C3148.5,-220 3206.04,-220 3250.02,-220"/>
+<polygon fill="#ff2f00" stroke="#ff2f00" points="3250.04,-223.5 3260.04,-220 3250.04,-216.5 3250.04,-223.5"/>
+</g>
+<!-- interface~check_conserved_convergence_control -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node68" class="node">
+<title>interface~check_conserved_convergence_control</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node68"><a xlink:href="../interface/check_conserved_convergence_control.html" xlink:title="type_convergence_control%check_conserved_convergence_control">
+<polygon fill="#a7506f" stroke="#a7506f" points="2809,-232 2437,-232 2437,-208 2809,-208 2809,-232"/>
+<text text-anchor="middle" x="2623" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_control%check_conserved_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- interface~check_conserved_convergence_control&#45;&gt;proc~check_conserved_convergence_control -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge99" class="edge">
+<title>interface~check_conserved_convergence_control&#45;&gt;proc~check_conserved_convergence_control</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M2809.23,-220C2828.51,-220 2847.72,-220 2866,-220"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="2866.06,-223.5 2876.06,-220 2866.05,-216.5 2866.06,-223.5"/>
+</g>
+<!-- proc~check_convergence_control~2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node69" class="node">
+<title>proc~check_convergence_control~2</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node69"><a xlink:href="../proc/check_convergence_control~2.html" xlink:title="check_convergence_control">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="3674,-108 3513,-108 3513,-84 3674,-84 3674,-108"/>
+<text text-anchor="middle" x="3593.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">check_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_control~2&#45;&gt;interface~check_convergence_criterion -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge97" class="edge">
+<title>proc~check_convergence_control~2&#45;&gt;interface~check_convergence_criterion</title>
+<path fill="none" stroke="#ff0000" d="M3674.21,-90.73C3694.13,-89.41 3716.28,-87.95 3738.82,-86.45"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3739.1,-89.94 3748.85,-85.79 3738.64,-82.96 3739.1,-89.94"/>
+</g>
+<!-- proc~run_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node70" class="node">
+<title>proc~run_ftcms</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node70"><a xlink:href="../proc/run_ftcms.html" xlink:title="run_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-237 169,-237 169,-213 234,-213 234,-237"/>
+<text text-anchor="middle" x="201.5" y="-222.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~compute_lte_error_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge98" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~compute_lte_error_ftcms</title>
+<path fill="none" stroke="#ffbf00" d="M234.14,-230.5C251.51,-233.52 273.91,-237.42 295.71,-241.21"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="295.22,-244.68 305.67,-242.94 296.42,-237.78 295.22,-244.68"/>
+</g>
+<!-- interface~solve_time_step_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node86" class="node">
+<title>interface~solve_time_step_ftcms</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node86"><a xlink:href="../interface/solve_time_step_ftcms.html" xlink:title="type_ftcms%solve_time_step_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="475.5,-216 276.5,-216 276.5,-192 475.5,-192 475.5,-216"/>
+<text text-anchor="middle" x="376" y="-201.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge119" class="edge">
+<title>proc~run_ftcms&#45;&gt;interface~solve_time_step_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M234.14,-221.15C243.71,-219.98 254.81,-218.63 266.5,-217.21"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="266.93,-220.68 276.43,-216 266.08,-213.73 266.93,-220.68"/>
+</g>
+<!-- interface~check_convergence_control -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node71" class="node">
+<title>interface~check_convergence_control</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node71"><a xlink:href="../interface/check_convergence_control.html" xlink:title="type_convergence_control%check_convergence_control">
+<polygon fill="#a7506f" stroke="#a7506f" points="3477,-118 3166,-118 3166,-94 3477,-94 3477,-118"/>
+<text text-anchor="middle" x="3321.5" y="-103.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_convergence_control%check_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- interface~check_convergence_control&#45;&gt;proc~check_convergence_control~2 -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge101" class="edge">
+<title>interface~check_convergence_control&#45;&gt;proc~check_convergence_control~2</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M3477.21,-100.27C3485.92,-99.95 3494.52,-99.63 3502.86,-99.32"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="3503.03,-102.82 3512.89,-98.95 3502.77,-95.82 3503.03,-102.82"/>
+</g>
+<!-- interface~run_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node72" class="node">
+<title>interface~run_ftcms</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node72"><a xlink:href="../interface/run_ftcms.html" xlink:title="type_ftcms%run_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="133,-237 0,-237 0,-213 133,-213 133,-237"/>
+<text text-anchor="middle" x="66.5" y="-222.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%run_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~run_ftcms&#45;&gt;proc~run_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge102" class="edge">
+<title>interface~run_ftcms&#45;&gt;proc~run_ftcms</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M133.22,-225C141.87,-225 150.53,-225 158.63,-225"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="158.89,-228.5 168.89,-225 158.89,-221.5 158.89,-228.5"/>
+</g>
+<!-- proc~check_conserved_setting -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node73" class="node">
+<title>proc~check_conserved_setting</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node73"><a xlink:href="../proc/check_conserved_setting.html" xlink:title="type_iteration_setting%check_conserved_setting">
+<polygon fill="#d9534f" stroke="#d9534f" points="2401,-232 2130,-232 2130,-208 2401,-208 2401,-232"/>
+<text text-anchor="middle" x="2265.5" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration_setting%check_conserved_setting</text>
+</a>
+</g>
+</g>
+<!-- proc~check_conserved_setting&#45;&gt;interface~check_conserved_convergence_control -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge100" class="edge">
+<title>proc~check_conserved_setting&#45;&gt;interface~check_conserved_convergence_control</title>
+<path fill="none" stroke="#ff0000" d="M2401.15,-220C2409.56,-220 2418.1,-220 2426.69,-220"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2426.81,-223.5 2436.81,-220 2426.81,-216.5 2426.81,-223.5"/>
+</g>
+<!-- proc~check_convergence_conserved_iteration -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node74" class="node">
+<title>proc~check_convergence_conserved_iteration</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node74"><a xlink:href="../proc/check_convergence_conserved_iteration.html" xlink:title="type_iteration%check_convergence_conserved_iteration">
+<polygon fill="#d9534f" stroke="#d9534f" points="2094,-232 1781,-232 1781,-208 2094,-208 2094,-232"/>
+<text text-anchor="middle" x="1937.5" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%check_convergence_conserved_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_conserved_iteration&#45;&gt;proc~check_conserved_setting -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge104" class="edge">
+<title>proc~check_convergence_conserved_iteration&#45;&gt;proc~check_conserved_setting</title>
+<path fill="none" stroke="#0000ff" d="M2094.34,-220C2102.72,-220 2111.12,-220 2119.46,-220"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="2119.6,-223.5 2129.6,-220 2119.6,-216.5 2119.6,-223.5"/>
+</g>
+<!-- proc~check_convergence_setting -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node75" class="node">
+<title>proc~check_convergence_setting</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node75"><a xlink:href="../proc/check_convergence_setting.html" xlink:title="type_iteration_setting%check_convergence_setting">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="3130,-141 2845,-141 2845,-117 3130,-117 3130,-141"/>
+<text text-anchor="middle" x="2987.5" y="-126.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration_setting%check_convergence_setting</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_setting&#45;&gt;interface~check_convergence_control -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge103" class="edge">
+<title>proc~check_convergence_setting&#45;&gt;interface~check_convergence_control</title>
+<path fill="none" stroke="#ff0000" d="M3130.26,-119.18C3138.75,-118.59 3147.32,-118 3155.89,-117.4"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="3156.21,-120.89 3165.94,-116.71 3155.72,-113.91 3156.21,-120.89"/>
+</g>
+<!-- proc~check_convergence_conserved_control -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node76" class="node">
+<title>proc~check_convergence_conserved_control</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node76"><a xlink:href="../proc/check_convergence_conserved_control.html" xlink:title="type_control%check_convergence_conserved_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="1738,-232 1441,-232 1441,-208 1738,-208 1738,-232"/>
+<text text-anchor="middle" x="1589.5" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control%check_convergence_conserved_control</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_conserved_control&#45;&gt;proc~check_convergence_conserved_iteration -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge105" class="edge">
+<title>proc~check_convergence_conserved_control&#45;&gt;proc~check_convergence_conserved_iteration</title>
+<path fill="none" stroke="#ff0000" d="M1738.24,-220C1749.07,-220 1760.03,-220 1770.95,-220"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1770.97,-223.5 1780.97,-220 1770.97,-216.5 1770.97,-223.5"/>
+</g>
+<!-- proc~check_convergence_iteration -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node77" class="node">
+<title>proc~check_convergence_iteration</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node77"><a xlink:href="../proc/check_convergence_iteration.html" xlink:title="type_iteration%check_convergence_iteration">
+<polygon fill="#d9534f" stroke="#d9534f" points="2749.5,-146 2496.5,-146 2496.5,-122 2749.5,-122 2749.5,-146"/>
+<text text-anchor="middle" x="2623" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_iteration%check_convergence_iteration</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_iteration&#45;&gt;proc~check_convergence_setting -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge106" class="edge">
+<title>proc~check_convergence_iteration&#45;&gt;proc~check_convergence_setting</title>
+<path fill="none" stroke="#00ffff" d="M2749.51,-132.27C2777.05,-131.89 2806.5,-131.48 2834.94,-131.09"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2835,-134.59 2844.95,-130.95 2834.9,-127.59 2835,-134.59"/>
+</g>
+<!-- proc~check_convergence_control -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node78" class="node">
+<title>proc~check_convergence_control</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node78"><a xlink:href="../proc/check_convergence_control.html" xlink:title="type_control%check_convergence_control">
+<polygon fill="#d9534f" stroke="#d9534f" points="2383.5,-149 2147.5,-149 2147.5,-125 2383.5,-125 2383.5,-149"/>
+<text text-anchor="middle" x="2265.5" y="-134.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_control%check_convergence_control</text>
+</a>
+</g>
+</g>
+<!-- proc~check_convergence_control&#45;&gt;proc~check_convergence_iteration -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge108" class="edge">
+<title>proc~check_convergence_control&#45;&gt;proc~check_convergence_iteration</title>
+<path fill="none" stroke="#00ffff" d="M2383.89,-136.01C2416.61,-135.73 2452.42,-135.43 2486.1,-135.15"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="2486.51,-138.64 2496.48,-135.06 2486.45,-131.64 2486.51,-138.64"/>
+</g>
+<!-- proc~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node79" class="node">
+<title>proc~solve_time_step_check_convergence_conserved_ftcms</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node79"><a xlink:href="../proc/solve_time_step_check_convergence_conserved_ftcms.html" xlink:title="solve_time_step_check_convergence_conserved_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1398,-232 1094,-232 1094,-208 1398,-208 1398,-232"/>
+<text text-anchor="middle" x="1246" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_check_convergence_conserved_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;proc~check_convergence_conserved_control -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge107" class="edge">
+<title>proc~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;proc~check_convergence_conserved_control</title>
+<path fill="none" stroke="#ff0000" d="M1398.28,-220C1409.03,-220 1419.88,-220 1430.66,-220"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1430.98,-223.5 1440.98,-220 1430.97,-216.5 1430.98,-223.5"/>
+</g>
+<!-- interface~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node80" class="node">
+<title>interface~solve_time_step_check_convergence_conserved_ftcms</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node80"><a xlink:href="../interface/solve_time_step_check_convergence_conserved_ftcms.html" xlink:title="type_ftcms%solve_time_step_check_convergence_conserved_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1058,-232 686,-232 686,-208 1058,-208 1058,-232"/>
+<text text-anchor="middle" x="872" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_check_convergence_conserved_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;proc~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge111" class="edge">
+<title>interface~solve_time_step_check_convergence_conserved_ftcms&#45;&gt;proc~solve_time_step_check_convergence_conserved_ftcms</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1058.18,-220C1066.67,-220 1075.15,-220 1083.57,-220"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1083.8,-223.5 1093.8,-220 1083.8,-216.5 1083.8,-223.5"/>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node81" class="node">
+<title>proc~solve_time_step_check_convergence_ftcms</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node81"><a xlink:href="../proc/solve_time_step_check_convergence_ftcms.html" xlink:title="solve_time_step_check_convergence_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="2059.5,-189 1815.5,-189 1815.5,-165 2059.5,-165 2059.5,-189"/>
+<text text-anchor="middle" x="1937.5" y="-174.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_check_convergence_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_check_convergence_ftcms&#45;&gt;proc~check_convergence_control -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge109" class="edge">
+<title>proc~solve_time_step_check_convergence_ftcms&#45;&gt;proc~check_convergence_control</title>
+<path fill="none" stroke="#ff0000" d="M2036.31,-165C2074.1,-160.36 2117.49,-155.04 2156.21,-150.29"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2156.98,-153.72 2166.48,-149.03 2156.13,-146.77 2156.98,-153.72"/>
+</g>
+<!-- proc~solve_time_step_staggered_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node82" class="node">
+<title>proc~solve_time_step_staggered_ftcms</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node82"><a xlink:href="../proc/solve_time_step_staggered_ftcms.html" xlink:title="solve_time_step_staggered_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="1341,-152 1151,-152 1151,-128 1341,-128 1341,-152"/>
+<text text-anchor="middle" x="1246" y="-137.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_staggered_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_staggered_ftcms&#45;&gt;proc~check_convergence_control -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge110" class="edge">
+<title>proc~solve_time_step_staggered_ftcms&#45;&gt;proc~check_convergence_control</title>
+<path fill="none" stroke="#ff0000" d="M1341.35,-139.72C1524.94,-139.18 1930.31,-137.99 2137.37,-137.37"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2137.39,-140.87 2147.38,-137.35 2137.37,-133.87 2137.39,-140.87"/>
+</g>
+<!-- interface~solve_time_step_check_convergence_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node83" class="node">
+<title>interface~solve_time_step_check_convergence_ftcms</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node83"><a xlink:href="../interface/solve_time_step_check_convergence_ftcms.html" xlink:title="type_ftcms%solve_time_step_check_convergence_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1745,-189 1434,-189 1434,-165 1745,-165 1745,-189"/>
+<text text-anchor="middle" x="1589.5" y="-174.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_check_convergence_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_staggered_ftcms&#45;&gt;interface~solve_time_step_check_convergence_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge116" class="edge">
+<title>proc~solve_time_step_staggered_ftcms&#45;&gt;interface~solve_time_step_check_convergence_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M1341.22,-150.21C1380.25,-154.44 1426.01,-159.39 1467.48,-163.89"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1467.32,-167.39 1477.64,-164.99 1468.08,-160.43 1467.32,-167.39"/>
+</g>
+<!-- interface~solve_time_step_check_convergence_ftcms&#45;&gt;proc~solve_time_step_check_convergence_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge113" class="edge">
+<title>interface~solve_time_step_check_convergence_ftcms&#45;&gt;proc~solve_time_step_check_convergence_ftcms</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M1745.03,-177C1765.12,-177 1785.54,-177 1805.2,-177"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="1805.41,-180.5 1815.41,-177 1805.41,-173.5 1805.41,-180.5"/>
+</g>
+<!-- interface~solve_time_step_staggered_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node84" class="node">
+<title>interface~solve_time_step_staggered_ftcms</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node84"><a xlink:href="../interface/solve_time_step_staggered_ftcms.html" xlink:title="type_ftcms%solve_time_step_staggered_ftcms">
+<polygon fill="#a7506f" stroke="#a7506f" points="1001,-152 743,-152 743,-128 1001,-128 1001,-152"/>
+<text text-anchor="middle" x="872" y="-137.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">type_ftcms%solve_time_step_staggered_ftcms</text>
+</a>
+</g>
+</g>
+<!-- interface~solve_time_step_staggered_ftcms&#45;&gt;proc~solve_time_step_staggered_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge114" class="edge">
+<title>interface~solve_time_step_staggered_ftcms&#45;&gt;proc~solve_time_step_staggered_ftcms</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M1001.02,-140C1046.55,-140 1097.23,-140 1140.55,-140"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="1140.82,-143.5 1150.82,-140 1140.82,-136.5 1140.82,-143.5"/>
+</g>
+<!-- proc~solve_time_step_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_node85" class="node">
+<title>proc~solve_time_step_ftcms</title>
+<g id="a_proc~~mpi_allreduce_int32~~CalledByGraph_node85"><a xlink:href="../proc/solve_time_step_ftcms.html" xlink:title="solve_time_step_ftcms">
+<polygon fill="#d9534f" stroke="#d9534f" points="650,-197 518,-197 518,-173 650,-173 650,-197"/>
+<text text-anchor="middle" x="584" y="-182.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">solve_time_step_ftcms</text>
+</a>
+</g>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_check_convergence_conserved_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge112" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_check_convergence_conserved_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M650.26,-192.99C683.55,-197.06 724.92,-202.12 762.82,-206.76"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="762.54,-210.25 772.89,-207.99 763.39,-203.3 762.54,-210.25"/>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_check_convergence_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge115" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_check_convergence_ftcms</title>
+<path fill="none" stroke="#ff0000" d="M650.07,-184.48C804.7,-183.25 1198.04,-180.11 1423.35,-178.32"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1423.64,-181.81 1433.61,-178.23 1423.59,-174.81 1423.64,-181.81"/>
+</g>
+<!-- proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_staggered_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge117" class="edge">
+<title>proc~solve_time_step_ftcms&#45;&gt;interface~solve_time_step_staggered_ftcms</title>
+<path fill="none" stroke="#00ff00" d="M646.34,-172.99C659.41,-170.56 673.15,-168.11 686,-166 712.82,-161.6 741.9,-157.29 768.89,-153.49"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="769.71,-156.91 779.13,-152.06 768.74,-149.98 769.71,-156.91"/>
+</g>
+<!-- interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms -->
+<g id="proc~~mpi_allreduce_int32~~CalledByGraph_edge118" class="edge">
+<title>interface~solve_time_step_ftcms&#45;&gt;proc~solve_time_step_ftcms</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M475.78,-194.89C486.46,-193.9 497.21,-192.91 507.56,-191.96"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="508.12,-195.42 517.76,-191.02 507.48,-188.45 508.12,-195.42"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocmpi_allreduce_int32CalledByGraph = svgPanZoom('#procmpi_allreduce_int32CalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ Where possible, edges connecting nodes are
+given different colours to make them easier to distinguish in
+large graphs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">subroutine </span><span class="n">mpi_allreduce_int32</span><span class="p">(</span><span class="n">send_buffer</span><span class="p">,</span><span class="w"> </span><span class="n">receive_buffer</span><span class="p">,</span><span class="w"> </span><span class="nb">count</span><span class="p">,</span><span class="w"> </span><span class="n">datatype</span><span class="p">,</span><span class="w"> </span><span class="n">operation</span><span class="p">,</span><span class="w"> </span><span class="n">comm</span><span class="p">,</span><span class="w"> </span><span class="n">ierror</span><span class="p">)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">send_buffer</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">receive_buffer</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">count</span>
+<span class="nb">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">datatype</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">operation</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">MPI_Comm</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">comm</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">(</span><span class="n">int32</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ierror</span>
+
+<span class="w">        </span><span class="n">receive_buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">send_buffer</span>
+<span class="w">        </span><span class="n">ierror</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_SUCCESS</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">mpi_allreduce_int32</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              FTCMS
+ was developed by Kikuchi Shun<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+ on 2026-07-14 07:48 +0000             </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

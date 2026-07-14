@@ -1,7 +1,7 @@
 module io_input_basic
     use, intrinsic :: iso_fortran_env
 !$  use :: omp_lib
-    use :: mpi_f08
+    use :: core_parallel_mpi
     use :: stdlib_strings, only:to_string, strip, ends_with
     use :: stdlib_logger
     use :: json_module, only:json_file

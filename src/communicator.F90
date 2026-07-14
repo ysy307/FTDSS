@@ -5,7 +5,7 @@
 !> Achieves efficient scalar and vector data exchange via MPI asynchronous communication.
 module numerical_parallel_communicator
     use, intrinsic :: iso_fortran_env
-    use :: mpi_f08
+    use :: core_parallel_mpi
     use :: module_core
     use :: module_input, only:type_input
     use :: core_findings, only:binary_find

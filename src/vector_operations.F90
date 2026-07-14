@@ -12,7 +12,7 @@
 module linalg_vector_operations
     use, intrinsic :: iso_fortran_env, only: int32, real64
     use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
-    use :: mpi_f08
+    use :: core_parallel_mpi
     use :: module_core
 #ifdef _MKL
     use :: linalg_mkl_backend, only: norm_1_backend => norm_1_mkl, &
