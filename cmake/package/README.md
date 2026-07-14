@@ -19,6 +19,7 @@ set FTCMS_PROJECT_PATH=C:\path\to\project
 bin\FTCMS.exe
 ```
 
-The executable can run as a single MPI process without a launcher. Running
-multiple MPI processes requires a compatible Intel MPI launcher on the target
-system.
+The Linux package includes MPI support and can run as one process without a
+launcher. Running multiple Linux processes requires a compatible Intel MPI
+launcher on the target system. The Windows package is a single-process build
+without MPI or ScaLAPACK support.

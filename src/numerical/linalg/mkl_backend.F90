@@ -9,7 +9,7 @@ module linalg_mkl_backend
     use, intrinsic :: ieee_arithmetic
     use, intrinsic :: ieee_exceptions
 #ifdef _MPI
-    use :: mpi_f08
+    use :: core_parallel_mpi
 #endif
 #ifdef _MKL
     use :: linalg_mkl_interface

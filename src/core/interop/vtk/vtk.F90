@@ -3,7 +3,7 @@
 module core_interop_vtk
     use, intrinsic :: iso_fortran_env
     use, intrinsic :: iso_c_binding
-    use :: mpi_f08
+    use :: core_parallel_mpi
     use :: stdlib_strings, only:to_string, replace_all, strip
     use :: stdlib_sorting, only:sort
     use :: stdlib_logger

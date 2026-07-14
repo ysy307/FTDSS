@@ -99,8 +99,14 @@ function(enable_build_flags target)
 
     if(NOT KEYWORD STREQUAL "INTERFACE")
         target_compile_options(${target} ${KEYWORD}
-            # Fortran: Intel / IntelLLVM
-            $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:Intel,IntelLLVM>>:
+            # Fortran: Intel / IntelLLVM on Windows
+            $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:Intel,IntelLLVM>,$<PLATFORM_ID:Windows>>:
+            /stand:f18 /fpp /fpscomp:logicals /extend-source /traceback
+            $<$<CONFIG:Release>:/O2>
+            $<$<CONFIG:Debug>:/Od /debug:full /check:all /init:snan /init:arrays /warn:all /warn:errors /implicitnone>
+            >
+            # Fortran: Intel / IntelLLVM on Unix
+            $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:Intel,IntelLLVM>,$<NOT:$<PLATFORM_ID:Windows>>>:
             -stand f18 -fpp -fpscomp logicals -extend-source -g -traceback
             $<$<CONFIG:Release>:-O2>
             $<$<CONFIG:Debug>:-O0 -check all -init=snan -init=arrays -warn all -warn errors -implicitnone -fstack-protector-all>
@@ -182,7 +188,9 @@ function(enable_build_flags target)
             MKL::MKL_SCALAPACK
             MPI::MPI_Fortran)
     else()
-        target_link_libraries(${target} ${KEYWORD} MKL::MKL)
+        target_link_libraries(${target} ${KEYWORD}
+            SPBLAS::SPBLAS
+            MKL::MKL)
     endif()
 endfunction()
 

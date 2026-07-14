@@ -3,7 +3,7 @@
 !>
 module domain_domain_manager
     use, intrinsic :: iso_fortran_env
-    use :: mpi_f08
+    use :: core_parallel_mpi
     use :: stdlib_logger
     use :: stdlib_strings, only:strip
     use :: stdlib_optval, only:optval

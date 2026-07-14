@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       build_windows:
-        description: Build the experimental Windows package
+        description: Build the Windows single-process package
         required: false
         default: false
         type: boolean
@@ -85,13 +85,13 @@ jobs:
           retention-days: 14
 
   windows-ifx:
-    name: Windows (ifx, experimental)
+    name: Windows (ifx, single process)
     if: github.event_name == 'workflow_dispatch' && inputs.build_windows
     runs-on: windows-latest
     env:
       DEPENDENCY_PREFIX: ${{ github.workspace }}\third_party\.local\intel
       ONEAPI_URL: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/4144bec3-82ce-4672-bd71-5c93a79cd5e7/intel-oneapi-toolkit-2026.1.0.191_offline.exe
-      ONEAPI_COMPONENTS: intel.oneapi.win.ifort-compiler:intel.oneapi.win.mkl.devel:intel.oneapi.win.mpi.devel
+      ONEAPI_COMPONENTS: intel.oneapi.win.ifort-compiler:intel.oneapi.win.mkl.devel
 
     steps:
       - name: Checkout code
@@ -105,8 +105,7 @@ jobs:
             C:\Program Files (x86)\Intel\oneAPI\setvars-vcvarsall.bat
             C:\Program Files (x86)\Intel\oneAPI\compiler
             C:\Program Files (x86)\Intel\oneAPI\mkl
-            C:\Program Files (x86)\Intel\oneAPI\mpi
-          key: oneapi-windows-2026.1-v1
+          key: oneapi-windows-2026.1-v2
 
       - name: Install oneAPI
         if: steps.oneapi-cache.outputs.cache-hit != 'true'
@@ -140,7 +139,7 @@ jobs:
         run: |
           call "C:\Program Files (x86)\Intel\oneAPI\setvars-vcvarsall.bat" vs2022
           if errorlevel 1 exit /b 1
-          cmake -S . -B CMakeBuild/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DBUILD_TESTING=OFF -DFTCMS_PORTABLE_BUILD=ON -DFTCMS_BUNDLE_RUNTIME=ON
+          cmake -S . -B CMakeBuild/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DBUILD_TESTING=OFF -DENABLE_MPI=OFF -DFTCMS_PORTABLE_BUILD=ON -DFTCMS_BUNDLE_RUNTIME=ON
           if errorlevel 1 exit /b 1
           cmake --build CMakeBuild/release --target FTCMS --parallel 2
           if errorlevel 1 exit /b 1
