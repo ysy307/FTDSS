@@ -1556,21 +1556,41 @@ contains
     !> only the phase contents Qw/Qi/Qa/Qv are read from the state here, so
     !> the Darcy flux evaluation is skipped. Assembly and output build their
     !> own states with fluxes included and are unaffected.
+    !>
+    !> Parallelization: the node loop is OpenMP-parallel with one
+    !> thread-local scratch state per thread (same scheme as
+    !> update_variables_ftcms). Each iteration reads only global nodal
+    !> arrays plus the static table and writes only its own node_id entry of
+    !> Qw/Qi/Qa/Qv, so the result is independent of the schedule and
+    !> bit-identical to the serial loop.
     module subroutine update_nodal_phases_ftcms(self)
         implicit none
         class(type_ftcms), intent(inout) :: self
 
         integer(int32) :: node_id, num_nodes, row_start, row_end, m, k, repr_elem
-        type(type_state) :: state
+        type(type_state), allocatable :: states(:)
         real(real64) :: qw_val, qi_val, qa_val, qv_val
         logical :: qi_set, qw_set, qa_set, qv_set
         real(real64) :: measure
         real(real64) :: sum_qw, sum_qi, sum_qa, sum_qv
         real(real64) :: wsum_qw, wsum_qi, wsum_qa, wsum_qv
         logical :: any_qw, any_qi, any_qa, any_qv
+        integer(int32) :: num_threads, tid
 
         call self%domain%get_num_nodes(num_nodes)
+        num_threads = omp_get_max_threads()
+        allocate (states(num_threads))
 
+        !$OMP PARALLEL DEFAULT(NONE) &
+        !$OMP SHARED(self, num_nodes, states) &
+        !$OMP PRIVATE(node_id, row_start, row_end, m, k, repr_elem, &
+        !$OMP         qw_val, qi_val, qa_val, qv_val, &
+        !$OMP         qi_set, qw_set, qa_set, qv_set, measure, &
+        !$OMP         sum_qw, sum_qi, sum_qa, sum_qv, &
+        !$OMP         wsum_qw, wsum_qi, wsum_qa, wsum_qv, &
+        !$OMP         any_qw, any_qi, any_qa, any_qv, tid)
+        tid = omp_get_thread_num() + 1
+        !$OMP DO
         do node_id = 1, num_nodes
             row_start = self%node_material_table%ptr(node_id)
             row_end = self%node_material_table%ptr(node_id + 1) - 1
@@ -1579,13 +1599,13 @@ contains
 
             if (m == 1) then
                 repr_elem = self%node_material_table%repr_element(row_start)
-                call self%set_state(node_id, repr_elem, state, calc_physics=.true., include_fluxes=.false.)
+                call self%set_state(node_id, repr_elem, states(tid), calc_physics=.true., include_fluxes=.false.)
                 qi_set = .false.; qw_set = .false.; qa_set = .false.
                 qv_set = .false.
-                call state%ice_content%get(qi_val, qi_set)
-                call state%water_content%get(qw_val, qw_set)
-                call state%air_content%get(qa_val, qa_set)
-                call state%vapor_content%get(qv_val, qv_set)
+                call states(tid)%ice_content%get(qi_val, qi_set)
+                call states(tid)%water_content%get(qw_val, qw_set)
+                call states(tid)%air_content%get(qa_val, qa_set)
+                call states(tid)%vapor_content%get(qv_val, qv_set)
                 if (qi_set) call self%Qi%set_current(node_id, qi_val)
                 if (qw_set) call self%Qw%set_current(node_id, qw_val)
                 if (qa_set) call self%Qa%set_current(node_id, qa_val)
@@ -1598,13 +1618,13 @@ contains
                 do k = row_start, row_end
                     repr_elem = self%node_material_table%repr_element(k)
                     measure = self%node_material_table%measure_sum(k)
-                    call self%set_state(node_id, repr_elem, state, calc_physics=.true., include_fluxes=.false.)
+                    call self%set_state(node_id, repr_elem, states(tid), calc_physics=.true., include_fluxes=.false.)
                     qi_set = .false.; qw_set = .false.; qa_set = .false.
                     qv_set = .false.
-                    call state%ice_content%get(qi_val, qi_set)
-                    call state%water_content%get(qw_val, qw_set)
-                    call state%air_content%get(qa_val, qa_set)
-                    call state%vapor_content%get(qv_val, qv_set)
+                    call states(tid)%ice_content%get(qi_val, qi_set)
+                    call states(tid)%water_content%get(qw_val, qw_set)
+                    call states(tid)%air_content%get(qa_val, qa_set)
+                    call states(tid)%vapor_content%get(qv_val, qv_set)
 
                     if (qw_set) then
                         sum_qw = sum_qw + qw_val * measure
@@ -1634,6 +1654,10 @@ contains
                 if (any_qv .and. wsum_qv > epsilon(1.0d0)) call self%Qv%set_current(node_id, sum_qv / wsum_qv)
             end if
         end do
+        !$OMP END DO
+        !$OMP END PARALLEL
+
+        if (allocated(states)) deallocate (states)
 
     end subroutine update_nodal_phases_ftcms
 
