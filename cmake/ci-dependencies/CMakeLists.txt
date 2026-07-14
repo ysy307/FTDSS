@@ -44,6 +44,7 @@ ExternalProject_Add(json_fortran
     UPDATE_DISCONNECTED TRUE
     CMAKE_ARGS
         ${common_cmake_args}
+        -DCMAKE_Fortran_MODULE_DIRECTORY:PATH=<BINARY_DIR>/include
         -DJSONFORTRAN_ENABLE_TESTS:BOOL=OFF
         -DJSONFORTRAN_STATIC_LIBRARY_ONLY:BOOL=ON
 )
