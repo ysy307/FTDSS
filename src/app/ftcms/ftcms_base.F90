@@ -1667,26 +1667,49 @@ contains
     !> - enthalpy(j)  = volumetric enthalpy density H_j(T_j, p_{w,j}) [J/m3]
     !> - density(j)   = pore-water effective density rho_eff,j         [kg/m3]
     !>
-    !> Each node is visited once (processed mask). The nodal state is rebuilt with
-    !> set_state(calc_physics=.true.) so the phase contents are consistent with the
-    !> current (T, p_w) before evaluating H and rho_eff. Inactive physics yields a
-    !> zero field (contributes nothing to the weighted norm). Cost: O(N_nd).
+    !> Node-major loop over the precomputed node_material_table (see
+    !> type_node_material_table), replacing the original element-major loop
+    !> with a processed mask (first visiting element's material wins). The
+    !> nodal state is rebuilt with set_state(calc_physics=.true.) so the
+    !> phase contents are consistent with the current (T, p_w) before
+    !> evaluating H and rho_eff. Fluxes are skipped (include_fluxes=.false.):
+    !> the enthalpy/effective-density evaluations read only T, porosity, the
+    !> phase contents, and (T, p)-dependent densities/heats -- never the
+    !> Darcy fluxes or gradients.
+    !>
+    !> - Nodes with no adjacent elements keep the pre-zeroed H and rho_eff,
+    !>   identical to the original loop.
+    !> - m == 1 (single distinct material): one evaluation at the table's
+    !>   representative element. The evaluated material is the node's only
+    !>   material, so this reproduces the original first-element-wins result
+    !>   exactly (the representative element's index does not matter beyond
+    !>   its material id).
+    !> - m > 1: evaluate once per distinct material and combine H and
+    !>   rho_eff by material-summed-measure weighted average -- the same
+    !>   multi-material convention as update_nodal_phases (evaluate per
+    !>   material first, then average), instead of the original "material of
+    !>   the lowest-index adjacent element" pick.
+    !>
+    !> Inactive physics yields a zero field (contributes nothing to the
+    !> weighted norm). Parallelization: OpenMP over nodes with thread-local
+    !> scratch states; each iteration writes only its own node_id entries,
+    !> so the result is schedule-independent. Cost: O(sum of distinct
+    !> materials per node) constitutive evaluations.
     module subroutine compute_nodal_conserved_ftcms(self, enthalpy, density)
         implicit none
         class(type_ftcms), intent(inout) :: self
         real(real64), allocatable, intent(inout) :: enthalpy(:)
         real(real64), allocatable, intent(inout) :: density(:)
 
-        integer(int32) :: i_elem, num_elem, i_local, node_id, material_id, n_nodes
-        integer(int32), pointer, contiguous :: connectivity(:)
-        type(type_state) :: state
-        logical, allocatable :: processed(:)
+        integer(int32) :: node_id, material_id, n_nodes
+        integer(int32) :: row_start, row_end, m, k, repr_elem
+        type(type_state), allocatable :: states(:)
         logical :: active_thermal, active_hydraulic
-        real(real64) :: H_j, rho_j
+        real(real64) :: H_j, rho_j, measure
+        real(real64) :: sum_H, sum_rho, wsum
+        integer(int32) :: num_threads, tid
 
-        nullify (connectivity)
         call self%domain%get_num_nodes(n_nodes)
-        call self%domain%get_num_fe(num_elem)
 
         if (allocated(enthalpy)) deallocate (enthalpy)
         if (allocated(density)) deallocate (density)
@@ -1699,33 +1722,59 @@ contains
         active_thermal = self%is_active_thermal()
         active_hydraulic = self%is_active_hydraulic()
 
-        allocate (processed(n_nodes))
-        processed = .false.
+        num_threads = omp_get_max_threads()
+        allocate (states(num_threads))
 
-        do i_elem = 1, num_elem
-            call self%domain%get_fe_connectivity(i_elem, connectivity)
-            call self%domain%get_material_id(i_elem, material_id)
+        !$OMP PARALLEL DEFAULT(NONE) &
+        !$OMP SHARED(self, n_nodes, states, enthalpy, density, active_thermal, active_hydraulic) &
+        !$OMP PRIVATE(node_id, material_id, row_start, row_end, m, k, repr_elem, &
+        !$OMP         H_j, rho_j, measure, sum_H, sum_rho, wsum, tid)
+        tid = omp_get_thread_num() + 1
+        !$OMP DO
+        do node_id = 1, n_nodes
+            row_start = self%node_material_table%ptr(node_id)
+            row_end = self%node_material_table%ptr(node_id + 1) - 1
+            m = row_end - row_start + 1
+            if (m <= 0) cycle ! no adjacent elements: keep the pre-zeroed values
 
-            do i_local = 1, size(connectivity)
-                node_id = connectivity(i_local)
-                if (node_id < 1 .or. node_id > n_nodes) cycle
-                if (processed(node_id)) cycle
-                processed(node_id) = .true.
-
-                call self%set_state(node_id, i_elem, state, calc_physics=.true.)
-
+            if (m == 1) then
+                repr_elem = self%node_material_table%repr_element(row_start)
+                material_id = self%node_material_table%material_id(row_start)
+                call self%set_state(node_id, repr_elem, states(tid), calc_physics=.true., include_fluxes=.false.)
                 H_j = 0.0d0
                 rho_j = 0.0d0
-                if (active_thermal) call self%thermal%calc_enthalpy_density(material_id, state, H_j)
-                if (active_hydraulic) call self%hydraulic%calc_effective_density_value(state, rho_j)
-
+                if (active_thermal) call self%thermal%calc_enthalpy_density(material_id, states(tid), H_j)
+                if (active_hydraulic) call self%hydraulic%calc_effective_density_value(states(tid), rho_j)
                 enthalpy(node_id) = H_j
                 density(node_id) = rho_j
-            end do
-            nullify (connectivity)
+            else
+                sum_H = 0.0d0
+                sum_rho = 0.0d0
+                wsum = 0.0d0
+                do k = row_start, row_end
+                    repr_elem = self%node_material_table%repr_element(k)
+                    material_id = self%node_material_table%material_id(k)
+                    measure = self%node_material_table%measure_sum(k)
+                    call self%set_state(node_id, repr_elem, states(tid), calc_physics=.true., include_fluxes=.false.)
+                    H_j = 0.0d0
+                    rho_j = 0.0d0
+                    if (active_thermal) call self%thermal%calc_enthalpy_density(material_id, states(tid), H_j)
+                    if (active_hydraulic) call self%hydraulic%calc_effective_density_value(states(tid), rho_j)
+                    sum_H = sum_H + H_j * measure
+                    sum_rho = sum_rho + rho_j * measure
+                    wsum = wsum + measure
+                end do
+                ! Degenerate zero-measure rows leave the pre-zeroed values.
+                if (wsum > epsilon(1.0d0)) then
+                    enthalpy(node_id) = sum_H / wsum
+                    density(node_id) = sum_rho / wsum
+                end if
+            end if
         end do
+        !$OMP END DO
+        !$OMP END PARALLEL
 
-        deallocate (processed)
+        if (allocated(states)) deallocate (states)
     end subroutine compute_nodal_conserved_ftcms
 
     !> See the interface for the mathematical definition. Cost: O(N_dof) per step.
