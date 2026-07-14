@@ -96,8 +96,12 @@ contains
             prescribe_bc = .false.
         end if
 
-        call self%calc_gradient_temperature()
-        call self%calc_gradient_pressure()
+        ! No gradient recomputation here: the nodal T/P gradients are already
+        ! current at this point. Every T/P mutation is followed by a
+        ! projection -- reflect_variables recomputes both gradients after the
+        ! update (end of each nonlinear iteration), and the first iteration
+        ! recomputes them right after prescribe_dirichlet (before assembly).
+        ! Recomputing from unchanged inputs here produced identical values.
 
     end subroutine solve_time_step_setup_ftcms
 

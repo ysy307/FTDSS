@@ -68,6 +68,45 @@ module app_ftcms
         procedure, pass(self), public :: destroy => destroy_node_material_table
     end type type_node_material_table
 
+    !>
+    !> Static per-element Gauss-point geometry cache for the L2 (lumped
+    !> mass) nodal gradient projection, built once after the domain is
+    !> initialized (the mesh is static for the lifetime of a run). Caches
+    !> exactly the quantities the projection re-derived per call: the
+    !> shape-function nodal weights psi_k(x_p) * w_p * det(J_p), the global
+    !> shape-function derivatives dpsi_k/dx(x_p), and the lumped nodal
+    !> volume, so calc_gradient no longer calls calc_shape_function.
+    !>
+    !> Flattened CSR-like layout: element e's (gauss, node) entries occupy
+    !> entry_ptr(e) : entry_ptr(e+1)-1 in shape_weight / dpsi_dx, ordered
+    !> Gauss-point-major then local-node (the projection's loop order).
+    !>
+    type :: type_gradient_geometry_cache
+        !> Number of elements the cache was built for (0 if not yet built).
+        integer(int32) :: num_elements = 0
+        !> Number of global nodes (size of nodal_vol).
+        integer(int32) :: num_nodes = 0
+        !> Spatial dimension of the computation (rows of dpsi_dx).
+        integer(int32) :: dim = 0
+        !> Entry offsets per element (size num_elements + 1).
+        integer(int32), allocatable :: entry_ptr(:)
+        !> Number of Gauss points per element (size num_elements).
+        integer(int32), allocatable :: num_gauss(:)
+        !> Number of local nodes per element (size num_elements).
+        integer(int32), allocatable :: num_nodes_elem(:)
+        !> psi_k(x_p) * w_p * det(J_p) per (element, gauss, node) entry.
+        real(real64), allocatable :: shape_weight(:)
+        !> Global shape-function derivatives dpsi_k/dx_d(x_p), shape (dim, entries).
+        real(real64), allocatable :: dpsi_dx(:, :)
+        !> Lumped nodal volume sum over adjacent Gauss points of
+        !> psi_k w_p det(J_p) (size num_nodes).
+        real(real64), allocatable :: nodal_vol(:)
+    contains
+        ! ---- Lifecycle ----
+        procedure, pass(self), public :: initialize => initialize_gradient_geometry_cache
+        procedure, pass(self), public :: destroy => destroy_gradient_geometry_cache
+    end type type_gradient_geometry_cache
+
     type :: type_ftcms
         type(type_domain) :: domain
 
@@ -75,6 +114,11 @@ module app_ftcms
         !> domain's node->element adjacency (see type_node_material_table).
         !> Consumed by update_nodal_phases.
         type(type_node_material_table) :: node_material_table
+
+        !> Static Gauss-point geometry cache for the nodal gradient
+        !> projection (see type_gradient_geometry_cache). Consumed by
+        !> calc_gradient.
+        type(type_gradient_geometry_cache) :: gradient_cache
 
         type(type_variable) :: porosity
         type(type_variable) :: temperature
@@ -253,6 +297,29 @@ module app_ftcms
             implicit none
             class(type_node_material_table), intent(inout) :: self
         end subroutine destroy_node_material_table
+
+        !> Build the Gauss-point geometry cache for the nodal gradient
+        !> projection from the (already initialized) domain. See
+        !> type_gradient_geometry_cache for the storage layout. The cached
+        !> values are computed by the same calc_shape_function evaluations
+        !> the projection previously performed per call, in the same order,
+        !> so a cache-based projection is bit-identical to the direct one.
+        !>
+        !> Computational complexity: O(E_gp) time and memory, where E_gp is
+        !> the total number of (element, gauss, node) entries.
+        !> Failure behavior: a domain with zero elements or nodes leaves the
+        !> cache empty (num_elements == 0); no error is raised.
+        module subroutine initialize_gradient_geometry_cache(self, domain)
+            implicit none
+            class(type_gradient_geometry_cache), intent(inout) :: self
+            type(type_domain), intent(in) :: domain
+        end subroutine initialize_gradient_geometry_cache
+
+        !> Release the cache's allocatable storage and reset it to empty.
+        module subroutine destroy_gradient_geometry_cache(self)
+            implicit none
+            class(type_gradient_geometry_cache), intent(inout) :: self
+        end subroutine destroy_gradient_geometry_cache
 
         module subroutine initialize_type_ftcms(self)
             implicit none

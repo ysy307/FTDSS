@@ -258,80 +258,176 @@ contains
         end select
     end subroutine jacobi_equilibrate_bsr
 
+    !> Implementation strategy: replicate exactly the geometry evaluations
+    !> the direct projection performed per call -- same element order, same
+    !> Gauss-point order, same calc_shape_function invocations, and the same
+    !> shape_weight = psi_k * (w_p * det J_p) product and nodal-volume
+    !> accumulation order -- and store the results. Because the cached
+    !> values are produced by the identical instruction sequence, a
+    !> cache-based projection reproduces the direct projection bit for bit.
+    !> Memory: entry_ptr/num_gauss/num_nodes_elem O(E) int32,
+    !> shape_weight O(E_gp) and dpsi_dx O(dim * E_gp) real64,
+    !> nodal_vol O(N_nd) real64.
+    module subroutine initialize_gradient_geometry_cache(self, domain)
+        implicit none
+        class(type_gradient_geometry_cache), intent(inout) :: self
+        type(type_domain), intent(in) :: domain
+
+        class(abst_fe), pointer :: fe
+        integer(int32), dimension(:), pointer, contiguous :: p_conn
+        real(real64), allocatable :: node_coords(:, :)
+        real(real64), allocatable :: psi(:)
+        real(real64), allocatable :: dpsi_dx(:, :)
+        real(real64), pointer, contiguous, dimension(:) :: fe_weights
+        type(type_coordinate_dp), pointer, contiguous, dimension(:) :: fe_gauss_pts
+        real(real64) :: det_j, w_vol, shape_weight
+        type(type_coordinate_dp) :: r
+        integer(int32) :: num_elements, num_total_nodes, dim
+        integer(int32) :: n_nodes_elem, n_gauss
+        integer(int32) :: i, p, k, entry, total_entries
+
+        call self%destroy()
+        nullify (fe, p_conn, fe_weights, fe_gauss_pts)
+
+        call domain%get_num_fe(num_elements)
+        call domain%get_num_nodes(num_total_nodes)
+        call domain%get_computation_dimension(dim)
+        if (num_elements <= 0 .or. num_total_nodes <= 0 .or. dim <= 0) return
+
+        self%num_elements = num_elements
+        self%num_nodes = num_total_nodes
+        self%dim = dim
+
+        allocate (self%entry_ptr(num_elements + 1))
+        allocate (self%num_gauss(num_elements))
+        allocate (self%num_nodes_elem(num_elements))
+
+        ! Pass 1: per-element sizes and entry offsets
+        self%entry_ptr(1) = 1
+        do i = 1, num_elements
+            call domain%get_fe(i, fe)
+            call fe%get_num_nodes(n_nodes_elem)
+            call fe%get_num_gauss(n_gauss)
+            self%num_nodes_elem(i) = n_nodes_elem
+            self%num_gauss(i) = n_gauss
+            self%entry_ptr(i + 1) = self%entry_ptr(i) + n_gauss * n_nodes_elem
+        end do
+        total_entries = self%entry_ptr(num_elements + 1) - 1
+
+        allocate (self%shape_weight(max(total_entries, 1)))
+        allocate (self%dpsi_dx(dim, max(total_entries, 1)))
+        allocate (self%nodal_vol(num_total_nodes))
+        self%nodal_vol(:) = 0.0d0
+
+        allocate (psi(20), dpsi_dx(dim, 20))
+
+        ! Pass 2: evaluate and store the Gauss-point geometry, accumulating
+        ! the lumped nodal volume in the projection's original order.
+        do i = 1, num_elements
+            call domain%get_fe(i, fe)
+            call domain%get_fe_connectivity(i, p_conn)
+            n_nodes_elem = self%num_nodes_elem(i)
+            n_gauss = self%num_gauss(i)
+            call fe%get_weight(fe_weights)
+            call fe%get_gauss(fe_gauss_pts)
+            call domain%get_fe_coordinate(i, node_coords)
+            entry = self%entry_ptr(i)
+            do p = 1, n_gauss
+                r = fe_gauss_pts(p)
+                call fe%calc_shape_function(r, node_coords, psi=psi(1:n_nodes_elem), &
+                                            dpsi_dx=dpsi_dx(:, 1:n_nodes_elem), determinant_jacobian=det_j)
+                w_vol = fe_weights(p) * det_j
+                do k = 1, n_nodes_elem
+                    shape_weight = psi(k) * w_vol
+                    self%shape_weight(entry) = shape_weight
+                    self%dpsi_dx(:, entry) = dpsi_dx(:, k)
+                    self%nodal_vol(p_conn(k)) = self%nodal_vol(p_conn(k)) + shape_weight
+                    entry = entry + 1
+                end do
+            end do
+            nullify (p_conn, fe_weights, fe_gauss_pts, fe)
+        end do
+
+    end subroutine initialize_gradient_geometry_cache
+
+    module subroutine destroy_gradient_geometry_cache(self)
+        implicit none
+        class(type_gradient_geometry_cache), intent(inout) :: self
+
+        if (allocated(self%entry_ptr)) deallocate (self%entry_ptr)
+        if (allocated(self%num_gauss)) deallocate (self%num_gauss)
+        if (allocated(self%num_nodes_elem)) deallocate (self%num_nodes_elem)
+        if (allocated(self%shape_weight)) deallocate (self%shape_weight)
+        if (allocated(self%dpsi_dx)) deallocate (self%dpsi_dx)
+        if (allocated(self%nodal_vol)) deallocate (self%nodal_vol)
+        self%num_elements = 0
+        self%num_nodes = 0
+        self%dim = 0
+    end subroutine destroy_gradient_geometry_cache
+
     !> Calculate nodal gradient of a scalar field
+    !>
+    !> Implementation: cache-based L2 (lumped mass) projection. The static
+    !> Gauss-point geometry (shape weights, global shape derivatives, lumped
+    !> nodal volume) comes from self%gradient_cache, built once at
+    !> initialization; only the field-dependent gather and accumulation run
+    !> per call. Loop order and arithmetic match the original direct
+    !> projection exactly (bit-identical results).
     module subroutine calc_gradient_ftcms(self, values_vec, grad)
         implicit none
         class(type_ftcms), intent(inout) :: self
         real(real64), intent(in) :: values_vec(:)
         type(type_coordinate_array_dp), intent(inout) :: grad
 
-        class(abst_fe), pointer :: fe
         integer(int32), dimension(:), pointer, contiguous :: p_conn
         real(real64), allocatable :: elem_u(:)
-        real(real64), allocatable :: node_coords(:, :)
-        real(real64), allocatable :: psi(:)
-        real(real64), allocatable :: dpsi_dx(:, :)
-        real(real64), pointer, contiguous, dimension(:) :: fe_weights
-        type(type_coordinate_dp), pointer, contiguous, dimension(:) :: fe_gauss_pts
-        real(real64), allocatable :: nodal_vol(:)
-        real(real64) :: det_j
         real(real64) :: gauss_grad(3)
-        real(real64) :: w_vol, shape_weight
-        type(type_coordinate_dp) :: r
+        real(real64) :: shape_weight
         integer(int32) :: num_elements, num_total_nodes, dim
         integer(int32) :: n_nodes_elem, n_gauss
-        integer(int32) :: i, p, k, d, global_nid
+        integer(int32) :: i, p, k, d, global_nid, entry
         real(real64) :: grad_component
 
-        nullify (fe, p_conn, fe_weights, fe_gauss_pts)
-        call self%domain%get_num_fe(num_elements)
-        call self%domain%get_num_nodes(num_total_nodes)
-        call self%domain%get_computation_dimension(dim)
+        nullify (p_conn)
+        num_elements = self%gradient_cache%num_elements
+        num_total_nodes = self%gradient_cache%num_nodes
+        dim = self%gradient_cache%dim
         call grad%zero()
+        if (num_elements <= 0) return
 
-        if (allocated(nodal_vol)) deallocate (nodal_vol)
-        allocate (nodal_vol(num_total_nodes))
-        nodal_vol(:) = 0.0d0
-
-        allocate (elem_u(20), psi(20), dpsi_dx(dim, 20))
+        allocate (elem_u(20))
 
         do i = 1, num_elements
-            call self%domain%get_fe(i, fe)
             call self%domain%get_fe_connectivity(i, p_conn)
-            call fe%get_num_nodes(n_nodes_elem)
-            call fe%get_num_gauss(n_gauss)
-            call fe%get_weight(fe_weights)
-            call fe%get_gauss(fe_gauss_pts)
+            n_nodes_elem = self%gradient_cache%num_nodes_elem(i)
+            n_gauss = self%gradient_cache%num_gauss(i)
             elem_u(1:n_nodes_elem) = values_vec(p_conn(1:n_nodes_elem))
-            call self%domain%get_fe_coordinate(i, node_coords)
+            entry = self%gradient_cache%entry_ptr(i)
             do p = 1, n_gauss
-                r = fe_gauss_pts(p)
-                call fe%calc_shape_function(r, node_coords, psi=psi(1:n_nodes_elem), &
-                                            dpsi_dx=dpsi_dx(:, 1:n_nodes_elem), determinant_jacobian=det_j)
-                w_vol = fe_weights(p) * det_j
                 gauss_grad = 0.0d0
                 do d = 1, dim
                     grad_component = 0.0d0
                     do k = 1, n_nodes_elem
-                        grad_component = grad_component + elem_u(k) * dpsi_dx(d, k)
+                        grad_component = grad_component + elem_u(k) * self%gradient_cache%dpsi_dx(d, entry + k - 1)
                     end do
                     gauss_grad(d) = grad_component
                 end do
                 do k = 1, n_nodes_elem
                     global_nid = p_conn(k)
-                    shape_weight = psi(k) * w_vol
-                    nodal_vol(global_nid) = nodal_vol(global_nid) + shape_weight
+                    shape_weight = self%gradient_cache%shape_weight(entry + k - 1)
                     if (allocated(grad%x)) grad%x(global_nid) = grad%x(global_nid) + shape_weight * gauss_grad(1)
                     if (dim >= 2 .and. allocated(grad%y)) grad%y(global_nid) = grad%y(global_nid) + shape_weight * gauss_grad(2)
                     if (dim >= 3 .and. allocated(grad%z)) grad%z(global_nid) = grad%z(global_nid) + shape_weight * gauss_grad(3)
                 end do
+                entry = entry + n_nodes_elem
             end do
+            nullify (p_conn)
         end do
         do k = 1, num_total_nodes
-            if (nodal_vol(k) > epsilon(1.0d0)) then
-                if (allocated(grad%x)) grad%x(k) = grad%x(k) / nodal_vol(k)
-                if (allocated(grad%y)) grad%y(k) = grad%y(k) / nodal_vol(k)
-                if (allocated(grad%z)) grad%z(k) = grad%z(k) / nodal_vol(k)
+            if (self%gradient_cache%nodal_vol(k) > epsilon(1.0d0)) then
+                if (allocated(grad%x)) grad%x(k) = grad%x(k) / self%gradient_cache%nodal_vol(k)
+                if (allocated(grad%y)) grad%y(k) = grad%y(k) / self%gradient_cache%nodal_vol(k)
+                if (allocated(grad%z)) grad%z(k) = grad%z(k) / self%gradient_cache%nodal_vol(k)
             end if
         end do
     end subroutine calc_gradient_ftcms

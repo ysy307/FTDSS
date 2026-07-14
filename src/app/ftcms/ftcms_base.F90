@@ -110,6 +110,10 @@ contains
         ! domain is fully built, for use by update_nodal_phases.
         call self%node_material_table%initialize(self%domain)
 
+        ! Likewise build the static Gauss-point geometry cache used by the
+        ! nodal gradient projection (calc_gradient).
+        call self%gradient_cache%initialize(self%domain)
+
         call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, self%thermal_start_dof)
         call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, self%hydraulic_start_dof)
 
