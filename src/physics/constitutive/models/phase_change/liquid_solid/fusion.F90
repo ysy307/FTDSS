@@ -30,6 +30,7 @@ module models_phase_change_fusion
         procedure, pass(self), public :: calc_water_content
         procedure, pass(self), public :: calc_water_content_derivatives
         procedure, pass(self), public :: calc_effective_suction
+        procedure, pass(self), public :: calc_saturation_pressure
         procedure, pass(self), public :: deriv_pressure_ice_water
 
     end type type_fusion
@@ -48,9 +49,9 @@ contains
         ! the single relation S_w = F_WRF(p_c*) for both unfrozen and frozen states.
         ! Thermodynamically p_c* is the chemical-potential lowering of soil water,
         ! mu_w = mu_w^sat - v_w * p_c*. A smooth max keeps the derivatives well
-        ! defined; dpsi_eff_dpsi_cap and dpsi_eff_dpsi_cryo are the weights with which
-        ! the capillary (grad p_w) and cryogenic (grad T) contributions enter the
-        ! Darcy flux driven by grad(p_c*).
+        ! defined. The weights are used only for derivatives of retention and
+        ! phase storage. Darcy transport is driven by the actual pore-water
+        ! pressure, not by the generalized suction.
         real(real64) :: delta_psi, blend_denom
 
         delta_psi = psi_cap - psi_cryo
@@ -364,6 +365,99 @@ contains
         call self%gcc%calc(state, psi_cryo)
         call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
     end subroutine calc_effective_suction
+
+    !> Calculate the pore-water pressure at which the gas-filled pore volume vanishes.
+    !>
+    !> \[ \theta_l(T,p_b)+\theta_i(T,p_b)=\phi \]
+    !> Assumptions: local phase equilibrium, monotone WRF, and fixed porosity.
+    !> Numerical guarantee: returns a bracketed bisection solution when a transition exists.
+    !> Computational complexity: \(O(N_b)\) arithmetic and \(O(1)\) memory.
+    !> Failure behavior: reports an unsaturated state when no finite transition is bracketed.
+    subroutine calc_saturation_pressure(self, state, saturation_pressure, is_saturated)
+        implicit none
+        class(type_fusion), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: saturation_pressure
+        logical, intent(inout) :: is_saturated
+
+        integer(int32), parameter :: max_bisection_iterations = 64
+        real(real64), parameter :: pressure_floor = -1.0d12
+        type(type_state) :: local_state
+        real(real64) :: pressure, porosity
+        real(real64) :: pressure_low, pressure_high, pressure_mid
+        real(real64) :: volume_current, volume_low, volume_high, volume_mid
+        real(real64) :: volume_tolerance
+        integer(int32) :: i
+
+        saturation_pressure = 0.0d0
+        is_saturated = .false.
+        call state%pressure%get(pressure)
+        call state%porosity%get(porosity)
+        if (porosity <= 0.0d0) return
+
+        call local_state%copy(state)
+        call evaluate_unconstrained_phase_volume(local_state, pressure, volume_current)
+        volume_tolerance = 64.0d0 * epsilon(1.0d0) * max(1.0d0, porosity)
+        if (volume_current < porosity - volume_tolerance) return
+
+        pressure_high = 0.0d0
+        call evaluate_unconstrained_phase_volume(local_state, pressure_high, volume_high)
+        if (volume_high < porosity - volume_tolerance) return
+
+        pressure_low = -rho_std * g
+        call evaluate_unconstrained_phase_volume(local_state, pressure_low, volume_low)
+        do while (volume_low >= porosity .and. pressure_low > pressure_floor)
+            pressure_low = max(10.0d0 * pressure_low, pressure_floor)
+            call evaluate_unconstrained_phase_volume(local_state, pressure_low, volume_low)
+        end do
+        if (volume_low >= porosity) return
+
+        do i = 1, max_bisection_iterations
+            pressure_mid = 0.5d0 * (pressure_low + pressure_high)
+            call evaluate_unconstrained_phase_volume(local_state, pressure_mid, volume_mid)
+            if (volume_mid >= porosity) then
+                pressure_high = pressure_mid
+            else
+                pressure_low = pressure_mid
+            end if
+        end do
+
+        saturation_pressure = 0.5d0 * (pressure_low + pressure_high)
+        is_saturated = pressure >= saturation_pressure - &
+                       max(1.0d-8 * max(abs(saturation_pressure), 1.0d0), epsilon(1.0d0))
+
+    contains
+        subroutine evaluate_unconstrained_phase_volume(candidate_state, candidate_pressure, phase_volume)
+            implicit none
+            type(type_state), intent(inout) :: candidate_state
+            real(real64), intent(in) :: candidate_pressure
+            real(real64), intent(inout) :: phase_volume
+
+            real(real64) :: psi_cap, psi_cryo, psi_eff
+            real(real64) :: theta_total, theta_liquid, theta_ice
+            real(real64) :: rho_w, rho_i
+
+            call candidate_state%pressure%set(candidate_pressure)
+            call self%calc_rho_water(candidate_state, rho_w)
+            call self%calc_rho_ice(candidate_state, rho_i)
+            if (rho_w <= tiny(1.0d0) .or. rho_i <= tiny(1.0d0)) then
+                phase_volume = 0.0d0
+                return
+            end if
+
+            psi_cap = max(0.0d0, -candidate_pressure)
+            call self%wrf%calc(-psi_cap / (rho_std * g), theta_total)
+            call self%gcc%calc(candidate_state, psi_cryo)
+            call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
+            call self%wrf%calc(-psi_eff / (rho_std * g), theta_liquid)
+
+            theta_ice = 0.0d0
+            if (theta_liquid < theta_total) then
+                theta_ice = (theta_total - theta_liquid) * rho_w / rho_i
+            end if
+            phase_volume = theta_liquid + theta_ice
+        end subroutine evaluate_unconstrained_phase_volume
+    end subroutine calc_saturation_pressure
 
     !>
     !> @brief Calculate derivative of ice pressure w.r.t water pressure.

@@ -44,6 +44,8 @@ submodule(io_input_basic) input_basic_materials
     character(*), parameter :: unit = "unit"
     character(*), parameter :: valid_units(3) = [character(len=4) :: "cm", "m", "Pa"]
     character(*), parameter :: hydraulic_conductivity_model = "hydraulic_conductivity_model"
+    character(*), parameter :: hydraulic_storage = "hydraulic_storage"
+    character(*), parameter :: specific_storage = "specific_storage"
     character(*), parameter :: saturated_conductivity = "saturated_conductivity"
     character(*), parameter :: l = "l"
     character(*), parameter :: impedance_factor = "impedance_factor"
@@ -201,6 +203,7 @@ contains
 
             call read_materials_swcc(self, json, i_material)
             call read_materials_hydraulic_model(self, json, i_material)
+            call read_materials_hydraulic_storage(self, json, i_material)
         end if
 
     end subroutine read_materials_physics
@@ -239,6 +242,21 @@ contains
                                 is_required=.false., default_value=1.0d0, valid_range=[0.0d0, huge(0.0d0)])
         end associate
     end subroutine read_materials_hydraulic_model
+
+    subroutine read_materials_hydraulic_storage(self, json, i_material)
+        implicit none
+        class(type_input_basic), intent(inout) :: self
+        type(json_file), intent(inout) :: json
+        integer(int32), intent(in) :: i_material
+
+        character(256) :: buffer(3) = [character(256) :: "", "", ""]
+
+        buffer(1) = materials//"("//to_string(i_material)//")"
+        buffer(2) = hydraulic_storage
+        buffer(3) = specific_storage
+        call get_json_value(json, join(buffer), self%materials(i_material)%hydraulic_storage%specific_storage, &
+                            is_required=.false., default_value=0.0d0, valid_range=[0.0d0, huge(0.0d0)])
+    end subroutine read_materials_hydraulic_storage
 
     subroutine read_materials_swcc(self, json, i_material)
         implicit none
@@ -622,6 +640,7 @@ contains
         write (*, '(a, es12.4e2)') "    Impedance Factor    : ", material%hydraulic_conductivity_model%impedance_factor
         write (*, '(a, i0)') "    Viscosity Model #   : ", material%hydraulic_conductivity_model%water_viscosity_model
         write (*, '(a, es12.4e2)') "    Gain Factor         : ", material%hydraulic_conductivity_model%gain_factor
+        write (*, '(a, es12.4e2)') "    Specific Storage    : ", material%hydraulic_storage%specific_storage
 
         ! Water Retention Model (WCC)
         call display_wcc(material%water_characteristic_curve)

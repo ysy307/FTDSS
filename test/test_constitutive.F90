@@ -1,10 +1,13 @@
 module test_constitutive_suite
     use, intrinsic :: iso_fortran_env, only: error_unit, int32, int64, output_unit, real64
     use :: iapws, only: type_iapws06, type_iapws97
-    use :: module_core, only: HCF_MODES, PHYSICS_UNITS, SWCC_MODELS, type_config_hcf, type_config_wrf, type_state
+    use :: module_core, only: GCC_TYPES, HCF_MODES, PHYSICS_UNITS, SWCC_MODELS, &
+        type_config_gcc, type_config_hcf, type_config_wrf, type_state
     use :: module_input, only: input_translator, type_input
     use :: models_hcf, only: holder_hcfs
     use :: models_phase_change_vaporization, only: type_evaporation
+    use :: models_phase_change_gcc, only: holder_gccs
+    use :: models_phase_change_manager, only: type_phase_manager
     use :: models_wrf, only: holder_wrfs
     use :: numerical_special_functions_mkl, only: type_mkl_regularized_incomplete_beta
     implicit none
@@ -23,6 +26,7 @@ module test_constitutive_suite
         procedure, private :: test_hcf_vg_dispatch
         procedure, private :: test_incomplete_beta_thread_safety
         procedure, private :: test_vapor_combined_evaluation
+        procedure, private :: test_saturation_pressure
         procedure, private :: benchmark_hot_paths
         procedure, private :: report_benchmark
         procedure, private :: configure_wrf
@@ -43,6 +47,7 @@ contains
         call self%test_hcf_vg_dispatch()
         call self%test_incomplete_beta_thread_safety()
         call self%test_vapor_combined_evaluation()
+        call self%test_saturation_pressure()
         call self%benchmark_hot_paths()
 
         if (self%failures > 0) then
@@ -322,6 +327,66 @@ contains
         call self%check_close("combined vapor pressure derivative", dP_combined, dP_separate, 2.0d-14)
         call self%check_close("combined vapor temperature derivative", dT_combined, dT_separate, 2.0d-14)
     end subroutine test_vapor_combined_evaluation
+
+    subroutine test_saturation_pressure(self)
+        implicit none
+        class(type_constitutive_test_suite), intent(inout) :: self
+
+        type(type_config_wrf) :: wrf_config
+        type(type_config_gcc) :: gcc_config
+        type(holder_wrfs) :: wrf
+        type(holder_gccs) :: gcc
+        type(type_phase_manager) :: phase_manager
+        type(type_iapws97), target :: water
+        type(type_iapws06), target :: ice
+        type(type_state) :: state
+        real(real64) :: saturation_pressure, Qw, Qi, Qa
+        logical :: is_saturated
+
+        call self%configure_wrf(wrf_config, SWCC_MODELS%VG%ID)
+        wrf_config%theta_s = 0.535d0
+        wrf_config%theta_r = 0.05d0
+        wrf_config%alpha1 = 1.11d0
+        wrf_config%n1 = 1.48d0
+        wrf_config%m1 = 0.2d0
+        call wrf%initialize(wrf_config)
+
+        call gcc_config%reset()
+        gcc_config%gcc_model = GCC_TYPES%NON_SEGREGATION
+        call water%initialize()
+        call ice%initialize()
+        call gcc%initialize(1_int32, gcc_config, water, ice)
+        call phase_manager%initialize(gcc%p, wrf%p, water, ice)
+
+        call state%temperature%set(-1.0d0)
+        call state%pressure%set(0.0d0)
+        call state%porosity%set(0.535d0)
+        saturation_pressure = 0.0d0
+        is_saturated = .false.
+        call phase_manager%calc_saturation_pressure(state, saturation_pressure, is_saturated)
+        call self%check_true("frozen saturation pressure is negative", saturation_pressure < 0.0d0)
+        call self%check_true("zero gauge pressure is saturated while frozen", is_saturated)
+
+        call state%pressure%set(saturation_pressure - 10.0d0)
+        call phase_manager%calc_saturation_pressure(state, saturation_pressure, is_saturated)
+        call self%check_true("state below saturation pressure contains gas", .not. is_saturated)
+        call phase_manager%update_water_phases(state)
+        call state%water_content%get(Qw)
+        call state%ice_content%get(Qi)
+        call state%air_content%get(Qa)
+        call self%check_true("state below saturation pressure has positive gas volume", Qa > 0.0d0)
+        call self%check_close("unsaturated phase volumes close the pore volume", Qw + Qi + Qa, 0.535d0, 2.0d-14)
+
+        call state%pressure%set(saturation_pressure + 10.0d0)
+        call phase_manager%calc_saturation_pressure(state, saturation_pressure, is_saturated)
+        call self%check_true("state above saturation pressure is gas-free", is_saturated)
+        call phase_manager%update_water_phases(state)
+        call state%water_content%get(Qw)
+        call state%ice_content%get(Qi)
+        call state%air_content%get(Qa)
+        call self%check_close("saturated phase volumes close the pore volume", Qw + Qi + Qa, 0.535d0, 2.0d-14)
+        call self%check_true("saturated state has zero gas volume", abs(Qa) < 1.0d-12)
+    end subroutine test_saturation_pressure
 
     subroutine benchmark_hot_paths(self)
         implicit none

@@ -61,11 +61,25 @@ contains
                                      configs_gcc=gcc_model_info)
 
         if (allocated(self%iteration_capacity_bound)) deallocate (self%iteration_capacity_bound)
+        if (allocated(self%specific_storage)) deallocate (self%specific_storage)
         if (num_active_materials > 0) then
             allocate (self%iteration_capacity_bound(maxval(active_region_ids)), source=0.0d0)
+            allocate (self%specific_storage(maxval(active_region_ids)), source=0.0d0)
             do i = 1, num_active_materials
                 call self%physics%calc_lscheme_capacity(active_region_ids(i), &
                                                         self%iteration_capacity_bound(active_region_ids(i)))
+                material_idx = 0
+                do j = 1, num_materials
+                    if (input%basic%materials(j)%id == active_region_ids(i)) then
+                        material_idx = j
+                        exit
+                    end if
+                end do
+                if (material_idx == 0 .and. num_materials == 1) material_idx = 1
+                if (material_idx > 0) then
+                    self%specific_storage(active_region_ids(i)) = &
+                        input%basic%materials(material_idx)%hydraulic_storage%specific_storage
+                end if
             end do
         end if
 

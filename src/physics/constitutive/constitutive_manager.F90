@@ -46,6 +46,7 @@ module physics_constitutive_manager
         procedure, public :: calc_vol_heat_capacity
         procedure, public :: calc_latent_heat_fusion
         procedure, public :: calc_latent_heat_vaporization
+        procedure, public :: calc_saturation_pressure
         procedure, public :: calc_pressure_ice_water_derivative
 
         procedure, public :: update_water_phases
@@ -451,6 +452,18 @@ contains
 
         call self%models(self%materials_id_map(material_id))%calc_KvT(state, KvT)
     end subroutine calc_KvT
+
+    subroutine calc_saturation_pressure(self, material_id, state, saturation_pressure, is_saturated)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: saturation_pressure
+        logical, intent(inout) :: is_saturated
+
+        call self%models(self%materials_id_map(material_id))%calc_saturation_pressure( &
+            state, saturation_pressure, is_saturated)
+    end subroutine calc_saturation_pressure
 
     subroutine calc_cryo_suction_deriv_T(self, material_id, state, deriv)
         implicit none

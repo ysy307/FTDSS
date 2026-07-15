@@ -118,6 +118,10 @@ module io_input_basic
         real(real64) :: gain_factor
     end type type_hydraulic_conductivity_model
 
+    type :: type_hydraulic_storage
+        real(real64) :: specific_storage = 0.0d0
+    end type type_hydraulic_storage
+
     type :: type_materials_gcc
         logical :: is_segregation
         character(:), allocatable :: unit
@@ -156,6 +160,7 @@ module io_input_basic
         type(type_materials_water_characteristic_curve) :: water_characteristic_curve
         type(type_phase_change) :: phase_change
         type(type_hydraulic_conductivity_model) :: hydraulic_conductivity_model
+        type(type_hydraulic_storage) :: hydraulic_storage
     contains
         procedure, pass(self) :: display => display_material_settings
         ! procedure, pass(self) :: get_density_info => get_density_info_material_settings

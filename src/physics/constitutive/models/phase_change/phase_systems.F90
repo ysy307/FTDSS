@@ -30,6 +30,7 @@ module models_phase_change_manager
         procedure, public :: update_water_phases
         procedure, public :: calc_latent_heat_fusion
         procedure, public :: calc_latent_heat_vaporization
+        procedure, public :: calc_saturation_pressure
         procedure, public :: deriv_pressure_ice_water
         ! procedure, public :: update_phases_array ! Implement as needed
     end type type_phase_manager
@@ -274,6 +275,16 @@ contains
         call self%evap%calc_latent_heat_vaporization(temperature, Lv)
 
     end subroutine calc_latent_heat_vaporization
+
+    subroutine calc_saturation_pressure(self, state, saturation_pressure, is_saturated)
+        implicit none
+        class(type_phase_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: saturation_pressure
+        logical, intent(inout) :: is_saturated
+
+        call self%fusion%calc_saturation_pressure(state, saturation_pressure, is_saturated)
+    end subroutine calc_saturation_pressure
 
     subroutine deriv_pressure_ice_water(self, state, deriv)
         implicit none

@@ -151,6 +151,8 @@ module control_iteration_convergence
         !> Reference block residual norms ||R^0|| (set on first evaluation)
         real(real64), private :: residual0_thermal = -1.0d0
         real(real64), private :: residual0_hydraulic = -1.0d0
+        !> Previous combined relative residual norm for conserved-mode globalization.
+        real(real64), private :: residual_norm_prev = -1.0d0
         !> Previous weighted-RMS norm and divergence counter for kappa monitoring
         real(real64), private :: dq_norm_prev = -1.0d0
         integer(int32), private :: diverge_count = 0

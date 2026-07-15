@@ -4,7 +4,7 @@ module physics_governing_hydraulic
     use :: module_control, only:type_control
     use :: module_input, only:type_input, input_translator
     use :: module_linalg
-    use :: module_constitutive, g => gravity_acceleration
+    use :: module_constitutive, g => gravity_acceleration, rho_std => reference_water_density
     use :: physics_governing_base, only:type_assemble_workspace
     implicit none
     private
@@ -18,6 +18,7 @@ module physics_governing_hydraulic
         logical :: enable_vapor_transport = .true.
         logical :: enable_fringe_subcell_quadrature = .true.
         real(real64), allocatable :: iteration_capacity_bound(:)
+        real(real64), allocatable :: specific_storage(:)
         type(type_constitutive_manager) :: physics
     contains
         procedure, pass(self), public :: initialize => initialize_type_hydraulic
@@ -49,6 +50,7 @@ module physics_governing_hydraulic
         procedure, pass(self), private :: compute_C_eq => compute_C_eq_hydraulic
         procedure, pass(self), private :: compute_iteration_capacity => compute_iteration_capacity_hydraulic
         procedure, pass(self), private :: compute_transient_term_mixed => compute_transient_term_mixed_hydraulic
+        procedure, pass(self), private :: compute_compressive_storage => compute_compressive_storage_hydraulic
         procedure, pass(self), public :: calc_segregation_sink => calc_segregation_sink_hydraulic
     end type type_hydraulic
 
@@ -179,9 +181,10 @@ module physics_governing_hydraulic
         !> \( \rho_{eff} = \rho_w \theta_w + \rho_{ice} \theta_{ice} + \rho_w \theta_v^{\star} \) [kg/m3].
         !> Plain (non-time-derivative) conserved storage quantity of the water-mass
         !> balance; phase contents must already be consistent with (T, p_w).
-        module subroutine calc_effective_density_value_hydraulic(self, state, rho_eff)
+        module subroutine calc_effective_density_value_hydraulic(self, material_id, state, rho_eff)
             implicit none
             class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: rho_eff
         end subroutine calc_effective_density_value_hydraulic
@@ -190,9 +193,10 @@ module physics_governing_hydraulic
         !> \[ C_{eq} = \frac{\partial\theta_l}{\partial P}
         !>           + \frac{\rho_i}{\rho_l}\frac{\partial\theta_i}{\partial P}
         !>           + \frac{\partial\theta_v}{\partial P} \]
-        module subroutine compute_C_eq_hydraulic(self, state, C_eq)
+        module subroutine compute_C_eq_hydraulic(self, material_id, state, C_eq)
             implicit none
             class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
             type(type_state), intent(in) :: state
             real(real64), intent(inout) :: C_eq
         end subroutine compute_C_eq_hydraulic
@@ -217,6 +221,15 @@ module physics_governing_hydraulic
             real(real64), intent(inout) :: dTheta_dt
         end subroutine compute_transient_term_mixed_hydraulic
 
+        module subroutine compute_compressive_storage_hydraulic(self, material_id, state, storage, capacity)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: storage
+            real(real64), intent(inout), optional :: capacity
+        end subroutine compute_compressive_storage_hydraulic
+
         module subroutine calc_segregation_sink_hydraulic(self, material_id, state, dt, S_seg)
             implicit none
             class(type_hydraulic), intent(in) :: self
@@ -234,5 +247,6 @@ contains
         class(type_hydraulic), intent(inout) :: self
 
         if (allocated(self%iteration_capacity_bound)) deallocate (self%iteration_capacity_bound)
+        if (allocated(self%specific_storage)) deallocate (self%specific_storage)
     end subroutine destroy_type_hydraulic
 end module physics_governing_hydraulic

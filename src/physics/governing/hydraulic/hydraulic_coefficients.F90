@@ -15,7 +15,6 @@ contains
         real(real64), intent(inout) :: D_HH(:, :)
 
         real(real64) :: K_flh, K_vP, rho_w
-        real(real64) :: w_cap, w_cryo
         real(real64) :: coeff_D
 
         integer(int32) :: i
@@ -23,13 +22,10 @@ contains
         call self%physics%calc_Kflh(material_id, state, K_flh)
         call self%calc_K_vP(material_id, state, K_vP)
         call self%physics%calc_density_water(state, rho_w)
-        call self%physics%calc_suction_weights(material_id, state, w_cap, w_cryo)
-
-        ! D_HH = K_flh * w_cap / (rho_w g): the effective-suction weight w_cap
-        ! ensures that in the frozen fringe the capillary and cryosuction driving
-        ! forces are not double-counted.  The impedance factor inside K_flh
-        ! independently reduces conductivity in the fully-frozen zone.
-        coeff_D = (K_flh * w_cap + K_vP) / (rho_w * g)
+        ! Pressure is the actual pore-water pressure. Generalized suction controls
+        ! liquid saturation and relative permeability, but it does not replace the
+        ! Darcy potential or attenuate its pressure gradient.
+        coeff_D = (K_flh + K_vP) / (rho_w * g)
 
         D_HH(:, :) = 0.0d0
         do i = 1, self%computation_dimension
@@ -146,9 +142,9 @@ contains
     !> @brief Calculate Coupling Diffusion Term D_HT
     !> @details
     !>   Total moisture flux driven by temperature gradient:
-    !>   \( q^{(T)} = -(K_{lT} + K_{vT} + K_{flh}/(\rho_w g) \cdot d\psi_{cryo}/dT) \nabla T \)
-    !>   The cryo-suction liquid flux term \( K_{flh}/(\rho_w g) \cdot d\psi_{cryo}/dT \)
-    !>   is the dominant mechanism for water transport toward the freezing front.
+    !>   \( q^{(T)} = -(K_{lT} + K_{vT}) \nabla T \).
+    !>   Clapeyron equilibrium enters phase storage; the solved pore-water pressure
+    !>   carries its hydraulic effect through the ordinary Darcy pressure gradient.
     module subroutine compute_coupling_diffusion_term_hydraulic(self, material_id, state, D_HT)
         implicit none
         class(type_hydraulic), intent(in) :: self
@@ -156,28 +152,15 @@ contains
         type(type_state), intent(inout) :: state
         real(real64), intent(inout) :: D_HT(:, :)
 
-        real(real64) :: K_lT, K_vT, K_flh, dpsi_cryo_dT, rho_w
-        real(real64) :: w_cap, w_cryo
-        real(real64) :: coeff_D, temperature_local
+        real(real64) :: K_lT, K_vT
+        real(real64) :: coeff_D
         integer(int32) :: i
 
         call self%physics%calc_KlT(material_id, state, K_lT)
         call self%calc_K_vT(material_id, state, K_vT)
-        call state%temperature%get(temperature_local)
-
-        if (self%physics%has_cryo_transport(material_id) .and. temperature_local < 0.0d0) then
-            call self%physics%calc_Kflh(material_id, state, K_flh)
-            call self%physics%calc_density_water(state, rho_w)
-            call self%physics%calc_suction_weights(material_id, state, w_cap, w_cryo)
-            call self%physics%calc_cryo_suction_deriv_T(material_id, state, dpsi_cryo_dT)
-            if (rho_w > tiny(1.0d0)) then
-                coeff_D = K_lT + K_vT - K_flh * w_cryo / (rho_w * g) * dpsi_cryo_dT
-            else
-                coeff_D = K_lT + K_vT
-            end if
-        else
-            coeff_D = K_lT + K_vT
-        end if
+        ! Freezing changes storage and therefore the solved pore-water pressure.
+        ! Its Clapeyron gradient is not added again as an explicit Darcy force.
+        coeff_D = K_lT + K_vT
 
         D_HT(:, :) = 0.0d0
         do i = 1, self%computation_dimension
@@ -195,24 +178,7 @@ contains
         integer(int32), intent(in) :: target_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: K_wT
-        real(real64) :: K_flh, dpsi_cryo_dT, rho_w, temperature_local
-        real(real64) :: w_cap, w_cryo
-
         call self%physics%calc_KlT(target_id, state, K_wT)
-
-        ! Keep diagnostic/output liquid flux consistent with the hydraulic
-        ! equation: a temperature gradient contributes not only through surface
-        ! tension (KlT), but also through generalized Clapeyron cryosuction.
-        call state%temperature%get(temperature_local)
-        if (self%physics%has_cryo_transport(target_id) .and. temperature_local < 0.0d0) then
-            call self%physics%calc_Kflh(target_id, state, K_flh)
-            call self%physics%calc_density_water(state, rho_w)
-            if (rho_w > tiny(1.0d0)) then
-                call self%physics%calc_suction_weights(target_id, state, w_cap, w_cryo)
-                call self%physics%calc_cryo_suction_deriv_T(target_id, state, dpsi_cryo_dT)
-                K_wT = K_wT - K_flh * w_cryo / (rho_w * g) * dpsi_cryo_dT
-            end if
-        end if
     end subroutine calc_K_wT_hydraulic
 
     module subroutine calc_K_wP_hydraulic(self, target_id, state, K_wP)
@@ -272,7 +238,7 @@ contains
 
         real(real64) :: Qw, Qi, Qv
         real(real64) :: rho_w, rho_i
-        real(real64) :: Uj
+        real(real64) :: Uj, compressive_storage
         integer(int32) :: j, n
 
         nullify (temperature_history)
@@ -305,6 +271,8 @@ contains
             Uj = rho_w * Qw &
                  + rho_i * Qi &
                  + rho_w * Qv
+            call self%compute_compressive_storage(material_id, local_state, compressive_storage)
+            Uj = Uj + rho_std * compressive_storage
 
             drho_dt = drho_dt + bdf_coeffs(j) * Uj
         end do
@@ -321,14 +289,16 @@ contains
     !> Assumptions: the phase contents Qw, Qi, Qv stored in state are already
     !> consistent with (T, p_w) (call update_water_phases beforehand). Used by the
     !> conserved-quantity convergence norm (PDF 6.2.4). Cost: O(1).
-    module subroutine calc_effective_density_value_hydraulic(self, state, rho_eff)
+    module subroutine calc_effective_density_value_hydraulic(self, material_id, state, rho_eff)
         implicit none
         class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: rho_eff
 
         real(real64) :: Qw, Qi, Qv
         real(real64) :: rho_w, rho_i
+        real(real64) :: compressive_storage
 
         call state%water_content%get(Qw)
         call state%ice_content%get(Qi)
@@ -337,18 +307,21 @@ contains
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_density_ice(state, rho_i)
 
-        rho_eff = rho_w * Qw + rho_i * Qi + rho_w * Qv
+        call self%compute_compressive_storage(material_id, state, compressive_storage)
+        rho_eff = rho_w * Qw + rho_i * Qi + rho_w * Qv + rho_std * compressive_storage
     end subroutine calc_effective_density_value_hydraulic
 
     !> @brief Compute equivalent specific moisture capacity C_eq = dTheta/dP.
-    module subroutine compute_C_eq_hydraulic(self, state, C_eq)
+    module subroutine compute_C_eq_hydraulic(self, material_id, state, C_eq)
         implicit none
         class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: C_eq
 
         real(real64) :: rho_w, rho_i
         real(real64) :: dQw_dP, dQi_dP, dQv_dP
+        real(real64) :: compressive_capacity, compressive_storage
 
         dQw_dP = 0.0d0
         dQi_dP = 0.0d0
@@ -366,7 +339,8 @@ contains
         ! Clamp to non-negative: thermodynamically dTheta/dP >= 0 always holds,
         ! but phase_systems compensation (dQw_dP = -dQi_dP) can cause numerical
         ! sign reversal near the freezing front.
-        C_eq = max(0.0d0, dQw_dP + (rho_i / rho_w) * dQi_dP + dQv_dP)
+        call self%compute_compressive_storage(material_id, state, compressive_storage, compressive_capacity)
+        C_eq = max(0.0d0, dQw_dP + (rho_i / rho_w) * dQi_dP + dQv_dP) + compressive_capacity
     end subroutine compute_C_eq_hydraulic
 
     !> Compute the nonlinear-iteration capacity from the physical tangent and WRF bound.
@@ -379,7 +353,7 @@ contains
 
         real(real64) :: physical_capacity
         physical_capacity = 0.0d0
-        call self%compute_C_eq(state, physical_capacity)
+        call self%compute_C_eq(material_id, state, physical_capacity)
         capacity = max(physical_capacity, self%iteration_capacity_bound(material_id))
     end subroutine compute_iteration_capacity_hydraulic
 
@@ -398,7 +372,7 @@ contains
 
         real(real64) :: Qw, Qi, Qv
         real(real64) :: rho_w, rho_i
-        real(real64) :: Theta_j
+        real(real64) :: Theta_j, compressive_storage
         integer(int32) :: j, n
 
         nullify (temperature_history)
@@ -429,11 +403,41 @@ contains
 
             ! Theta = Qw + (rho_i/rho_w)*Qi + Qv  (rho_v ~ rho_w)
             Theta_j = Qw + (rho_i / rho_w) * Qi + Qv
+            call self%compute_compressive_storage(material_id, local_state, compressive_storage)
+            Theta_j = Theta_j + compressive_storage
 
             dTheta_dt = dTheta_dt + bdf_coeffs(j) * Theta_j
         end do
 
     end subroutine compute_transient_term_mixed_hydraulic
+
+    module subroutine compute_compressive_storage_hydraulic(self, material_id, state, storage, capacity)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: storage
+        real(real64), intent(inout), optional :: capacity
+
+        real(real64) :: pressure, saturation_pressure, storage_coefficient
+        logical :: is_saturated
+
+        storage = 0.0d0
+        if (present(capacity)) capacity = 0.0d0
+        if (.not. allocated(self%specific_storage)) return
+        if (material_id < 1 .or. material_id > size(self%specific_storage)) return
+        if (self%specific_storage(material_id) <= 0.0d0) return
+
+        saturation_pressure = 0.0d0
+        is_saturated = .false.
+        call self%physics%calc_saturation_pressure(material_id, state, saturation_pressure, is_saturated)
+        if (.not. is_saturated) return
+
+        call state%pressure%get(pressure)
+        storage_coefficient = self%specific_storage(material_id) / (rho_std * g)
+        storage = storage_coefficient * max(0.0d0, pressure - saturation_pressure)
+        if (present(capacity)) capacity = storage_coefficient
+    end subroutine compute_compressive_storage_hydraulic
 
     !> @brief Compute segregation sink from temperature gradient magnitude.
     !>

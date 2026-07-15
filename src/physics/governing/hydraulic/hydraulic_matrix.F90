@@ -24,20 +24,17 @@ contains
     !> All coefficients are evaluated directly at quadrature points from the
     !> interpolated state (no nodal pre-evaluation / lerp of coefficients).
     !>
-    !> The diffusion terms D_HH and D_HT are discontinuous in the state across
-    !> the freezing interface \(\phi = T_{high}(p_w) - T = 0\) (the capillary /
-    !> cryogenic switch of the generalized suction).  Elements cut by the
+    !> The transport coefficients can change sharply across the freezing
+    !> interface \(\phi = T_{high}(p_w) - T = 0\).  Elements cut by the
     !> interface are therefore integrated with the interface-split subcell rule
     !> (build_interface_quadrature_points), which REPLACES the standard Gauss
-    !> rule for the diffusion terms in those elements: each subcell point lies
-    !> strictly on one side, and the subcell weights vary continuously with the
-    !> nodal unknowns.  This keeps the assembled residual continuous in
-    !> (T, p_w) at the moving free boundary - the property Picard/Newton needs
-    !> to contract - without any regularization parameter.
+    !> rule for the pressure, temperature, and gravity fluxes in those elements.
+    !> Using one quadrature partition for all three parts of the Darcy flux
+    !> avoids a discrete imbalance caused solely by sampling the same flux at
+    !> different points.
     !>
-    !> Terms whose integrands are continuous across the interface (storage
-    !> C_eq, mixed transient, gravity advection, segregation sink) keep the
-    !> standard Gauss rule in all elements.
+    !> Storage C_eq, mixed transient, and segregation sink keep the standard
+    !> Gauss rule in all elements.
     !>
     !> ### Linearization of the T-p coupling
     !> The K_HT block is intentionally left zero: the cryosuction flux
@@ -71,6 +68,8 @@ contains
         real(real64) :: rho_w_node_sub, T_high_node
         real(real64) :: T_q_sub, P_q_sub, porosity_q_sub
         real(real64) :: D_HH_sub, D_HT_sub, eff_weight_sub, det_J_sub
+        real(real64) :: V_sub(workspace%num_fe_dimension)
+        real(real64) :: vec_V_sub(workspace%num_fe_nodes)
         real(real64) :: coeff_sub_mat(workspace%num_fe_dimension, workspace%num_fe_dimension)
         real(real64) :: mat_HH_sub(workspace%num_fe_nodes, workspace%num_fe_nodes)
         real(real64) :: mat_HT_sub(workspace%num_fe_nodes, workspace%num_fe_nodes)
@@ -130,16 +129,17 @@ contains
         end if
 
         ! ----------------------------------------------------------------
-        ! 1. Gauss loop: continuous-integrand terms at all Gauss points;
-        !    diffusion coefficients only for uncut elements.
+        ! 1. Gauss loop: storage and sink terms at all Gauss points;
+        !    flux coefficients only for uncut elements.
         ! ----------------------------------------------------------------
         do i = 1, n_gauss
             call self%compute_iteration_capacity(workspace%material_id, workspace%state_gp(i), workspace%work_C(i))
-            call self%compute_advective_term(workspace%material_id, workspace%state_gp(i), workspace%work_V(:, i))
             call self%compute_transient_term_mixed(workspace%material_id, workspace%state_gp(i), &
                                                    workspace%bdf_coeffs, workspace%work_d_dt(i))
 
             if (.not. is_cut) then
+                call self%compute_advective_term(workspace%material_id, workspace%state_gp(i), &
+                                                 workspace%work_V(:, i))
                 call self%compute_diffusion_term(workspace%material_id, workspace%state_gp(i), workspace%work_D(:, :, i))
 
                 if (coupling_flux_needed) then
@@ -173,10 +173,10 @@ contains
         ! storage and the D_HT flux in the residual (see the header).
 
         ! ----------------------------------------------------------------
-        ! 4. Diffusion terms.
+        ! 4. Flux terms.
         !    Uncut element: standard Gauss rule (coefficients from step 1).
-        !    Cut element: interface-split subcell rule for BOTH D_HH and
-        !    D_HT (replacement, so nothing is double-counted).
+        !    Cut element: interface-split subcell rule for D_HH, D_HT, and
+        !    gravity advection (replacement, so nothing is double-counted).
         ! ----------------------------------------------------------------
         if (.not. is_cut) then
             if (coupling_flux_needed) then
@@ -210,6 +210,7 @@ contains
 
             mat_HH_sub(:, :) = 0.0d0
             mat_HT_sub(:, :) = 0.0d0
+            vec_V_sub(:) = 0.0d0
 
             do q_s = 1, n_sub_qps
                 r_sub%x = sub_qps(q_s)%xi
@@ -240,6 +241,9 @@ contains
                 call self%compute_coupling_diffusion_term(workspace%material_id, state_sub, coeff_sub_mat)
                 D_HT_sub = coeff_sub_mat(1, 1)
 
+                V_sub(:) = 0.0d0
+                call self%compute_advective_term(workspace%material_id, state_sub, V_sub)
+
                 do j = 1, n_nodes
                     do i = 1, n_nodes
                         mat_HH_sub(i, j) = mat_HH_sub(i, j) + eff_weight_sub * D_HH_sub * &
@@ -247,6 +251,10 @@ contains
                         mat_HT_sub(i, j) = mat_HT_sub(i, j) + eff_weight_sub * D_HT_sub * &
                                            dot_product(dpsi_dx_sub(:, i), dpsi_dx_sub(:, j))
                     end do
+                end do
+                do i = 1, n_nodes
+                    vec_V_sub(i) = vec_V_sub(i) + eff_weight_sub * &
+                                   dot_product(dpsi_dx_sub(:, i), V_sub)
                 end do
             end do
 
@@ -282,9 +290,13 @@ contains
             call workspace%compute_R1(workspace%work_d_dt, workspace%work_vec)
             local_vec_res(:) = local_vec_res(:) + workspace%work_vec(:)
 
-            workspace%work_vec(:) = 0.0d0
-            call workspace%compute_R2(workspace%work_V, workspace%work_vec)
-            local_vec_res(:) = local_vec_res(:) - workspace%work_vec(:)
+            if (is_cut) then
+                local_vec_res(:) = local_vec_res(:) - vec_V_sub(:)
+            else
+                workspace%work_vec(:) = 0.0d0
+                call workspace%compute_R2(workspace%work_V, workspace%work_vec)
+                local_vec_res(:) = local_vec_res(:) - workspace%work_vec(:)
+            end if
 
             workspace%work_vec(:) = 0.0d0
             call workspace%compute_R1(work_sink, workspace%work_vec)

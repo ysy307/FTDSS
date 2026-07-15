@@ -287,13 +287,11 @@ contains
         logical, intent(inout) :: is_ok
         logical, intent(inout) :: is_diverged
 
-        real(real64) :: dq_norm, kappa, lambda_est
-        real(real64) :: aitken_omega, numerator, denominator
-        real(real64) :: wH, wR, z, z_prev, dz
-        real(real64) :: rT, rH, ratioT, ratioH
-        logical :: dq_ok
-        logical :: omega_updated
-        integer(int32) :: j, n_cons
+        real(real64) :: dq_norm, kappa, residual_norm, residual_ratio
+        real(real64) :: rT, rH, ratioT, ratioH, balanceH
+        logical :: dq_ok, residual_ok
+        logical :: has_residual_norm
+        integer(int32) :: n_cons
         real(real64), allocatable :: dH(:), drho(:)
 
         is_ok = .false.
@@ -304,6 +302,9 @@ contains
         rH = 0.0d0
         ratioT = 0.0d0
         ratioH = 0.0d0
+        balanceH = 0.0d0
+        residual_norm = 0.0d0
+        has_residual_norm = .false.
 
         ! Divergence guard: NaN in the conserved fields
         if (any(enthalpy /= enthalpy) .or. any(density /= density)) then
@@ -321,25 +322,40 @@ contains
             dq_norm = weighted_rms_conserved(self, dH, drho, enthalpy, density)
         end if
 
-        ! Per-block residual ratios; reference ||R^0|| captured on first evaluation
-        ! Block residual ratios (peak-relative, with the constant/nullspace mode
-        ! removed) are computed for monitoring and divergence context only. They are
-        ! intentionally NOT a hard convergence gate: for stiff and all-Neumann blocks
-        ! the Picard residual reduces far more slowly than the solution change, and
-        ! forcing extra iterations to satisfy a residual ratio destabilises the
-        ! iteration. Convergence is governed by the weighted conserved-quantity change
-        ! ||dQ||_W <= 1 (a complete WRMS criterion over energy and water mass, PDF
-        ! 6.2.3-6.2.4); genuine divergence is caught by the kappa monitor below.
+        ! Residuals are hard convergence gates. The transient hydraulic block has
+        ! storage and therefore no additive-constant nullspace; retaining its mean
+        ! component is required to retain the global water-balance equation.
+        residual_ok = .true.
         if (check_thermal .and. present(residual_thermal)) then
             rT = block_residual_norm(residual_thermal)
-            self%residual0_thermal = max(self%residual0_thermal, rT, tiny(1.0d0))
+            if (self%residual0_thermal < 0.0d0) self%residual0_thermal = max(rT, tiny(1.0d0))
             ratioT = rT / self%residual0_thermal
+            residual_ok = residual_ok .and. (ratioT <= self%residual_eps)
+        else if (check_thermal) then
+            residual_ok = .false.
         end if
         if (check_hydraulic .and. present(residual_hydraulic)) then
             rH = block_residual_norm(residual_hydraulic)
-            self%residual0_hydraulic = max(self%residual0_hydraulic, rH, tiny(1.0d0))
+            if (self%residual0_hydraulic < 0.0d0) self%residual0_hydraulic = max(rH, tiny(1.0d0))
             ratioH = rH / self%residual0_hydraulic
+            if (size(residual_hydraulic) > 0) then
+                balanceH = abs(sum(residual_hydraulic)) / &
+                           (sqrt(real(size(residual_hydraulic), real64)) * self%residual0_hydraulic)
+            end if
+            residual_ok = residual_ok .and. (ratioH <= self%residual_eps) .and. &
+                          (balanceH <= self%residual_eps)
+        else if (check_hydraulic) then
+            residual_ok = .false.
         end if
+        if (check_thermal .and. present(residual_thermal)) then
+            residual_norm = residual_norm + ratioT * ratioT
+            has_residual_norm = .true.
+        end if
+        if (check_hydraulic .and. present(residual_hydraulic)) then
+            residual_norm = residual_norm + ratioH * ratioH
+            has_residual_norm = .true.
+        end if
+        if (has_residual_norm) residual_norm = sqrt(residual_norm)
 
         ! Convergence is the complete weighted-RMS criterion over the conserved
         ! quantities (energy and water mass, PDF 6.2.3-6.2.4), CORRECTED for the
@@ -362,89 +378,31 @@ contains
             ! on the raw change alone.
             dq_ok = .false.
         end if
-        is_ok = dq_ok
+        is_ok = dq_ok .and. residual_ok
 
-        ! Convergence-rate monitoring (PDF 6.2.4.3) with coupled globalization.
-        ! The next Picard update uses the same omega for T and p, so freezing-front
-        ! growth in the conserved variables cannot be hidden by independent block
-        ! relaxation. For a growing fixed-point map, reducing omega by 1/(1+kappa)
-        ! is a scale-free way to move the relaxed map back toward contraction; when
-        ! the conserved change contracts strongly, omega is released back toward 1.
+        ! Globalize the coupled Picard update using the freshly assembled nonlinear
+        ! residual. The conserved-quantity increment can alternate while the true
+        ! residual decreases, particularly around a moving freezing front; using
+        ! that increment to re-amplify a step caused omega to collapse to its floor.
+        ! Keep omega while the residual contracts, and damp only after a measured
+        ! residual increase. The fallback uses kappa only when no residual exists.
         if (self%has_prev_conserved .and. self%dq_norm_prev > 0.0d0) then
             kappa = dq_norm / self%dq_norm_prev
-            if (kappa >= 1.0d0) then
+            if (has_residual_norm .and. self%residual_norm_prev > 0.0d0) then
+                residual_ratio = residual_norm / self%residual_norm_prev
+                if (residual_ratio > 1.0d0) then
+                    self%relaxation_omega = max(CONSERVED_OMEGA_MIN, &
+                                                self%relaxation_omega / residual_ratio)
+                    self%diverge_count = self%diverge_count + 1
+                else
+                    self%diverge_count = 0
+                end if
+            else if (kappa >= 1.0d0) then
+                self%relaxation_omega = max(CONSERVED_OMEGA_MIN, &
+                                            self%relaxation_omega / (1.0d0 + kappa))
                 self%diverge_count = self%diverge_count + 1
             else
                 self%diverge_count = 0
-            end if
-
-            omega_updated = .false.
-            if (self%has_prev_conserved_increment .and. allocated(dH) .and. allocated(drho) .and. &
-                allocated(self%dH_prev) .and. allocated(self%drho_prev)) then
-                if (size(self%dH_prev) == size(dH) .and. size(self%drho_prev) == size(drho)) then
-                    numerator = 0.0d0
-                    denominator = 0.0d0
-                    do j = 1, size(dH)
-                        wH = self%atol_enthalpy + self%rtol_conserved * abs(enthalpy(j))
-                        wR = self%atol_density + self%rtol_conserved * abs(density(j))
-
-                        if (wH > 0.0d0) then
-                            z = dH(j) / wH
-                            z_prev = self%dH_prev(j) / wH
-                            dz = z - z_prev
-                            numerator = numerator + dz * z_prev
-                            denominator = denominator + dz * dz
-                        end if
-
-                        if (wR > 0.0d0) then
-                            z = drho(j) / wR
-                            z_prev = self%drho_prev(j) / wR
-                            dz = z - z_prev
-                            numerator = numerator + dz * z_prev
-                            denominator = denominator + dz * dz
-                        end if
-                    end do
-
-                    if (denominator > epsilon(1.0d0)) then
-                        aitken_omega = -self%relaxation_omega * (numerator / denominator)
-                        if (aitken_omega == aitken_omega .and. aitken_omega > 0.0d0 .and. &
-                            abs(aitken_omega) < huge(1.0d0)) then
-                            self%relaxation_omega = max(CONSERVED_OMEGA_MIN, min(1.0d0, aitken_omega))
-                            omega_updated = .true.
-                        end if
-                    end if
-                end if
-            end if
-
-            if (.not. omega_updated) then
-                if (kappa >= 1.0d0) then
-                    self%relaxation_omega = max(CONSERVED_OMEGA_MIN, &
-                                                self%relaxation_omega / (1.0d0 + kappa))
-                else
-                    ! Fallback rate estimate for the first two increments or
-                    ! degenerate Aitken denominators.
-                    lambda_est = 1.0d0 - (1.0d0 - kappa) / max(self%relaxation_omega, tiny(1.0d0))
-                    if (lambda_est >= 0.0d0 .and. lambda_est < 1.0d0) then
-                        ! The relaxed map is behaving like a monotone contraction:
-                        ! kappa ~= 1 - omega*(1-lambda). In that regime the unrelaxed
-                        ! step has contraction factor lambda < kappa, so holding omega
-                        ! at 0.5 only slows convergence without adding stability.
-                        self%relaxation_omega = 1.0d0
-                    else if (lambda_est < 0.0d0) then
-                        ! A negative inferred fixed-point factor means the relaxed map
-                        ! is alternating across the front. Treat that as oscillatory
-                        ! contraction, not as permission to release omega to 1; otherwise
-                        ! a small kappa is followed by a full-step overshoot and omega
-                        ! ratchets down to its floor.
-                        self%relaxation_omega = max(CONSERVED_OMEGA_MIN, &
-                                                    self%relaxation_omega / (1.0d0 + kappa))
-                    else if (kappa < CONSERVED_KAPPA_RECOVER) then
-                        self%relaxation_omega = min(1.0d0, &
-                                                    self%relaxation_omega * &
-                                                    min(CONSERVED_OMEGA_GROW_MAX, &
-                                                        CONSERVED_KAPPA_RECOVER / max(kappa, tiny(1.0d0))))
-                    end if
-                end if
             end if
             if (self%diverge_count >= 15 .and. &
                 self%relaxation_omega <= CONSERVED_OMEGA_MIN * (1.0d0 + epsilon(1.0d0))) then
@@ -453,10 +411,10 @@ contains
         end if
 
         if (CONSERVED_VERBOSE) then
-            write (*, '(A,I4,A,ES12.5,A,F6.4,A,ES10.3,A,ES10.3,A,ES10.3)') &
+            write (*, '(A,I4,A,ES12.5,A,F6.4,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3)') &
                 '    [Conserved] iter:', nonlinear_iter, '  ||dQ||_W:', dq_norm, &
                 '  omega:', self%relaxation_omega, '  kappa:', kappa, &
-                '  resT/0:', ratioT, '  resH/0:', ratioH
+                '  resT/0:', ratioT, '  resH/0:', ratioH, '  mass/0:', balanceH
         end if
 
         ! Store current iterate as previous for the next check
@@ -468,6 +426,7 @@ contains
         self%density_prev = density
         self%has_prev_conserved = .true.
         if (dq_norm < huge(0.0d0)) self%dq_norm_prev = dq_norm
+        if (has_residual_norm) self%residual_norm_prev = residual_norm
 
         if (allocated(dH) .and. allocated(drho)) then
             if (allocated(self%dH_prev)) then
@@ -517,33 +476,25 @@ contains
         self%has_prev_conserved_increment = .false.
         self%residual0_thermal = -1.0d0
         self%residual0_hydraulic = -1.0d0
+        self%residual_norm_prev = -1.0d0
         self%dq_norm_prev = -1.0d0
         self%diverge_count = 0
         self%relaxation_omega = min(1.0d0, max(CONSERVED_OMEGA_WARM_FLOOR, &
                                                CONSERVED_OMEGA_WARM_RELEASE * self%relaxation_omega))
     end subroutine reset_conserved_state
 
-    !> L2 norm of a block residual with the constant (nullspace) mode removed.
-    !> For all-Neumann blocks (e.g. a closed/flux-only hydraulic domain) the
-    !> consistent residual is defined only up to an additive constant; projecting
-    !> that mode out makes the residual-decrease criterion meaningful and universal,
-    !> while leaving well-posed blocks essentially unchanged near convergence.
+    !> L2 norm of the complete block residual, including its mean component.
     function block_residual_norm(r) result(norm)
         implicit none
         real(real64), intent(in) :: r(:)
         real(real64) :: norm
 
-        integer(int32) :: n
-        real(real64) :: mean
-
-        n = size(r)
-        if (n <= 0) then
+        if (size(r) <= 0) then
             norm = 0.0d0
             return
         end if
 
-        mean = sum(r) / real(n, real64)
-        norm = vector_norm2(r - mean)
+        norm = vector_norm2(r)
     end function block_residual_norm
 
     !> Weighted root-mean-square norm (PDF eq 6.2.3) of a conserved-quantity

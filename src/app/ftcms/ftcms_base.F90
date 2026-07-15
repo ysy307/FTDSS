@@ -1748,7 +1748,9 @@ contains
                 H_j = 0.0d0
                 rho_j = 0.0d0
                 if (active_thermal) call self%thermal%calc_enthalpy_density(material_id, states(tid), H_j)
-                if (active_hydraulic) call self%hydraulic%calc_effective_density_value(states(tid), rho_j)
+                if (active_hydraulic) then
+                    call self%hydraulic%calc_effective_density_value(material_id, states(tid), rho_j)
+                end if
                 enthalpy(node_id) = H_j
                 density(node_id) = rho_j
             else
@@ -1763,7 +1765,9 @@ contains
                     H_j = 0.0d0
                     rho_j = 0.0d0
                     if (active_thermal) call self%thermal%calc_enthalpy_density(material_id, states(tid), H_j)
-                    if (active_hydraulic) call self%hydraulic%calc_effective_density_value(states(tid), rho_j)
+                    if (active_hydraulic) then
+                        call self%hydraulic%calc_effective_density_value(material_id, states(tid), rho_j)
+                    end if
                     sum_H = sum_H + H_j * measure
                     sum_rho = sum_rho + rho_j * measure
                     wsum = wsum + measure

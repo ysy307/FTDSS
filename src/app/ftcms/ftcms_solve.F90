@@ -268,7 +268,7 @@ contains
         ! Nodal conserved quantities at the updated iterate
         call self%compute_nodal_conserved(enthalpy, density)
 
-        ! Per-block residuals from the current assembly (still held in F)
+        ! Per-block residuals from the assembly at the updated iterate.
         if (check_thermal) call self%get_variable_residual(PHYSICS_TYPES%THERMAL, residual_thermal)
         if (check_hydraulic) call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, residual_hydraulic)
 
@@ -422,8 +422,14 @@ contains
                 ! Aitken for legacy Picard, damped for Newton).
                 call self%reflect_variables()
 
-                ! Conserved-quantity convergence (PDF 6.2.4) on the updated state.
-                if (self%control%is_conserved()) call self%solve_time_step_check_convergence_conserved()
+                if (self%control%is_conserved()) then
+                    ! The solved system was assembled at x_k. Reassemble after
+                    ! reflection so the residual and conserved fields both refer
+                    ! to x_{k+1} when convergence is tested.
+                    call self%assemble()
+                    call self%apply_bc(prescribed=.false.)
+                    call self%solve_time_step_check_convergence_conserved()
+                end if
 
                 ! Force exit after one iteration when config is NONE (linear solve)
                 if (self%control%is_none()) exit nonlinear

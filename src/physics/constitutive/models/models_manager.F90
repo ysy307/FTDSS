@@ -31,6 +31,7 @@ module constitutive_models_manager
         procedure, public :: calc_KvT
         procedure, public :: calc_latent_heat_fusion
         procedure, public :: calc_latent_heat_vaporization
+        procedure, public :: calc_saturation_pressure
         procedure, public :: calc_pressure_ice_water_derivative
         procedure, public :: calc_cryo_suction_deriv_T
         procedure, public :: calc_lscheme_capacity
@@ -135,6 +136,16 @@ contains
 
         call self%phase_manager%calc_latent_heat_vaporization(state, L_vaporization)
     end subroutine calc_latent_heat_vaporization
+
+    subroutine calc_saturation_pressure(self, state, saturation_pressure, is_saturated)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: saturation_pressure
+        logical, intent(inout) :: is_saturated
+
+        call self%phase_manager%calc_saturation_pressure(state, saturation_pressure, is_saturated)
+    end subroutine calc_saturation_pressure
 
     subroutine calc_pressure_ice_water_derivative(self, state, deriv)
         implicit none

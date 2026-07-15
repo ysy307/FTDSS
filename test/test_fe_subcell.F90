@@ -11,6 +11,7 @@
 !>   F. Degenerates continuously as the interface leaves through a vertex
 !>      (vanishing minority side).
 !>   G. Integrates a side-wise-constant coefficient exactly on a cut triangle.
+!>   H. Integrates a side-wise vector flux residual on the same cut partition.
 !>   H/I. Chemical-potential helpers: psi_ice(0degC) = 0, T_high(P=0) = 0degC.
 program test_fe_subcell
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit, error_unit
@@ -62,11 +63,14 @@ contains
         call test_sidewise_constant_integration(error)
         call report("G: sidewise_constant_integration", error, failures)
 
+        call test_sidewise_flux_residual(error)
+        call report("H: sidewise_flux_residual", error, failures)
+
         call test_psi_ice_at_freezing(error)
-        call report("H: psi_ice_at_freezing_point", error, failures)
+        call report("I: psi_ice_at_freezing_point", error, failures)
 
         call test_T_high_zero_pressure(error)
-        call report("I: T_high_at_zero_pressure", error, failures)
+        call report("J: T_high_at_zero_pressure", error, failures)
 
     end subroutine run_all_tests
 
@@ -298,7 +302,54 @@ contains
     end subroutine test_sidewise_constant_integration
 
     ! =========================================================================
-    ! H. calc_psi_ice: at T = 0degC, psi_ice should be zero.
+    ! H. Flux residual on a cut triangle. This is the discrete form used for
+    ! gravity: R_i = integral(grad(N_i) . V) dOmega. The pressure, temperature,
+    ! and gravity terms must use this identical partition when their coefficient
+    ! changes at the freezing interface.
+    ! =========================================================================
+    subroutine test_sidewise_flux_residual(error)
+        type(error_type), allocatable, intent(inout) :: error
+
+        class(abst_fe), allocatable :: fe
+        type(type_subcell_qp) :: qps(SUBCELL_QP_CAP)
+        type(type_coordinate_dp) :: r
+        integer(int32) :: n_qps, q, i
+        real(real64) :: phi(3), nodes(2, 3), dpsi_dx(2, 3), det_J
+        real(real64) :: flux(2), residual(3), expected(3)
+
+        fe = create_fe(FE_TYPE%TRIANGLE%ID, 1)
+        nodes = reshape([0.0d0, 0.0d0, 1.0d0, 0.0d0, 0.0d0, 1.0d0], shape(nodes))
+        phi = [-0.5d0, 1.0d0, 1.0d0]
+        n_qps = 0
+        call build_interface_quadrature_points(fe, phi, qps, n_qps)
+
+        residual = 0.0d0
+        do q = 1, n_qps
+            r%x = qps(q)%xi
+            r%y = qps(q)%eta
+            r%z = 0.0d0
+            dpsi_dx = 0.0d0
+            call fe%calc_shape_function(r, nodes, dpsi_dx=dpsi_dx, determinant_jacobian=det_J)
+            if (qps(q)%is_plus_side) then
+                flux = [3.0d0, -1.0d0]
+            else
+                flux = [1.0d0, 2.0d0]
+            end if
+            do i = 1, 3
+                residual(i) = residual(i) + qps(q)%weight * abs(det_J) * dot_product(dpsi_dx(:, i), flux)
+            end do
+        end do
+
+        expected = [-19.0d0 / 18.0d0, 25.0d0 / 18.0d0, -1.0d0 / 3.0d0]
+        call check(error, maxval(abs(residual - expected)) < 1.0d-12, &
+                   "Interface-split flux residual must match its analytic sidewise integral")
+        if (allocated(error)) return
+        call check(error, abs(sum(residual)) < 1.0d-12, &
+                   "Internal cut-element flux residual must conserve its nodal sum")
+    end subroutine test_sidewise_flux_residual
+
+    ! =========================================================================
+    ! I. calc_psi_ice: at T = 0degC, psi_ice should be zero.
     ! =========================================================================
     subroutine test_psi_ice_at_freezing(error)
         type(error_type), allocatable, intent(inout) :: error
@@ -311,7 +362,7 @@ contains
     end subroutine test_psi_ice_at_freezing
 
     ! =========================================================================
-    ! I. calc_T_high_celsius: at P_w = 0 and rho_w = 1000, T_high should be 0degC.
+    ! J. calc_T_high_celsius: at P_w = 0 and rho_w = 1000, T_high should be 0degC.
     ! =========================================================================
     subroutine test_T_high_zero_pressure(error)
         type(error_type), allocatable, intent(inout) :: error
