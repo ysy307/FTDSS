@@ -25,11 +25,10 @@ module models_phase_change_fusion
         class(abst_gcc), pointer :: gcc
     contains
         procedure, pass(self), public :: initialize => initialize_type_fusion
-        procedure, pass(self), public :: calc_ice_content
-        procedure, pass(self), public :: calc_ice_content_derivatives
         procedure, pass(self), public :: calc_water_content
         procedure, pass(self), public :: calc_water_content_derivatives
         procedure, pass(self), public :: calc_effective_suction
+        procedure, pass(self), public :: project_ice_content
         procedure, pass(self), public :: calc_saturation_pressure
         procedure, pass(self), public :: deriv_pressure_ice_water
 
@@ -276,7 +275,7 @@ contains
         real(real64), intent(inout) :: water_content
 
         real(real64) :: pressure
-        real(real64) :: psi_cap, psi_cryo, psi_eff
+        real(real64) :: psi_cap
 
         call state%pressure%get(pressure)
 
@@ -286,11 +285,10 @@ contains
             psi_cap = 0.0d0
         end if
 
-        call self%gcc%calc(state, psi_cryo)
-        call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
-
-        ! Pass negative pressure head [m] to WRF
-        call self%wrf%calc(-psi_eff / (rho_std * g), water_content)
+        ! The primary pressure is the actual pore-water pressure. Retention is
+        ! therefore evaluated from its capillary head; freezing is represented
+        ! by the independent outer ice state and the resulting pressure change.
+        call self%wrf%calc(-psi_cap / (rho_std * g), water_content)
 
     end subroutine calc_water_content
 
@@ -305,11 +303,8 @@ contains
         real(real64), intent(inout) :: dwater_dT !> d(theta_l)/dT
 
         real(real64) :: pressure
-        real(real64) :: psi_cap, psi_cryo
+        real(real64) :: psi_cap
         real(real64) :: d_psi_cap_dP
-        real(real64) :: d_psi_cryo_dP, d_psi_cryo_dT
-        real(real64) :: psi_eff, d_psi_eff_dpsi_cap, d_psi_eff_dpsi_cryo
-        real(real64) :: d_psi_eff_dP, d_psi_eff_dT
         real(real64) :: d_theta_liquid_dPress ! renamed variable
 
         call state%pressure%get(pressure)
@@ -323,48 +318,86 @@ contains
             d_psi_cap_dP = 0.0d0
         end if
 
-        ! Cryogenic suction
-        call self%gcc%calc(state, psi_cryo)
-
-        call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
-        call self%gcc%deriv_temperature(state, d_psi_cryo_dT)
-
-        ! Select effective suction and determine derivatives with smooth blending.
-        call compute_effective_suction(psi_cap, psi_cryo, psi_eff, d_psi_eff_dpsi_cap, d_psi_eff_dpsi_cryo)
-        d_psi_eff_dP = d_psi_eff_dpsi_cap*d_psi_cap_dP + d_psi_eff_dpsi_cryo*d_psi_cryo_dP
-        d_psi_eff_dT = d_psi_eff_dpsi_cryo*d_psi_cryo_dT
-
-        ! 3. Compute moisture capacity (dTheta/dh) where h is in meters
-        call self%wrf%deriv(-psi_eff / (rho_std * g), d_theta_liquid_dPress)
+        call self%wrf%deriv(-psi_cap / (rho_std * g), d_theta_liquid_dPress)
 
         ! 4. Assemble liquid water content derivatives (chain rule):
-        !    dTheta/dP = (dTheta/dh) * dh/dP = (dTheta/dh) * (-dpsi_eff/dP) / (rho_std*g)
-        dwater_dP = d_theta_liquid_dPress * (-d_psi_eff_dP) / (rho_std * g)
-        dwater_dT = d_theta_liquid_dPress * (-d_psi_eff_dT) / (rho_std * g)
+        !    dTheta/dP = (dTheta/dh) * dh/dP.
+        dwater_dP = d_theta_liquid_dPress * (-d_psi_cap_dP) / (rho_std * g)
+        dwater_dT = 0.0d0
 
     end subroutine calc_water_content_derivatives
 
     !>
-    !> @brief Generalized suction \(p_c^* = \max(\psi_{cap}, \psi_{cryo})\) [Pa].
-    !>
-    !> The liquid-phase potential is \(-p_c^*\); water retention AND relative
-    !> permeability must be evaluated at this suction for thermodynamic
-    !> consistency of the single-potential freezing model.
+    !> @brief Capillary suction \(\max(0,-p_w)\) [Pa] of actual pore pressure.
     subroutine calc_effective_suction(self, state, psi_eff)
         implicit none
         class(type_fusion), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: psi_eff
 
-        real(real64) :: pressure, psi_cap, psi_cryo
+        real(real64) :: pressure
+
+        call state%pressure%get(pressure)
+        psi_eff = max(0.0d0, -pressure)
+    end subroutine calc_effective_suction
+
+    !> Project the outer ice state onto local ice-water equilibrium.
+    !>
+    !> The liquid content is evaluated from the actual pore pressure, while
+    !> the equilibrium unfrozen content is evaluated from the Clapeyron
+    !> suction. The proposed phase increment is the liquid-equivalent phase
+    !> transfer used by the outer water-conserving solve:
+    !> \(\Delta\theta_i=(\theta_l(p_w)-\theta_l^{eq}(T))\rho_w/\rho_i\).
+    !> Bounds enforce non-negative ice and fixed pore volume. The returned
+    !> increment is zero on the admissible side of either active bound.
+    subroutine project_ice_content(self, state, projected_ice, ice_increment, equilibrium_error)
+        implicit none
+        class(type_fusion), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: projected_ice
+        real(real64), intent(inout) :: ice_increment
+        real(real64), intent(inout) :: equilibrium_error
+
+        real(real64) :: current_ice, liquid_pressure, liquid_equilibrium
+        real(real64) :: pressure, psi_cap, psi_cryo, rho_w, rho_i, porosity, upper_bound
+        ! Active-set tolerance for the ice-free/full-ice complementarity
+        ! bounds. It matches the outer phase-content discretization tolerance
+        ! so a node is not classified simultaneously as bound-converged and
+        ! as an interior point requiring pressure equality.
+        real(real64), parameter :: BOUND_TOLERANCE = 1.0d-3
+        logical :: ice_is_set
+
+        current_ice = 0.0d0
+        ice_is_set = .false.
+        call state%ice_content%get(current_ice, ice_is_set)
+        if (.not. ice_is_set) current_ice = 0.0d0
+        call state%porosity%get(porosity)
+        call self%calc_water_content(state, liquid_pressure)
+        call self%gcc%calc(state, psi_cryo)
+        call self%wrf%calc(-max(0.0d0, psi_cryo) / (rho_std * g), liquid_equilibrium)
+        call self%calc_rho_water(state, rho_w)
+        call self%calc_rho_ice(state, rho_i)
+
+        if (rho_w <= tiny(1.0d0) .or. rho_i <= tiny(1.0d0)) then
+            projected_ice = max(0.0d0, current_ice)
+            ice_increment = 0.0d0
+            equilibrium_error = 0.0d0
+            return
+        end if
+
+        projected_ice = current_ice + (liquid_pressure - liquid_equilibrium) * rho_w / rho_i
+        upper_bound = max(0.0d0, porosity - liquid_equilibrium)
+        projected_ice = min(max(projected_ice, 0.0d0), upper_bound)
+        ice_increment = projected_ice - current_ice
 
         call state%pressure%get(pressure)
         psi_cap = max(0.0d0, -pressure)
-
-        psi_cryo = 0.0d0
-        call self%gcc%calc(state, psi_cryo)
-        call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
-    end subroutine calc_effective_suction
+        equilibrium_error = 0.0d0
+        if (abs(ice_increment) > BOUND_TOLERANCE .or. &
+            (current_ice > BOUND_TOLERANCE .and. current_ice < upper_bound - BOUND_TOLERANCE)) then
+            equilibrium_error = abs(max(0.0d0, psi_cryo) - psi_cap)
+        end if
+    end subroutine project_ice_content
 
     !> Calculate the pore-water pressure at which the gas-filled pore volume vanishes.
     !>
@@ -383,7 +416,7 @@ contains
         integer(int32), parameter :: max_bisection_iterations = 64
         real(real64), parameter :: pressure_floor = -1.0d12
         type(type_state) :: local_state
-        real(real64) :: pressure, porosity
+        real(real64) :: pressure, porosity, ice_content
         real(real64) :: pressure_low, pressure_high, pressure_mid
         real(real64) :: volume_current, volume_low, volume_high, volume_mid
         real(real64) :: volume_tolerance
@@ -393,6 +426,7 @@ contains
         is_saturated = .false.
         call state%pressure%get(pressure)
         call state%porosity%get(porosity)
+        call state%ice_content%get(ice_content)
         if (porosity <= 0.0d0) return
 
         call local_state%copy(state)
@@ -433,29 +467,11 @@ contains
             real(real64), intent(in) :: candidate_pressure
             real(real64), intent(inout) :: phase_volume
 
-            real(real64) :: psi_cap, psi_cryo, psi_eff
-            real(real64) :: theta_total, theta_liquid, theta_ice
-            real(real64) :: rho_w, rho_i
+            real(real64) :: theta_liquid
 
             call candidate_state%pressure%set(candidate_pressure)
-            call self%calc_rho_water(candidate_state, rho_w)
-            call self%calc_rho_ice(candidate_state, rho_i)
-            if (rho_w <= tiny(1.0d0) .or. rho_i <= tiny(1.0d0)) then
-                phase_volume = 0.0d0
-                return
-            end if
-
-            psi_cap = max(0.0d0, -candidate_pressure)
-            call self%wrf%calc(-psi_cap / (rho_std * g), theta_total)
-            call self%gcc%calc(candidate_state, psi_cryo)
-            call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
-            call self%wrf%calc(-psi_eff / (rho_std * g), theta_liquid)
-
-            theta_ice = 0.0d0
-            if (theta_liquid < theta_total) then
-                theta_ice = (theta_total - theta_liquid) * rho_w / rho_i
-            end if
-            phase_volume = theta_liquid + theta_ice
+            call self%calc_water_content(candidate_state, theta_liquid)
+            phase_volume = theta_liquid + ice_content
         end subroutine evaluate_unconstrained_phase_volume
     end subroutine calc_saturation_pressure
 

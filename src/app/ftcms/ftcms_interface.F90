@@ -142,6 +142,10 @@ module app_ftcms
         class(abst_solver), allocatable :: solver_thermal
 
         integer(int32) :: current_physics_id = 0
+        ! Number of outer phase-equilibrium iterations in the latest solve.
+        integer(int32) :: last_phase_iterations = 1
+        ! Sum of inner nonlinear iterations over all outer phase iterations.
+        integer(int32) :: last_nonlinear_work = 1
         integer(int32) :: thermal_start_dof = 0
         integer(int32) :: hydraulic_start_dof = 0
         logical :: hydraulic_has_dirichlet_bc = .false.
@@ -242,6 +246,7 @@ module app_ftcms
         procedure, private, pass(self) :: apply_phase_change_temperature_correction => &
             apply_phase_change_temperature_correction_ftcms
         procedure, private, pass(self) :: update_nodal_phases => update_nodal_phases_ftcms
+        procedure, private, pass(self) :: project_nodal_ice => project_nodal_ice_ftcms
         procedure, private, pass(self) :: compute_nodal_conserved => compute_nodal_conserved_ftcms
         procedure, public, pass(self) :: compute_lte_error => compute_lte_error_ftcms
         procedure, public, pass(self) :: nonlinear_residual_norm => nonlinear_residual_norm_ftcms
@@ -451,6 +456,25 @@ module app_ftcms
             implicit none
             class(type_ftcms), intent(inout) :: self
         end subroutine update_nodal_phases_ftcms
+
+        module subroutine project_nodal_ice_ftcms(self, apply_update, ice_update, max_increment, increment_norm, &
+                                                   max_node, max_temperature, max_pressure, &
+                                                   max_current_ice, max_projected_ice, &
+                                                   max_equilibrium_error, increments)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            logical, intent(in) :: apply_update
+            real(real64), intent(in) :: ice_update(:)
+            real(real64), intent(inout) :: max_increment
+            real(real64), intent(inout) :: increment_norm
+            integer(int32), intent(inout) :: max_node
+            real(real64), intent(inout) :: max_temperature
+            real(real64), intent(inout) :: max_pressure
+            real(real64), intent(inout) :: max_current_ice
+            real(real64), intent(inout) :: max_projected_ice
+            real(real64), intent(inout) :: max_equilibrium_error
+            real(real64), allocatable, intent(inout) :: increments(:)
+        end subroutine project_nodal_ice_ftcms
 
         !> Evaluate the per-node conserved quantities (volumetric enthalpy density
         !> and pore-water effective density) at the current iterate, for the

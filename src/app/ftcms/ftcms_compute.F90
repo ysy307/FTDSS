@@ -399,9 +399,11 @@ contains
         integer(int32) :: num_elements, num_total_nodes, dim
         integer(int32) :: n_nodes_elem, n_gauss
         integer(int32) :: i_node, j, i, p, k, k_local, entry, entry0
-        integer(int32) :: d
+        integer(int32) :: d, computation_type_id
         real(real64) :: grad_component
         logical :: has_x, has_y, has_z
+        logical :: second_component_is_z
+        type(type_constant_id), pointer :: computation_type => null()
 
         num_elements = self%gradient_cache%num_elements
         num_total_nodes = self%gradient_cache%num_nodes
@@ -409,12 +411,16 @@ contains
         call grad%zero()
         if (num_elements <= 0) return
 
+        call self%domain%get_computation_type(computation_type)
+        computation_type_id = computation_type%ID
         has_x = allocated(grad%x)
-        has_y = dim >= 2 .and. allocated(grad%y)
+        second_component_is_z = computation_type_id == COMP_TYPES%XZ_2D%ID
+        has_y = dim >= 2 .and. .not. second_component_is_z .and. allocated(grad%y)
         has_z = dim >= 3 .and. allocated(grad%z)
+        if (second_component_is_z) has_z = allocated(grad%z)
 
         !$OMP PARALLEL DEFAULT(NONE) &
-        !$OMP SHARED(self, values_vec, grad, num_total_nodes, dim, has_x, has_y, has_z) &
+        !$OMP SHARED(self, values_vec, grad, num_total_nodes, dim, has_x, has_y, has_z, second_component_is_z) &
         !$OMP PRIVATE(i_node, j, i, p, k, k_local, d, entry, entry0, &
         !$OMP         p_conn, element_list, elem_u, gauss_grad, acc, &
         !$OMP         shape_weight, grad_component, n_nodes_elem, n_gauss)
@@ -456,7 +462,13 @@ contains
                     shape_weight = self%gradient_cache%shape_weight(entry + k_local - 1)
                     if (has_x) acc(1) = acc(1) + shape_weight * gauss_grad(1)
                     if (has_y) acc(2) = acc(2) + shape_weight * gauss_grad(2)
-                    if (has_z) acc(3) = acc(3) + shape_weight * gauss_grad(3)
+                    if (has_z) then
+                        if (second_component_is_z) then
+                            acc(3) = acc(3) + shape_weight * gauss_grad(2)
+                        else
+                            acc(3) = acc(3) + shape_weight * gauss_grad(3)
+                        end if
+                    end if
                 end do
             end do
             nullify (element_list)

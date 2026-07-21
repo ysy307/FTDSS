@@ -98,6 +98,8 @@ contains
         type(json_file), intent(inout) :: json
         character(256) :: buffer(6)
         character(:), allocatable :: temp_string
+        real(real64) :: default_atol_enthalpy, default_atol_density
+        real(real64) :: default_rtol_conserved, default_residual_eps
 
         buffer(1) = solver_settings
         buffer(2) = t_nonlinear_solver
@@ -165,13 +167,20 @@ contains
                                 is_required=.false., default_value=1.0d-1, valid_range=[0.0d0, huge(0.0d0)])
 
             ! Hierarchical keys (preferred)
+            ! Keep defaults in distinct variables. Passing the destination as
+            ! its own default aliases an INTENT(OUT) argument in json-fortran
+            ! and can replace a valid flat-key value with zero.
+            default_atol_enthalpy = self%solver_settings%nonlinear_solver%convergence%atol_enthalpy
+            default_atol_density = self%solver_settings%nonlinear_solver%convergence%atol_density
+            default_rtol_conserved = self%solver_settings%nonlinear_solver%convergence%rtol_conserved
+            default_residual_eps = self%solver_settings%nonlinear_solver%convergence%residual_eps
             buffer(4) = "conserved"
             buffer(5) = "thermal"
             buffer(6) = absolute_tolerance
             call get_json_value(json, join(buffer(1:6)), &
                                 self%solver_settings%nonlinear_solver%convergence%atol_enthalpy, &
                                 is_required=.false., &
-                                default_value=self%solver_settings%nonlinear_solver%convergence%atol_enthalpy, &
+                                default_value=default_atol_enthalpy, &
                                 valid_range=[0.0d0, huge(0.0d0)])
 
             buffer(5) = "hydraulic"
@@ -179,7 +188,7 @@ contains
             call get_json_value(json, join(buffer(1:6)), &
                                 self%solver_settings%nonlinear_solver%convergence%atol_density, &
                                 is_required=.false., &
-                                default_value=self%solver_settings%nonlinear_solver%convergence%atol_density, &
+                                default_value=default_atol_density, &
                                 valid_range=[0.0d0, huge(0.0d0)])
 
             buffer(5) = ""
@@ -188,14 +197,14 @@ contains
             call get_json_value(json, join(buffer(1:5)), &
                                 self%solver_settings%nonlinear_solver%convergence%rtol_conserved, &
                                 is_required=.false., &
-                                default_value=self%solver_settings%nonlinear_solver%convergence%rtol_conserved, &
+                                default_value=default_rtol_conserved, &
                                 valid_range=[0.0d0, huge(0.0d0)])
 
             buffer(5) = "residual_ratio_tolerance"
             call get_json_value(json, join(buffer(1:5)), &
                                 self%solver_settings%nonlinear_solver%convergence%residual_eps, &
                                 is_required=.false., &
-                                default_value=self%solver_settings%nonlinear_solver%convergence%residual_eps, &
+                                default_value=default_residual_eps, &
                                 valid_range=[0.0d0, huge(0.0d0)])
         end if
 

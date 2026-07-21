@@ -6,33 +6,19 @@ contains
 
     !> Suction head [m] controlling the retention-based relative permeability.
     !>
-    !> \( h_{kr} = -p_c^*/(\rho_{std} g) \) with the generalized suction
-    !> \( p_c^* = \max(\psi_{cap}, \psi_{cryo}) \) from the phase update.
-    !> In unfrozen conditions this equals the pressure head, so behaviour is
-    !> unchanged there; in the freezing fringe it keeps k_r consistent with
-    !> the (Clapeyron-reduced) liquid content.  Evaluating k_r at the raw
-    !> pressure head instead lets k_r -> 1 while the pores saturate under
-    !> cryosuction pumping, which removes the self-limiting of the pumping
-    !> flux and drives a physical runaway at the freezing interface.
-    !> Falls back to the pressure head when the phase update has not run.
+    !> The primary pressure is the actual pore-water pressure, so the
+    !> retention-based relative permeability uses its pressure head directly.
+    !> Ice impedance is applied separately by the configured HCF model.
     module subroutine calc_head_hcf(self, state, head)
         implicit none
         class(abst_hcf), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: head
 
-        real(real64) :: psi_eff, pressure
-        logical :: is_set
+        real(real64) :: pressure
 
-        psi_eff = 0.0d0
-        is_set = .false.
-        call state%effective_suction%get(psi_eff, is_set)
-        if (is_set) then
-            head = -psi_eff / (rho_std * g)
-        else
-            call state%pressure%get(pressure)
-            head = pressure / (rho_std * g)
-        end if
+        call state%pressure%get(pressure)
+        head = pressure / (rho_std * g)
     end subroutine calc_head_hcf
 
     !> Impedance factor of Hansson et al. (2004):
@@ -311,8 +297,8 @@ contains
 
         call state%temperature%get(temperature)
 
-        ! Head of the liquid potential (effective suction), consistent with
-        ! the retention scaling this thermo-osmotic term derives from.
+        ! Actual pore-pressure head used by the retention scaling from which
+        ! this thermo-osmotic term is derived.
         call self%calc_head(state, head)
 
         if (allocated(self%base)) then

@@ -30,6 +30,8 @@ module physics_governing_base
         real(real64), allocatable :: P_gp(:)
         real(real64), allocatable :: phi_node(:)
         real(real64), allocatable :: phi_gp(:)
+        real(real64), allocatable :: Qi_node(:)
+        real(real64), allocatable :: Qi_gp(:)
 
         ! --- Workspaces ---
         real(real64), allocatable :: work_node(:, :)
@@ -181,10 +183,12 @@ contains
         call allocate_and_init(self%T_node, self%num_fe_nodes)
         call allocate_and_init(self%P_node, self%num_fe_nodes)
         call allocate_and_init(self%phi_node, self%num_fe_nodes)
+        call allocate_and_init(self%Qi_node, self%num_fe_nodes)
 
         call allocate_and_init(self%T_gp, self%num_fe_gauss)
         call allocate_and_init(self%P_gp, self%num_fe_gauss)
         call allocate_and_init(self%phi_gp, self%num_fe_gauss)
+        call allocate_and_init(self%Qi_gp, self%num_fe_gauss)
 
         call allocate_and_init_2d(self%work_node, self%bdf_order + 1, self%num_fe_nodes)
         call allocate_and_init(self%work_bdf_buffer, self%bdf_order + 1)
@@ -281,6 +285,7 @@ contains
         self%T_node(:) = 273.15d0
         self%P_node(:) = 0.0d0
         self%phi_node(:) = 0.0d0
+        self%Qi_node(:) = 0.0d0
         self%work_bdf_buffer(:) = 0.0d0
 
         ! 1. Temperature (THERMAL)
@@ -382,6 +387,37 @@ contains
                 call self%fe%lerp(gp(j), self%work_node(k, 1:self%num_fe_nodes), self%work_bdf_buffer(k))
             end do
             call self%state_gp(j)%porosity_history%set(self%work_bdf_buffer)
+        end do
+
+        ! 4. Outer ice state. The current value and its BDF history are
+        ! interpolated independently of the monolithic T-p unknown vector.
+        self%work_node(:, :) = 0.0d0
+
+        do i = 1, self%num_fe_nodes
+            nullify (work_history_ptr)
+            is_set = .false.
+            call self%state(i)%ice_content%get(work_value, is_set=is_set)
+            if (is_set) self%Qi_node(i) = work_value
+
+            is_set = .false.
+            call self%state(i)%ice_content_history%get(work_history_ptr, is_set=is_set)
+            if (associated(work_history_ptr) .and. is_set) then
+                history_len = min(size(work_history_ptr), self%bdf_order + 1)
+                self%work_node(1:history_len, i) = work_history_ptr(1:history_len)
+            end if
+        end do
+
+        do i = 1, self%num_fe_gauss
+            call self%fe%lerp(gp(i), self%Qi_node(1:self%num_fe_nodes), self%Qi_gp(i))
+            call self%state_gp(i)%ice_content%set(self%Qi_gp(i))
+        end do
+
+        do j = 1, self%num_fe_gauss
+            self%work_bdf_buffer(:) = 0.0d0
+            do k = 1, self%bdf_order + 1
+                call self%fe%lerp(gp(j), self%work_node(k, 1:self%num_fe_nodes), self%work_bdf_buffer(k))
+            end do
+            call self%state_gp(j)%ice_content_history%set(self%work_bdf_buffer)
         end do
 
         nullify (gp)
@@ -525,9 +561,11 @@ contains
             if (allocated(self%T_node)) deallocate (self%T_node)
             if (allocated(self%P_node)) deallocate (self%P_node)
             if (allocated(self%phi_node)) deallocate (self%phi_node)
+            if (allocated(self%Qi_node)) deallocate (self%Qi_node)
             if (allocated(self%T_gp)) deallocate (self%T_gp)
             if (allocated(self%P_gp)) deallocate (self%P_gp)
             if (allocated(self%phi_gp)) deallocate (self%phi_gp)
+            if (allocated(self%Qi_gp)) deallocate (self%Qi_gp)
             if (allocated(self%coordinates)) deallocate (self%coordinates)
 
             if (allocated(self%work_node)) deallocate (self%work_node)

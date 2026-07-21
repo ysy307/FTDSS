@@ -44,6 +44,7 @@ module control_iteration_manager
 
         ! ---- Algorithm / Operation ----
         procedure, public, pass(self) :: check_convergence => check_convergence_iteration
+        procedure, public, pass(self) :: prime_conserved_residual => prime_conserved_residual_iteration
         procedure, public, pass(self) :: check_convergence_conserved => check_convergence_conserved_iteration
         procedure, public, pass(self) :: compute_error_norm => compute_error_norm_iteration
 
@@ -181,6 +182,20 @@ contains
         ! Divergence is set only by explicit detection (NaN, stagnation, etc.)
         call self%set_converged(physics_type, is_ok)
     end subroutine check_convergence_iteration
+
+    !> Store the residual assembled at x_0 for relative nonlinear convergence.
+    subroutine prime_conserved_residual_iteration(self, residual_thermal, residual_hydraulic, &
+                                                  check_thermal, check_hydraulic)
+        implicit none
+        class(type_iteration), intent(inout) :: self
+        real(real64), intent(in), optional :: residual_thermal(:)
+        real(real64), intent(in), optional :: residual_hydraulic(:)
+        logical, intent(in) :: check_thermal
+        logical, intent(in) :: check_hydraulic
+
+        call self%settings%prime_conserved_residual(residual_thermal, residual_hydraulic, &
+                                                    check_thermal, check_hydraulic)
+    end subroutine prime_conserved_residual_iteration
 
     !> Conserved-quantity convergence check (PDF 6.2.4). Evaluates a single coupled
     !> indicator from the nodal enthalpy/effective-density increments and the

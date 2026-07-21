@@ -28,6 +28,7 @@ module models_phase_change_manager
     contains
         procedure, public :: initialize
         procedure, public :: update_water_phases
+        procedure, public :: project_ice_content
         procedure, public :: calc_latent_heat_fusion
         procedure, public :: calc_latent_heat_vaporization
         procedure, public :: calc_saturation_pressure
@@ -61,11 +62,7 @@ contains
         real(real64) :: water_content, ice_content, air_content, vapor_content, porosity
         real(real64) :: relative_humidity
         real(real64) :: temperature, pressure, temperature_K, exponent
-        logical :: temperature_set, pressure_set
-
-        ! Temporary raw values
-        real(real64) :: raw_ice_content
-        real(real64) :: raw_water_content
+        logical :: temperature_set, pressure_set, ice_content_set
 
         ! Local variables for derivatives
         real(real64) :: dQw_dP, dQw_dT
@@ -74,8 +71,8 @@ contains
         real(real64) :: dQv_dP, dQv_dT
         real(real64) :: psi_eff
 
-        ! 0. Generalized suction of the liquid phase: retention-based
-        !    properties (theta_w, relative permeability) are evaluated at it.
+        ! 0. The liquid retention and permeability argument is the capillary
+        !    suction of the actual pore-water pressure.
         psi_eff = 0.0d0
         call self%fusion%calc_effective_suction(state, psi_eff)
         call state%effective_suction%set(psi_eff)
@@ -84,101 +81,29 @@ contains
         call state%porosity%get(porosity)
         porosity = min(max(porosity, 0.0d0), 1.0d0)
 
-        ! 2. Preliminary ice content (theta_i) calculation
-        call self%fusion%calc_ice_content(state, raw_ice_content)
-        call self%fusion%calc_ice_content_derivatives(state, dQi_dP, dQi_dT)
+        ! 2. Ice is fixed during the inner monolithic T-p solve. It is updated
+        !    by a bounded Clapeyron projection outside that solve.
+        ice_content = 0.0d0
+        ice_content_set = .false.
+        call state%ice_content%get(ice_content, ice_content_set)
+        if (.not. ice_content_set) ice_content = 0.0d0
+        ice_content = min(max(ice_content, 0.0d0), porosity)
+        dQi_dP = 0.0d0
+        dQi_dT = 0.0d0
 
-        ! --- Ice upper-bound check (Ice Cap) ---
-        if (raw_ice_content > porosity) then
-            ! Ice exceeds porosity: all pore space is ice
-            ice_content = porosity
-
-            ! Derivatives are zero since ice is capped at the upper limit
-            dQi_dP = 0.0d0
-            dQi_dT = 0.0d0
-
-            ! No water or air can exist
-            water_content = 0.0d0
-            dQw_dP = 0.0d0
-            dQw_dT = 0.0d0
-
-            air_content = 0.0d0
-            dQa_dP = 0.0d0
-            dQa_dT = 0.0d0
-        else
-            ! Normal case: ice content as computed
-            ice_content = raw_ice_content
-            ! Use computed derivatives (dQi_dP, dQi_dT) as-is
-
-            ! 3. Preliminary liquid water content (theta_w) calculation
-            call self%fusion%calc_water_content(state, raw_water_content)
-            call self%fusion%calc_water_content_derivatives(state, dQw_dP, dQw_dT)
-
-            ! --- Water upper-bound check (Water Cap) ---
-            if (raw_water_content + ice_content > porosity) then
-                ! Oversaturated: water fills remaining pore space after ice
-                water_content = max(0.0d0, porosity - ice_content)
-
-                ! Water content depends on (Porosity - Ice), so derivative is opposite sign of ice
-                dQw_dP = -1.0d0 * dQi_dP
-                dQw_dT = -1.0d0 * dQi_dT
-
-                ! No gas phase
-                air_content = 0.0d0
-                dQa_dP = 0.0d0
-                dQa_dT = 0.0d0
-            else
-                ! Unsaturated: use computed values
-                water_content = raw_water_content
-                ! Use computed derivatives (dQw_dP, dQw_dT) as-is
-
-                ! Gas phase = porosity - water - ice
-                air_content = porosity - water_content - ice_content
-
-                ! Gas phase derivatives (from conservation)
-                dQa_dP = -1.0d0 * (dQw_dP + dQi_dP)
-                dQa_dT = -1.0d0 * (dQw_dT + dQi_dT)
-            end if
-        end if
-
-        ! 4. Physical projection to avoid negative/oversaturated phase fractions.
-        ! Keep the thermodynamic one-sided derivatives while a phase is active. The
-        ! freezing front needs dQi/dT and dQi/dP immediately after ice appears;
-        ! tapering them to zero near Qi=0 removes the latent/apparent capacity and
-        ! makes the Picard map jump across the front.
-        if (ice_content < 0.0d0) then
-            ice_content = 0.0d0
-            dQi_dP = 0.0d0
-            dQi_dT = 0.0d0
-        end if
-
-        if (ice_content > porosity) then
-            ice_content = porosity
-            dQi_dP = 0.0d0
-            dQi_dT = 0.0d0
-        end if
-
-        if (water_content < 0.0d0) then
-            water_content = 0.0d0
-            dQw_dP = 0.0d0
-            dQw_dT = 0.0d0
-        end if
-
-        if (water_content > porosity - ice_content) then
+        ! 3. Liquid water follows the retention curve of actual pore pressure.
+        call self%fusion%calc_water_content(state, water_content)
+        call self%fusion%calc_water_content_derivatives(state, dQw_dP, dQw_dT)
+        water_content = max(0.0d0, water_content)
+        if (water_content + ice_content > porosity) then
             water_content = max(0.0d0, porosity - ice_content)
-            dQw_dP = -1.0d0 * dQi_dP
-            dQw_dT = -1.0d0 * dQi_dT
+            dQw_dP = 0.0d0
+            dQw_dT = 0.0d0
         end if
 
-        air_content = porosity - water_content - ice_content
-        if (air_content < 0.0d0) then
-            air_content = 0.0d0
-            dQa_dP = 0.0d0
-            dQa_dT = 0.0d0
-        else
-            dQa_dP = -1.0d0 * (dQw_dP + dQi_dP)
-            dQa_dT = -1.0d0 * (dQw_dT + dQi_dT)
-        end if
+        air_content = max(0.0d0, porosity - water_content - ice_content)
+        dQa_dP = -dQw_dP
+        dQa_dT = -dQw_dT
 
         ! 4. Set values (consistency ensured)
         call state%ice_content%set(ice_content)
@@ -252,6 +177,17 @@ contains
         call state%dQv_dT%set(dQv_dT)
 
     end subroutine update_water_phases
+
+    subroutine project_ice_content(self, state, projected_ice, ice_increment, equilibrium_error)
+        implicit none
+        class(type_phase_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: projected_ice
+        real(real64), intent(inout) :: ice_increment
+        real(real64), intent(inout) :: equilibrium_error
+
+        call self%fusion%project_ice_content(state, projected_ice, ice_increment, equilibrium_error)
+    end subroutine project_ice_content
 
     subroutine calc_latent_heat_fusion(self, state, Lf)
         implicit none

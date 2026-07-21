@@ -341,6 +341,7 @@ contains
         type(type_iapws06), target :: ice
         type(type_state) :: state
         real(real64) :: saturation_pressure, Qw, Qi, Qa
+        real(real64) :: projected_ice, ice_increment, equilibrium_error, dQi_dP, dQi_dT
         logical :: is_saturated
 
         call self%configure_wrf(wrf_config, SWCC_MODELS%VG%ID)
@@ -359,8 +360,40 @@ contains
         call phase_manager%initialize(gcc%p, wrf%p, water, ice)
 
         call state%temperature%set(-1.0d0)
+        call state%pressure%set(-5.4d4)
+        call state%porosity%set(0.535d0)
+        call state%ice_content%set(0.0d0)
+        call phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error)
+        call self%check_true("cold state projects a positive ice increment", ice_increment > 0.0d0)
+        call self%check_true("cold state has positive Clapeyron error", equilibrium_error > 0.0d0)
+        call self%check_close("ice projection increment is consistent", projected_ice, ice_increment, 1.0d-14)
+        call state%ice_content%set(projected_ice)
+        call phase_manager%update_water_phases(state)
+        call state%ice_content%get(Qi)
+        call state%dQi_dP%get(dQi_dP)
+        call state%dQi_dT%get(dQi_dT)
+        call self%check_close("inner phase update preserves outer ice", Qi, projected_ice, 1.0d-14)
+        call self%check_close("outer ice has zero inner pressure tangent", dQi_dP, 0.0d0, 1.0d-14)
+        call self%check_close("outer ice has zero inner temperature tangent", dQi_dT, 0.0d0, 1.0d-14)
+
+        call state%temperature%set(1.0d0)
+        call state%pressure%set(-5.4d4)
+        call state%ice_content%set(0.0d0)
+        call phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error)
+        call self%check_close("unfrozen lower bound has no phase increment", ice_increment, 0.0d0, 1.0d-14)
+        call self%check_close("unfrozen lower bound satisfies complementarity", equilibrium_error, 0.0d0, 1.0d-14)
+
+        call state%ice_content%set(5.0d-5)
+        call phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error)
+        call self%check_close("near-bound ice projects to zero", projected_ice, 0.0d0, 1.0d-14)
+        call self%check_close("near-bound ice uses complementarity tolerance", equilibrium_error, 0.0d0, 1.0d-14)
+
+        call state%temperature%set(-1.0d0)
         call state%pressure%set(0.0d0)
         call state%porosity%set(0.535d0)
+        ! Saturation is defined for the fixed outer ice state. With no ice,
+        ! the ordinary VG saturation pressure is zero even below freezing.
+        call state%ice_content%set(0.1d0)
         saturation_pressure = 0.0d0
         is_saturated = .false.
         call phase_manager%calc_saturation_pressure(state, saturation_pressure, is_saturated)

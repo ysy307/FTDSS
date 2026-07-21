@@ -25,6 +25,7 @@ module constitutive_models_manager
     contains
         procedure, public :: initialize
         procedure, public :: update_water_phases
+        procedure, public :: project_ice_content
         procedure, public :: calc_Kflh
         procedure, public :: calc_KlT
         procedure, public :: calc_Kvh
@@ -82,6 +83,17 @@ contains
 
         call self%phase_manager%update_water_phases(state)
     end subroutine update_water_phases
+
+    subroutine project_ice_content(self, state, projected_ice, ice_increment, equilibrium_error)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: projected_ice
+        real(real64), intent(inout) :: ice_increment
+        real(real64), intent(inout) :: equilibrium_error
+
+        call self%phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error)
+    end subroutine project_ice_content
 
     subroutine calc_Kflh(self, state, Kflh)
         implicit none
@@ -217,9 +229,9 @@ contains
         active = self%segregation%is_active()
     end function is_segregation_active
 
-    ! Returns .true. when any GCC model is active. Cryogenic suction (dψ_cryo/dT)
-    ! drives the D_HT coupling term, which is the primary mechanism for water
-    ! redistribution in freezing soil regardless of segregation mode.
+    ! Returns .true. when a GCC model is active. The hydraulic element uses
+    ! this flag to enable subcell quadrature across the freezing interface;
+    ! it does not add a separate cryogenic Darcy driving term.
     pure function has_cryo_transport(self) result(active)
         implicit none
         class(type_models_manager), intent(in) :: self

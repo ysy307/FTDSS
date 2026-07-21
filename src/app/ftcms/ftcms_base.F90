@@ -715,6 +715,7 @@ contains
         real(real64) :: temperature, pressure, porosity
         type(type_coordinate_dp) :: grad_T, grad_P
         real(real64) :: temperature_history(8), pressure_history(8), porosity_history(8)
+        real(real64) :: ice_content_history(8)
 
         logical :: do_calc, do_fluxes
         logical :: temperature_set, pressure_set
@@ -773,6 +774,8 @@ contains
             call state%air_content%set(qa_val)
             call state%vapor_content%set(qv_val)
         end block
+        call self%Qi%get_history(node_id, ice_content_history)
+        call state%ice_content_history%set(ice_content_history(1:bdf_order + 1))
 
         call state%temperature%get(temperature, temperature_set)
         call state%pressure%get(pressure, pressure_set)
@@ -1664,6 +1667,110 @@ contains
         if (allocated(states)) deallocate (states)
 
     end subroutine update_nodal_phases_ftcms
+
+    !> Update the outer nodal ice state by a local Clapeyron projection.
+    !> The monolithic unknown vector remains (T, p_w); this projection is a
+    !> bounded phase-transfer correction between water-conserving monolithic
+    !> solves. A converged outer iteration satisfies both balances.
+    module subroutine project_nodal_ice_ftcms(self, apply_update, ice_update, max_increment, increment_norm, &
+                                               max_node, max_temperature, max_pressure, &
+                                               max_current_ice, max_projected_ice, &
+                                               max_equilibrium_error, increments)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        logical, intent(in) :: apply_update
+        real(real64), intent(in) :: ice_update(:)
+        real(real64), intent(inout) :: max_increment
+        real(real64), intent(inout) :: increment_norm
+        integer(int32), intent(inout) :: max_node
+        real(real64), intent(inout) :: max_temperature
+        real(real64), intent(inout) :: max_pressure
+        real(real64), intent(inout) :: max_current_ice
+        real(real64), intent(inout) :: max_projected_ice
+        real(real64), intent(inout) :: max_equilibrium_error
+        real(real64), allocatable, intent(inout) :: increments(:)
+
+        integer(int32) :: node_id, num_nodes, row_start, row_end, k, repr_elem
+        integer(int32) :: num_threads, tid
+        type(type_state), allocatable :: states(:)
+        real(real64), allocatable :: current_ice_values(:), projected_ice_values(:)
+        real(real64), allocatable :: equilibrium_errors(:), node_measures(:)
+        real(real64) :: measure, projected_ice, ice_increment, equilibrium_error, porosity, updated_ice
+        real(real64) :: weighted_ice, weight_sum, current_ice, node_equilibrium_error
+
+        call self%domain%get_num_nodes(num_nodes)
+        num_threads = omp_get_max_threads()
+        allocate (states(num_threads))
+        allocate (current_ice_values(num_nodes), projected_ice_values(num_nodes))
+        allocate (equilibrium_errors(num_nodes), source=0.0d0)
+        allocate (node_measures(num_nodes), source=0.0d0)
+        if (allocated(increments)) deallocate (increments)
+        allocate (increments(num_nodes))
+        max_increment = 0.0d0
+
+        !$OMP PARALLEL DEFAULT(NONE) &
+        !$OMP SHARED(self, num_nodes, states, current_ice_values, projected_ice_values, equilibrium_errors, node_measures) &
+        !$OMP PRIVATE(node_id, row_start, row_end, k, repr_elem, tid, measure, &
+        !$OMP         projected_ice, ice_increment, equilibrium_error, weighted_ice, &
+        !$OMP         weight_sum, current_ice, node_equilibrium_error)
+        tid = omp_get_thread_num() + 1
+        !$OMP DO
+        do node_id = 1, num_nodes
+            call self%Qi%get_current(node_id, current_ice)
+            current_ice_values(node_id) = current_ice
+            projected_ice_values(node_id) = current_ice
+
+            row_start = self%node_material_table%ptr(node_id)
+            row_end = self%node_material_table%ptr(node_id + 1) - 1
+            if (row_end < row_start) cycle
+
+            weighted_ice = 0.0d0
+            weight_sum = 0.0d0
+            node_equilibrium_error = 0.0d0
+            do k = row_start, row_end
+                repr_elem = self%node_material_table%repr_element(k)
+                measure = self%node_material_table%measure_sum(k)
+                call self%set_state(node_id, repr_elem, states(tid), calc_physics=.true., include_fluxes=.false.)
+                call self%thermal%project_ice_content(self%node_material_table%material_id(k), &
+                                                      states(tid), projected_ice, ice_increment, &
+                                                      equilibrium_error)
+                weighted_ice = weighted_ice + measure * projected_ice
+                weight_sum = weight_sum + measure
+                node_equilibrium_error = max(node_equilibrium_error, equilibrium_error)
+            end do
+
+            if (weight_sum > epsilon(1.0d0)) then
+                projected_ice_values(node_id) = weighted_ice / weight_sum
+                equilibrium_errors(node_id) = node_equilibrium_error
+                node_measures(node_id) = weight_sum
+            end if
+        end do
+        !$OMP END DO
+        !$OMP END PARALLEL
+
+        increments = projected_ice_values - current_ice_values
+        max_node = maxloc(abs(increments), dim=1)
+        max_increment = abs(increments(max_node))
+        increment_norm = max_increment
+        if (sum(node_measures) > tiny(1.0d0)) then
+            increment_norm = sqrt(dot_product(node_measures, increments**2) / sum(node_measures))
+        end if
+        max_equilibrium_error = maxval(equilibrium_errors)
+        max_current_ice = current_ice_values(max_node)
+        max_projected_ice = projected_ice_values(max_node)
+        call self%temperature%get_current(max_node, max_temperature)
+        call self%pressure%get_current(max_node, max_pressure)
+
+        if (apply_update) then
+            do node_id = 1, num_nodes
+                call self%porosity%get_current(node_id, porosity)
+                updated_ice = min(max(current_ice_values(node_id) + ice_update(node_id), 0.0d0), porosity)
+                call self%Qi%set_current(node_id, updated_ice)
+            end do
+        end if
+
+        deallocate (states, current_ice_values, projected_ice_values, equilibrium_errors, node_measures)
+    end subroutine project_nodal_ice_ftcms
 
     !> Evaluate per-node conserved quantities at the current iterate.
     !>

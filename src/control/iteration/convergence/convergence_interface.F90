@@ -181,6 +181,7 @@ module control_iteration_convergence
         procedure, public, pass(self) :: get_tolerances => get_tolerances_convergence_control
         ! ---- Conserved-quantity convergence (PDF 6.2.4) ----
         procedure, public, pass(self) :: is_conserved => is_conserved_convergence_control
+        procedure, public, pass(self) :: prime_conserved_residual => prime_conserved_residual_convergence_control
         procedure, public, pass(self) :: check_conserved => check_conserved_convergence_control
         procedure, public, pass(self) :: compute_error_norm => compute_error_norm_convergence_control
         procedure, public, pass(self) :: get_conserved_relaxation => get_conserved_relaxation_convergence_control
@@ -291,6 +292,17 @@ module control_iteration_convergence
             class(type_convergence_control), intent(in) :: self
             logical :: is_conserved
         end function is_conserved_convergence_control
+
+        !> Stores residual norms assembled at the initial nonlinear iterate.
+        module subroutine prime_conserved_residual_convergence_control(self, residual_thermal, residual_hydraulic, &
+                                                                       check_thermal, check_hydraulic)
+            implicit none
+            class(type_convergence_control), intent(inout) :: self
+            real(real64), intent(in), optional :: residual_thermal(:)
+            real(real64), intent(in), optional :: residual_hydraulic(:)
+            logical, intent(in) :: check_thermal
+            logical, intent(in) :: check_hydraulic
+        end subroutine prime_conserved_residual_convergence_control
 
         !> Conserved-quantity convergence check (PDF 6.2.4).
         !>

@@ -4,9 +4,10 @@ submodule(control_iteration_convergence) convergence_control
     !> Floor for the adaptive under-relaxation factor of the globalized modified
     !> Picard step. Below this the step is considered un-saveable by damping and
     !> the step is declared diverged so the ATS reduces dt instead.
-    real(real64), parameter :: CONSERVED_OMEGA_MIN = 1.0d-4
-    real(real64), parameter :: CONSERVED_OMEGA_GROW_MAX = 2.0d0
-    real(real64), parameter :: CONSERVED_KAPPA_RECOVER = 5.0d-1
+    real(real64), parameter :: CONSERVED_OMEGA_MIN = 5.0d-2
+    real(real64), parameter :: CONSERVED_OMEGA_GROW_MAX = 1.05d0
+    real(real64), parameter :: CONSERVED_RESIDUAL_DECREASE = 9.5d-1
+    real(real64), parameter :: CONSERVED_RESIDUAL_INCREASE = 1.05d0
     ! Warm start of the under-relaxation across nonlinear loops: the spectrum
     ! of the coupled Picard map changes little between consecutive time steps
     ! (and between a failed attempt and its retry), so re-exploring omega from
@@ -252,6 +253,26 @@ contains
         is_conserved = (self%convergence_norm_type == NONLINEAR_NORM_CRITERIA%CONSERVED)
     end function is_conserved_convergence_control
 
+    !> Capture R(x_0) before the first nonlinear update. Using the residual after
+    !> that update can create an arbitrarily small reference when the first linear
+    !> solve happens to be nearly exact, making the relative test ill-conditioned.
+    module subroutine prime_conserved_residual_convergence_control(self, residual_thermal, residual_hydraulic, &
+                                                                   check_thermal, check_hydraulic)
+        implicit none
+        class(type_convergence_control), intent(inout) :: self
+        real(real64), intent(in), optional :: residual_thermal(:)
+        real(real64), intent(in), optional :: residual_hydraulic(:)
+        logical, intent(in) :: check_thermal
+        logical, intent(in) :: check_hydraulic
+
+        if (check_thermal .and. present(residual_thermal)) then
+            self%residual0_thermal = max(block_residual_norm(residual_thermal), tiny(1.0d0))
+        end if
+        if (check_hydraulic .and. present(residual_hydraulic)) then
+            self%residual0_hydraulic = max(block_residual_norm(residual_hydraulic), tiny(1.0d0))
+        end if
+    end subroutine prime_conserved_residual_convergence_control
+
     !> Current adaptive under-relaxation factor for the globalized modified Picard.
     module pure function get_conserved_dq_norm_convergence_control(self) result(dq_norm)
         implicit none
@@ -287,9 +308,9 @@ contains
         logical, intent(inout) :: is_ok
         logical, intent(inout) :: is_diverged
 
-        real(real64) :: dq_norm, kappa, residual_norm, residual_ratio
-        real(real64) :: rT, rH, ratioT, ratioH, balanceH
-        logical :: dq_ok, residual_ok
+        real(real64) :: dq_norm, dq_effective, kappa, residual_norm, residual_ratio
+        real(real64) :: rT, rH, ratioT, ratioH, balanceT, balanceH
+        logical :: dq_ok, residual_ok, balance_ok
         logical :: has_residual_norm
         integer(int32) :: n_cons
         real(real64), allocatable :: dH(:), drho(:)
@@ -302,6 +323,7 @@ contains
         rH = 0.0d0
         ratioT = 0.0d0
         ratioH = 0.0d0
+        balanceT = 0.0d0
         balanceH = 0.0d0
         residual_norm = 0.0d0
         has_residual_norm = .false.
@@ -326,11 +348,17 @@ contains
         ! storage and therefore no additive-constant nullspace; retaining its mean
         ! component is required to retain the global water-balance equation.
         residual_ok = .true.
+        balance_ok = .true.
         if (check_thermal .and. present(residual_thermal)) then
             rT = block_residual_norm(residual_thermal)
             if (self%residual0_thermal < 0.0d0) self%residual0_thermal = max(rT, tiny(1.0d0))
             ratioT = rT / self%residual0_thermal
+            if (size(residual_thermal) > 0) then
+                balanceT = abs(sum(residual_thermal)) / &
+                           (sqrt(real(size(residual_thermal), real64)) * self%residual0_thermal)
+            end if
             residual_ok = residual_ok .and. (ratioT <= self%residual_eps)
+            balance_ok = balance_ok .and. (balanceT <= self%residual_eps)
         else if (check_thermal) then
             residual_ok = .false.
         end if
@@ -344,6 +372,7 @@ contains
             end if
             residual_ok = residual_ok .and. (ratioH <= self%residual_eps) .and. &
                           (balanceH <= self%residual_eps)
+            balance_ok = balance_ok .and. (balanceH <= self%residual_eps)
         else if (check_hydraulic) then
             residual_ok = .false.
         end if
@@ -357,44 +386,55 @@ contains
         end if
         if (has_residual_norm) residual_norm = sqrt(residual_norm)
 
-        ! Convergence is the complete weighted-RMS criterion over the conserved
-        ! quantities (energy and water mass, PDF 6.2.3-6.2.4), CORRECTED for the
-        ! contraction rate: for a fixed-point iteration the true error obeys
-        ! ||e_k|| <= ||dQ_k|| * kappa/(1 - kappa), so the raw change ||dQ||_W <= 1
-        ! alone is vacuous when the step is strongly under-relaxed (small change
-        ! per iteration says nothing about distance to the fixed point). Requiring
-        ! the kappa-corrected bound as well makes acceptance omega-independent and
-        ! prevents "converged" steps in which the physics has silently stalled.
-        dq_ok = self%has_prev_conserved .and. (dq_norm <= 1.0d0)
-        if (dq_ok .and. self%dq_norm_prev > 0.0d0) then
+        ! Convergence requires both the conserved-quantity change and the complete
+        ! assembled residual. The residual gate makes the raw change independent
+        ! of under-relaxation: a small relaxed update cannot pass while the field
+        ! equations remain unsatisfied. A contraction estimate is used only when
+        ! no residual is available. It is not valid across active-set changes at a
+        ! freezing front, where successive increments need not have one stationary
+        ! linear convergence factor even arbitrarily close to the solution.
+        dq_effective = dq_norm / max(self%relaxation_omega, CONSERVED_OMEGA_MIN)
+        dq_ok = self%has_prev_conserved .and. (dq_effective <= 1.0d0)
+        if (dq_ok .and. (.not. has_residual_norm) .and. self%dq_norm_prev > 0.0d0) then
             kappa = dq_norm / self%dq_norm_prev
             if (kappa >= 1.0d0) then
                 dq_ok = .false.
             else if (kappa > 0.0d0) then
                 dq_ok = dq_norm * kappa / (1.0d0 - kappa) <= 1.0d0
             end if
-        else if (dq_ok) then
+        else if (dq_ok .and. (.not. has_residual_norm)) then
             ! No contraction estimate yet (first measurable change): do not accept
             ! on the raw change alone.
             dq_ok = .false.
         end if
-        is_ok = dq_ok .and. residual_ok
+        ! When R(x_0) is already at the algebraic noise floor, its relative ratio
+        ! is ill-conditioned. In that case accept only with a ten-times stricter
+        ! unrelaxed conserved update and the complete energy/water balance sums.
+        is_ok = dq_ok .and. (residual_ok .or. &
+                             (dq_effective <= self%residual_eps .and. balance_ok))
 
         ! Globalize the coupled Picard update using the freshly assembled nonlinear
         ! residual. The conserved-quantity increment can alternate while the true
         ! residual decreases, particularly around a moving freezing front; using
         ! that increment to re-amplify a step caused omega to collapse to its floor.
-        ! Keep omega while the residual contracts, and damp only after a measured
-        ! residual increase. The fallback uses kappa only when no residual exists.
+        ! Recover omega in proportion to a measured contraction, damp it after a
+        ! measured increase, and retain it inside a five-percent noise band. The
+        ! fallback uses kappa only when no residual exists.
         if (self%has_prev_conserved .and. self%dq_norm_prev > 0.0d0) then
             kappa = dq_norm / self%dq_norm_prev
             if (has_residual_norm .and. self%residual_norm_prev > 0.0d0) then
                 residual_ratio = residual_norm / self%residual_norm_prev
-                if (residual_ratio > 1.0d0) then
+                if (residual_ratio > CONSERVED_RESIDUAL_INCREASE) then
                     self%relaxation_omega = max(CONSERVED_OMEGA_MIN, &
                                                 self%relaxation_omega / residual_ratio)
                     self%diverge_count = self%diverge_count + 1
                 else
+                    if (residual_ratio < CONSERVED_RESIDUAL_DECREASE) then
+                        self%relaxation_omega = min(1.0d0, &
+                                                    min(CONSERVED_OMEGA_GROW_MAX, 1.0d0 / &
+                                                        max(residual_ratio, tiny(1.0d0))) * &
+                                                    self%relaxation_omega)
+                    end if
                     self%diverge_count = 0
                 end if
             else if (kappa >= 1.0d0) then
@@ -411,10 +451,11 @@ contains
         end if
 
         if (CONSERVED_VERBOSE) then
-            write (*, '(A,I4,A,ES12.5,A,F6.4,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3)') &
+            write (*, '(A,I4,A,ES12.5,A,F6.4,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3)') &
                 '    [Conserved] iter:', nonlinear_iter, '  ||dQ||_W:', dq_norm, &
                 '  omega:', self%relaxation_omega, '  kappa:', kappa, &
-                '  resT/0:', ratioT, '  resH/0:', ratioH, '  mass/0:', balanceH
+                '  resT/0:', ratioT, '  resH/0:', ratioH, &
+                '  energy/0:', balanceT, '  mass/0:', balanceH
         end if
 
         ! Store current iterate as previous for the next check

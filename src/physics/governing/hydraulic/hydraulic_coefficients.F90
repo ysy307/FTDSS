@@ -22,9 +22,9 @@ contains
         call self%physics%calc_Kflh(material_id, state, K_flh)
         call self%calc_K_vP(material_id, state, K_vP)
         call self%physics%calc_density_water(state, rho_w)
-        ! Pressure is the actual pore-water pressure. Generalized suction controls
-        ! liquid saturation and relative permeability, but it does not replace the
-        ! Darcy potential or attenuate its pressure gradient.
+        ! Pressure is the actual pore-water pressure used by retention,
+        ! relative permeability, and the Darcy potential. Ice impedance is a
+        ! separate multiplicative conductivity factor.
         coeff_D = (K_flh + K_vP) / (rho_w * g)
 
         D_HH(:, :) = 0.0d0
@@ -102,10 +102,9 @@ contains
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_density_ice(state, rho_i)
 
-        ! C_HT = dTheta/dT in the mixed water-content formulation.
-        ! Theta = Qw + (rho_i/rho_w)*Qi + Qv. For pore-water freezing, the
-        ! Qw/Qi terms cancel when mass is conserved, preventing an artificial
-        ! temperature-storage spike in the hydraulic equation.
+        ! C_HT = dTheta/dT in the mixed water-content formulation. Ice is an
+        ! outer fixed state and liquid retention uses p_w, so their inner
+        ! temperature tangents vanish; vapor remains when enabled.
         C_HT = dQw_dT + (rho_i / rho_w) * dQi_dT + dQv_dT
 
         ! Phase-change stabilization (mirrors the thermal C_TT chord): use the
@@ -235,6 +234,7 @@ contains
         type(type_state) :: local_state
         real(real64), pointer, dimension(:), contiguous :: temperature_history
         real(real64), pointer, dimension(:), contiguous :: pressure_history
+        real(real64), pointer, dimension(:), contiguous :: ice_content_history
 
         real(real64) :: Qw, Qi, Qv
         real(real64) :: rho_w, rho_i
@@ -243,20 +243,24 @@ contains
 
         nullify (temperature_history)
         nullify (pressure_history)
+        nullify (ice_content_history)
 
         call state%temperature_history%get(temperature_history)
         call state%pressure_history%get(pressure_history)
+        call state%ice_content_history%get(ice_content_history)
 
         drho_dt = 0.0d0
         if (.not. associated(temperature_history)) return
         if (.not. associated(pressure_history)) return
+        if (.not. associated(ice_content_history)) return
 
-        n = min(size(bdf_coeffs), size(temperature_history), size(pressure_history))
+        n = min(size(bdf_coeffs), size(temperature_history), size(pressure_history), size(ice_content_history))
         call local_state%copy(state)
 
         do j = 1, n
             call local_state%temperature%set(temperature_history(j))
             call local_state%pressure%set(pressure_history(j))
+            call local_state%ice_content%set(ice_content_history(j))
 
             call self%update_water_phases(material_id, local_state)
 
@@ -336,9 +340,8 @@ contains
 
         ! C_eq = dTheta/dP = dQw_dP + (rho_i/rho_w)*dQi_dP + dQv_dP
         ! (rho_v ~ rho_w approximation consistent with calc_effective_density)
-        ! Clamp to non-negative: thermodynamically dTheta/dP >= 0 always holds,
-        ! but phase_systems compensation (dQw_dP = -dQi_dP) can cause numerical
-        ! sign reversal near the freezing front.
+        ! Clamp to non-negative roundoff. The outer ice state has zero inner
+        ! pressure tangent, while liquid retention supplies positive capacity.
         call self%compute_compressive_storage(material_id, state, compressive_storage, compressive_capacity)
         C_eq = max(0.0d0, dQw_dP + (rho_i / rho_w) * dQi_dP + dQv_dP) + compressive_capacity
     end subroutine compute_C_eq_hydraulic
@@ -369,6 +372,7 @@ contains
         type(type_state) :: local_state
         real(real64), pointer, dimension(:), contiguous :: temperature_history
         real(real64), pointer, dimension(:), contiguous :: pressure_history
+        real(real64), pointer, dimension(:), contiguous :: ice_content_history
 
         real(real64) :: Qw, Qi, Qv
         real(real64) :: rho_w, rho_i
@@ -377,20 +381,24 @@ contains
 
         nullify (temperature_history)
         nullify (pressure_history)
+        nullify (ice_content_history)
 
         call state%temperature_history%get(temperature_history)
         call state%pressure_history%get(pressure_history)
+        call state%ice_content_history%get(ice_content_history)
 
         dTheta_dt = 0.0d0
         if (.not. associated(temperature_history)) return
         if (.not. associated(pressure_history)) return
+        if (.not. associated(ice_content_history)) return
 
-        n = min(size(bdf_coeffs), size(temperature_history), size(pressure_history))
+        n = min(size(bdf_coeffs), size(temperature_history), size(pressure_history), size(ice_content_history))
         call local_state%copy(state)
 
         do j = 1, n
             call local_state%temperature%set(temperature_history(j))
             call local_state%pressure%set(pressure_history(j))
+            call local_state%ice_content%set(ice_content_history(j))
 
             call self%update_water_phases(material_id, local_state)
 

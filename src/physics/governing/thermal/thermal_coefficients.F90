@@ -139,6 +139,19 @@ contains
         call self%physics%update_water_phases(material_id, state)
     end subroutine update_water_phases_thermal
 
+    module subroutine project_ice_content_thermal(self, material_id, state, projected_ice, &
+                                                   ice_increment, equilibrium_error)
+        implicit none
+        class(type_thermal), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: projected_ice
+        real(real64), intent(inout) :: ice_increment
+        real(real64), intent(inout) :: equilibrium_error
+
+        call self%physics%project_ice_content(material_id, state, projected_ice, ice_increment, equilibrium_error)
+    end subroutine project_ice_content_thermal
+
     ! ==========================================================================
     ! Transient / Mass Terms (Refactored for NR & Picard)
     ! ==========================================================================
@@ -170,18 +183,23 @@ contains
         real(real64), pointer, contiguous, dimension(:) :: temperature_history
         real(real64), pointer, contiguous, dimension(:) :: pressure_history
         real(real64), pointer, contiguous, dimension(:) :: porosity_history
+        real(real64), pointer, contiguous, dimension(:) :: ice_content_history
         real(real64) :: Uj
         integer(int32) :: j, n_hist
 
+        nullify (ice_content_history)
         call state%get(temperature_history=temperature_history, &
                        pressure_history=pressure_history, &
                        porosity_history=porosity_history)
+        call state%ice_content_history%get(ice_content_history)
 
         dU_dt = 0.0d0
         if (.not. associated(temperature_history)) return
         if (.not. associated(pressure_history)) return
         if (.not. associated(porosity_history)) return
-        n_hist = min(size(bdf_coeffs), size(temperature_history), size(pressure_history), size(porosity_history))
+        if (.not. associated(ice_content_history)) return
+        n_hist = min(size(bdf_coeffs), size(temperature_history), size(pressure_history), &
+                     size(porosity_history), size(ice_content_history))
 
         ! Copy once: only T/P/porosity vary over the BDF history; the other state
         ! fields (e.g. clay fraction) are constant, so the deep copy is hoisted
@@ -198,6 +216,7 @@ contains
                 call local_state%temperature%set(temperature_history(j))
                 call local_state%pressure%set(pressure_history(j))
                 call local_state%porosity%set(porosity_history(j))
+                call local_state%ice_content%set(ice_content_history(j))
                 call self%update_water_phases(material_id, local_state)
                 call self%calc_enthalpy_density(material_id, local_state, Uj)
 

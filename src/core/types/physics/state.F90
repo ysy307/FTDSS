@@ -59,15 +59,16 @@ module core_types_physics_state
         type(type_field_dp) :: vapor_content ! Vapor content [-]
         type(type_field_dp) :: air_content ! Air content [-]
         type(type_field_dp) :: porosity ! Porosity [-]
-        ! Generalized suction p_c* = max(psi_cap, psi_cryo) [Pa].
-        ! Set by update_water_phases; the liquid-phase potential is
-        ! -effective_suction, and retention-based properties (theta_w,
-        ! relative permeability) must be evaluated at this suction.
+        ! Capillary suction max(0,-p_w) [Pa] of the actual pore-water
+        ! pressure. Retention and relative permeability use this value.
         type(type_field_dp) :: effective_suction ! [Pa]
 
         type(type_field_array_dp) :: temperature_history ! Temperature history [C]
         type(type_field_array_dp) :: pressure_history ! Pressure history [Pa]
         type(type_field_array_dp) :: porosity_history ! Porosity history [-]
+        ! Ice content is an outer local state, not a monolithic unknown. Its
+        ! history is required by the conservative water and enthalpy BDF terms.
+        type(type_field_array_dp) :: ice_content_history ! Ice content history [-]
 
         ! --- Thermal Properties ---
         type(type_field_dp) :: latent_heat_fusion ! [J/kg]
@@ -478,6 +479,7 @@ contains
         call self%temperature_history%reset()
         call self%pressure_history%reset()
         call self%porosity_history%reset()
+        call self%ice_content_history%reset()
         call self%latent_heat_fusion%reset()
         call self%latent_heat_vaporization%reset()
         call self%dQw_dT%reset()
@@ -512,6 +514,7 @@ contains
         call copy_array_field(self%temperature_history, source%temperature_history)
         call copy_array_field(self%pressure_history, source%pressure_history)
         call copy_array_field(self%porosity_history, source%porosity_history)
+        call copy_array_field(self%ice_content_history, source%ice_content_history)
         call copy_field(self%latent_heat_fusion, source%latent_heat_fusion)
         call copy_field(self%latent_heat_vaporization, source%latent_heat_vaporization)
         call copy_field(self%dQw_dT, source%dQw_dT)

@@ -52,6 +52,7 @@ module control_control_manager
         procedure, public, pass(self) :: profiler_record => profiler_record_control
         ! - iteration
         procedure, public, pass(self) :: check_convergence => check_convergence_control
+        procedure, public, pass(self) :: prime_conserved_residual => prime_conserved_residual_control
         procedure, public, pass(self) :: check_convergence_conserved => check_convergence_conserved_control
         procedure, public, pass(self) :: compute_error_norm => compute_error_norm_control
         ! - acceleration
@@ -386,11 +387,12 @@ contains
         is_end_time = self%time%is_end_time()
     end function is_end_time_control
 
-    subroutine update_controls(self, success, error_estimate)
+    subroutine update_controls(self, success, error_estimate, iteration_count)
         implicit none
         class(type_control), intent(inout) :: self
         logical, intent(in) :: success
         real(real64), intent(in), optional :: error_estimate
+        integer(int32), intent(in), optional :: iteration_count
         integer(int32) :: iter_count
         real(real64) :: t_target
         real(real64) :: t_arrival ! Time that will be reached after this step
@@ -399,6 +401,7 @@ contains
 
         ! 1. Get iteration count
         call self%iteration%get_nonlinear_iter(iter_count)
+        if (present(iteration_count)) iter_count = max(iter_count, iteration_count)
 
         ! 2. Predicted arrival time (t_new = t_old + dt)
         !    If successful, time%update will advance to this time
@@ -595,6 +598,20 @@ contains
         call self%iteration%check_convergence(physics_type, residual_vector, update_vector)
 
     end subroutine check_convergence_control
+
+    !> Store the residual assembled before the first nonlinear update.
+    subroutine prime_conserved_residual_control(self, residual_thermal, residual_hydraulic, &
+                                                check_thermal, check_hydraulic)
+        implicit none
+        class(type_control), intent(inout) :: self
+        real(real64), intent(in), optional :: residual_thermal(:)
+        real(real64), intent(in), optional :: residual_hydraulic(:)
+        logical, intent(in) :: check_thermal
+        logical, intent(in) :: check_hydraulic
+
+        call self%iteration%prime_conserved_residual(residual_thermal, residual_hydraulic, &
+                                                     check_thermal, check_hydraulic)
+    end subroutine prime_conserved_residual_control
 
     !> Conserved-quantity convergence check (PDF 6.2.4): a single coupled indicator
     !> from the nodal enthalpy/effective-density increments and per-block residuals.

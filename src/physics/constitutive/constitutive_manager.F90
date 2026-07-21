@@ -50,6 +50,7 @@ module physics_constitutive_manager
         procedure, public :: calc_pressure_ice_water_derivative
 
         procedure, public :: update_water_phases
+        procedure, public :: project_ice_content
         procedure, public :: calc_Kflh
         procedure, public :: calc_KlT
         procedure, public :: calc_Kvh
@@ -412,6 +413,19 @@ contains
 
         call self%models(self%materials_id_map(material_id))%update_water_phases(state)
     end subroutine update_water_phases
+
+    subroutine project_ice_content(self, material_id, state, projected_ice, ice_increment, equilibrium_error)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: projected_ice
+        real(real64), intent(inout) :: ice_increment
+        real(real64), intent(inout) :: equilibrium_error
+
+        call self%models(self%materials_id_map(material_id))%project_ice_content( &
+            state, projected_ice, ice_increment, equilibrium_error)
+    end subroutine project_ice_content
 
     subroutine calc_Kflh(self, material_id, state, Kflh)
         implicit none

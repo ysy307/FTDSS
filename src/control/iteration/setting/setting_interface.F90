@@ -24,6 +24,7 @@ module control_iteration_setting
         procedure, public, pass(self) :: reset => reset_iteration_setting
         ! ---- Algorithm / Operation ----
         procedure, public, pass(self) :: check_convergence => check_convergence_setting
+        procedure, public, pass(self) :: prime_conserved_residual => prime_conserved_residual_setting
         procedure, public, pass(self) :: check_conserved => check_conserved_setting
         procedure, public, pass(self) :: compute_error_norm => compute_error_norm_setting
         ! ---- Inquiry ----
@@ -90,6 +91,19 @@ contains
 
         omega = self%convergence_control%get_conserved_relaxation()
     end function get_conserved_relaxation_setting
+
+    subroutine prime_conserved_residual_setting(self, residual_thermal, residual_hydraulic, &
+                                                check_thermal, check_hydraulic)
+        implicit none
+        class(type_iteration_setting), intent(inout) :: self
+        real(real64), intent(in), optional :: residual_thermal(:)
+        real(real64), intent(in), optional :: residual_hydraulic(:)
+        logical, intent(in) :: check_thermal
+        logical, intent(in) :: check_hydraulic
+
+        call self%convergence_control%prime_conserved_residual(residual_thermal, residual_hydraulic, &
+                                                               check_thermal, check_hydraulic)
+    end subroutine prime_conserved_residual_setting
 
     !> Last weighted-RMS conserved-quantity change ||dQ||_W (diagnostics).
     pure function get_conserved_dq_norm_setting(self) result(dq_norm)

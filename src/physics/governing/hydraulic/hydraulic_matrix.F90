@@ -66,7 +66,7 @@ contains
         real(real64) :: phi_nodes(workspace%num_fe_nodes)
         real(real64) :: porosity_nodes(workspace%num_fe_nodes)
         real(real64) :: rho_w_node_sub, T_high_node
-        real(real64) :: T_q_sub, P_q_sub, porosity_q_sub
+        real(real64) :: T_q_sub, P_q_sub, porosity_q_sub, Qi_q_sub
         real(real64) :: D_HH_sub, D_HT_sub, eff_weight_sub, det_J_sub
         real(real64) :: V_sub(workspace%num_fe_dimension)
         real(real64) :: vec_V_sub(workspace%num_fe_nodes)
@@ -220,11 +220,13 @@ contains
                 call workspace%fe%lerp(r_sub, workspace%T_node(1:n_nodes), T_q_sub)
                 call workspace%fe%lerp(r_sub, workspace%P_node(1:n_nodes), P_q_sub)
                 call workspace%fe%lerp(r_sub, porosity_nodes(1:n_nodes), porosity_q_sub)
+                call workspace%fe%lerp(r_sub, workspace%Qi_node(1:n_nodes), Qi_q_sub)
 
                 call state_sub%copy(workspace%state(1))
                 call state_sub%temperature%set(T_q_sub)
                 call state_sub%pressure%set(P_q_sub)
                 call state_sub%porosity%set(porosity_q_sub)
+                call state_sub%ice_content%set(Qi_q_sub)
                 call self%update_water_phases(workspace%material_id, state_sub)
 
                 dpsi_dx_sub(:, :) = 0.0d0

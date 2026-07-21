@@ -51,6 +51,7 @@ module physics_governing_thermal
         procedure, pass(self), public :: calc_specific_heat_water => calc_specific_heat_water_thermal
         procedure, pass(self), public :: calc_specific_heat_vapor => calc_specific_heat_vapor_thermal
         procedure, pass(self), public :: update_water_phases => update_water_phases_thermal
+        procedure, pass(self), public :: project_ice_content => project_ice_content_thermal
         procedure, pass(self), public :: cache_enthalpy_history => cache_enthalpy_history_thermal
         procedure, pass(self), public :: invalidate_enthalpy_cache => invalidate_enthalpy_cache_thermal
     end type type_thermal
@@ -110,6 +111,17 @@ module physics_governing_thermal
 
         end subroutine update_water_phases_thermal
 
+        module subroutine project_ice_content_thermal(self, material_id, state, projected_ice, &
+                                                       ice_increment, equilibrium_error)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: projected_ice
+            real(real64), intent(inout) :: ice_increment
+            real(real64), intent(inout) :: equilibrium_error
+        end subroutine project_ice_content_thermal
+
         module subroutine compute_transient_term_thermal(self, material_id, state, bdf_coeffs, dU_dt)
             implicit none
             class(type_thermal), intent(in) :: self
@@ -128,7 +140,7 @@ module physics_governing_thermal
             integer(int32), intent(in), optional :: scheme_opt
 
         end subroutine compute_mass_term_thermal
-        
+
         module subroutine compute_diffusion_term_thermal(self, material_id, state, D_TT)
             implicit none
             class(type_thermal), intent(in) :: self
