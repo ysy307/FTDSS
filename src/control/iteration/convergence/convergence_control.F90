@@ -8,6 +8,12 @@ submodule(control_iteration_convergence) convergence_control
     real(real64), parameter :: CONSERVED_OMEGA_GROW_MAX = 1.05d0
     real(real64), parameter :: CONSERVED_RESIDUAL_DECREASE = 9.5d-1
     real(real64), parameter :: CONSERVED_RESIDUAL_INCREASE = 1.05d0
+    !> Consecutive residual increases tolerated before under-relaxation engages.
+    !> A moving freezing front makes the coupled residual oscillate iteration to
+    !> iteration as front nodes toggle phase; damping on a single increase is a
+    !> false divergence signal. Sustained increase over this many iterations is
+    !> genuine divergence and is damped as before.
+    integer(int32), parameter :: CONSERVED_DIVERGE_PATIENCE = 3
     ! Warm start of the under-relaxation across nonlinear loops: the spectrum
     ! of the coupled Picard map changes little between consecutive time steps
     ! (and between a failed attempt and its retry), so re-exploring omega from
@@ -19,7 +25,7 @@ submodule(control_iteration_convergence) convergence_control
     ! vacuously, and steps are accepted while the physics stalls.
     real(real64), parameter :: CONSERVED_OMEGA_WARM_RELEASE = 1.25d0
     real(real64), parameter :: CONSERVED_OMEGA_WARM_FLOOR = 2.5d-1
-    logical, parameter :: CONSERVED_VERBOSE = .false.
+    logical, parameter :: CONSERVED_VERBOSE = .true.
 contains
 
     module subroutine initialize_convergence_control(self, config, max_iterations, reference_values)
@@ -393,7 +399,17 @@ contains
         ! no residual is available. It is not valid across active-set changes at a
         ! freezing front, where successive increments need not have one stationary
         ! linear convergence factor even arbitrarily close to the solution.
-        dq_effective = dq_norm / max(self%relaxation_omega, CONSERVED_OMEGA_MIN)
+        ! dq_norm is the sentinel huge(0.0d0) until has_prev_conserved (no
+        ! prior iterate to difference against yet); dividing that sentinel by
+        ! omega (which can be driven down to CONSERVED_OMEGA_MIN) overflows a
+        ! double. Skip the division while the sentinel is in effect and keep
+        ! dq_effective at the same "not converged" huge value the raw dq_norm
+        ! comparison used before this omega-scaled form was introduced.
+        if (self%has_prev_conserved) then
+            dq_effective = dq_norm / max(self%relaxation_omega, CONSERVED_OMEGA_MIN)
+        else
+            dq_effective = huge(0.0d0)
+        end if
         dq_ok = self%has_prev_conserved .and. (dq_effective <= 1.0d0)
         if (dq_ok .and. (.not. has_residual_norm) .and. self%dq_norm_prev > 0.0d0) then
             kappa = dq_norm / self%dq_norm_prev
@@ -425,9 +441,16 @@ contains
             if (has_residual_norm .and. self%residual_norm_prev > 0.0d0) then
                 residual_ratio = residual_norm / self%residual_norm_prev
                 if (residual_ratio > CONSERVED_RESIDUAL_INCREASE) then
-                    self%relaxation_omega = max(CONSERVED_OMEGA_MIN, &
-                                                self%relaxation_omega / residual_ratio)
                     self%diverge_count = self%diverge_count + 1
+                    ! Only under-relax on a SUSTAINED residual increase. A single
+                    ! iteration's increase at a moving freezing front is chatter
+                    ! from front nodes toggling across the phase boundary, not
+                    ! divergence; damping on it collapses omega and stalls the
+                    ! hydraulic block, which otherwise contracts at omega = 1.
+                    if (self%diverge_count >= CONSERVED_DIVERGE_PATIENCE) then
+                        self%relaxation_omega = max(CONSERVED_OMEGA_MIN, &
+                                                    self%relaxation_omega / residual_ratio)
+                    end if
                 else
                     if (residual_ratio < CONSERVED_RESIDUAL_DECREASE) then
                         self%relaxation_omega = min(1.0d0, &
@@ -451,11 +474,12 @@ contains
         end if
 
         if (CONSERVED_VERBOSE) then
-            write (*, '(A,I4,A,ES12.5,A,F6.4,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3)') &
-                '    [Conserved] iter:', nonlinear_iter, '  ||dQ||_W:', dq_norm, &
-                '  omega:', self%relaxation_omega, '  kappa:', kappa, &
-                '  resT/0:', ratioT, '  resH/0:', ratioH, &
-                '  energy/0:', balanceT, '  mass/0:', balanceH
+            write (*, '(A,I4,A,ES10.3,A,F6.4,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3,A,L1,1X,L1,1X,L1)') &
+                '    [Conserved] it:', nonlinear_iter, ' dQeff:', dq_effective, &
+                ' om:', self%relaxation_omega, &
+                ' resT/0:', ratioT, ' balT:', balanceT, &
+                ' resH/0:', ratioH, ' balH:', balanceH, &
+                ' dq/res/is_ok:', dq_ok, residual_ok, is_ok
         end if
 
         ! Store current iterate as previous for the next check

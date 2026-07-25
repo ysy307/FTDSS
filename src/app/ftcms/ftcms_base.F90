@@ -2,6 +2,43 @@ submodule(app_ftcms) ftcms_base
     use :: core_types_topology_system_topology, only:type_system_topology
     use :: module_linalg, only:vector_norm2
     implicit none
+
+    ! Bridge experiment (see plan spicy-sauteeing-scroll.md, WP3 refinement):
+    ! where freezing impedance has collapsed hydraulic conductivity, a node no
+    ! longer exchanges water with its neighbors within a time step, so its
+    ! outer-loop target can be found directly by a local, flux-free Newton
+    ! solve (calc_conserved_target + solve_local_conserved_equilibrium in
+    ! fusion.F90) instead of many Picard/Anderson iterations toward the same
+    ! point.
+    !
+    ! Gated by two dimensionless, problem-independent numerical-error-control
+    ! parameters (not a case-fitted physical threshold - an ice-fraction
+    ! proxy was tried first and measurably regressed the A/B test at one
+    ! cutoff, then simply never triggered at another picked only to stop that
+    ! regression; that case-fitting pattern is exactly what is prohibited):
+    !
+    ! 1. PHASE_LOCAL_EQ_FOURIER_GATE bounds Fo = (D_HH/C_eq)*dt/h^2, the
+    !    Fourier number of the *inner* (fixed-ice) hydraulic transport
+    !    operator at the node's representative element - D_HH/C_eq is
+    !    verified dimensionally to be m^2/s (compute_diffusion_term's D_HH
+    !    alone is m^2 s/kg; C_eq = dTheta/dP is 1/Pa = m s^2/kg; the ratio is
+    !    m^2/s), and C_eq's dQi_dP is always zero (phase_systems.F90 - ice is
+    !    outer-lagged, zero inner pressure tangent), so this is exactly the
+    !    diffusivity the monolithic solve itself already uses at fixed ice.
+    !    Fo << 1 means pressure information has not meaningfully diffused
+    !    across the element this step.
+    ! 2. Fo small only bounds the *internal* transport operator's relaxation,
+    !    not actual boundary/source water exchange (gravity flow, prescribed
+    !    flux, segregation sink can still move water regardless of Fo) - so
+    !    nodes on any hydraulic boundary patch are excluded outright, and
+    !    PHASE_LOCAL_EQ_TRANSPORT_EPS bounds the segregation-sink
+    !    contribution over dt relative to the pore volume scale.
+    !
+    ! Both remain genuine, problem-independent safety margins (analogous to a
+    ! CFL number or a Newton tolerance), not case-tuned constants.
+    logical, parameter :: PHASE_USE_LOCAL_CONSERVED_EQ = .true.
+    real(real64), parameter :: PHASE_LOCAL_EQ_FOURIER_GATE = 0.1d0
+    real(real64), parameter :: PHASE_LOCAL_EQ_TRANSPORT_EPS = 1.0d-2
 contains
 
     module subroutine initialize_type_ftcms(self)
@@ -46,6 +83,21 @@ contains
         type(type_config_overall) :: config_overall
 
         type(type_config_bc), allocatable :: config_bcs(:)
+
+        self%last_phase_iterations = 1
+        self%last_inner_iterations = 0
+        self%last_max_inner_iterations = 0
+        self%last_nonlinear_work = 0
+        self%last_solve_status = 0
+        self%last_phase_metrics_available = .false.
+        self%last_phase_converged = .false.
+        self%last_phase_active_nodes = -1
+        self%last_phase_increment_max = -1.0d0
+        self%last_phase_increment_norm = -1.0d0
+        self%last_phase_equilibrium_error = -1.0d0
+        self%last_phase_merit = -1.0d0
+        self%last_accepted_phase_iterations = 1
+        self%last_accepted_dt = 0.0d0
 
         call self%control%initialize()
         call self%control%profiler_record(TIME_RECORDS%START)
@@ -320,9 +372,17 @@ contains
             return
         end if
         write (self%solver_history_unit, '(A)') &
-            "# FTCMS solver history: one record per time-step attempt"
+            "# FTCMS solver history schema=2: one record per time-step attempt"
         write (self%solver_history_unit, '(A)') &
-            "# step_attempt  time_end[s]      dt[s]        nl_iter  accepted  omega     dq_norm_W    lte_rel"
+            "# attempt accepted_step time_start_s time_trial_s time_accepted_s dt_used_s dt_next_s" // &
+            " accepted status inner_last inner_max outer_iter nl_work ats_iter phase_spike phase_eval" // &
+            " phase_converged active_nodes phase_dqi_max phase_dqi_rms phase_eq_Pa phase_merit" // &
+            " T_res_Linf T_update_Linf H_res_Linf H_update_Linf omega dq_norm_W lte_rel"
+        write (self%solver_history_unit, '(A)') &
+            "# phase fields are the latest evaluated projection; -1 means unavailable;" // &
+            " inner_last is the final inner solve and nl_work is the sum over all inner solves"
+        write (self%solver_history_unit, '(A)') &
+            "# T/H norm fields are -1 in conserved mode; dq_norm_W is its active nonlinear change criterion"
         flush (self%solver_history_unit)
     end subroutine open_solver_history_log
 
@@ -636,7 +696,7 @@ contains
                     variable(:) = 0.0d0
                 else
                     call self%domain%get_num_dof_per_node(num_dofs_per_node)
-                    call self%domain%get_start_dof_index(variable_id, target_dof)
+                call self%domain%get_start_dof_index(variable_id, target_dof)
                     start_idx = target_dof
                     end_idx = num_dofs_per_node * (num_nodes - 1) + target_dof
                     variable(:) = du(start_idx:end_idx:num_dofs_per_node)
@@ -1675,7 +1735,7 @@ contains
     module subroutine project_nodal_ice_ftcms(self, apply_update, ice_update, max_increment, increment_norm, &
                                                max_node, max_temperature, max_pressure, &
                                                max_current_ice, max_projected_ice, &
-                                               max_equilibrium_error, increments)
+                                               max_equilibrium_error, increments, active_bounds)
         implicit none
         class(type_ftcms), intent(inout) :: self
         logical, intent(in) :: apply_update
@@ -1689,14 +1749,25 @@ contains
         real(real64), intent(inout) :: max_projected_ice
         real(real64), intent(inout) :: max_equilibrium_error
         real(real64), allocatable, intent(inout) :: increments(:)
+        integer(int32), allocatable, intent(inout) :: active_bounds(:)
 
         integer(int32) :: node_id, num_nodes, row_start, row_end, k, repr_elem
-        integer(int32) :: num_threads, tid
+        integer(int32) :: num_threads, tid, active_bound, node_active_bound
         type(type_state), allocatable :: states(:)
         real(real64), allocatable :: current_ice_values(:), projected_ice_values(:)
         real(real64), allocatable :: equilibrium_errors(:), node_measures(:)
+        integer(int32), allocatable :: projected_active_bounds(:)
         real(real64) :: measure, projected_ice, ice_increment, equilibrium_error, porosity, updated_ice
         real(real64) :: weighted_ice, weight_sum, current_ice, node_equilibrium_error
+        real(real64) :: target_total_water, local_pressure, local_ice
+        logical :: target_available, local_converged, use_local_eq
+        logical, allocatable :: is_hydraulic_boundary_node(:)
+        integer(int32) :: i_patch, num_patches, i_bc_node, bc_idx, comp_dim, i_coord, j_coord
+        type(type_boundary_patch), pointer :: bc_patch
+        real(real64) :: dt_local, C_eq_val, hydraulic_diffusivity, element_length, fourier_number, S_seg
+        real(real64), allocatable :: D_HH_matrix(:, :), element_coords(:, :)
+        integer(int32) :: local_eq_candidates, local_eq_fires
+        real(real64) :: local_eq_fo_min
 
         call self%domain%get_num_nodes(num_nodes)
         num_threads = omp_get_max_threads()
@@ -1704,15 +1775,50 @@ contains
         allocate (current_ice_values(num_nodes), projected_ice_values(num_nodes))
         allocate (equilibrium_errors(num_nodes), source=0.0d0)
         allocate (node_measures(num_nodes), source=0.0d0)
+        allocate (projected_active_bounds(num_nodes), source=0_int32)
         if (allocated(increments)) deallocate (increments)
         allocate (increments(num_nodes))
+        if (allocated(active_bounds)) deallocate (active_bounds)
+        allocate (active_bounds(num_nodes))
         max_increment = 0.0d0
 
+        ! Nodes touched by ANY hydraulic boundary patch (Dirichlet or flux) are
+        ! excluded from the local-conserved-equilibrium fast path below,
+        ! regardless of their Fourier number: a prescribed boundary value or
+        ! flux can inject/remove water independent of the internal transport
+        ! operator's own relaxation rate (see plan spicy-sauteeing-scroll.md,
+        ! WP3 refinement discussion). Built once per call, not per node.
+        allocate (is_hydraulic_boundary_node(num_nodes), source=.false.)
+        dt_local = 0.0d0
+        if (PHASE_USE_LOCAL_CONSERVED_EQ) then
+            call self%domain%get_num_bc_patches(num_patches)
+            do i_patch = 1, num_patches
+                call self%domain%get_bc_patch(i_patch, bc_patch)
+                call self%bc(PHYSICS_TYPES%HYDRAULIC%ID)%get_bc_index(bc_patch%entity_id, bc_idx)
+                if (bc_idx < 0) cycle
+                if (allocated(bc_patch%connectivity%col_ind)) then
+                    do i_bc_node = 1, size(bc_patch%connectivity%col_ind)
+                        is_hydraulic_boundary_node(bc_patch%connectivity%col_ind(i_bc_node)) = .true.
+                    end do
+                end if
+            end do
+            call self%control%get_dt(dt_local)
+            call self%domain%get_computation_dimension(comp_dim)
+        end if
+
+        local_eq_candidates = 0
+        local_eq_fires = 0
+        local_eq_fo_min = huge(1.0d0)
         !$OMP PARALLEL DEFAULT(NONE) &
-        !$OMP SHARED(self, num_nodes, states, current_ice_values, projected_ice_values, equilibrium_errors, node_measures) &
-        !$OMP PRIVATE(node_id, row_start, row_end, k, repr_elem, tid, measure, &
+        !$OMP SHARED(self, num_nodes, states, current_ice_values, projected_ice_values, equilibrium_errors, node_measures, &
+        !$OMP        projected_active_bounds, is_hydraulic_boundary_node, dt_local, comp_dim) &
+        !$OMP PRIVATE(node_id, row_start, row_end, k, repr_elem, tid, measure, porosity, &
         !$OMP         projected_ice, ice_increment, equilibrium_error, weighted_ice, &
-        !$OMP         weight_sum, current_ice, node_equilibrium_error)
+        !$OMP         weight_sum, current_ice, node_equilibrium_error, active_bound, node_active_bound, &
+        !$OMP         target_total_water, local_pressure, local_ice, target_available, local_converged, use_local_eq, &
+        !$OMP         C_eq_val, hydraulic_diffusivity, element_length, fourier_number, S_seg, &
+        !$OMP         D_HH_matrix, element_coords, i_coord, j_coord) &
+        !$OMP REDUCTION(+:local_eq_candidates, local_eq_fires) REDUCTION(min:local_eq_fo_min)
         tid = omp_get_thread_num() + 1
         !$OMP DO
         do node_id = 1, num_nodes
@@ -1724,31 +1830,117 @@ contains
             row_end = self%node_material_table%ptr(node_id + 1) - 1
             if (row_end < row_start) cycle
 
+            call self%porosity%get_current(node_id, porosity)
+
             weighted_ice = 0.0d0
             weight_sum = 0.0d0
             node_equilibrium_error = 0.0d0
+            node_active_bound = 2
             do k = row_start, row_end
                 repr_elem = self%node_material_table%repr_element(k)
                 measure = self%node_material_table%measure_sum(k)
                 call self%set_state(node_id, repr_elem, states(tid), calc_physics=.true., include_fluxes=.false.)
-                call self%thermal%project_ice_content(self%node_material_table%material_id(k), &
-                                                      states(tid), projected_ice, ice_increment, &
-                                                      equilibrium_error)
+
+                use_local_eq = .false.
+                if (PHASE_USE_LOCAL_CONSERVED_EQ .and. .not. is_hydraulic_boundary_node(node_id)) then
+                    ! Fourier number Fo = (D_HH/C_eq) * dt / h^2 at this
+                    ! material's representative element: D_HH/C_eq is the
+                    ! hydraulic diffusivity [m^2/s] the *inner* (fixed-ice)
+                    ! monolithic solve itself uses (C_eq's dQi_dP is always
+                    ! zero there - phase_systems.F90 - so this is exactly the
+                    ! operator whose relaxation we are judging). h is the
+                    ! minimum pairwise node spacing of the element, a safe
+                    ! (smallest, not area-averaged) length scale on this
+                    ! deliberately anisotropic mesh.
+                    if (.not. allocated(D_HH_matrix)) then
+                        allocate (D_HH_matrix(comp_dim, comp_dim))
+                    else if (size(D_HH_matrix, 1) /= comp_dim) then
+                        deallocate (D_HH_matrix)
+                        allocate (D_HH_matrix(comp_dim, comp_dim))
+                    end if
+                    call self%hydraulic%compute_diffusion_term(self%node_material_table%material_id(k), &
+                                                                states(tid), D_HH_matrix)
+                    call self%hydraulic%compute_C_eq(self%node_material_table%material_id(k), states(tid), C_eq_val)
+                    call self%domain%get_fe_coordinate(repr_elem, element_coords)
+                    element_length = huge(1.0d0)
+                    do i_coord = 1, size(element_coords, 2) - 1
+                        do j_coord = i_coord + 1, size(element_coords, 2)
+                            element_length = min(element_length, &
+                                norm2(element_coords(:, i_coord) - element_coords(:, j_coord)))
+                        end do
+                    end do
+                    fourier_number = huge(1.0d0)
+                    if (C_eq_val > tiny(1.0d0) .and. element_length > tiny(1.0d0)) then
+                        hydraulic_diffusivity = D_HH_matrix(1, 1) / C_eq_val
+                        fourier_number = hydraulic_diffusivity * dt_local / element_length**2
+                    end if
+                    if (current_ice > 0.05d0) then
+                        !$OMP CRITICAL (fo_debug)
+                        write (*, '(A,I0,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3)') &
+                            '   [FO_DEBUG] node=', node_id, ' Qi=', current_ice, ' D_HH=', D_HH_matrix(1, 1), &
+                            ' C_eq=', C_eq_val, ' D=', hydraulic_diffusivity, ' h=', element_length, &
+                            ' Fo=', fourier_number
+                        !$OMP END CRITICAL (fo_debug)
+                    end if
+                    local_eq_candidates = local_eq_candidates + 1
+                    local_eq_fo_min = min(local_eq_fo_min, fourier_number)
+
+                    S_seg = 0.0d0
+                    call self%hydraulic%calc_segregation_sink(self%node_material_table%material_id(k), &
+                                                               states(tid), dt_local, S_seg)
+
+                    if (fourier_number < PHASE_LOCAL_EQ_FOURIER_GATE .and. &
+                        abs(S_seg * dt_local) < PHASE_LOCAL_EQ_TRANSPORT_EPS * max(porosity, 1.0d-3)) then
+                        call self%thermal%calc_conserved_target(self%node_material_table%material_id(k), &
+                                                                 states(tid), target_total_water, target_available)
+                        if (target_available) then
+                            call self%thermal%solve_local_conserved_equilibrium( &
+                                self%node_material_table%material_id(k), states(tid), target_total_water, &
+                                local_pressure, local_ice, local_converged)
+                            if (local_converged) then
+                                projected_ice = local_ice
+                                ice_increment = projected_ice - current_ice
+                                equilibrium_error = 0.0d0
+                                active_bound = 0
+                                use_local_eq = .true.
+                                local_eq_fires = local_eq_fires + 1
+                            end if
+                        end if
+                    end if
+                end if
+
+                if (.not. use_local_eq) then
+                    call self%thermal%project_ice_content(self%node_material_table%material_id(k), &
+                                                          states(tid), projected_ice, ice_increment, &
+                                                          equilibrium_error, active_bound)
+                end if
                 weighted_ice = weighted_ice + measure * projected_ice
                 weight_sum = weight_sum + measure
                 node_equilibrium_error = max(node_equilibrium_error, equilibrium_error)
+                if (node_active_bound == 2) then
+                    node_active_bound = active_bound
+                else if (node_active_bound /= active_bound) then
+                    node_active_bound = 0
+                end if
             end do
 
             if (weight_sum > epsilon(1.0d0)) then
                 projected_ice_values(node_id) = weighted_ice / weight_sum
                 equilibrium_errors(node_id) = node_equilibrium_error
                 node_measures(node_id) = weight_sum
+                projected_active_bounds(node_id) = node_active_bound
             end if
         end do
         !$OMP END DO
         !$OMP END PARALLEL
 
+        if (PHASE_USE_LOCAL_CONSERVED_EQ) then
+            write (*, '(A,I0,A,I0,A,ES10.3)') '   [LOCAL_EQ_DEBUG] candidates=', local_eq_candidates, &
+                ' fires=', local_eq_fires, ' min_Fo=', local_eq_fo_min
+        end if
+
         increments = projected_ice_values - current_ice_values
+        active_bounds = projected_active_bounds
         max_node = maxloc(abs(increments), dim=1)
         max_increment = abs(increments(max_node))
         increment_norm = max_increment
@@ -1769,7 +1961,8 @@ contains
             end do
         end if
 
-        deallocate (states, current_ice_values, projected_ice_values, equilibrium_errors, node_measures)
+        deallocate (states, current_ice_values, projected_ice_values, equilibrium_errors, node_measures, &
+                    projected_active_bounds)
     end subroutine project_nodal_ice_ftcms
 
     !> Evaluate per-node conserved quantities at the current iterate.

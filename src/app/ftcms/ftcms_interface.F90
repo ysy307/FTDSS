@@ -144,8 +144,26 @@ module app_ftcms
         integer(int32) :: current_physics_id = 0
         ! Number of outer phase-equilibrium iterations in the latest solve.
         integer(int32) :: last_phase_iterations = 1
+        ! Iterations in the final and most expensive inner nonlinear solves.
+        integer(int32) :: last_inner_iterations = 0
+        integer(int32) :: last_max_inner_iterations = 0
         ! Sum of inner nonlinear iterations over all outer phase iterations.
-        integer(int32) :: last_nonlinear_work = 1
+        integer(int32) :: last_nonlinear_work = 0
+        ! Termination status and the latest evaluated phase-equilibrium metrics.
+        integer(int32) :: last_solve_status = 0
+        logical :: last_phase_metrics_available = .false.
+        logical :: last_phase_converged = .false.
+        integer(int32) :: last_phase_active_nodes = -1
+        real(real64) :: last_phase_increment_max = -1.0d0
+        real(real64) :: last_phase_increment_norm = -1.0d0
+        real(real64) :: last_phase_equilibrium_error = -1.0d0
+        real(real64) :: last_phase_merit = -1.0d0
+        ! Outer count of the latest accepted step, used to detect a sudden
+        ! increase in phase-coupling work without throttling a steady regime.
+        integer(int32) :: last_accepted_phase_iterations = 1
+        ! Time increment of the latest accepted step. Used only to extrapolate
+        ! the initial ice-state guess; it does not enter the governing equations.
+        real(real64) :: last_accepted_dt = 0.0d0
         integer(int32) :: thermal_start_dof = 0
         integer(int32) :: hydraulic_start_dof = 0
         logical :: hydraulic_has_dirichlet_bc = .false.
@@ -183,9 +201,10 @@ module app_ftcms
         ! this sequence is non-increasing (contracting fixed-point iteration).
         real(real64) :: aa_gnorm_prev = -1.0d0
 
-        ! Unit of Output/solver_history.log: one record per time-step attempt
-        ! (step, time, dt, nonlinear iterations, accepted flag, omega, ||dQ||_W,
-        ! LTE estimate). -1 when the log is not open (non-root ranks).
+        ! Unit of Output/solver_history.log: one record per time-step attempt.
+        ! The log distinguishes attempted/accepted time and dt, termination
+        ! status, inner/outer work, phase metrics, nonlinear norms, and ATS
+        ! diagnostics. -1 when the log is not open.
         integer(int32) :: solver_history_unit = -1
 
         type(type_control) :: control
@@ -460,7 +479,7 @@ module app_ftcms
         module subroutine project_nodal_ice_ftcms(self, apply_update, ice_update, max_increment, increment_norm, &
                                                    max_node, max_temperature, max_pressure, &
                                                    max_current_ice, max_projected_ice, &
-                                                   max_equilibrium_error, increments)
+                                                   max_equilibrium_error, increments, active_bounds)
             implicit none
             class(type_ftcms), intent(inout) :: self
             logical, intent(in) :: apply_update
@@ -474,6 +493,7 @@ module app_ftcms
             real(real64), intent(inout) :: max_projected_ice
             real(real64), intent(inout) :: max_equilibrium_error
             real(real64), allocatable, intent(inout) :: increments(:)
+            integer(int32), allocatable, intent(inout) :: active_bounds(:)
         end subroutine project_nodal_ice_ftcms
 
         !> Evaluate the per-node conserved quantities (volumetric enthalpy density

@@ -6,19 +6,32 @@ contains
 
     !> Suction head [m] controlling the retention-based relative permeability.
     !>
-    !> The primary pressure is the actual pore-water pressure, so the
-    !> retention-based relative permeability uses its pressure head directly.
-    !> Ice impedance is applied separately by the configured HCF model.
+    !> The retention-based relative permeability is evaluated at the same
+    !> generalized suction psi_eff that sets the unfrozen liquid content, so
+    !> the mobile-water saturation the permeability sees is consistent with the
+    !> content actually present. Its gradient carries the cryosuction driving
+    !> force for moisture migration toward the freezing front. Ice impedance is
+    !> applied as a separate multiplicative factor by the configured HCF model.
+    !> Falls back to the actual pore-water head when psi_eff is not set on the
+    !> state (e.g. isothermal callers that never populate effective_suction).
     module subroutine calc_head_hcf(self, state, head)
         implicit none
         class(abst_hcf), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: head
 
-        real(real64) :: pressure
+        real(real64) :: psi_eff, pressure
+        logical :: is_set
 
-        call state%pressure%get(pressure)
-        head = pressure / (rho_std * g)
+        psi_eff = 0.0d0
+        is_set = .false.
+        call state%effective_suction%get(psi_eff, is_set)
+        if (is_set) then
+            head = -psi_eff / (rho_std * g)
+        else
+            call state%pressure%get(pressure)
+            head = pressure / (rho_std * g)
+        end if
     end subroutine calc_head_hcf
 
     !> Impedance factor of Hansson et al. (2004):

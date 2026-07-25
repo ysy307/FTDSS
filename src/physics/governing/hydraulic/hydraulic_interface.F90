@@ -47,7 +47,7 @@ module physics_governing_hydraulic
         procedure, pass(self), public :: calc_effective_density => calc_effective_density_hydraulic
         procedure, pass(self), public :: calc_effective_density_value => calc_effective_density_value_hydraulic
 
-        procedure, pass(self), private :: compute_C_eq => compute_C_eq_hydraulic
+        procedure, pass(self), public :: compute_C_eq => compute_C_eq_hydraulic
         procedure, pass(self), private :: compute_iteration_capacity => compute_iteration_capacity_hydraulic
         procedure, pass(self), private :: compute_transient_term_mixed => compute_transient_term_mixed_hydraulic
         procedure, pass(self), private :: compute_compressive_storage => compute_compressive_storage_hydraulic

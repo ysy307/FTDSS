@@ -29,6 +29,9 @@ module models_phase_change_manager
         procedure, public :: initialize
         procedure, public :: update_water_phases
         procedure, public :: project_ice_content
+        procedure, public :: calc_cryo_head_dT
+        procedure, public :: calc_conserved_target
+        procedure, public :: solve_local_conserved_equilibrium
         procedure, public :: calc_latent_heat_fusion
         procedure, public :: calc_latent_heat_vaporization
         procedure, public :: calc_saturation_pressure
@@ -81,29 +84,45 @@ contains
         call state%porosity%get(porosity)
         porosity = min(max(porosity, 0.0d0), 1.0d0)
 
-        ! 2. Ice is fixed during the inner monolithic T-p solve. It is updated
-        !    by a bounded Clapeyron projection outside that solve.
-        ice_content = 0.0d0
-        ice_content_set = .false.
-        call state%ice_content%get(ice_content, ice_content_set)
-        if (.not. ice_content_set) ice_content = 0.0d0
-        ice_content = min(max(ice_content, 0.0d0), porosity)
-        dQi_dP = 0.0d0
-        dQi_dT = 0.0d0
+        ! 2. Ice content is a state function theta_i(T, p_w) of the generalized
+        !    Clapeyron freezing curve, with analytic T,P derivatives. The
+        !    dQi_dT term supplies the apparent heat capacity to the energy
+        !    equation's C_TT diagonal (thermal_coefficients.F90), so the latent
+        !    heat feedback is resolved by the fast monolithic solve rather than
+        !    a slow outer projection loop. Bounds enforce 0 <= theta_i <= phi.
+        call self%fusion%calc_ice_content(state, ice_content)
+        call self%fusion%calc_ice_content_derivatives(state, dQi_dP, dQi_dT)
 
-        ! 3. Liquid water follows the retention curve of actual pore pressure.
+        ! 3. Liquid water is the unfrozen content on the generalized suction
+        !    (theta_l(psi_eff)), temperature-dependent through psi_cryo.
         call self%fusion%calc_water_content(state, water_content)
         call self%fusion%calc_water_content_derivatives(state, dQw_dP, dQw_dT)
         water_content = max(0.0d0, water_content)
+
+        ! Phase-volume bounds. Keep the one-sided thermodynamic derivatives
+        ! while a phase is active; tapering dQi/dT, dQi/dP to zero right at
+        ! theta_i = 0 would remove the apparent heat capacity exactly at the
+        ! freezing front and make the Picard map jump across it.
+        if (ice_content < 0.0d0) then
+            ice_content = 0.0d0
+            dQi_dP = 0.0d0
+            dQi_dT = 0.0d0
+        end if
+        if (ice_content > porosity) then
+            ice_content = porosity
+            dQi_dP = 0.0d0
+            dQi_dT = 0.0d0
+        end if
+
         if (water_content + ice_content > porosity) then
             water_content = max(0.0d0, porosity - ice_content)
-            dQw_dP = 0.0d0
-            dQw_dT = 0.0d0
+            dQw_dP = -dQi_dP
+            dQw_dT = -dQi_dT
         end if
 
         air_content = max(0.0d0, porosity - water_content - ice_content)
-        dQa_dP = -dQw_dP
-        dQa_dT = -dQw_dT
+        dQa_dP = -(dQw_dP + dQi_dP)
+        dQa_dT = -(dQw_dT + dQi_dT)
 
         ! 4. Set values (consistency ensured)
         call state%ice_content%set(ice_content)
@@ -178,16 +197,52 @@ contains
 
     end subroutine update_water_phases
 
-    subroutine project_ice_content(self, state, projected_ice, ice_increment, equilibrium_error)
+    subroutine calc_cryo_head_dT(self, state, dh_dT)
+        implicit none
+        class(type_phase_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: dh_dT
+
+        call self%fusion%calc_cryo_head_dT(state, dh_dT)
+    end subroutine calc_cryo_head_dT
+
+    subroutine project_ice_content(self, state, projected_ice, ice_increment, equilibrium_error, active_bound, &
+                                    dice_dT, dice_dP)
         implicit none
         class(type_phase_manager), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: projected_ice
         real(real64), intent(inout) :: ice_increment
         real(real64), intent(inout) :: equilibrium_error
+        integer(int32), intent(inout), optional :: active_bound
+        real(real64), intent(inout), optional :: dice_dT
+        real(real64), intent(inout), optional :: dice_dP
 
-        call self%fusion%project_ice_content(state, projected_ice, ice_increment, equilibrium_error)
+        call self%fusion%project_ice_content(state, projected_ice, ice_increment, equilibrium_error, active_bound, &
+                                              dice_dT, dice_dP)
     end subroutine project_ice_content
+
+    subroutine calc_conserved_target(self, state, target_total_water, available)
+        implicit none
+        class(type_phase_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: target_total_water
+        logical, intent(inout) :: available
+
+        call self%fusion%calc_conserved_target(state, target_total_water, available)
+    end subroutine calc_conserved_target
+
+    subroutine solve_local_conserved_equilibrium(self, state, target_total_water, new_pressure, new_ice, converged)
+        implicit none
+        class(type_phase_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(in) :: target_total_water
+        real(real64), intent(inout) :: new_pressure
+        real(real64), intent(inout) :: new_ice
+        logical, intent(inout) :: converged
+
+        call self%fusion%solve_local_conserved_equilibrium(state, target_total_water, new_pressure, new_ice, converged)
+    end subroutine solve_local_conserved_equilibrium
 
     subroutine calc_latent_heat_fusion(self, state, Lf)
         implicit none

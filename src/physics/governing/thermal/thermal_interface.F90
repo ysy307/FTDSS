@@ -52,6 +52,8 @@ module physics_governing_thermal
         procedure, pass(self), public :: calc_specific_heat_vapor => calc_specific_heat_vapor_thermal
         procedure, pass(self), public :: update_water_phases => update_water_phases_thermal
         procedure, pass(self), public :: project_ice_content => project_ice_content_thermal
+        procedure, pass(self), public :: calc_conserved_target => calc_conserved_target_thermal
+        procedure, pass(self), public :: solve_local_conserved_equilibrium => solve_local_conserved_equilibrium_thermal
         procedure, pass(self), public :: cache_enthalpy_history => cache_enthalpy_history_thermal
         procedure, pass(self), public :: invalidate_enthalpy_cache => invalidate_enthalpy_cache_thermal
     end type type_thermal
@@ -112,7 +114,8 @@ module physics_governing_thermal
         end subroutine update_water_phases_thermal
 
         module subroutine project_ice_content_thermal(self, material_id, state, projected_ice, &
-                                                       ice_increment, equilibrium_error)
+                                                       ice_increment, equilibrium_error, active_bound, &
+                                                       dice_dT, dice_dP)
             implicit none
             class(type_thermal), intent(in) :: self
             integer(int32), intent(in) :: material_id
@@ -120,7 +123,31 @@ module physics_governing_thermal
             real(real64), intent(inout) :: projected_ice
             real(real64), intent(inout) :: ice_increment
             real(real64), intent(inout) :: equilibrium_error
+            integer(int32), intent(inout), optional :: active_bound
+            real(real64), intent(inout), optional :: dice_dT
+            real(real64), intent(inout), optional :: dice_dP
         end subroutine project_ice_content_thermal
+
+        module subroutine calc_conserved_target_thermal(self, material_id, state, target_total_water, available)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: target_total_water
+            logical, intent(inout) :: available
+        end subroutine calc_conserved_target_thermal
+
+        module subroutine solve_local_conserved_equilibrium_thermal(self, material_id, state, target_total_water, &
+                                                                     new_pressure, new_ice, converged)
+            implicit none
+            class(type_thermal), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(in) :: target_total_water
+            real(real64), intent(inout) :: new_pressure
+            real(real64), intent(inout) :: new_ice
+            logical, intent(inout) :: converged
+        end subroutine solve_local_conserved_equilibrium_thermal
 
         module subroutine compute_transient_term_thermal(self, material_id, state, bdf_coeffs, dU_dt)
             implicit none

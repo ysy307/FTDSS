@@ -51,8 +51,11 @@ module physics_constitutive_manager
 
         procedure, public :: update_water_phases
         procedure, public :: project_ice_content
+        procedure, public :: calc_conserved_target
+        procedure, public :: solve_local_conserved_equilibrium
         procedure, public :: calc_Kflh
         procedure, public :: calc_KlT
+        procedure, public :: calc_cryo_head_dT
         procedure, public :: calc_Kvh
         procedure, public :: calc_KvT
         procedure, public :: calc_cryo_suction_deriv_T
@@ -414,7 +417,8 @@ contains
         call self%models(self%materials_id_map(material_id))%update_water_phases(state)
     end subroutine update_water_phases
 
-    subroutine project_ice_content(self, material_id, state, projected_ice, ice_increment, equilibrium_error)
+    subroutine project_ice_content(self, material_id, state, projected_ice, ice_increment, equilibrium_error, active_bound, &
+                                    dice_dT, dice_dP)
         implicit none
         class(type_constitutive_manager), intent(in) :: self
         integer(int32), intent(in) :: material_id
@@ -422,10 +426,39 @@ contains
         real(real64), intent(inout) :: projected_ice
         real(real64), intent(inout) :: ice_increment
         real(real64), intent(inout) :: equilibrium_error
+        integer(int32), intent(inout), optional :: active_bound
+        real(real64), intent(inout), optional :: dice_dT
+        real(real64), intent(inout), optional :: dice_dP
 
         call self%models(self%materials_id_map(material_id))%project_ice_content( &
-            state, projected_ice, ice_increment, equilibrium_error)
+            state, projected_ice, ice_increment, equilibrium_error, active_bound, dice_dT, dice_dP)
     end subroutine project_ice_content
+
+    subroutine calc_conserved_target(self, material_id, state, target_total_water, available)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: target_total_water
+        logical, intent(inout) :: available
+
+        call self%models(self%materials_id_map(material_id))%calc_conserved_target(state, target_total_water, available)
+    end subroutine calc_conserved_target
+
+    subroutine solve_local_conserved_equilibrium(self, material_id, state, target_total_water, new_pressure, new_ice, &
+                                                  converged)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(in) :: target_total_water
+        real(real64), intent(inout) :: new_pressure
+        real(real64), intent(inout) :: new_ice
+        logical, intent(inout) :: converged
+
+        call self%models(self%materials_id_map(material_id))%solve_local_conserved_equilibrium( &
+            state, target_total_water, new_pressure, new_ice, converged)
+    end subroutine solve_local_conserved_equilibrium
 
     subroutine calc_Kflh(self, material_id, state, Kflh)
         implicit none
@@ -446,6 +479,16 @@ contains
 
         call self%models(self%materials_id_map(material_id))%calc_KlT(state, KlT)
     end subroutine calc_KlT
+
+    subroutine calc_cryo_head_dT(self, material_id, state, dh_dT)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: dh_dT
+
+        call self%models(self%materials_id_map(material_id))%calc_cryo_head_dT(state, dh_dT)
+    end subroutine calc_cryo_head_dT
 
     subroutine calc_Kvh(self, material_id, state, Kvh)
         implicit none

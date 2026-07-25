@@ -1,6 +1,16 @@
 submodule(app_ftcms) ftcms_solve
     implicit none
 
+    ! Keep the history predictor within the latent-heat scale that the next
+    ! monolithic solve can absorb without crossing the phase boundary.
+    real(real64), parameter :: PHASE_PREDICTOR_MAX_INCREMENT = 1.0d-3
+    integer(int32), parameter :: SOLVE_STATUS_NOT_RUN = 0
+    integer(int32), parameter :: SOLVE_STATUS_CONVERGED = 1
+    integer(int32), parameter :: SOLVE_STATUS_LINEAR_FAILURE = 2
+    integer(int32), parameter :: SOLVE_STATUS_NONLINEAR_DIVERGED = 3
+    integer(int32), parameter :: SOLVE_STATUS_NONLINEAR_LIMIT = 4
+    integer(int32), parameter :: SOLVE_STATUS_PHASE_FAILURE = 5
+
 contains
     module subroutine solve_time_step_initial_setup_ftcms(self)
         implicit none
@@ -19,7 +29,7 @@ contains
         self%aa_gnorm_prev = -1.0d0
 
         ! [Important] Compute solver must always be PICARD or NEWTON if not NONE.
-        ! Even for linear config (where iter=1 is forced), Picard discretization 
+        ! Even for linear config (where iter=1 is forced), Picard discretization
         ! is often the base, but if explicitly NONE, we should respect it.
         if (.not. self%control%is_none()) then
             call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
@@ -79,6 +89,37 @@ contains
         end if
 
     end subroutine solve_time_step_initial_setup_ftcms
+
+    !> Extrapolate the accepted ice history to provide the next outer-loop
+    !> initial guess. The bounded projection and the monolithic T-p solve still
+    !> determine the accepted state, so this changes iteration count only.
+    subroutine apply_phase_predictor(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        integer(int32) :: node_id
+        real(real64) :: dt, ratio, predicted_increment, ice_history(3)
+        real(real64), pointer, contiguous, dimension(:) :: current_ice, current_porosity
+
+        if (self%last_accepted_dt <= tiny(1.0d0)) return
+
+        call self%control%get_dt(dt)
+        ratio = min(max(dt / self%last_accepted_dt, 0.0d0), 1.0d0)
+        nullify (current_ice, current_porosity)
+        call self%Qi%get_current(current_ice)
+        call self%porosity%get_current(current_porosity)
+        do node_id = 1, size(current_ice)
+            call self%Qi%get_history(node_id, ice_history)
+            predicted_increment = ratio * (ice_history(2) - ice_history(3))
+            predicted_increment = min(max(predicted_increment, -PHASE_PREDICTOR_MAX_INCREMENT), &
+                                      PHASE_PREDICTOR_MAX_INCREMENT)
+            current_ice(node_id) = min(max(ice_history(2) + predicted_increment, 0.0d0), &
+                                       current_porosity(node_id))
+        end do
+        nullify (current_ice, current_porosity)
+
+        call self%update_nodal_phases()
+    end subroutine apply_phase_predictor
 
     module subroutine solve_time_step_setup_ftcms(self, prescribe_bc)
         implicit none
@@ -291,26 +332,73 @@ contains
         integer(int32) :: iter_nl
         real(real64) :: t_res, t_inc, h_res, h_inc
 
-        ! Staggered coupling variables
-        logical :: do_staggered
+        ! Outer local phase-equilibrium iteration. The inner solve remains a
+        ! monolithic T-p solve with no ice DOF added to its block structure.
+        logical :: do_phase_outer
         integer(int32) :: coupling_iter
-        integer(int32), parameter :: MAX_COUPLING_ITER = 3
-        real(real64), parameter :: COUPLING_TOL = 1.0d-3
-        real(real64) :: coupling_change_T, coupling_change_P
-        real(real64), allocatable :: T_old(:)
-        real(real64), allocatable :: P_old(:)
-        real(real64), pointer, contiguous :: T_cur(:) => null()
-        real(real64), pointer, contiguous :: P_cur(:) => null()
-        integer(int32) :: bdf_order
-        real(real64) :: T_scale, P_scale, mean_pressure
-        integer(int32) :: num_nodes
-        logical :: linear_failed
+        ! Hansson et al. (2004) is a fully implicit single monolithic solve:
+        ! ice is a state function theta_i(T,p) (calc_ice_content) evaluated in
+        ! the residual, and the latent heat enters the fast Newton diagonal as
+        ! the apparent heat capacity C_a = C_p - Lf*rho_i*dtheta_i/dT
+        ! (thermal_coefficients.F90). No outer projection loop is needed; it is
+        ! disabled here. Set true only to A/B against the old outer-lagged path.
+        logical, parameter :: PHASE_USE_OUTER_PROJECTION = .false.
+        ! Allow a contracting phase map to finish before ATS reduces dt.
+        integer(int32), parameter :: MAX_PHASE_ITER = 240
+        ! 5 kPa corresponds to about 4e-3 K through Clapeyron near 0 C,
+        ! below the verified spatial temperature discretization error.
+        real(real64), parameter :: PHASE_PRESSURE_TOL = 5.0d3
+        ! The phase equation is a water-content equality. This tolerance is
+        ! consistent with the configured hydraulic conserved-quantity scale.
+        real(real64), parameter :: PHASE_CONTENT_TOL = 1.0d-3
+        ! Keep a local guard without forcing a mesh-dependent L-infinity solve
+        ! to the same tolerance as the volume-weighted phase balance. A 0.005
+        ! volumetric ice-content defect is accepted only when the global RMS
+        ! content error and local Clapeyron-pressure condition also pass.
+        real(real64), parameter :: PHASE_CONTENT_MAX_TOL = 5.0d-3
+        integer(int32), parameter :: PHASE_ANDERSON_DEPTH = 5
+        real(real64), parameter :: PHASE_MIXING = 0.3d0
+        real(real64), parameter :: PHASE_MIXING_MIN = 0.05d0
+        real(real64), parameter :: PHASE_STEP_FLOOR = 1.0d-5
+        integer(int32), parameter :: PHASE_STAGNATION_LIMIT = 40
+        real(real64) :: phase_increment_max, phase_increment_norm
+        real(real64) :: phase_temperature, phase_pressure
+        real(real64) :: phase_current_ice, phase_projected_ice
+        real(real64) :: phase_equilibrium_error
+        real(real64) :: phase_step_limit, phase_step_max, phase_step_factor
+        real(real64) :: phase_mixing_current, previous_phase_increment_norm
+        real(real64) :: phase_merit, phase_best_merit
+        real(real64), allocatable :: initial_residual_thermal(:), initial_residual_hydraulic(:)
+        real(real64), allocatable :: phase_increments(:), previous_phase_increments(:)
+        real(real64), allocatable :: phase_update(:), previous_phase_update(:)
+        real(real64), allocatable :: anderson_dF(:, :), anderson_dX(:, :)
+        real(real64), allocatable :: anderson_matrix(:, :), anderson_rhs(:), anderson_gamma(:)
+        integer(int32), allocatable :: phase_active_bounds(:)
+        integer(int32) :: phase_max_node, phase_node, num_phase_nodes, anderson_count
+        integer(int32) :: num_active_nodes
+        integer(int32) :: phase_stagnation_count
+        logical :: linear_failed, phase_is_converged, anderson_success
+        logical :: phase_reset_anderson
+        logical :: phase_final_correction_applied
         logical :: min_dt_extension_announced
         integer(int32) :: max_iter_config, min_dt_iter_limit
         integer(int32), parameter :: MIN_DT_ITER_FACTOR = 5
 
 
         is_step_converged = .false.
+
+        self%last_phase_iterations = 1
+        self%last_inner_iterations = 0
+        self%last_max_inner_iterations = 0
+        self%last_nonlinear_work = 0
+        self%last_solve_status = SOLVE_STATUS_NOT_RUN
+        self%last_phase_metrics_available = .false.
+        self%last_phase_converged = .false.
+        self%last_phase_active_nodes = -1
+        self%last_phase_increment_max = -1.0d0
+        self%last_phase_increment_norm = -1.0d0
+        self%last_phase_equilibrium_error = -1.0d0
+        self%last_phase_merit = -1.0d0
 
         ! Dispatch to true staggered solver (H then T sequential nonlinear loops)
         if (self%control%is_staggered() .and. &
@@ -319,30 +407,29 @@ contains
             return
         end if
 
-        ! Monolithic: single coupled nonlinear loop (no outer coupling iteration)
-        do_staggered = .false.
-
-        if (do_staggered) then
-            call self%domain%get_num_nodes(num_nodes)
-            allocate (T_old(num_nodes), P_old(num_nodes))
-        end if
+        do_phase_outer = self%is_active_thermal() .and. self%is_active_hydraulic() .and. PHASE_USE_OUTER_PROJECTION
+        phase_final_correction_applied = .false.
 
         ! Initialize per-time-step state only once.
         call self%solve_time_step_initial_setup()
-
-        ! Outer coupling iteration loop
-        coupling_loop: do coupling_iter = 1, merge(MAX_COUPLING_ITER, 1, do_staggered)
+        if (do_phase_outer) call apply_phase_predictor(self)
+        call self%domain%get_num_nodes(num_phase_nodes)
+        allocate (phase_update(num_phase_nodes), source=0.0d0)
+        allocate (previous_phase_update(num_phase_nodes), source=0.0d0)
+        allocate (anderson_dF(num_phase_nodes, PHASE_ANDERSON_DEPTH), source=0.0d0)
+        allocate (anderson_dX(num_phase_nodes, PHASE_ANDERSON_DEPTH), source=0.0d0)
+        allocate (anderson_matrix(PHASE_ANDERSON_DEPTH, PHASE_ANDERSON_DEPTH), source=0.0d0)
+        allocate (anderson_rhs(PHASE_ANDERSON_DEPTH), source=0.0d0)
+        allocate (anderson_gamma(PHASE_ANDERSON_DEPTH), source=0.0d0)
+        anderson_count = 0
+        phase_mixing_current = PHASE_MIXING
+        previous_phase_increment_norm = -1.0d0
+        phase_best_merit = huge(1.0d0)
+        phase_stagnation_count = 0
+        ! Outer phase projection loop
+        coupling_loop: do coupling_iter = 1, merge(MAX_PHASE_ITER, 1, do_phase_outer)
+            self%last_phase_iterations = coupling_iter
             linear_failed = .false.
-
-            ! Save solution before inner nonlinear solve for coupling check
-            if (do_staggered .and. coupling_iter > 1) then
-                call self%temperature%get_current(T_cur)
-                call self%pressure%get_current(P_cur)
-                if (associated(T_cur)) T_old(:) = T_cur(:)
-                if (associated(P_cur)) P_old(:) = P_cur(:)
-                nullify (T_cur)
-                nullify (P_cur)
-            end if
 
             ! For coupling iterations > 1, reset nonlinear controls only.
             if (coupling_iter > 1) then
@@ -354,6 +441,9 @@ contains
 
             call self%control%get_max_iterations(max_iter_config)
             min_dt_iter_limit = max_iter_config
+            if (do_phase_outer .and. self%control%is_conserved()) then
+                min_dt_iter_limit = max(max_iter_config, MIN_DT_ITER_FACTOR * max_iter_config)
+            end if
             if (self%control%is_min_dt() .and. self%control%is_conserved()) then
                 min_dt_iter_limit = max(max_iter_config, MIN_DT_ITER_FACTOR * max_iter_config)
             end if
@@ -363,11 +453,11 @@ contains
             nonlinear: do
                 if (.not. self%control%should_continue()) then
                     call self%control%get_nonlinear_iter(iter_nl)
-                    if (self%control%is_min_dt() .and. self%control%is_conserved() .and. &
+                    if (self%control%is_conserved() .and. &
                         (.not. self%control%is_converged()) .and. (.not. self%control%is_diverged()) .and. &
                         iter_nl < min_dt_iter_limit) then
                         if (.not. min_dt_extension_announced) then
-                            write (*, '(A,I0,A,I0,A)') '   [NONLINEAR] minimum-dt continuation: iter limit ', &
+                            write (*, '(A,I0,A,I0,A)') '   [NONLINEAR] conserved continuation: iter limit ', &
                                 max_iter_config, ' -> ', min_dt_iter_limit, ' while conserved iteration is still contracting.'
                             min_dt_extension_announced = .true.
                         end if
@@ -393,6 +483,23 @@ contains
                 call self%apply_bc(prescribed=.false.)
 
                 call self%control%get_nonlinear_iter(iter_nl)
+
+                ! Relative residuals must be normalized by R(x_0), assembled
+                ! before any nonlinear update in this fixed-phase subproblem.
+                if (self%control%is_conserved() .and. iter_nl == 1) then
+                    if (self%is_active_thermal()) then
+                        call self%get_variable_residual(PHYSICS_TYPES%THERMAL, initial_residual_thermal)
+                    end if
+                    if (self%is_active_hydraulic()) then
+                        call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, initial_residual_hydraulic)
+                    end if
+                    call self%control%prime_conserved_residual(initial_residual_thermal, &
+                                                               initial_residual_hydraulic, &
+                                                               self%is_active_thermal(), &
+                                                               self%is_active_hydraulic())
+                    if (allocated(initial_residual_thermal)) deallocate (initial_residual_thermal)
+                    if (allocated(initial_residual_hydraulic)) deallocate (initial_residual_hydraulic)
+                end if
 
                 ! Linear solve (K * du = F)
                 call self%solve()
@@ -437,9 +544,19 @@ contains
             end do nonlinear
 
             is_step_converged = self%control%is_converged()
+            call self%control%get_nonlinear_iter(iter_nl)
+            self%last_inner_iterations = iter_nl
+            self%last_max_inner_iterations = max(self%last_max_inner_iterations, iter_nl)
+            self%last_nonlinear_work = self%last_nonlinear_work + max(1_int32, iter_nl)
 
             if (.not. is_step_converged) then
-                call self%control%get_nonlinear_iter(iter_nl)
+                if (linear_failed) then
+                    self%last_solve_status = SOLVE_STATUS_LINEAR_FAILURE
+                else if (self%control%is_diverged()) then
+                    self%last_solve_status = SOLVE_STATUS_NONLINEAR_DIVERGED
+                else
+                    self%last_solve_status = SOLVE_STATUS_NONLINEAR_LIMIT
+                end if
                 t_res = 0.0d0
                 t_inc = 0.0d0
                 h_res = 0.0d0
@@ -472,44 +589,225 @@ contains
             ! If inner solve failed, skip coupling check
             if (.not. is_step_converged) exit coupling_loop
 
-            ! On first coupling iteration or if not staggered, exit
-            if (.not. do_staggered .or. coupling_iter == 1) exit coupling_loop
-
-            ! Check coupling convergence: has the solution changed significantly
-            ! between coupling iterations?
-            coupling_change_T = 0.0d0
-            coupling_change_P = 0.0d0
-
-            call self%temperature%get_current(T_cur)
-            call self%pressure%get_current(P_cur)
-
-            if (associated(T_cur)) then
-                T_scale = maxval(abs(T_cur)) + 1.0d0
-                coupling_change_T = maxval(abs(T_cur - T_old)) / T_scale
-            end if
-            if (associated(P_cur)) then
-                P_scale = maxval(abs(P_cur)) + 1.0d0
-                coupling_change_P = maxval(abs(P_cur - P_old)) / P_scale
-            end if
-
-            nullify (T_cur)
-            nullify (P_cur)
-
-            write (*, '("   [Coupling] Iter:", I2, " dT_rel:", ES10.3, " dP_rel:", ES10.3)') &
-                coupling_iter, coupling_change_T, coupling_change_P
-
-            if (coupling_change_T < COUPLING_TOL .and. coupling_change_P < COUPLING_TOL) then
+            ! Hansson single-solve path: ice is already the state function
+            ! theta_i(T,p) used inside the just-converged monolithic solve.
+            ! Refresh the nodal Qw/Qi/Qa/Qv fields from the converged (T,p) so
+            ! the history/output carry the consistent phase state, then exit -
+            ! no outer projection iteration.
+            if (.not. do_phase_outer) then
+                call self%update_nodal_phases()
                 exit coupling_loop
             end if
 
+            call self%project_nodal_ice(.false., phase_update, phase_increment_max, phase_increment_norm, &
+                                        phase_max_node, phase_temperature, phase_pressure, &
+                                        phase_current_ice, phase_projected_ice, &
+                                        phase_equilibrium_error, phase_increments, phase_active_bounds)
+
+            phase_reset_anderson = .false.
+            if (previous_phase_increment_norm > 0.0d0) then
+                if (phase_increment_norm > 1.2d0 * previous_phase_increment_norm) then
+                    phase_mixing_current = max(PHASE_MIXING_MIN, 0.5d0 * phase_mixing_current)
+                    anderson_count = 0
+                    phase_reset_anderson = .true.
+                else if (phase_increment_norm < 0.95d0 * previous_phase_increment_norm) then
+                    phase_mixing_current = min(PHASE_MIXING, 1.2d0 * phase_mixing_current)
+                end if
+            end if
+
+            if (allocated(previous_phase_increments) .and. .not. phase_reset_anderson) then
+                if (anderson_count < PHASE_ANDERSON_DEPTH) then
+                    anderson_count = anderson_count + 1
+                else
+                    anderson_dF(:, 1:PHASE_ANDERSON_DEPTH - 1) = anderson_dF(:, 2:PHASE_ANDERSON_DEPTH)
+                    anderson_dX(:, 1:PHASE_ANDERSON_DEPTH - 1) = anderson_dX(:, 2:PHASE_ANDERSON_DEPTH)
+                end if
+                anderson_dF(:, anderson_count) = phase_increments - previous_phase_increments
+                anderson_dX(:, anderson_count) = previous_phase_update
+
+                anderson_matrix(1:anderson_count, 1:anderson_count) = matmul( &
+                    transpose(anderson_dF(:, 1:anderson_count)), anderson_dF(:, 1:anderson_count))
+                anderson_rhs(1:anderson_count) = matmul( &
+                    transpose(anderson_dF(:, 1:anderson_count)), phase_increments)
+                call solve_phase_anderson_system(anderson_matrix(1:anderson_count, 1:anderson_count), &
+                                                  anderson_rhs(1:anderson_count), &
+                                                  anderson_gamma(1:anderson_count), anderson_success)
+                if (anderson_success) then
+                    phase_update = phase_mixing_current * phase_increments - matmul( &
+                        anderson_dX(:, 1:anderson_count) + phase_mixing_current * anderson_dF(:, 1:anderson_count), &
+                        anderson_gamma(1:anderson_count))
+                else
+                    phase_update = phase_mixing_current * phase_increments
+                    anderson_count = 0
+                end if
+                if (dot_product(phase_update, phase_increments) <= 0.0d0 .or. &
+                    maxval(abs(phase_update)) < 0.25d0 * phase_mixing_current * phase_increment_max) then
+                    phase_update = phase_mixing_current * phase_increments
+                    anderson_count = 0
+                end if
+            else
+                phase_update = phase_mixing_current * phase_increments
+            end if
+
+            ! A global Anderson descent direction can still move an individual
+            ! node away from its bounded local phase projection. Preserve the
+            ! local phase-transfer direction without restricting the coupled
+            ! Anderson update at nodes where it already points toward the target.
+            do phase_node = 1, num_phase_nodes
+                if (abs(phase_increments(phase_node)) <= tiny(1.0d0)) then
+                    phase_update(phase_node) = 0.0d0
+                else if (phase_update(phase_node) * phase_increments(phase_node) <= 0.0d0 .or. &
+                         abs(phase_update(phase_node)) <= tiny(1.0d0)) then
+                    phase_update(phase_node) = phase_mixing_current * phase_increments(phase_node)
+                end if
+            end do
+            phase_step_max = maxval(abs(phase_update))
+            phase_step_limit = max(PHASE_STEP_FLOOR, 2.0d0 * phase_mixing_current * phase_increment_max)
+            if (phase_step_max > phase_step_limit) phase_update = phase_update * phase_step_limit / phase_step_max
+            num_active_nodes = count(phase_active_bounds /= 0)
+            phase_step_factor = 0.0d0
+            if (abs(phase_increments(phase_max_node)) > tiny(1.0d0)) then
+                phase_step_factor = phase_update(phase_max_node) / phase_increments(phase_max_node)
+            end if
+            write (*, '(A,I0,A,ES10.3,A,ES10.3,A,I0,A,F9.4,A,ES11.3,' // &
+                        'A,ES10.3,A,ES10.3,A,ES10.3,A,F6.3,A,I0)') &
+                '   [PHASE] outer:', coupling_iter, ' max|dQi|:', phase_increment_max, &
+                ' rms|dQi|:', phase_increment_norm, ' node:', phase_max_node, &
+                ' T:', phase_temperature, ' p:', phase_pressure, &
+                ' Qi:', phase_current_ice, ' target:', phase_projected_ice, &
+                ' eq[Pa]:', phase_equilibrium_error, ' omega:', phase_step_factor, &
+                ' active_nodes:', num_active_nodes
+
+            ! Both forms of the phase condition are required. In the flat part
+            ! of a retention curve a small water-content defect can coexist with
+            ! a large chemical-potential (Clapeyron pressure) disequilibrium.
+            phase_is_converged = phase_equilibrium_error <= PHASE_PRESSURE_TOL .and. &
+                                 phase_increment_norm <= PHASE_CONTENT_TOL .and. &
+                                 phase_increment_max <= PHASE_CONTENT_MAX_TOL
+            phase_merit = max(phase_equilibrium_error / PHASE_PRESSURE_TOL, &
+                              phase_increment_norm / PHASE_CONTENT_TOL, &
+                              phase_increment_max / PHASE_CONTENT_MAX_TOL)
+            self%last_phase_metrics_available = .true.
+            self%last_phase_converged = phase_is_converged
+            self%last_phase_active_nodes = num_active_nodes
+            self%last_phase_increment_max = phase_increment_max
+            self%last_phase_increment_norm = phase_increment_norm
+            self%last_phase_equilibrium_error = phase_equilibrium_error
+            self%last_phase_merit = phase_merit
+            if (phase_merit < 0.9d0 * phase_best_merit) then
+                phase_best_merit = phase_merit
+                phase_stagnation_count = 0
+            else
+                phase_stagnation_count = phase_stagnation_count + 1
+            end if
+            if (phase_is_converged .and. is_step_converged .and. &
+                (phase_final_correction_applied .or. phase_increment_max <= tiny(1.0d0))) exit coupling_loop
+            if (.not. phase_is_converged) phase_final_correction_applied = .false.
+
+            if (coupling_iter == MAX_PHASE_ITER .or. &
+                (phase_stagnation_count >= PHASE_STAGNATION_LIMIT .and. phase_best_merit > 1.0d0)) then
+                write (*, '(A,ES11.3,A,ES11.3,A,ES11.3)') &
+                    '   [PHASE] failed to reach local equilibrium; max|dQi|=', phase_increment_max, &
+                    ', rms|dQi|=', phase_increment_norm, &
+                    ', max pressure error [Pa]=', phase_equilibrium_error
+                call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
+                call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
+                call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
+                call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
+                is_step_converged = .false.
+                self%last_solve_status = SOLVE_STATUS_PHASE_FAILURE
+                exit coupling_loop
+            end if
+
+            if (allocated(previous_phase_increments)) deallocate (previous_phase_increments)
+            allocate (previous_phase_increments, source=phase_increments)
+            previous_phase_increment_norm = phase_increment_norm
+            phase_final_correction_applied = phase_is_converged
+            previous_phase_update = phase_update
+            call self%project_nodal_ice(.true., phase_update, phase_increment_max, phase_increment_norm, &
+                                        phase_max_node, phase_temperature, phase_pressure, &
+                                        phase_current_ice, phase_projected_ice, &
+                                        phase_equilibrium_error, phase_increments, phase_active_bounds)
+            call self%update_nodal_phases()
+
         end do coupling_loop
 
-        if (do_staggered) then
-            if (allocated(T_old)) deallocate (T_old)
-            if (allocated(P_old)) deallocate (P_old)
+        if (is_step_converged) then
+            self%last_solve_status = SOLVE_STATUS_CONVERGED
+        else if (self%last_solve_status == SOLVE_STATUS_NOT_RUN) then
+            if (self%control%is_diverged()) then
+                self%last_solve_status = SOLVE_STATUS_NONLINEAR_DIVERGED
+            else
+                self%last_solve_status = SOLVE_STATUS_NONLINEAR_LIMIT
+            end if
         end if
 
     end subroutine solve_time_step_ftcms
+
+    !> Solve the small regularized normal equation used by outer Anderson mixing.
+    subroutine solve_phase_anderson_system(matrix, rhs, solution, success)
+        implicit none
+        real(real64), intent(in) :: matrix(:, :)
+        real(real64), intent(in) :: rhs(:)
+        real(real64), intent(inout) :: solution(:)
+        logical, intent(inout) :: success
+
+        real(real64) :: work_matrix(size(rhs), size(rhs)), work_rhs(size(rhs))
+        real(real64) :: factor, pivot_value, regularization, row_value
+        integer(int32) :: i, j, k, pivot, system_size
+
+        system_size = size(rhs)
+        solution = 0.0d0
+        success = .false.
+        if (system_size < 1) return
+
+        work_matrix = matrix
+        work_rhs = rhs
+        regularization = 0.0d0
+        do i = 1, system_size
+            regularization = regularization + abs(work_matrix(i, i))
+        end do
+        regularization = max(1.0d-24, 1.0d-10 * regularization / real(system_size, real64))
+        do i = 1, system_size
+            work_matrix(i, i) = work_matrix(i, i) + regularization
+        end do
+
+        do k = 1, system_size - 1
+            pivot = k - 1 + maxloc(abs(work_matrix(k:system_size, k)), dim=1)
+            pivot_value = abs(work_matrix(pivot, k))
+            if (pivot_value <= tiny(1.0d0)) return
+            if (pivot /= k) then
+                do j = k, system_size
+                    row_value = work_matrix(k, j)
+                    work_matrix(k, j) = work_matrix(pivot, j)
+                    work_matrix(pivot, j) = row_value
+                end do
+                row_value = work_rhs(k)
+                work_rhs(k) = work_rhs(pivot)
+                work_rhs(pivot) = row_value
+            end if
+            do i = k + 1, system_size
+                factor = work_matrix(i, k) / work_matrix(k, k)
+                work_matrix(i, k) = 0.0d0
+                work_matrix(i, k + 1:system_size) = work_matrix(i, k + 1:system_size) - &
+                                                    factor * work_matrix(k, k + 1:system_size)
+                work_rhs(i) = work_rhs(i) - factor * work_rhs(k)
+            end do
+        end do
+        if (abs(work_matrix(system_size, system_size)) <= tiny(1.0d0)) return
+
+        do i = system_size, 1, -1
+            row_value = work_rhs(i)
+            if (i < system_size) then
+                row_value = row_value - dot_product(work_matrix(i, i + 1:system_size), &
+                                                     solution(i + 1:system_size))
+            end if
+            if (abs(work_matrix(i, i)) <= tiny(1.0d0)) return
+            solution(i) = row_value / work_matrix(i, i)
+            if (.not. (solution(i) == solution(i) .and. abs(solution(i)) < huge(1.0d0))) return
+        end do
+        success = .true.
+    end subroutine solve_phase_anderson_system
 
     module subroutine solve_time_step_staggered_ftcms(self, is_step_converged)
         implicit none
@@ -544,8 +842,21 @@ contains
         allocate (T_old(num_nodes), P_old(num_nodes))
 
         call self%solve_time_step_initial_setup()
+        self%last_phase_iterations = 1
+        self%last_inner_iterations = 0
+        self%last_max_inner_iterations = 0
+        self%last_nonlinear_work = 0
+        self%last_solve_status = SOLVE_STATUS_NOT_RUN
+        self%last_phase_metrics_available = .false.
+        self%last_phase_converged = .false.
+        self%last_phase_active_nodes = -1
+        self%last_phase_increment_max = -1.0d0
+        self%last_phase_increment_norm = -1.0d0
+        self%last_phase_equilibrium_error = -1.0d0
+        self%last_phase_merit = -1.0d0
 
         coupling_loop: do coupling_iter = 1, MAX_COUPLING_ITER
+            self%last_phase_iterations = coupling_iter
 
             if (coupling_iter > 1) then
                 call self%temperature%get_current(T_cur)
@@ -585,6 +896,7 @@ contains
 
                     if (.not. self%solver%is_success()) then
                         linear_failed = .true.
+                        self%last_solve_status = SOLVE_STATUS_LINEAR_FAILURE
                         call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
                         call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
                         exit hydraulic_nl
@@ -641,7 +953,7 @@ contains
 
                     call self%control%get_nonlinear_iter(iter_nl)
                     if ((.not. self%control%is_converged()) .and. iter_nl >= MAX_PHASE_NL_ITER) then
-                        linear_failed = .true.
+                        self%last_solve_status = SOLVE_STATUS_NONLINEAR_LIMIT
                         write (*, '(A,I0,A)') '   [HYD_NL] reached nonlinear iteration cap (', MAX_PHASE_NL_ITER, &
                             '). Triggering timestep retry.'
                         call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
@@ -651,6 +963,11 @@ contains
 
                     if (self%control%is_none()) exit hydraulic_nl
                 end do hydraulic_nl
+
+                call self%control%get_nonlinear_iter(iter_nl)
+                self%last_inner_iterations = iter_nl
+                self%last_max_inner_iterations = max(self%last_max_inner_iterations, iter_nl)
+                self%last_nonlinear_work = self%last_nonlinear_work + max(1_int32, iter_nl)
 
                 if (.not. self%control%is_converged()) then
                     call self%control%get_nonlinear_iter(iter_nl)
@@ -670,6 +987,13 @@ contains
                         write (*, '(A,A,A,I0,A,L1,A,2(ES11.3,1X))') '   ', phase_label, &
                             ' failed: iter=', iter_nl, ', diverged=', self%control%is_diverged(), &
                             ', H_res/H_inc=', h_res, h_inc
+                    end if
+                    if (self%last_solve_status == SOLVE_STATUS_NOT_RUN) then
+                        if (self%control%is_diverged()) then
+                            self%last_solve_status = SOLVE_STATUS_NONLINEAR_DIVERGED
+                        else
+                            self%last_solve_status = SOLVE_STATUS_NONLINEAR_LIMIT
+                        end if
                     end if
                     exit coupling_loop
                 end if
@@ -709,12 +1033,14 @@ contains
                     if (allocated(self%solver_thermal)) then
                         if (.not. self%solver_thermal%is_success()) then
                             linear_failed = .true.
+                            self%last_solve_status = SOLVE_STATUS_LINEAR_FAILURE
                             call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
                             call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
                             exit thermal_nl
                         end if
                     else if (.not. self%solver%is_success()) then
                         linear_failed = .true.
+                        self%last_solve_status = SOLVE_STATUS_LINEAR_FAILURE
                         call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
                         call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
                         exit thermal_nl
@@ -741,7 +1067,7 @@ contains
 
                     call self%control%get_nonlinear_iter(iter_nl)
                     if ((.not. self%control%is_converged()) .and. iter_nl >= MAX_PHASE_NL_ITER) then
-                        linear_failed = .true.
+                        self%last_solve_status = SOLVE_STATUS_NONLINEAR_LIMIT
                         write (*, '(A,I0,A)') '   [THM_NL] reached nonlinear iteration cap (', MAX_PHASE_NL_ITER, &
                             '). Triggering timestep retry.'
                         call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
@@ -751,6 +1077,11 @@ contains
 
                     if (self%control%is_none()) exit thermal_nl
                 end do thermal_nl
+
+                call self%control%get_nonlinear_iter(iter_nl)
+                self%last_inner_iterations = iter_nl
+                self%last_max_inner_iterations = max(self%last_max_inner_iterations, iter_nl)
+                self%last_nonlinear_work = self%last_nonlinear_work + max(1_int32, iter_nl)
 
                 is_step_converged = self%control%is_converged()
 
@@ -772,6 +1103,13 @@ contains
                         write (*, '(A,A,A,I0,A,L1,A,2(ES11.3,1X))') '   ', phase_label, &
                             ' failed: iter=', iter_nl, ', diverged=', self%control%is_diverged(), &
                             ', T_res/T_inc=', t_res, t_inc
+                    end if
+                    if (self%last_solve_status == SOLVE_STATUS_NOT_RUN) then
+                        if (self%control%is_diverged()) then
+                            self%last_solve_status = SOLVE_STATUS_NONLINEAR_DIVERGED
+                        else
+                            self%last_solve_status = SOLVE_STATUS_NONLINEAR_LIMIT
+                        end if
                     end if
                     exit coupling_loop
                 end if
@@ -814,7 +1152,96 @@ contains
         if (allocated(P_old)) deallocate (P_old)
         if (allocated(phase_increment)) deallocate (phase_increment)
 
+        if (is_step_converged) then
+            self%last_solve_status = SOLVE_STATUS_CONVERGED
+        else if (self%last_solve_status == SOLVE_STATUS_NOT_RUN) then
+            if (self%control%is_diverged()) then
+                self%last_solve_status = SOLVE_STATUS_NONLINEAR_DIVERGED
+            else
+                self%last_solve_status = SOLVE_STATUS_NONLINEAR_LIMIT
+            end if
+        end if
+
     end subroutine solve_time_step_staggered_ftcms
+
+    pure function solve_status_label(status) result(label)
+        implicit none
+        integer(int32), intent(in) :: status
+        character(len=18) :: label
+
+        select case (status)
+        case (SOLVE_STATUS_CONVERGED)
+            label = "accepted"
+        case (SOLVE_STATUS_LINEAR_FAILURE)
+            label = "linear_failure"
+        case (SOLVE_STATUS_NONLINEAR_DIVERGED)
+            label = "nonlinear_diverged"
+        case (SOLVE_STATUS_NONLINEAR_LIMIT)
+            label = "nonlinear_limit"
+        case (SOLVE_STATUS_PHASE_FAILURE)
+            label = "phase_failure"
+        case default
+            label = "not_run"
+        end select
+    end function solve_status_label
+
+    !> Write diagnostics after time-control update so dt_next and accepted time
+    !> describe the actual state used by the following attempt.
+    subroutine write_solver_history_attempt(self, attempt, accepted_step, time_start, time_trial, dt_used, &
+                                            accepted, ats_iter, phase_spike, lte_error)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(in) :: attempt, accepted_step, ats_iter
+        real(real64), intent(in) :: time_start, time_trial, dt_used, lte_error
+        logical, intent(in) :: accepted, phase_spike
+
+        character(len=18) :: status
+        real(real64) :: time_accepted, dt_next
+        real(real64) :: t_res, t_inc, h_res, h_inc
+        real(real64) :: omega_used, dq_norm_used
+
+        if (self%solver_history_unit == -1) return
+
+        call self%control%get_time(time_accepted)
+        call self%control%get_dt(dt_next)
+        omega_used = self%control%get_conserved_relaxation()
+        dq_norm_used = self%control%get_conserved_dq_norm()
+        status = solve_status_label(self%last_solve_status)
+
+        t_res = -1.0d0
+        t_inc = -1.0d0
+        h_res = -1.0d0
+        h_inc = -1.0d0
+        if ((.not. self%control%is_conserved()) .and. &
+            self%last_solve_status /= SOLVE_STATUS_LINEAR_FAILURE .and. &
+            self%last_solve_status /= SOLVE_STATUS_NOT_RUN) then
+            if (self%is_active_thermal()) then
+                call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, NONLINEAR_NORM_CRITERIA%RESIDUAL, &
+                                                   NORM_TYPES%LINF, t_res)
+                call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, NONLINEAR_NORM_CRITERIA%UPDATE, &
+                                                   NORM_TYPES%LINF, t_inc)
+            end if
+            if (self%is_active_hydraulic()) then
+                call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, NONLINEAR_NORM_CRITERIA%RESIDUAL, &
+                                                   NORM_TYPES%LINF, h_res)
+                call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, NONLINEAR_NORM_CRITERIA%UPDATE, &
+                                                   NORM_TYPES%LINF, h_inc)
+            end if
+        end if
+
+        write (self%solver_history_unit, &
+               '(2(I10,1X),5(ES15.7,1X),I1,1X,A18,1X,9(I10,1X),11(ES13.5,1X))') &
+            attempt, accepted_step, time_start, time_trial, time_accepted, dt_used, dt_next, &
+            merge(1_int32, 0_int32, accepted), status, &
+            self%last_inner_iterations, self%last_max_inner_iterations, self%last_phase_iterations, &
+            self%last_nonlinear_work, ats_iter, merge(1_int32, 0_int32, phase_spike), &
+            merge(1_int32, 0_int32, self%last_phase_metrics_available), &
+            merge(1_int32, 0_int32, self%last_phase_converged), self%last_phase_active_nodes, &
+            self%last_phase_increment_max, self%last_phase_increment_norm, &
+            self%last_phase_equilibrium_error, self%last_phase_merit, &
+            t_res, t_inc, h_res, h_inc, omega_used, dq_norm_used, lte_error
+        flush (self%solver_history_unit)
+    end subroutine write_solver_history_attempt
 
     module subroutine run_ftcms(self)
         implicit none
@@ -825,9 +1252,14 @@ contains
         integer(int32) :: step_counter
         integer(int32) :: attempt_counter
         integer(int32) :: nl_iter
-        real(real64) :: time_s, dt_s
+        integer(int32) :: phase_iter
+        integer(int32) :: nonlinear_work
+        integer(int32) :: effective_iter
+        logical :: phase_iteration_spike
+        real(real64) :: time_s, time_start_s, time_trial_s, dt_s, dt_used
         real(real64) :: lte_error
         integer(int32), parameter :: MAX_CONSECUTIVE_FAILURES = 50
+        integer(int32), parameter :: PHASE_SPIKE_MIN_ITER = 16
 
         consecutive_failures = 0
         step_counter = 0
@@ -835,45 +1267,45 @@ contains
 
         ! Loop until end time
         time_loop: do while (.not. self%control%is_end_time())
-            call self%control%get_time(time_s)
-            call self%run_assimilation(time_s, 1.0d0 + time_s / 86400.0d0)
+            call self%control%get_time(time_start_s)
+            call self%run_assimilation(time_start_s, 1.0d0 + time_start_s / 86400.0d0)
             call self%solve_time_step(is_step_converged)
+            call self%control%get_dt(dt_used)
+            time_trial_s = time_start_s + dt_used
+            nl_iter = self%last_inner_iterations
+            phase_iter = self%last_phase_iterations
+            nonlinear_work = self%last_nonlinear_work
+            ! Outer phase work is diagnosed separately. LTE controls temporal
+            ! accuracy and the final monolithic inner count supplies the existing
+            ! nonlinear robustness brake; reducing dt did not reduce outer work.
+            effective_iter = nl_iter
+            phase_iteration_spike = phase_iter >= PHASE_SPIKE_MIN_ITER .and. &
+                                    2 * phase_iter > 3 * self%last_accepted_phase_iterations
 
             ! Local-truncation-error estimate for error-controlled ATS, evaluated
             ! before the time/variable history is shifted (needs ydot_n and dt_n).
             lte_error = -1.0d0
             if (is_step_converged) lte_error = self%compute_lte_error()
 
-            ! Solver-history record of this attempt, captured before control%update
-            ! rescales dt / advances time.
             attempt_counter = attempt_counter + 1
-            if (self%solver_history_unit /= -1) then
-                block
-                    real(real64) :: dt_used, omega_used, dq_norm_used
-                    integer(int32) :: iter_used
-                    call self%control%get_dt(dt_used)
-                    call self%control%get_nonlinear_iter(iter_used)
-                    omega_used = self%control%get_conserved_relaxation()
-                    dq_norm_used = self%control%get_conserved_dq_norm()
-                    write (self%solver_history_unit, &
-                           '(I13,1X,ES15.7,1X,ES12.5,1X,I8,1X,I9,1X,F9.5,1X,ES12.5,1X,ES12.5)') &
-                        attempt_counter, time_s + dt_used, dt_used, iter_used, &
-                        merge(1, 0, is_step_converged), omega_used, dq_norm_used, lte_error
-                    flush (self%solver_history_unit)
-                end block
-            end if
 
             if (is_step_converged) then
+                self%last_accepted_dt = dt_used
+                self%last_accepted_phase_iterations = phase_iter
                 ! Update time and adaptive time stepping
-                call self%control%update(is_step_converged, error_estimate=lte_error)
+                call self%control%update(is_step_converged, error_estimate=lte_error, &
+                                         iteration_count=effective_iter)
 
                 consecutive_failures = 0
                 step_counter = step_counter + 1
-                call self%control%get_nonlinear_iter(nl_iter)
+                call write_solver_history_attempt(self, attempt_counter, step_counter, time_start_s, &
+                                                  time_trial_s, dt_used, is_step_converged, effective_iter, &
+                                                  phase_iteration_spike, lte_error)
                 call self%control%get_time(time_s)
-                if (step_counter == 1 .or. mod(step_counter, 20) == 0 .or. nl_iter > 8) then
-                    write (*, '(A,I0,A,ES13.5,A,I0)') '   [STEP] converged: n=', step_counter, &
-                        ', t[s]=', time_s, ', nonlinear_iter=', nl_iter
+                if (step_counter == 1 .or. mod(step_counter, 20) == 0 .or. effective_iter > 8) then
+                    write (*, '(A,I0,A,ES13.5,A,I0,A,I0,A,I0)') '   [STEP] converged: n=', step_counter, &
+                        ', t[s]=', time_s, ', nonlinear_iter=', nl_iter, &
+                        ', outer_iter=', phase_iter, ', nonlinear_work=', nonlinear_work
                 end if
 
                 ! Shift variable history on convergence
@@ -884,10 +1316,14 @@ contains
                 call self%output_history()
             else
                 ! Update time and adaptive time stepping
-                call self%control%update(is_step_converged, error_estimate=lte_error)
+                call self%control%update(is_step_converged, error_estimate=lte_error, &
+                                         iteration_count=effective_iter)
 
                 ! Retry with smaller dt
                 consecutive_failures = consecutive_failures + 1
+                call write_solver_history_attempt(self, attempt_counter, step_counter, time_start_s, &
+                                                  time_trial_s, dt_used, is_step_converged, effective_iter, &
+                                                  phase_iteration_spike, lte_error)
 
                 if (self%control%is_min_dt()) then
                     call self%control%get_dt(dt_s)

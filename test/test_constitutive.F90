@@ -342,7 +342,12 @@ contains
         type(type_state) :: state
         real(real64) :: saturation_pressure, Qw, Qi, Qa
         real(real64) :: projected_ice, ice_increment, equilibrium_error, dQi_dP, dQi_dT
+        integer(int32) :: active_bound
         logical :: is_saturated
+        real(real64) :: dice_dT_analytic, dice_dP_analytic, dice_dT_fd, dice_dP_fd
+        real(real64) :: t0, p0, fd_step_T, fd_step_P, ice_fwd, ice_bwd, ice_unused, eq_unused
+        real(real64) :: target_total_water, solved_pressure, solved_ice, liquid_check, psi_check
+        logical :: local_eq_converged
 
         call self%configure_wrf(wrf_config, SWCC_MODELS%VG%ID)
         wrf_config%theta_s = 0.535d0
@@ -363,10 +368,38 @@ contains
         call state%pressure%set(-5.4d4)
         call state%porosity%set(0.535d0)
         call state%ice_content%set(0.0d0)
-        call phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error)
+        call phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error, active_bound)
         call self%check_true("cold state projects a positive ice increment", ice_increment > 0.0d0)
         call self%check_true("cold state has positive Clapeyron error", equilibrium_error > 0.0d0)
+        call self%check_true("cold unsaturated projection is interior", active_bound == 0)
         call self%check_close("ice projection increment is consistent", projected_ice, ice_increment, 1.0d-14)
+
+        ! dice_dT, dice_dP: check against a central finite difference of
+        ! project_ice_content itself (not a second hand-derived formula), so
+        ! this catches chain-rule transcription errors in the analytic path.
+        call phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error, active_bound, &
+                                                dice_dT_analytic, dice_dP_analytic)
+        call state%temperature%get(t0)
+        call state%pressure%get(p0)
+        fd_step_T = 1.0d-5
+        fd_step_P = 1.0d0
+
+        call state%temperature%set(t0 + fd_step_T)
+        call phase_manager%project_ice_content(state, ice_fwd, ice_unused, eq_unused, active_bound)
+        call state%temperature%set(t0 - fd_step_T)
+        call phase_manager%project_ice_content(state, ice_bwd, ice_unused, eq_unused, active_bound)
+        call state%temperature%set(t0)
+        dice_dT_fd = (ice_fwd - ice_bwd) / (2.0d0 * fd_step_T)
+        call self%check_close("dQi_eq/dT matches finite difference", dice_dT_analytic, dice_dT_fd, 1.0d-4)
+
+        call state%pressure%set(p0 + fd_step_P)
+        call phase_manager%project_ice_content(state, ice_fwd, ice_unused, eq_unused, active_bound)
+        call state%pressure%set(p0 - fd_step_P)
+        call phase_manager%project_ice_content(state, ice_bwd, ice_unused, eq_unused, active_bound)
+        call state%pressure%set(p0)
+        dice_dP_fd = (ice_fwd - ice_bwd) / (2.0d0 * fd_step_P)
+        call self%check_close("dQi_eq/dP matches finite difference", dice_dP_analytic, dice_dP_fd, 1.0d-4)
+
         call state%ice_content%set(projected_ice)
         call phase_manager%update_water_phases(state)
         call state%ice_content%get(Qi)
@@ -379,14 +412,79 @@ contains
         call state%temperature%set(1.0d0)
         call state%pressure%set(-5.4d4)
         call state%ice_content%set(0.0d0)
-        call phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error)
+        call phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error, active_bound)
         call self%check_close("unfrozen lower bound has no phase increment", ice_increment, 0.0d0, 1.0d-14)
         call self%check_close("unfrozen lower bound satisfies complementarity", equilibrium_error, 0.0d0, 1.0d-14)
+        call self%check_true("unfrozen projection activates the lower bound", active_bound == -1)
+        call phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error, active_bound, &
+                                                dice_dT_analytic, dice_dP_analytic)
+        call self%check_close("ice-free bound has zero dice_dT", dice_dT_analytic, 0.0d0, 1.0d-14)
+        call self%check_close("ice-free bound has zero dice_dP", dice_dP_analytic, 0.0d0, 1.0d-14)
 
         call state%ice_content%set(5.0d-5)
-        call phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error)
+        call phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error, active_bound)
         call self%check_close("near-bound ice projects to zero", projected_ice, 0.0d0, 1.0d-14)
         call self%check_close("near-bound ice uses complementarity tolerance", equilibrium_error, 0.0d0, 1.0d-14)
+
+        call state%temperature%set(-1.0d0)
+        call state%pressure%set(0.0d0)
+        call state%ice_content%set(0.0d0)
+        call phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error, active_bound, &
+                                                dice_dT_analytic, dice_dP_analytic)
+        call self%check_true("cold saturated projection activates the upper bound", active_bound == 1)
+        call state%temperature%get(t0)
+        call state%pressure%get(p0)
+        call state%temperature%set(t0 + fd_step_T)
+        call phase_manager%project_ice_content(state, ice_fwd, ice_unused, eq_unused, active_bound)
+        call state%temperature%set(t0 - fd_step_T)
+        call phase_manager%project_ice_content(state, ice_bwd, ice_unused, eq_unused, active_bound)
+        call state%temperature%set(t0)
+        dice_dT_fd = (ice_fwd - ice_bwd) / (2.0d0 * fd_step_T)
+        call self%check_close("upper-bound dQi_eq/dT matches finite difference", dice_dT_analytic, dice_dT_fd, 1.0d-4)
+        call state%pressure%set(p0 + fd_step_P)
+        call phase_manager%project_ice_content(state, ice_fwd, ice_unused, eq_unused, active_bound)
+        call state%pressure%set(p0 - fd_step_P)
+        call phase_manager%project_ice_content(state, ice_bwd, ice_unused, eq_unused, active_bound)
+        call state%pressure%set(p0)
+        dice_dP_fd = (ice_fwd - ice_bwd) / (2.0d0 * fd_step_P)
+        call self%check_close("upper-bound dQi_eq/dP matches finite difference", dice_dP_analytic, dice_dP_fd, 1.0d-4)
+
+        ! solve_local_conserved_equilibrium: the returned (pressure, ice) must
+        ! be a fixed point of project_ice_content (ice_increment = 0) and
+        ! satisfy the Clapeyron condition (equilibrium_error = 0) - both
+        ! checked via project_ice_content itself as an independent oracle,
+        ! not by re-deriving the same formula the solver uses internally.
+        call state%temperature%set(-1.0d0)
+        call state%pressure%set(-5.4d4)
+        call state%porosity%set(0.535d0)
+        call state%ice_content%set(0.05d0)
+        target_total_water = 0.3d0
+        call phase_manager%solve_local_conserved_equilibrium(state, target_total_water, solved_pressure, solved_ice, &
+                                                              local_eq_converged)
+        call self%check_true("local conserved equilibrium converges (interior)", local_eq_converged)
+        call self%check_true("local equilibrium ice is within bounds", solved_ice >= 0.0d0 .and. solved_ice <= 0.535d0)
+        call state%pressure%set(solved_pressure)
+        call state%ice_content%set(solved_ice)
+        call phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error, active_bound)
+        ! Absolute checks, not check_close-against-zero (whose relative
+        ! tolerance is meaningless when the reference value is exactly 0):
+        ! ice_increment/equilibrium_error are tiny Newton residuals, not
+        ! algebraic zeros, so compare against the same absolute scales the
+        ! outer loop itself uses to call this "converged" (PHASE_CONTENT_TOL,
+        ! PHASE_PRESSURE_TOL in ftcms_solve.F90), several orders tighter.
+        call self%check_true("local equilibrium is a fixed point of project_ice_content", abs(ice_increment) < 1.0d-6)
+        call self%check_true("local equilibrium satisfies the Clapeyron condition", abs(equilibrium_error) < 1.0d0)
+
+        ! A target below what the ice-free state can hold should still
+        ! converge and clip to the ice-free bound.
+        call state%temperature%set(-1.0d0)
+        call state%pressure%set(-5.4d4)
+        call state%ice_content%set(0.05d0)
+        target_total_water = 1.0d-6
+        call phase_manager%solve_local_conserved_equilibrium(state, target_total_water, solved_pressure, solved_ice, &
+                                                              local_eq_converged)
+        call self%check_true("local conserved equilibrium converges (low target)", local_eq_converged)
+        call self%check_close("low target clips to the ice-free bound", solved_ice, 0.0d0, 1.0d-10)
 
         call state%temperature%set(-1.0d0)
         call state%pressure%set(0.0d0)

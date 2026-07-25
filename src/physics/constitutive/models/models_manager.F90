@@ -26,8 +26,11 @@ module constitutive_models_manager
         procedure, public :: initialize
         procedure, public :: update_water_phases
         procedure, public :: project_ice_content
+        procedure, public :: calc_conserved_target
+        procedure, public :: solve_local_conserved_equilibrium
         procedure, public :: calc_Kflh
         procedure, public :: calc_KlT
+        procedure, public :: calc_cryo_head_dT
         procedure, public :: calc_Kvh
         procedure, public :: calc_KvT
         procedure, public :: calc_latent_heat_fusion
@@ -84,16 +87,43 @@ contains
         call self%phase_manager%update_water_phases(state)
     end subroutine update_water_phases
 
-    subroutine project_ice_content(self, state, projected_ice, ice_increment, equilibrium_error)
+    subroutine project_ice_content(self, state, projected_ice, ice_increment, equilibrium_error, active_bound, &
+                                    dice_dT, dice_dP)
         implicit none
         class(type_models_manager), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: projected_ice
         real(real64), intent(inout) :: ice_increment
         real(real64), intent(inout) :: equilibrium_error
+        integer(int32), intent(inout), optional :: active_bound
+        real(real64), intent(inout), optional :: dice_dT
+        real(real64), intent(inout), optional :: dice_dP
 
-        call self%phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error)
+        call self%phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error, active_bound, &
+                                                      dice_dT, dice_dP)
     end subroutine project_ice_content
+
+    subroutine calc_conserved_target(self, state, target_total_water, available)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: target_total_water
+        logical, intent(inout) :: available
+
+        call self%phase_manager%calc_conserved_target(state, target_total_water, available)
+    end subroutine calc_conserved_target
+
+    subroutine solve_local_conserved_equilibrium(self, state, target_total_water, new_pressure, new_ice, converged)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(in) :: target_total_water
+        real(real64), intent(inout) :: new_pressure
+        real(real64), intent(inout) :: new_ice
+        logical, intent(inout) :: converged
+
+        call self%phase_manager%solve_local_conserved_equilibrium(state, target_total_water, new_pressure, new_ice, converged)
+    end subroutine solve_local_conserved_equilibrium
 
     subroutine calc_Kflh(self, state, Kflh)
         implicit none
@@ -104,14 +134,40 @@ contains
         call self%hcf%p%calc_Kflh(state, Kflh)
     end subroutine calc_Kflh
 
+    !> Thermal liquid conductivity KlT [m^2 s^-1 K^-1] for the D_HT coupling
+    !> flux. Currently disabled (returns 0) pending the migration regression
+    !> investigation - the explicit cryosuction thermal flux K_Lh*dh/dT was
+    !> found to destabilize the freezing front in both the residual-lagged and
+    !> fully-implicit forms, so migration must be recovered by whatever path
+    !> the pre-regression model used, not by adding this term.
     subroutine calc_KlT(self, state, KlT)
         implicit none
         class(type_models_manager), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: KlT
 
-        call self%hcf%p%calc_KlT(state, KlT)
+        real(real64) :: K_flh, dh_dT
+
+        KlT = 0.0d0
+        return
+        call self%hcf%p%calc_Kflh(state, K_flh)
+        call self%phase_manager%calc_cryo_head_dT(state, dh_dT)
+        KlT = K_flh * dh_dT
     end subroutine calc_KlT
+
+    !> dh/dT [m/K] of the generalized head h = -psi_eff/(rho_std g): the
+    !> temperature sensitivity of the total-potential head that drives the
+    !> liquid flux. Used to assemble the consistent K_HT coupling tangent so
+    !> the pressure solve accounts for the cryosuction flux's dependence on
+    !> the freezing-front temperature.
+    subroutine calc_cryo_head_dT(self, state, dh_dT)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: dh_dT
+
+        call self%phase_manager%calc_cryo_head_dT(state, dh_dT)
+    end subroutine calc_cryo_head_dT
 
     subroutine calc_Kvh(self, state, Kvh)
         implicit none
