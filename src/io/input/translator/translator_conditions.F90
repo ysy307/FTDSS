@@ -229,6 +229,9 @@ contains
                 config%scale_retry = time_control%adaptive_stepping%scale_retry
                 config%use_error_control = time_control%adaptive_stepping%use_error_control
                 config%error_rtol = time_control%adaptive_stepping%error_relative_tolerance
+                config%error_atol_temperature = &
+                    time_control%adaptive_stepping%error_absolute_tolerance_temperature
+                config%error_atol_pressure = time_control%adaptive_stepping%error_absolute_tolerance_pressure
                 config%pi_k_p = time_control%adaptive_stepping%proportional_gain
                 config%pi_k_i = time_control%adaptive_stepping%integral_gain
                 config%safety_factor = time_control%adaptive_stepping%safety_factor

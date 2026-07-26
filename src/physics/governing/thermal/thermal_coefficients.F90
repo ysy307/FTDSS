@@ -365,21 +365,13 @@ contains
             C_TT = C_TT + rho_w * c_v * (Qv + temperature * dQv_dT) + Lv * rho_w * dQv_dT
         end if
 
-        ! --- Phase-change stabilization: chord (secant) apparent heat capacity ---
-        ! Across the freezing front the instantaneous tangent under-estimates the
-        ! latent heat a node absorbs while crossing the freezing spike, so the
-        ! Picard/Newton step overshoots and the iteration chatters (the conserved
-        ! quantity toggles, independent of dt). The chord
-        !   C_chord = (H(T^m, p^m) - H(T^n, p^m)) / (T^m - T^n)
-        ! averages the latent heat actually crossed over the step; using
-        ! max(tangent, chord) damps the overshoot without changing the (conservative)
-        ! residual H^{n+1,m}-H^n. The chord is evaluated only for |dT| above a floor
-        ! so it stays bounded (no stall as T^m -> T^n, where the tangent is correct).
-        ! An explicit scheme_opt request still selects a pure scheme for testing.
+        ! Modified Picard uses the physical tangent evaluated at the current
+        ! iterate. A pure secant remains available only when explicitly
+        ! requested by a caller.
         use_scheme = SCHEME_TANGENT
         if (present(scheme_opt)) use_scheme = scheme_opt
 
-        if (use_scheme /= SCHEME_TANGENT .or. .not. present(scheme_opt)) then
+        if (use_scheme == SCHEME_SECANT) then
             if (size(temperature_history) >= 2 .and. abs(dT) > DT_SECANT_FLOOR) then
                 call self%calc_enthalpy_density(material_id, state, C_TT_current)
                 call temp_state%copy(state)
@@ -387,12 +379,7 @@ contains
                 call self%update_water_phases(material_id, temp_state)
                 call self%calc_enthalpy_density(material_id, temp_state, C_TT_old)
                 C_TT_secant = (C_TT_current - C_TT_old) / dT
-
-                if (present(scheme_opt) .and. use_scheme == SCHEME_SECANT) then
-                    C_TT = C_TT_secant                 ! explicit pure-secant request
-                else
-                    C_TT = max(C_TT, C_TT_secant)      ! default: chord-stabilized tangent
-                end if
+                C_TT = C_TT_secant
             end if
         end if
 

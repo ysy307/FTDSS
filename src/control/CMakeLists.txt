@@ -9,6 +9,7 @@ add_library(SOLVER_CONTROL STATIC)
 # ------------------------------------------------------------
 target_sources(SOLVER_CONTROL PRIVATE
     acceleration/acceleration_interface.F90
+    acceleration/aa1_coupled.F90
     acceleration/aitken.F90
     acceleration/anderson.F90
 

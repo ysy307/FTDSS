@@ -36,7 +36,7 @@ submodule(app_ftcms) ftcms_base
     !
     ! Both remain genuine, problem-independent safety margins (analogous to a
     ! CFL number or a Newton tolerance), not case-tuned constants.
-    logical, parameter :: PHASE_USE_LOCAL_CONSERVED_EQ = .true.
+    logical, parameter :: PHASE_USE_LOCAL_CONSERVED_EQ = .false.
     real(real64), parameter :: PHASE_LOCAL_EQ_FOURIER_GATE = 0.1d0
     real(real64), parameter :: PHASE_LOCAL_EQ_TRANSPORT_EPS = 1.0d-2
 contains
@@ -113,6 +113,10 @@ contains
         call input_translator%execute(input, config_iteration)
         call input_translator%execute(input, config_time)
         call input_translator%execute(input, config_time_ats)
+        self%lte_rtol = config_time_ats%error_rtol
+        self%lte_atol_thermal = config_time_ats%error_atol_temperature
+        self%lte_atol_hydraulic = config_time_ats%error_atol_pressure
+        self%lte_error_control_active = config_time_ats%active .and. config_time_ats%use_error_control
         call input_translator%execute(input, OUTPUT_TYPES%FIELD, config_output_field)
         call input_translator%execute(input, OUTPUT_TYPES%HISTORY, config_output_history)
         call input_translator%execute(input, config_acceleration)
@@ -171,6 +175,7 @@ contains
 
         call self%domain%get_total_dofs(num_total_dofs)
         call self%domain%get_num_nodes(num_nodes)
+        allocate (self%phase_onset_reset(num_nodes), source=.false.)
 
         block
             ! Domain-independent carrier injected into the system layer, so the
@@ -324,6 +329,8 @@ contains
         if (associated(phase_values)) call self%Qv%set_previous(phase_values)
         nullify (phase_values)
 
+        call self%initialize_lte_history()
+
         call input_translator%execute(input, config_output)
         call input_translator%execute(input, config_observation)
         call input_translator%execute(input, config_overall)
@@ -372,11 +379,11 @@ contains
             return
         end if
         write (self%solver_history_unit, '(A)') &
-            "# FTCMS solver history schema=2: one record per time-step attempt"
+            "# FTCMS solver history schema=3: one record per time-step attempt"
         write (self%solver_history_unit, '(A)') &
             "# attempt accepted_step time_start_s time_trial_s time_accepted_s dt_used_s dt_next_s" // &
-            " accepted status inner_last inner_max outer_iter nl_work ats_iter phase_spike phase_eval" // &
-            " phase_converged active_nodes phase_dqi_max phase_dqi_rms phase_eq_Pa phase_merit" // &
+            " accepted status inner_last inner_max outer_iter nl_work ats_iter aa_uses phase_spike phase_eval" // &
+            " phase_converged active_nodes phase_dqi_max phase_dqi_rms phase_eq_Pa phase_merit aa_gamma_max" // &
             " T_res_Linf T_update_Linf H_res_Linf H_update_Linf omega dq_norm_W lte_rel"
         write (self%solver_history_unit, '(A)') &
             "# phase fields are the latest evaluated projection; -1 means unavailable;" // &
@@ -985,6 +992,7 @@ contains
         real(real64), allocatable :: du(:)
         real(real64), allocatable :: current_prev(:)
         real(real64), allocatable :: du_eff(:)
+        real(real64), allocatable :: temperature_before_phase(:)
 
         real(real64) :: relaxation_factor
         logical :: is_none
@@ -998,15 +1006,15 @@ contains
         ! the modified-Picard structure and the adaptive damping w are unchanged.
         logical :: aa_active
         real(real64) :: aa_gamma
-        ! Safeguarded: the mixing is applied only while the weighted norm of the
-        ! fixed-point increment ||g_k||_W is non-increasing; on growth the
-        ! iteration falls back to plain relaxed Picard for that iterate (gamma=0),
-        ! which lets the adaptive omega re-establish contraction before mixing
-        ! resumes. Together with the kappa-corrected acceptance this closes the
-        ! omega-floor stall observed at the freezing onset.
+        real(real64) :: aa_alpha_joint
+        real(real64), allocatable :: aa_step_T(:), aa_step_P(:)
         logical, parameter :: AA_ENABLED = .true.
         real(real64), parameter :: AA_GAMMA_MAX = 2.0d0
-        real(real64), parameter :: AA_WEIGHT_P = 1.0d0 / 9.81d3  ! [K/Pa] head-equivalent
+        real(real64), parameter :: AA_STEP_GROWTH_MAX = 4.0d0
+        real(real64), parameter :: AA_WEIGHT_P = 1.0d0 / 9.81d3  ! pressure-head scaling [m/Pa]
+        ! Require the nonsmooth phase return to be one order inside its
+        ! 1e-3 content acceptance width before reusing a smooth-map secant.
+        real(real64), parameter :: AA_PHASE_RESTART_CONTENT = 1.0d-4
 
         real(real64) :: max_du, alpha
         real(real64), parameter :: PICARD_MAX_DT_STEP = 2.0d1
@@ -1038,7 +1046,27 @@ contains
         aa_active = AA_ENABLED .and. is_conserved_mode .and. (.not. is_none) .and. &
                     (.not. self%control%is_staggered()) .and. &
                     self%is_active_thermal() .and. self%is_active_hydraulic()
-        if (aa_active) call compute_aa_gamma(self, aa_gamma, aa_active)
+        if (aa_active .and. self%last_phase_metrics_available .and. &
+            self%last_phase_increment_max > AA_PHASE_RESTART_CONTENT) then
+            ! The local active-set return is still moving materially, so the
+            ! previous T-p secant pair belongs to a different reduced map.
+            ! Restart AA(1) without disabling it once the phase defect has
+            ! entered the discretization tolerance.
+            self%aa_has_prev = .false.
+            self%aa_gnorm_prev = -1.0d0
+            aa_active = .false.
+        end if
+        aa_alpha_joint = 1.0d0
+        if (aa_active) then
+            relaxation_factor = self%control%get_conserved_relaxation()
+            if (present(step_scale)) relaxation_factor = relaxation_factor * step_scale
+            call prepare_coupled_aa_step(self, relaxation_factor, aa_gamma, aa_step_T, aa_step_P, &
+                                         aa_alpha_joint, aa_active)
+            if (aa_alpha_joint > 0.0d0 .and. abs(aa_gamma) > sqrt(epsilon(1.0d0))) then
+                self%aa_use_count = self%aa_use_count + 1
+                self%aa_gamma_max_abs = max(self%aa_gamma_max_abs, abs(aa_gamma))
+            end if
+        end if
 
         if (self%is_active_thermal()) then
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
@@ -1046,6 +1074,8 @@ contains
             if (associated(current)) then
                 call allocate_array(current_prev, size(current))
                 current_prev(:) = current(:)
+                call allocate_array(temperature_before_phase, size(current))
+                temperature_before_phase(:) = current(:)
 
                 if (allocated(du) .and. size(du) > 0) then
                     if (is_conserved_mode) then
@@ -1055,21 +1085,13 @@ contains
                         relaxation_factor = self%control%get_conserved_relaxation()
                         if (present(step_scale)) relaxation_factor = relaxation_factor * step_scale
                         call allocate_array(du_eff, size(du))
-                        du_eff(:) = relaxation_factor * du(:)
-                        if (aa_active .and. self%aa_has_prev .and. &
-                            allocated(self%aa_T_prev) .and. allocated(self%aa_duT_prev)) then
-                            if (size(self%aa_T_prev) == size(current) .and. &
-                                size(self%aa_duT_prev) == size(du)) then
-                                du_eff(:) = du_eff(:) - aa_gamma * (current(:) - self%aa_T_prev(:) + &
-                                                                    relaxation_factor * (du(:) - self%aa_duT_prev(:)))
-                            end if
+                        if (aa_active .and. allocated(aa_step_T) .and. size(aa_step_T) == size(du)) then
+                            du_eff(:) = aa_step_T(:)
+                            alpha = aa_alpha_joint
+                        else
+                            du_eff(:) = relaxation_factor * du(:)
+                            alpha = min(1.0d0, bounded_step_factor(current, du_eff, TEMP_MIN_C, TEMP_MAX_C))
                         end if
-                        ! Store this iterate (pre-update) for the next AA mixing.
-                        if (aa_active) then
-                            call copy_into(self%aa_T_prev, current)
-                            call copy_into(self%aa_duT_prev, du)
-                        end if
-                        alpha = min(1.0d0, bounded_step_factor(current, du_eff, TEMP_MIN_C, TEMP_MAX_C))
                         current(:) = current(:) + alpha * du_eff(:)
                     else
                         max_du = maxval(abs(du))
@@ -1155,21 +1177,13 @@ contains
                         relaxation_factor = self%control%get_conserved_relaxation()
                         if (present(step_scale)) relaxation_factor = relaxation_factor * step_scale
                         call allocate_array(du_eff, size(du))
-                        du_eff(:) = relaxation_factor * du(:)
-                        if (aa_active .and. self%aa_has_prev .and. &
-                            allocated(self%aa_P_prev) .and. allocated(self%aa_duP_prev)) then
-                            if (size(self%aa_P_prev) == size(current) .and. &
-                                size(self%aa_duP_prev) == size(du)) then
-                                du_eff(:) = du_eff(:) - aa_gamma * (current(:) - self%aa_P_prev(:) + &
-                                                                    relaxation_factor * (du(:) - self%aa_duP_prev(:)))
-                            end if
+                        if (aa_active .and. allocated(aa_step_P) .and. size(aa_step_P) == size(du)) then
+                            du_eff(:) = aa_step_P(:)
+                            alpha = aa_alpha_joint
+                        else
+                            du_eff(:) = relaxation_factor * du(:)
+                            alpha = min(1.0d0, bounded_step_factor(current, du_eff, PRESS_MIN_PA, PRESS_MAX_PA))
                         end if
-                        if (aa_active) then
-                            call copy_into(self%aa_P_prev, current)
-                            call copy_into(self%aa_duP_prev, du)
-                            self%aa_has_prev = .true.
-                        end if
-                        alpha = min(1.0d0, bounded_step_factor(current, du_eff, PRESS_MIN_PA, PRESS_MAX_PA))
                         current(:) = current(:) + alpha * du_eff(:)
                     else
                         max_du = maxval(abs(du))
@@ -1234,6 +1248,19 @@ contains
             end if
         end if
 
+        if (self%is_active_thermal() .and. self%is_active_hydraulic() .and. &
+            allocated(temperature_before_phase)) then
+            nullify (current)
+            call self%temperature%get_current(current)
+            if (associated(current)) then
+                call self%apply_phase_change_temperature_correction(temperature_before_phase, current)
+                call self%temperature%set_delta(current(:) - temperature_before_phase(:))
+                call self%calc_gradient_temperature()
+                call self%temperature%compute_time_derivative(bdf_coeffs, bdf_order)
+            end if
+            call deallocate_array(temperature_before_phase)
+        end if
+
         call self%update_nodal_phases()
 
         call self%control%profiler_stop(PROFILER_TYPES%SETUP)
@@ -1262,74 +1289,88 @@ contains
             factor = max(0.0d0, min(1.0d0, factor))
         end function bounded_step_factor
 
-        !> Joint Anderson(1) mixing coefficient over the (T, p) increments.
-        !> \( \gamma = \langle g_k, g_k - g_{k-1}\rangle_W / \|g_k - g_{k-1}\|_W^2 \)
-        !> with W scaling p to head-equivalent units. gamma = 0 (plain relaxed
-        !> Picard) when no previous pair is stored, sizes changed, the
-        !> difference is degenerate, the result is non-finite, or the
-        !> monotonicity safeguard trips: mixing requires \( \|g_k\|_W \le
-        !> \|g_{k-1}\|_W \), so a diverging fixed-point sequence is never
-        !> extrapolated. |gamma| is clipped to AA_GAMMA_MAX as the standard
-        !> safeguard.
-        subroutine compute_aa_gamma(self, gamma, active)
+        !> Form one bounded, joint AA(1) step for temperature and pressure.
+        !>
+        !> The least-squares safeguard acts on the predicted fixed-point
+        !> residual, so a period-two sequence is eligible for acceleration.
+        !> A separate step-growth guard catches large secant extrapolations.
+        !> One feasibility factor is applied to both fields to preserve the
+        !> coupled AA direction at physical bounds.
+        subroutine prepare_coupled_aa_step(self, omega, gamma, step_T, step_P, alpha_joint, active)
             implicit none
             class(type_ftcms), intent(inout) :: self
+            real(real64), intent(in) :: omega
             real(real64), intent(inout) :: gamma
+            real(real64), allocatable, intent(inout) :: step_T(:), step_P(:)
+            real(real64), intent(inout) :: alpha_joint
             logical, intent(inout) :: active
 
             real(real64), allocatable :: g_T(:), g_P(:)
-            real(real64) :: numer, denom, dg, gnorm, gnorm_prev
-            integer(int32) :: i
+            real(real64), pointer, contiguous :: current_T(:), current_P(:)
+            real(real64) :: base_norm, candidate_norm
+            logical :: aa_usable
 
             gamma = 0.0d0
+            alpha_joint = 1.0d0
+            aa_usable = .false.
+            nullify (current_T, current_P)
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, g_T)
             call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, g_P)
             if (.not. (allocated(g_T) .and. allocated(g_P))) then
                 active = .false.
                 return
             end if
-
-            gnorm = 0.0d0
-            do i = 1, size(g_T)
-                gnorm = gnorm + g_T(i) * g_T(i)
-            end do
-            do i = 1, size(g_P)
-                gnorm = gnorm + (g_P(i) * AA_WEIGHT_P)**2
-            end do
-            gnorm = sqrt(gnorm)
-            gnorm_prev = self%aa_gnorm_prev
-            self%aa_gnorm_prev = gnorm
-
-            if (.not. self%aa_has_prev) return
-            if (.not. (allocated(self%aa_duT_prev) .and. allocated(self%aa_duP_prev))) return
-            if (size(self%aa_duT_prev) /= size(g_T) .or. size(self%aa_duP_prev) /= size(g_P)) then
-                self%aa_has_prev = .false.
+            call self%temperature%get_current(current_T)
+            call self%pressure%get_current(current_P)
+            if (.not. (associated(current_T) .and. associated(current_P))) then
+                active = .false.
                 return
             end if
-            ! Monotonicity safeguard: mix only while the increment sequence
-            ! contracts; otherwise fall back to plain relaxed Picard and let
-            ! the adaptive omega restore contraction first.
-            if (gnorm_prev >= 0.0d0 .and. gnorm > gnorm_prev) return
-
-            numer = 0.0d0
-            denom = 0.0d0
-            do i = 1, size(g_T)
-                dg = g_T(i) - self%aa_duT_prev(i)
-                numer = numer + g_T(i) * dg
-                denom = denom + dg * dg
-            end do
-            do i = 1, size(g_P)
-                dg = (g_P(i) - self%aa_duP_prev(i)) * AA_WEIGHT_P
-                numer = numer + (g_P(i) * AA_WEIGHT_P) * dg
-                denom = denom + dg * dg
-            end do
-
-            if (denom > tiny(1.0d0)) then
-                gamma = numer / denom
-                if (.not. (gamma == gamma .and. abs(gamma) < huge(1.0d0))) gamma = 0.0d0
-                gamma = max(-AA_GAMMA_MAX, min(AA_GAMMA_MAX, gamma))
+            if (size(current_T) /= size(g_T) .or. size(current_P) /= size(g_P)) then
+                active = .false.
+                return
             end if
-        end subroutine compute_aa_gamma
+
+            if (self%aa_has_prev .and. allocated(self%aa_duT_prev) .and. allocated(self%aa_duP_prev)) then
+                call compute_coupled_aa1_coefficient(g_T, g_P, self%aa_duT_prev, self%aa_duP_prev, &
+                                                     AA_WEIGHT_P, AA_GAMMA_MAX, gamma, aa_usable)
+            end if
+
+            allocate (step_T(size(g_T)), step_P(size(g_P)))
+            step_T(:) = omega * g_T(:)
+            step_P(:) = omega * g_P(:)
+            if (aa_usable .and. self%aa_has_prev .and. &
+                allocated(self%aa_T_prev) .and. allocated(self%aa_P_prev)) then
+                if (size(self%aa_T_prev) == size(current_T) .and. &
+                    size(self%aa_P_prev) == size(current_P)) then
+                    step_T(:) = step_T(:) - gamma * (current_T(:) - self%aa_T_prev(:) + &
+                                                      omega * (g_T(:) - self%aa_duT_prev(:)))
+                    step_P(:) = step_P(:) - gamma * (current_P(:) - self%aa_P_prev(:) + &
+                                                      omega * (g_P(:) - self%aa_duP_prev(:)))
+                else
+                    aa_usable = .false.
+                end if
+            end if
+
+            base_norm = abs(omega) * coupled_weighted_norm(g_T, g_P, AA_WEIGHT_P)
+            candidate_norm = coupled_weighted_norm(step_T, step_P, AA_WEIGHT_P)
+            if (.not. aa_usable .or. .not. (candidate_norm == candidate_norm) .or. &
+                candidate_norm > AA_STEP_GROWTH_MAX * max(base_norm, tiny(1.0d0))) then
+                gamma = 0.0d0
+                step_T(:) = omega * g_T(:)
+                step_P(:) = omega * g_P(:)
+            end if
+
+            alpha_joint = min(bounded_step_factor(current_T, step_T, TEMP_MIN_C, TEMP_MAX_C), &
+                              bounded_step_factor(current_P, step_P, PRESS_MIN_PA, PRESS_MAX_PA))
+
+            call copy_into(self%aa_T_prev, current_T)
+            call copy_into(self%aa_P_prev, current_P)
+            call copy_into(self%aa_duT_prev, g_T)
+            call copy_into(self%aa_duP_prev, g_P)
+            self%aa_gnorm_prev = coupled_weighted_norm(g_T, g_P, AA_WEIGHT_P)
+            self%aa_has_prev = .true.
+        end subroutine prepare_coupled_aa_step
 
         !> (Re)allocate dst to the shape of src and copy.
         subroutine copy_into(dst, src)
@@ -1346,125 +1387,41 @@ contains
 
     end subroutine reflect_variables_ftcms
 
-    !> Correct temperature for nodes crossing T_melt during a Picard step.
-    !> Uses the available-energy (Flerchinger-type) method: finds T_r satisfying
-    !> \[ H(T_r) = H_{sensible}(T_{new}) \]
-    !> via a Secant iteration, ensuring energy conservation at the phase-change front.
+    !> Reset a freezing-onset crossing to its pressure-dependent critical
+    !> temperature, following Hansson et al. (2004).
     module subroutine apply_phase_change_temperature_correction_ftcms(self, T_old, T_new)
         implicit none
         class(type_ftcms), intent(inout) :: self
         real(real64), intent(in) :: T_old(:)
         real(real64), intent(inout) :: T_new(:)
 
-        real(real64), parameter :: T_F = 0.0d0
-        real(real64), parameter :: DT_FD = 0.5d0
-        integer(int32), parameter :: MAX_SECANT = 15
-        real(real64), parameter :: SECANT_RTOL = 1.0d-4
-        ! Lower bound of the secant search. update_water_phases requires a positive
-        ! absolute temperature (T_K = T + 273.15 > 0); a diverging Picard iterate can
-        ! push T_new far below physical range, which would make the root finder probe
-        ! update_water_phases at T_K <= 0 (fatal). Confine the search to the same
-        ! physical floor used by the solution update (reflect_variables TEMP_MIN_C),
-        ! so a diverging step fails the convergence test cleanly and the ATS reduces
-        ! dt, instead of aborting the run inside this root finder.
-        real(real64), parameter :: T_PHYS_MIN = -80.0d0
-        real(real64) :: T_lo
+        integer(int32) :: node_id, num_nodes, row_start, repr_elem
+        type(type_state) :: state
+        real(real64) :: pressure, rho_water, critical_temperature
 
-        integer(int32) :: i_elem, num_elem, i_local, node_id, material_id, n_nodes, iter_s
-        integer(int32), pointer, contiguous :: connectivity(:)
-        type(type_state) :: ev
-        real(real64) :: T_old_i, T_new_i, P_i, phi_i
-        real(real64) :: H_low, H_high, C_unf, H_target, H_r
-        real(real64) :: G0, G1, T_r0, T_r1, T_r_new
-        logical, allocatable :: processed(:)
+        call self%domain%get_num_nodes(num_nodes)
+        if (num_nodes <= 0) return
 
-        nullify (connectivity)
-        call self%domain%get_num_fe(num_elem)
-        call self%domain%get_num_nodes(n_nodes)
-        if (n_nodes <= 0) return
+        do node_id = 1, min(num_nodes, size(T_old), size(T_new))
+            ! The pressure-dependent freezing temperature cannot exceed
+            ! 0 degC. A node that is still non-negative, or did not cool in
+            ! this Picard update, cannot cross the freezing active set.
+            if (T_new(node_id) >= 0.0d0 .or. T_new(node_id) >= T_old(node_id)) cycle
+            row_start = self%node_material_table%ptr(node_id)
+            if (row_start >= self%node_material_table%ptr(node_id + 1)) cycle
+            repr_elem = self%node_material_table%repr_element(row_start)
+            call self%set_state(node_id, repr_elem, state, calc_physics=.false., include_fluxes=.false.)
+            call state%pressure%get(pressure)
+            call self%thermal%calc_density_water(state, rho_water)
+            call calc_T_high_celsius(pressure, rho_water, critical_temperature)
 
-        allocate (processed(n_nodes))
-        processed = .false.
-
-        do i_elem = 1, num_elem
-            call self%domain%get_fe_connectivity(i_elem, connectivity)
-            call self%domain%get_material_id(i_elem, material_id)
-
-            do i_local = 1, size(connectivity)
-                node_id = connectivity(i_local)
-                if (node_id < 1 .or. node_id > n_nodes) cycle
-                if (processed(node_id)) cycle
-
-                T_old_i = T_old(node_id)
-                T_new_i = T_new(node_id)
-                if (.not. ((T_old_i > T_F .and. T_new_i < T_F) .or. &
-                           (T_old_i < T_F .and. T_new_i > T_F))) cycle
-                processed(node_id) = .true.
-
-                ! Pressure is only retained when hydraulic is active; use the
-                ! reference pressure otherwise (same convention as set_state_ftcms).
-                if (self%is_active_hydraulic()) then
-                    call self%pressure%get_current(node_id, P_i)
-                else
-                    P_i = 0.0d0
-                end if
-                call self%porosity%get_current(node_id, phi_i)
-
-                ! Unfrozen heat capacity C_unf via finite difference just above T_f
-                call ev%reset()
-                call ev%temperature%set(T_F + DT_FD)
-                call ev%pressure%set(P_i)
-                call ev%porosity%set(phi_i)
-                call self%thermal%update_water_phases(material_id, ev)
-                call self%thermal%calc_enthalpy_density(material_id, ev, H_low)
-
-                call ev%reset()
-                call ev%temperature%set(T_F + 2.0d0 * DT_FD)
-                call ev%pressure%set(P_i)
-                call ev%porosity%set(phi_i)
-                call self%thermal%update_water_phases(material_id, ev)
-                call self%thermal%calc_enthalpy_density(material_id, ev, H_high)
-
-                C_unf = (H_high - H_low) / DT_FD
-                if (C_unf <= 0.0d0) cycle
-
-                ! Sensible-only target enthalpy at T_new (no phase-change latent heat)
-                H_target = H_low + C_unf * (T_new_i - (T_F + DT_FD))
-
-                ! Secant: G(T_r) = H(T_r) - H_target = 0
-                ! G(T_f) = H(T_f) - H_target = -C_unf*(T_new_i - T_f) > 0
-                ! Confine the search to [max(T_new_i, T_PHYS_MIN), T_F] so probes stay
-                ! in the valid domain of update_water_phases (T_K > 0).
-                T_lo = max(T_new_i, T_PHYS_MIN)
-                T_r0 = T_F
-                G0 = -C_unf * (T_new_i - T_F)
-
-                T_r1 = max(T_lo, T_F - 2.0d0 * DT_FD)
-
-                do iter_s = 1, MAX_SECANT
-                    call ev%reset()
-                    call ev%temperature%set(T_r1)
-                    call ev%pressure%set(P_i)
-                    call ev%porosity%set(phi_i)
-                    call self%thermal%update_water_phases(material_id, ev)
-                    call self%thermal%calc_enthalpy_density(material_id, ev, H_r)
-
-                    G1 = H_r - H_target
-                    if (abs(G1) < SECANT_RTOL * abs(C_unf)) exit
-                    if (abs(G1 - G0) < 1.0d-30 * abs(C_unf)) exit
-
-                    T_r_new = T_r1 - G1 * (T_r1 - T_r0) / (G1 - G0)
-                    T_r0 = T_r1
-                    G0 = G1
-                    T_r1 = min(T_r_new, T_F)
-                    T_r1 = max(T_r1, T_lo)
-                end do
-
-                T_new(node_id) = min(max(T_r1, T_lo), T_F)
-            end do
+            if (T_old(node_id) > critical_temperature .and. &
+                T_new(node_id) < critical_temperature .and. &
+                .not. self%phase_onset_reset(node_id)) then
+                T_new(node_id) = critical_temperature
+                self%phase_onset_reset(node_id) = .true.
+            end if
         end do
-
-        deallocate (processed)
     end subroutine apply_phase_change_temperature_correction_ftcms
 
     !> Implementation strategy: two-pass CSR construction, mirroring
@@ -1735,11 +1692,12 @@ contains
     module subroutine project_nodal_ice_ftcms(self, apply_update, ice_update, max_increment, increment_norm, &
                                                max_node, max_temperature, max_pressure, &
                                                max_current_ice, max_projected_ice, &
-                                               max_equilibrium_error, increments, active_bounds)
+                                               max_equilibrium_error, increments, active_bounds, &
+                                               apply_projected_update, projected_update_scale)
         implicit none
         class(type_ftcms), intent(inout) :: self
         logical, intent(in) :: apply_update
-        real(real64), intent(in) :: ice_update(:)
+        real(real64), intent(inout) :: ice_update(:)
         real(real64), intent(inout) :: max_increment
         real(real64), intent(inout) :: increment_norm
         integer(int32), intent(inout) :: max_node
@@ -1750,6 +1708,8 @@ contains
         real(real64), intent(inout) :: max_equilibrium_error
         real(real64), allocatable, intent(inout) :: increments(:)
         integer(int32), allocatable, intent(inout) :: active_bounds(:)
+        logical, intent(in), optional :: apply_projected_update
+        real(real64), intent(in), optional :: projected_update_scale
 
         integer(int32) :: node_id, num_nodes, row_start, row_end, k, repr_elem
         integer(int32) :: num_threads, tid, active_bound, node_active_bound
@@ -1758,9 +1718,10 @@ contains
         real(real64), allocatable :: equilibrium_errors(:), node_measures(:)
         integer(int32), allocatable :: projected_active_bounds(:)
         real(real64) :: measure, projected_ice, ice_increment, equilibrium_error, porosity, updated_ice
+        real(real64) :: node_temperature, projected_scale
         real(real64) :: weighted_ice, weight_sum, current_ice, node_equilibrium_error
         real(real64) :: target_total_water, local_pressure, local_ice
-        logical :: target_available, local_converged, use_local_eq
+        logical :: target_available, local_converged, use_local_eq, use_projected_update
         logical, allocatable :: is_hydraulic_boundary_node(:)
         integer(int32) :: i_patch, num_patches, i_bc_node, bc_idx, comp_dim, i_coord, j_coord
         type(type_boundary_patch), pointer :: bc_patch
@@ -1770,6 +1731,10 @@ contains
         real(real64) :: local_eq_fo_min
 
         call self%domain%get_num_nodes(num_nodes)
+        use_projected_update = .false.
+        if (present(apply_projected_update)) use_projected_update = apply_projected_update
+        projected_scale = 1.0d0
+        if (present(projected_update_scale)) projected_scale = min(max(projected_update_scale, 0.0d0), 1.0d0)
         num_threads = omp_get_max_threads()
         allocate (states(num_threads))
         allocate (current_ice_values(num_nodes), projected_ice_values(num_nodes))
@@ -1812,7 +1777,7 @@ contains
         !$OMP PARALLEL DEFAULT(NONE) &
         !$OMP SHARED(self, num_nodes, states, current_ice_values, projected_ice_values, equilibrium_errors, node_measures, &
         !$OMP        projected_active_bounds, is_hydraulic_boundary_node, dt_local, comp_dim) &
-        !$OMP PRIVATE(node_id, row_start, row_end, k, repr_elem, tid, measure, porosity, &
+        !$OMP PRIVATE(node_id, row_start, row_end, k, repr_elem, tid, measure, porosity, node_temperature, &
         !$OMP         projected_ice, ice_increment, equilibrium_error, weighted_ice, &
         !$OMP         weight_sum, current_ice, node_equilibrium_error, active_bound, node_active_bound, &
         !$OMP         target_total_water, local_pressure, local_ice, target_available, local_converged, use_local_eq, &
@@ -1825,6 +1790,17 @@ contains
             call self%Qi%get_current(node_id, current_ice)
             current_ice_values(node_id) = current_ice
             projected_ice_values(node_id) = current_ice
+            call self%temperature%get_current(node_id, node_temperature)
+
+            ! Exact warm-side active-set exclusion: the non-segregated
+            ! Clapeyron suction is zero for T >= 0 degC, so an ice-free node
+            ! has a zero return-map increment without evaluating any material
+            ! model. This is only a fast path for a mathematically inactive
+            ! branch; all subzero or already-frozen nodes use the full map.
+            if (current_ice <= 0.0d0 .and. node_temperature >= 0.0d0) then
+                projected_active_bounds(node_id) = -1
+                cycle
+            end if
 
             row_start = self%node_material_table%ptr(node_id)
             row_end = self%node_material_table%ptr(node_id + 1) - 1
@@ -1956,7 +1932,16 @@ contains
         if (apply_update) then
             do node_id = 1, num_nodes
                 call self%porosity%get_current(node_id, porosity)
-                updated_ice = min(max(current_ice_values(node_id) + ice_update(node_id), 0.0d0), porosity)
+                if (use_projected_update) then
+                    updated_ice = current_ice_values(node_id) + projected_scale * &
+                                  (projected_ice_values(node_id) - current_ice_values(node_id))
+                else
+                    updated_ice = current_ice_values(node_id) + ice_update(node_id)
+                end if
+                updated_ice = min(max(updated_ice, 0.0d0), porosity)
+                ! AA(1) must retain the step that was actually applied after
+                ! projection onto the admissible ice-content interval.
+                ice_update(node_id) = updated_ice - current_ice_values(node_id)
                 call self%Qi%set_current(node_id, updated_ice)
             end do
         end if
@@ -2091,63 +2076,147 @@ contains
         class(type_ftcms), intent(inout) :: self
         real(real64) :: error_rel
 
-        real(real64) :: dt_n, e_thermal, e_hydraulic
+        real(real64) :: dt_n, dt_factor, e_thermal, e_hydraulic
 
         error_rel = -1.0d0
         call self%control%get_dt(dt_n)
         if (dt_n <= 0.0d0) return
+        if (.not. self%lte_has_state .or. .not. self%lte_has_derivative) return
+        if (dt_n + self%lte_prev_dt <= 0.0d0) return
 
+        dt_factor = dt_n * dt_n / (dt_n + self%lte_prev_dt)
         e_thermal = -1.0d0
         e_hydraulic = -1.0d0
 
-        if (self%is_active_thermal()) call physics_lte(self%temperature, self%lte_ydot_prev_thermal, e_thermal)
-        if (self%is_active_hydraulic()) call physics_lte(self%pressure, self%lte_ydot_prev_hydraulic, e_hydraulic)
+        if (self%is_active_thermal()) then
+            call physics_lte(self%temperature, self%lte_state_prev_thermal, &
+                             self%lte_ydot_prev_thermal, self%lte_atol_thermal, e_thermal)
+        end if
+        if (self%is_active_hydraulic()) then
+            call physics_lte(self%pressure, self%lte_state_prev_hydraulic, &
+                             self%lte_ydot_prev_hydraulic, self%lte_atol_hydraulic, e_hydraulic)
+        end if
 
-        ! Combine the per-physics relative errors by a maximum (most restrictive).
-        if (self%lte_has_prev) error_rel = max(e_thermal, e_hydraulic)
-
-        self%lte_prev_dt = dt_n
-        self%lte_has_prev = .true.
+        error_rel = max(e_thermal, e_hydraulic)
 
     contains
 
-        subroutine physics_lte(var, ydot_prev, e_rel)
+        subroutine physics_lte(var, state_prev, ydot_prev, atol, e_norm)
             implicit none
             type(type_variable), intent(inout) :: var
-            real(real64), allocatable, intent(inout) :: ydot_prev(:)
-            real(real64), intent(inout) :: e_rel
+            real(real64), allocatable, intent(in) :: state_prev(:)
+            real(real64), allocatable, intent(in) :: ydot_prev(:)
+            real(real64), intent(in) :: atol
+            real(real64), intent(inout) :: e_norm
 
-            real(real64), pointer, contiguous :: ydot(:), y(:)
-            real(real64), allocatable :: dydot(:)
-            real(real64) :: lte, ynorm, dt_factor
+            real(real64), pointer, contiguous :: y(:)
+            real(real64), allocatable :: ydot(:), defect(:), weight(:)
 
-            e_rel = -1.0d0
-            nullify (ydot); nullify (y)
-            call var%get_diff(ydot)     ! ydot_n = (y_n - y_{n-1})/dt_n for BDF1
+            e_norm = -1.0d0
+            nullify (y)
             call var%get_current(y)
-            if (.not. (associated(ydot) .and. associated(y))) return
+            if (.not. associated(y)) return
+            if (.not. allocated(state_prev) .or. .not. allocated(ydot_prev)) return
+            if (size(state_prev) /= size(y) .or. size(ydot_prev) /= size(y)) return
+            if (size(y) == 0) return
 
-            if (self%lte_has_prev .and. allocated(ydot_prev)) then
-                if (size(ydot_prev) == size(ydot) .and. (dt_n + self%lte_prev_dt) > 0.0d0) then
-                    allocate (dydot(size(ydot)))
-                    dydot(:) = ydot(:) - ydot_prev(:)
-                    dt_factor = dt_n * dt_n / (dt_n + self%lte_prev_dt)
-                    lte = vector_norm2(dydot) * dt_factor
-                    ynorm = vector_norm2(y)
-                    e_rel = lte / max(ynorm, tiny(1.0d0))
-                    deallocate (dydot)
-                end if
-            end if
-
-            ! Store the current derivative as the previous for the next step.
-            if (allocated(ydot_prev)) then
-                if (size(ydot_prev) /= size(ydot)) deallocate (ydot_prev)
-            end if
-            if (.not. allocated(ydot_prev)) allocate (ydot_prev(size(ydot)))
-            ydot_prev(:) = ydot(:)
+            allocate (ydot(size(y)), defect(size(y)), weight(size(y)))
+            ydot(:) = (y(:) - state_prev(:)) / dt_n
+            defect(:) = dt_factor * (ydot(:) - ydot_prev(:))
+            weight(:) = atol + self%lte_rtol * max(abs(y(:)), abs(state_prev(:)))
+            e_norm = sqrt(sum((defect(:) / max(weight(:), tiny(1.0d0)))**2) / real(size(y), real64))
         end subroutine physics_lte
 
     end function compute_lte_error_ftcms
+
+    module subroutine initialize_lte_history_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        self%lte_has_state = .false.
+        self%lte_has_derivative = .false.
+        self%lte_prev_dt = 0.0d0
+
+        if (self%is_active_thermal()) then
+            call copy_current(self%temperature, self%lte_state_prev_thermal)
+        end if
+        if (self%is_active_hydraulic()) then
+            call copy_current(self%pressure, self%lte_state_prev_hydraulic)
+        end if
+        self%lte_has_state = allocated(self%lte_state_prev_thermal) .or. &
+                             allocated(self%lte_state_prev_hydraulic)
+
+    contains
+        subroutine copy_current(var, state_copy)
+            implicit none
+            type(type_variable), intent(inout) :: var
+            real(real64), allocatable, intent(inout) :: state_copy(:)
+            real(real64), pointer, contiguous :: current(:)
+
+            nullify (current)
+            call var%get_current(current)
+            if (.not. associated(current)) return
+            if (allocated(state_copy)) deallocate (state_copy)
+            allocate (state_copy, source=current)
+        end subroutine copy_current
+    end subroutine initialize_lte_history_ftcms
+
+    module subroutine commit_lte_history_ftcms(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        real(real64) :: dt_n
+        logical :: committed
+
+        call self%control%get_dt(dt_n)
+        if (dt_n <= 0.0d0) return
+        committed = .false.
+
+        if (self%is_active_thermal()) then
+            call commit_physics(self%temperature, self%lte_state_prev_thermal, &
+                                self%lte_ydot_prev_thermal, committed)
+        end if
+        if (self%is_active_hydraulic()) then
+            call commit_physics(self%pressure, self%lte_state_prev_hydraulic, &
+                                self%lte_ydot_prev_hydraulic, committed)
+        end if
+
+        if (committed) then
+            self%lte_prev_dt = dt_n
+            self%lte_has_state = .true.
+            self%lte_has_derivative = .true.
+        end if
+
+    contains
+        subroutine commit_physics(var, state_prev, ydot_prev, did_commit)
+            implicit none
+            type(type_variable), intent(inout) :: var
+            real(real64), allocatable, intent(inout) :: state_prev(:)
+            real(real64), allocatable, intent(inout) :: ydot_prev(:)
+            logical, intent(inout) :: did_commit
+            real(real64), pointer, contiguous :: current(:)
+
+            nullify (current)
+            call var%get_current(current)
+            if (.not. associated(current)) return
+            if (.not. allocated(state_prev)) then
+                allocate (state_prev, source=current)
+                return
+            end if
+            if (size(state_prev) /= size(current)) then
+                deallocate (state_prev)
+                allocate (state_prev, source=current)
+                return
+            end if
+            if (allocated(ydot_prev)) then
+                if (size(ydot_prev) /= size(current)) deallocate (ydot_prev)
+            end if
+            if (.not. allocated(ydot_prev)) allocate (ydot_prev(size(current)))
+            ydot_prev(:) = (current(:) - state_prev(:)) / dt_n
+            state_prev(:) = current(:)
+            did_commit = .true.
+        end subroutine commit_physics
+    end subroutine commit_lte_history_ftcms
 
     !> See the interface. Cost: O(N_dof). Combines the energy and water residual
     !> blocks by Euclidean norm; used only as a monotone merit for the line search.

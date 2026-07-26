@@ -47,26 +47,19 @@ contains
         real(real64), intent(inout) :: psi_eff
         real(real64), intent(inout), optional :: dpsi_eff_dpsi_cap, dpsi_eff_dpsi_cryo
 
-        ! Total soil-water suction as the SUPERPOSITION of the two
-        ! chemical-potential lowerings acting on the liquid: the air-water
-        ! capillary suction psi_cap and the ice-water cryogenic suction
-        ! psi_cryo add. The water chemical potential is
-        !   mu_w = mu_w^sat - v_w * psi_eff,   psi_eff = psi_cap + psi_cryo,
-        ! so the single retention relation S_w = F_WRF(psi_eff) holds for both
-        ! unfrozen and frozen states, and - crucially - the Darcy flux is
-        ! driven by grad(mu_w) ~ grad(psi_eff), which carries BOTH the
-        ! pressure gradient and the cryogenic (temperature) gradient. A max()
-        ! would drop whichever term is smaller: in the frozen zone that
-        ! discards the pore-pressure contribution, decoupling the pressure
-        ! from transport (singular d/dp) and removing the cryosuction driving
-        ! force. Addition keeps d psi_eff/d psi_cap = 1 everywhere, so the
-        ! pressure diagonal stays well posed while the cryogenic gradient
-        ! migrates water to the freezing front. Above freezing psi_cryo = 0
-        ! and psi_eff reduces to the ordinary capillary suction.
-        psi_eff = psi_cap + psi_cryo
+        ! The freezing-as-drying relation evaluates retention at the larger of
+        ! the air-water and ice-water suctions. This relation determines phase
+        ! storage only; Darcy transport remains driven by pore pressure and the
+        ! separate thermal liquid conductivity. The smooth maximum keeps the
+        ! phase derivatives defined at the switching surface.
+        real(real64) :: delta_psi, blend_denom
 
-        if (present(dpsi_eff_dpsi_cap)) dpsi_eff_dpsi_cap = 1.0d0
-        if (present(dpsi_eff_dpsi_cryo)) dpsi_eff_dpsi_cryo = 1.0d0
+        delta_psi = psi_cap - psi_cryo
+        blend_denom = sqrt(delta_psi*delta_psi + SUCTION_BLEND_EPS*SUCTION_BLEND_EPS)
+        psi_eff = 0.5d0*(psi_cap + psi_cryo + blend_denom)
+
+        if (present(dpsi_eff_dpsi_cap)) dpsi_eff_dpsi_cap = 0.5d0*(1.0d0 + delta_psi/blend_denom)
+        if (present(dpsi_eff_dpsi_cryo)) dpsi_eff_dpsi_cryo = 0.5d0*(1.0d0 - delta_psi/blend_denom)
     end subroutine compute_effective_suction
 
     !>
@@ -194,6 +187,9 @@ contains
         real(real64) :: d_theta_cap_dP, d_theta_eff_dP, d_theta_eff_dT
         real(real64) :: rho_w, rho_i
         real(real64) :: theta_tot, phi, d_theta_tot_dP, d_theta_tot_dT, theta_bound
+        real(real64) :: drho_w_dP, drho_w_dT, drho_i_dP, drho_i_dT
+        real(real64) :: density_ratio, dratio_dP, dratio_dT, phase_difference
+        logical :: on_volume_bound
 
         call state%temperature%get(temperature)
         call state%pressure%get(pressure)
@@ -245,9 +241,11 @@ contains
             call state%porosity%get(phi)
             d_theta_tot_dP = d_theta_cap_dP
             d_theta_tot_dT = 0.0d0
+            on_volume_bound = .false.
             if (phi > 0.0d0) then
                 theta_bound = phi * (rho_i / rho_w) + theta_l_new * (1.0d0 - rho_i / rho_w)
                 if (theta_l_cap >= theta_bound) then
+                    on_volume_bound = .true.
                     theta_tot = theta_bound
                     d_theta_tot_dP = (1.0d0 - rho_i / rho_w) * d_theta_eff_dP
                     d_theta_tot_dT = (1.0d0 - rho_i / rho_w) * d_theta_eff_dT
@@ -255,8 +253,20 @@ contains
             end if
 
             if (theta_l_new < theta_tot) then
-                dice_dP = (d_theta_tot_dP - d_theta_eff_dP) * (rho_w / rho_i)
-                dice_dT = (d_theta_tot_dT - d_theta_eff_dT) * (rho_w / rho_i)
+                density_ratio = rho_w / rho_i
+                dice_dP = (d_theta_tot_dP - d_theta_eff_dP) * density_ratio
+                dice_dT = (d_theta_tot_dT - d_theta_eff_dT) * density_ratio
+                if (.not. on_volume_bound) then
+                    call self%calc_drho_water_dP(state, drho_w_dP)
+                    call self%calc_drho_water_dT(state, drho_w_dT)
+                    call self%calc_drho_ice_dP(state, drho_i_dP)
+                    call self%calc_drho_ice_dT(state, drho_i_dT)
+                    dratio_dP = drho_w_dP / rho_i - rho_w * drho_i_dP / rho_i**2
+                    dratio_dT = drho_w_dT / rho_i - rho_w * drho_i_dT / rho_i**2
+                    phase_difference = theta_tot - theta_l_new
+                    dice_dP = dice_dP + phase_difference * dratio_dP
+                    dice_dT = dice_dT + phase_difference * dratio_dT
+                end if
             else
                 dice_dP = 0.0d0
                 dice_dT = 0.0d0
@@ -282,25 +292,21 @@ contains
         real(real64), intent(inout) :: water_content
 
         real(real64) :: pressure
-        real(real64) :: psi_cap, psi_cryo, psi_eff
+        real(real64) :: pressure_head
 
         call state%pressure%get(pressure)
 
         if (pressure < 0.0d0) then
-            psi_cap = -pressure
+            pressure_head = pressure / (rho_std * g)
         else
-            psi_cap = 0.0d0
+            pressure_head = 0.0d0
         end if
 
-        ! Generalized-suction (freezing = drying analogy): the unfrozen liquid
-        ! content follows the retention curve evaluated at the generalized
-        ! suction psi_eff = max(psi_cap, psi_cryo). Below freezing the
-        ! cryogenic suction psi_cryo(T) lowers the unfrozen content, which is
-        ! what makes theta_l temperature-dependent and supplies the apparent
-        ! heat capacity to the energy equation.
-        call self%gcc%calc(state, psi_cryo)
-        call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
-        call self%wrf%calc(-psi_eff / (rho_std * g), water_content)
+        ! Hansson mixed form: the unfrozen liquid storage is theta_l(h), where
+        ! h is the solved pore-water pressure head. Temperature determines the
+        ! Clapeyron equilibrium target for the separate ice projection, not a
+        ! replacement retention argument in this routine.
+        call self%wrf%calc(pressure_head, water_content)
 
     end subroutine calc_water_content
 
@@ -314,54 +320,27 @@ contains
         real(real64), intent(inout) :: dwater_dP !> d(theta_l)/dP
         real(real64), intent(inout) :: dwater_dT !> d(theta_l)/dT
 
-        real(real64) :: pressure
-        real(real64) :: psi_cap, psi_cryo, psi_eff
-        real(real64) :: d_psi_cap_dP, d_psi_cryo_dP, d_psi_cryo_dT
-        real(real64) :: d_psi_eff_dpsi_cap, d_psi_eff_dpsi_cryo
-        real(real64) :: d_psi_eff_dP, d_psi_eff_dT
-        real(real64) :: d_theta_liquid_dPress
+        real(real64) :: pressure, pressure_head
+        real(real64) :: d_theta_liquid_dhead
 
         call state%pressure%get(pressure)
 
-        ! Capillary suction
         if (pressure < 0.0d0) then
-            psi_cap = -pressure
-            d_psi_cap_dP = -1.0d0
+            pressure_head = pressure / (rho_std * g)
+            call self%wrf%deriv(pressure_head, d_theta_liquid_dhead)
+            dwater_dP = d_theta_liquid_dhead / (rho_std * g)
         else
-            psi_cap = 0.0d0
-            d_psi_cap_dP = 0.0d0
+            dwater_dP = 0.0d0
         end if
 
-        ! Generalized suction psi_eff = max(psi_cap, psi_cryo(T)). The T
-        ! dependence flows through psi_cryo, giving a nonzero dwater_dT: this
-        ! is the freezing-curve slope that becomes the apparent heat capacity
-        ! in the energy equation's C_TT (thermal_coefficients.F90).
-        call self%gcc%calc(state, psi_cryo)
-        call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
-        call self%gcc%deriv_temperature(state, d_psi_cryo_dT)
-
-        call compute_effective_suction(psi_cap, psi_cryo, psi_eff, d_psi_eff_dpsi_cap, d_psi_eff_dpsi_cryo)
-        d_psi_eff_dP = d_psi_eff_dpsi_cap * d_psi_cap_dP + d_psi_eff_dpsi_cryo * d_psi_cryo_dP
-        d_psi_eff_dT = d_psi_eff_dpsi_cryo * d_psi_cryo_dT
-
-        call self%wrf%deriv(-psi_eff / (rho_std * g), d_theta_liquid_dPress)
-
-        ! Chain rule: dTheta/dX = (dTheta/dh) * (-d_psi_eff/dX) / (rho_std g).
-        dwater_dP = d_theta_liquid_dPress * (-d_psi_eff_dP) / (rho_std * g)
-        dwater_dT = d_theta_liquid_dPress * (-d_psi_eff_dT) / (rho_std * g)
+        dwater_dT = 0.0d0
 
     end subroutine calc_water_content_derivatives
 
     !> Temperature derivative of the generalized-suction head, dh/dT [m/K].
     !>
-    !> h = -psi_eff/(rho_std g) is the generalized (freezing = drying) head
-    !> that drives the liquid Darcy flux (Hansson et al. 2004, Eq. 1). Because
-    !> the primary hydraulic unknown here is the capillary pore pressure rather
-    !> than h itself, the temperature part of the liquid flux -K_Lh dh/dT dT/dz
-    !> - the cryosuction-driven moisture migration toward the freezing front -
-    !> must be supplied explicitly as the coupling flux D_HT. In the frozen
-    !> zone psi_eff = psi_cryo(T), so dh/dT = -(dpsi_cryo/dT)/(rho_std g) is
-    !> large; above freezing psi_cap dominates and dh/dT = 0.
+    !> This derivative belongs to the phase-storage relation. It is not the
+    !> thermal liquid conductivity in the hydraulic flux.
     subroutine calc_cryo_head_dT(self, state, dh_dT)
         implicit none
         class(type_fusion), intent(in) :: self
@@ -385,13 +364,8 @@ contains
     !>
     !> @brief Generalized suction \(\max(\psi_{cap}, \psi_{cryo})\) [Pa].
     !>
-    !> The generalized (freezing = drying) suction combines the capillary
-    !> suction of the actual pore pressure with the cryogenic suction from the
-    !> generalized Clapeyron relation. It is the single potential that drives
-    !> both the unfrozen liquid content (retention) and, through its gradient,
-    !> the cryosuction-driven moisture migration toward the freezing front.
-    !> Stored on the state so the permeability head (calc_head_hcf) uses the
-    !> same potential the content does.
+    !> The generalized suction combines capillary and cryogenic constraints for
+    !> phase storage. It is not used as the Darcy pressure potential.
     subroutine calc_effective_suction(self, state, psi_eff)
         implicit none
         class(type_fusion), intent(in) :: self
@@ -449,7 +423,8 @@ contains
         ! so a node is not classified simultaneously as bound-converged and
         ! as an interior point requiring pressure equality.
         real(real64), parameter :: BOUND_TOLERANCE = 1.0d-3
-        logical :: ice_is_set
+        logical :: ice_is_set, at_freezing_onset
+        real(real64) :: onset_content_tolerance
 
         current_ice = 0.0d0
         ice_is_set = .false.
@@ -477,6 +452,10 @@ contains
         projected_ice = min(max(unconstrained_ice, 0.0d0), upper_bound)
         ice_increment = projected_ice - current_ice
 
+        onset_content_tolerance = 64.0d0 * epsilon(1.0d0) * &
+                                  max(1.0d0, abs(liquid_pressure), abs(liquid_equilibrium))
+        at_freezing_onset = current_ice <= BOUND_TOLERANCE .and. &
+                            abs(liquid_pressure - liquid_equilibrium) <= onset_content_tolerance
         bound_state = 0
         if (unconstrained_ice <= 0.0d0) then
             bound_state = -1
@@ -530,8 +509,25 @@ contains
                 if (present(dice_dP)) dice_dP = (dliquid_dP - dliquid_eq_dP) * rho_w / rho_i + &
                     (liquid_pressure - liquid_equilibrium) * drho_ratio_dP
             case (-1)
-                if (present(dice_dT)) dice_dT = 0.0d0
-                if (present(dice_dP)) dice_dP = 0.0d0
+                if (at_freezing_onset) then
+                    ! Hansson's crossing reset places the iterate exactly at
+                    ! the critical freezing temperature. Use the frozen-side
+                    ! (maximum apparent-capacity) tangent there, although the
+                    ! admissible ice value is still the lower bound Qi=0.
+                    call self%calc_drho_water_dT(state, drho_w_dT)
+                    call self%calc_drho_water_dP(state, drho_w_dP)
+                    call self%calc_drho_ice_dT(state, drho_i_dT)
+                    call self%calc_drho_ice_dP(state, drho_i_dP)
+                    drho_ratio_dT = drho_w_dT / rho_i - rho_w * drho_i_dT / rho_i**2
+                    drho_ratio_dP = drho_w_dP / rho_i - rho_w * drho_i_dP / rho_i**2
+                    if (present(dice_dT)) dice_dT = (dliquid_dT - dliquid_eq_dT) * rho_w / rho_i + &
+                        (liquid_pressure - liquid_equilibrium) * drho_ratio_dT
+                    if (present(dice_dP)) dice_dP = (dliquid_dP - dliquid_eq_dP) * rho_w / rho_i + &
+                        (liquid_pressure - liquid_equilibrium) * drho_ratio_dP
+                else
+                    if (present(dice_dT)) dice_dT = 0.0d0
+                    if (present(dice_dP)) dice_dP = 0.0d0
+                end if
             case (1)
                 if (present(dice_dT)) dice_dT = -dliquid_eq_dT
                 if (present(dice_dP)) dice_dP = -dliquid_eq_dP

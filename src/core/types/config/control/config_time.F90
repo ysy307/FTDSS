@@ -50,8 +50,11 @@ module types_config_control_time
         !> k_I ~ 0.3/(p+1) and k_P ~ 0.4/(p+1) with p=1.
         real(real64) :: pi_k_i = 0.15d0
         real(real64) :: pi_k_p = 0.20d0
-        !> Relative tolerance for the normalized LTE estimate (E<=1 is on target).
+        !> Relative tolerance used to normalize the component-wise LTE defect.
         real(real64) :: error_rtol = 1.0d-2
+        !> Absolute scales for the component-wise weighted RMS LTE norm.
+        real(real64) :: error_atol_temperature = 1.0d-3
+        real(real64) :: error_atol_pressure = 1.0d1
         !> Maximum absolute temperature change per step used by ATS limiter [K or C].
         real(real64) :: max_dT_per_step = 5.0d0
         !> Maximum relative state change per step used by ATS limiter [-].
@@ -119,6 +122,8 @@ contains
             call self%set(self%pi_k_i, source%pi_k_i)
             call self%set(self%pi_k_p, source%pi_k_p)
             call self%set(self%error_rtol, source%error_rtol)
+            call self%set(self%error_atol_temperature, source%error_atol_temperature)
+            call self%set(self%error_atol_pressure, source%error_atol_pressure)
             call self%set(self%max_dT_per_step, source%max_dT_per_step)
             call self%set(self%max_relative_change_per_step, source%max_relative_change_per_step)
         class default
@@ -144,6 +149,8 @@ contains
         self%pi_k_i = 0.15d0
         self%pi_k_p = 0.20d0
         self%error_rtol = 1.0d-2
+        self%error_atol_temperature = 1.0d-3
+        self%error_atol_pressure = 1.0d1
         self%max_dT_per_step = 5.0d0
         self%max_relative_change_per_step = 0.3d0
     end subroutine reset_config_time_ats

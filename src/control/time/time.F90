@@ -438,8 +438,17 @@ contains
             ! Sync with output time (modifies only the active dt if necessary).
             call self%sync_with_output(next_output_time)
         else
-            ! Step failed: shrink dt and reset BDF order to 1 for stability
-            call self%ats%calc_retry_dt(self%dt, next_dt)
+            ! A converged step rejected by LTE uses the BDF1 defect estimate;
+            ! nonlinear failures retain the configured robustness retry factor.
+            if (self%ats%active .and. self%ats%use_error_control .and. present(error_estimate)) then
+                if (error_estimate > 1.0d0) then
+                    call self%ats%lte_retry_dt(self%dt, error_estimate, next_dt)
+                else
+                    call self%ats%calc_retry_dt(self%dt, next_dt)
+                end if
+            else
+                call self%ats%calc_retry_dt(self%dt, next_dt)
+            end if
             self%dt_controller = next_dt
             self%dt = next_dt
             self%current_bdf_order = 1

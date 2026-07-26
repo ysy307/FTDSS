@@ -35,6 +35,8 @@ module control_time_ats
         real(real64) :: pi_k_i = 0.15d0
         real(real64) :: pi_k_p = 0.20d0
         real(real64) :: error_rtol = 1.0d-2
+        real(real64) :: error_atol_temperature = 1.0d-3
+        real(real64) :: error_atol_pressure = 1.0d1
         !> Previous normalized error (state for the PI controller); 1.0 = on target.
         real(real64) :: error_prev = 1.0d0
     contains
@@ -42,6 +44,7 @@ module control_time_ats
         procedure, public, pass(self) :: is_active => is_active_ats
         procedure, public, pass(self) :: predict_next_dt
         procedure, public, pass(self) :: pi_controller_dt
+        procedure, public, pass(self) :: lte_retry_dt
         procedure, public, pass(self) :: calc_retry_dt
         procedure, public, pass(self) :: limit_dt_by_solution_change
     end type type_ats
@@ -70,6 +73,8 @@ contains
         self%pi_k_i = config_time_ats%pi_k_i
         self%pi_k_p = config_time_ats%pi_k_p
         self%error_rtol = config_time_ats%error_rtol
+        self%error_atol_temperature = config_time_ats%error_atol_temperature
+        self%error_atol_pressure = config_time_ats%error_atol_pressure
         self%max_dT_per_step = config_time_ats%max_dT_per_step
         self%max_relative_change = config_time_ats%max_relative_change_per_step
         self%error_prev = 1.0d0
@@ -85,6 +90,8 @@ contains
         write (output_unit, '(A,F7.4,A,F7.4)') "   - safety / max_growth: ", self%safety_factor, " / ", self%max_growth_rate
         write (output_unit, '(A,L1,A,F6.3,A,F6.3,A,ES10.3)') "   - err-control / kI / kP / rtol: ", &
             self%use_error_control, " / ", self%pi_k_i, " / ", self%pi_k_p, " / ", self%error_rtol
+        write (output_unit, '(A,2(ES10.3,1X))') "   - LTE atol T / p     : ", &
+            self%error_atol_temperature, self%error_atol_pressure
 
     end subroutine initialize_type_ats
 
@@ -154,8 +161,8 @@ contains
         if (.not. self%active) return
         if (error_norm <= 0.0d0) return
 
-        ! Normalize the relative LTE by the target tolerance so E<=1 is on-target.
-        e_cur = max(error_norm / self%error_rtol, 1.0d-12)
+        ! The estimator supplies an atol/rtol-normalized weighted RMS error.
+        e_cur = max(error_norm, 1.0d-12)
         e_prev = max(self%error_prev, 1.0d-12)
 
         ratio = self%safety_factor * e_cur**(-(self%pi_k_i + self%pi_k_p)) * e_prev**(self%pi_k_p)
@@ -164,6 +171,25 @@ contains
         next_dt = max(self%dt_min, min(current_dt * ratio, self%dt_max))
         self%error_prev = e_cur
     end subroutine pi_controller_dt
+
+    !> Retry step after a converged solve violates the LTE tolerance.
+    pure subroutine lte_retry_dt(self, current_dt, error_norm, retry_dt)
+        implicit none
+        class(type_ats), intent(in) :: self
+        real(real64), intent(in) :: current_dt
+        real(real64), intent(in) :: error_norm
+        real(real64), intent(inout) :: retry_dt
+
+        real(real64) :: ratio
+
+        retry_dt = current_dt
+        if (.not. self%active .or. error_norm <= 1.0d0) return
+
+        ! BDF1 has a second-order local defect, hence exponent -1/2.
+        ratio = self%safety_factor * error_norm**(-0.5d0)
+        ratio = min(0.8d0, max(0.1d0, ratio))
+        retry_dt = max(self%dt_min, min(current_dt * ratio, self%dt_max))
+    end subroutine lte_retry_dt
 
     !> Calculate a reduced dt for retry upon divergence.
     pure subroutine calc_retry_dt(self, current_dt, retry_dt)

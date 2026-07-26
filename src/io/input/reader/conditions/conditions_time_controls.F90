@@ -30,6 +30,8 @@ submodule(io_input_conditions) input_conditions_time_controls
     character(*), parameter :: error_control = "error_control"
     character(*), parameter :: error_control_is_active = "is_active"
     character(*), parameter :: error_relative_tolerance = "error_relative_tolerance"
+    character(*), parameter :: error_absolute_tolerance_temperature = "error_absolute_tolerance_temperature"
+    character(*), parameter :: error_absolute_tolerance_pressure = "error_absolute_tolerance_pressure"
     character(*), parameter :: proportional_gain = "proportional_gain"
     character(*), parameter :: integral_gain = "integral_gain"
     character(*), parameter :: safety_factor = "safety_factor"
@@ -196,6 +198,16 @@ contains
         buffer(4) = error_relative_tolerance
         call get_json_value(json, join(buffer(1:4)), self%time_control%adaptive_stepping%error_relative_tolerance, &
                             is_required=.false., default_value=1.0d-2, valid_range=[0.0d0, huge(0.0d0)])
+
+        buffer(4) = error_absolute_tolerance_temperature
+        call get_json_value(json, join(buffer(1:4)), &
+                            self%time_control%adaptive_stepping%error_absolute_tolerance_temperature, &
+                            is_required=.false., default_value=1.0d-3, valid_range=[0.0d0, huge(0.0d0)])
+
+        buffer(4) = error_absolute_tolerance_pressure
+        call get_json_value(json, join(buffer(1:4)), &
+                            self%time_control%adaptive_stepping%error_absolute_tolerance_pressure, &
+                            is_required=.false., default_value=1.0d1, valid_range=[0.0d0, huge(0.0d0)])
 
         buffer(4) = proportional_gain
         call get_json_value(json, join(buffer(1:4)), self%time_control%adaptive_stepping%proportional_gain, &

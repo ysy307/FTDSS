@@ -17,6 +17,12 @@ module models_phase_change_manager
     private
 
     public :: type_phase_manager
+    public :: phase_return_relaxation
+
+    ! Block relaxation of the eliminated local ice return map. The same
+    ! factor multiplies its algorithmic tangent and its committed increment,
+    ! preserving the Modified Picard linearization.
+    real(real64), parameter :: phase_return_relaxation = 0.3d0
 
     !>
     !> @brief Phase Manager Class
@@ -73,6 +79,8 @@ contains
         real(real64) :: dQa_dP, dQa_dT
         real(real64) :: dQv_dP, dQv_dT
         real(real64) :: psi_eff
+        real(real64) :: projected_ice, ice_increment, equilibrium_error
+        integer(int32) :: phase_active_bound
 
         ! 0. The liquid retention and permeability argument is the capillary
         !    suction of the actual pore-water pressure.
@@ -84,17 +92,28 @@ contains
         call state%porosity%get(porosity)
         porosity = min(max(porosity, 0.0d0), 1.0d0)
 
-        ! 2. Ice content is a state function theta_i(T, p_w) of the generalized
-        !    Clapeyron freezing curve, with analytic T,P derivatives. The
-        !    dQi_dT term supplies the apparent heat capacity to the energy
-        !    equation's C_TT diagonal (thermal_coefficients.F90), so the latent
-        !    heat feedback is resolved by the fast monolithic solve rather than
-        !    a slow outer projection loop. Bounds enforce 0 <= theta_i <= phi.
-        call self%fusion%calc_ice_content(state, ice_content)
-        call self%fusion%calc_ice_content_derivatives(state, dQi_dP, dQi_dT)
+        ! 2. Ice is a local constitutive state, not a third global DOF. Its
+        !    value at the current Picard iterate remains in the conservative
+        !    mass and enthalpy residuals, while the tangent of the bounded
+        !    Clapeyron return map enters the T-p iteration matrix. This is the
+        !    modified-Picard split of Hansson et al. (2004), Eq. (19)-(20):
+        !    theta_i^k is retained in the history defect and
+        !    d(theta_i)/d(T,p)^k multiplies the new primary-variable increment.
+        call state%ice_content%get(ice_content, ice_content_set)
+        if (.not. ice_content_set) ice_content = 0.0d0
+        projected_ice = ice_content
+        ice_increment = 0.0d0
+        equilibrium_error = 0.0d0
+        phase_active_bound = 0
+        call self%fusion%project_ice_content(state, projected_ice, ice_increment, equilibrium_error, &
+                                              phase_active_bound, dQi_dT, dQi_dP)
+        dQi_dT = phase_return_relaxation * dQi_dT
+        dQi_dP = phase_return_relaxation * dQi_dP
 
-        ! 3. Liquid water is the unfrozen content on the generalized suction
-        !    (theta_l(psi_eff)), temperature-dependent through psi_cryo.
+        ! 3. Liquid water follows the retention curve at the solved pore-water
+        !    pressure. The Clapeyron-equivalent content is used only by the
+        !    phase projection; replacing the actual pressure here would make
+        !    liquid loss cancel ice gain locally and suppress cryosuction.
         call self%fusion%calc_water_content(state, water_content)
         call self%fusion%calc_water_content_derivatives(state, dQw_dP, dQw_dT)
         water_content = max(0.0d0, water_content)

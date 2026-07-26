@@ -36,17 +36,9 @@ contains
     !> Storage C_eq, mixed transient, and segregation sink keep the standard
     !> Gauss rule in all elements.
     !>
-    !> ### Linearization of the T-p coupling
-    !> The K_HT block is intentionally left zero: the cryosuction flux
-    !> K2(D_HT)*T and the mixed storage dTheta/dt enter the RESIDUAL exactly,
-    !> so the converged solution is unchanged (block Gauss-Seidel lagging).
-    !> Putting K2(D_HT) on the LHS creates, together with the latent-heat
-    !> mass coupling C_TH of the thermal block, a dt-independent off-diagonal
-    !> product \( C_{TH} K_2(D_{HT}) / (C_{eq} K_2(\lambda)) \gg 1 \) at
-    !> freezing-interface nodes: the coupled linear solve then amplifies and
-    !> drives T and p to the validity walls at any dt.  The lagged coupling
-    !> is stabilized by the adaptive under-relaxation of the conserved
-    !> Picard loop.
+    !> In Modified Picard, the transport coefficients are frozen at the current
+    !> iterate while both primary increments remain coupled. The K_HT block is
+    !> therefore K2(D_HT), matching the temperature-flux term in the residual.
     module subroutine assemble_local_picard_hydraulic(self, control, workspace, K_HH, K_HT, F_H)
         implicit none
         class(type_hydraulic), intent(in) :: self
@@ -79,35 +71,19 @@ contains
 
         ! --- Standard assembly variables ---
         real(real64) :: local_vec_res(workspace%num_fe_nodes)
-        ! Total-potential nodal head driving the liquid Darcy flux. The water
-        ! chemical potential is mu_w ~ -psi_eff = -(psi_cap + psi_cryo), so the
-        ! flux is driven by grad(-psi_eff), which superposes the pore-pressure
-        ! gradient and the cryogenic (temperature) gradient. P_gen = -psi_eff:
-        ! it equals the pore pressure where unfrozen and adds the cryosuction
-        ! where frozen, and because d psi_eff/d P = 1 the K_HH pressure
-        ! diagonal remains the consistent tangent (stable), while the cryogenic
-        ! part carried in P_gen migrates water to the freezing front.
-        real(real64) :: P_gen_node(workspace%num_fe_nodes), psi_eff_i
-        ! Temperature sensitivity of the total-potential head, dP_gen/dT
-        ! [Pa/K] = -d psi_cryo/dT, per node. It is the consistent tangent of
-        ! the cryosuction flux with respect to temperature; assembled into the
-        ! K_HT block so the pressure solve is aware of how the freezing-front
-        ! temperature moves the flux (one-way T->p coupling: K_TH stays zero,
-        ! so no C_TH*D_HT saddle can form).
-        real(real64) :: dPgen_dT_node(workspace%num_fe_nodes), dh_dT_i
-        logical :: coupling_block_needed
+        real(real64) :: work_C_HT(workspace%num_fe_gauss)
         real(real64) :: work_sink(workspace%num_fe_gauss)
         real(real64) :: work_D_HT(workspace%num_fe_dimension, workspace%num_fe_dimension, workspace%num_fe_gauss)
         real(real64) :: work_matrix_coupling(workspace%num_fe_nodes, workspace%num_fe_nodes)
         real(real64) :: D_HT_tmp(workspace%num_fe_dimension, workspace%num_fe_dimension)
-        logical :: thermal_target, coupling_flux_needed
+        logical :: thermal_target, coupling_mass_needed, coupling_flux_needed
 
         n_nodes = workspace%num_fe_nodes
         n_gauss = workspace%num_fe_gauss
         n_dim = workspace%num_fe_dimension
         thermal_target = control%is_target(PHYSICS_TYPES%THERMAL, workspace%material_id)
-        coupling_flux_needed = present(F_H) .and. thermal_target
-        coupling_block_needed = present(K_HT) .and. thermal_target
+        coupling_mass_needed = present(K_HT) .and. thermal_target
+        coupling_flux_needed = (present(F_H) .or. present(K_HT)) .and. thermal_target
 
         bdf0 = workspace%bdf_coeffs(1)
         dt_local = 0.0d0
@@ -118,6 +94,7 @@ contains
         workspace%work_V(:, :) = 0.0d0
         workspace%work_d_dt(:) = 0.0d0
         local_vec_res(:) = 0.0d0
+        work_C_HT(:) = 0.0d0
         work_sink(:) = 0.0d0
         work_D_HT(:, :, :) = 0.0d0
 
@@ -152,6 +129,9 @@ contains
         ! ----------------------------------------------------------------
         do i = 1, n_gauss
             call self%compute_iteration_capacity(workspace%material_id, workspace%state_gp(i), workspace%work_C(i))
+            if (coupling_mass_needed) then
+                call self%compute_coupling_mass_term(workspace%material_id, workspace%state_gp(i), work_C_HT(i))
+            end if
             call self%compute_transient_term_mixed(workspace%material_id, workspace%state_gp(i), &
                                                    workspace%bdf_coeffs, workspace%work_d_dt(i))
 
@@ -175,20 +155,6 @@ contains
             end if
         end do
 
-        ! Total-potential nodal head (superposed pore pressure + cryosuction)
-        ! that drives the liquid flux, and its temperature sensitivity.
-        do i = 1, n_nodes
-            call workspace%state(i)%effective_suction%get(psi_eff_i)
-            P_gen_node(i) = -psi_eff_i
-        end do
-        dPgen_dT_node(:) = 0.0d0
-        if (coupling_block_needed) then
-            do i = 1, n_nodes
-                call self%physics%calc_cryo_head_dT(workspace%material_id, workspace%state(i), dh_dT_i)
-                dPgen_dT_node(i) = rho_std * g * dh_dT_i
-            end do
-        end if
-
         ! ----------------------------------------------------------------
         ! 2. Mass Matrix K1 (LHS, factor bdf0)
         ! ----------------------------------------------------------------
@@ -201,8 +167,14 @@ contains
             end do
         end if
 
-        ! K_HT stays zero: the T-p coupling is carried exactly by the mixed
-        ! storage and the D_HT flux in the residual (see the header).
+        if (coupling_mass_needed) then
+            call workspace%compute_K1(work_C_HT, workspace%work_matrix)
+            do j = 1, n_nodes
+                do i = 1, n_nodes
+                    call K_HT%set(MATRIX_OPS%ADD, i, j, bdf0 * workspace%work_matrix(i, j))
+                end do
+            end do
+        end if
 
         ! ----------------------------------------------------------------
         ! 4. Flux terms.
@@ -213,11 +185,18 @@ contains
         if (.not. is_cut) then
             if (coupling_flux_needed) then
                 call workspace%compute_K2(work_D_HT, work_matrix_coupling)
-                workspace%work_vec(:) = 0.0d0
-                call matvec(work_matrix_coupling, workspace%T_node, workspace%work_vec, ierr)
-                do i = 1, n_nodes
-                    local_vec_res(i) = local_vec_res(i) + workspace%work_vec(i)
-                end do
+                if (present(K_HT)) then
+                    do j = 1, n_nodes
+                        do i = 1, n_nodes
+                            call K_HT%set(MATRIX_OPS%ADD, i, j, work_matrix_coupling(i, j))
+                        end do
+                    end do
+                end if
+                if (present(F_H)) then
+                    workspace%work_vec(:) = 0.0d0
+                    call matvec(work_matrix_coupling, workspace%T_node, workspace%work_vec, ierr)
+                    local_vec_res(:) = local_vec_res(:) + workspace%work_vec(:)
+                end if
             end if
 
             call workspace%compute_K2(workspace%work_D, workspace%work_matrix)
@@ -228,19 +207,10 @@ contains
                     end do
                 end do
             end if
-            ! K_HT: consistent T-tangent of the cryosuction flux -K2(D_HH)*P_gen
-            ! w.r.t. T, i.e. column j of K2(D_HH) scaled by dP_gen/dT at node j.
-            if (coupling_block_needed) then
-                do j = 1, n_nodes
-                    do i = 1, n_nodes
-                        call K_HT%set(MATRIX_OPS%ADD, i, j, workspace%work_matrix(i, j) * dPgen_dT_node(j))
-                    end do
-                end do
-            end if
             if (present(F_H)) then
                 do i = 1, n_nodes
                     do j = 1, n_nodes
-                        local_vec_res(i) = local_vec_res(i) + workspace%work_matrix(i, j) * P_gen_node(j)
+                        local_vec_res(i) = local_vec_res(i) + workspace%work_matrix(i, j) * workspace%P_node(j)
                     end do
                 end do
             end if
@@ -308,23 +278,22 @@ contains
                     end do
                 end do
             end if
-            ! K_HT (cut element): subcell cryosuction-flux T-tangent.
-            if (coupling_block_needed) then
+            if (present(K_HT) .and. thermal_target) then
                 do j = 1, n_nodes
                     do i = 1, n_nodes
-                        call K_HT%set(MATRIX_OPS%ADD, i, j, mat_HH_sub(i, j) * dPgen_dT_node(j))
+                        call K_HT%set(MATRIX_OPS%ADD, i, j, mat_HT_sub(i, j))
                     end do
                 end do
             end if
             if (present(F_H)) then
                 workspace%work_vec(:) = 0.0d0
-                call matvec(mat_HH_sub, P_gen_node, workspace%work_vec, ierr)
+                call matvec(mat_HH_sub, workspace%P_node, workspace%work_vec, ierr)
                 do i = 1, n_nodes
                     local_vec_res(i) = local_vec_res(i) + workspace%work_vec(i)
                 end do
             end if
 
-            if (coupling_flux_needed) then
+            if (present(F_H) .and. thermal_target) then
                 workspace%work_vec(:) = 0.0d0
                 call matvec(mat_HT_sub, workspace%T_node, workspace%work_vec, ierr)
                 do i = 1, n_nodes

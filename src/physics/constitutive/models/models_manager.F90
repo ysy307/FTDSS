@@ -134,25 +134,14 @@ contains
         call self%hcf%p%calc_Kflh(state, Kflh)
     end subroutine calc_Kflh
 
-    !> Thermal liquid conductivity KlT [m^2 s^-1 K^-1] for the D_HT coupling
-    !> flux. Currently disabled (returns 0) pending the migration regression
-    !> investigation - the explicit cryosuction thermal flux K_Lh*dh/dT was
-    !> found to destabilize the freezing front in both the residual-lagged and
-    !> fully-implicit forms, so migration must be recovered by whatever path
-    !> the pre-regression model used, not by adding this term.
+    !> Thermal liquid conductivity from the surface-tension relation.
     subroutine calc_KlT(self, state, KlT)
         implicit none
         class(type_models_manager), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: KlT
 
-        real(real64) :: K_flh, dh_dT
-
-        KlT = 0.0d0
-        return
-        call self%hcf%p%calc_Kflh(state, K_flh)
-        call self%phase_manager%calc_cryo_head_dT(state, dh_dT)
-        KlT = K_flh * dh_dT
+        call self%hcf%p%calc_KlT(state, KlT)
     end subroutine calc_KlT
 
     !> dh/dT [m/K] of the generalized head h = -psi_eff/(rho_std g): the

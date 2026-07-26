@@ -1,15 +1,13 @@
 submodule(app_ftcms) ftcms_solve
     implicit none
 
-    ! Keep the history predictor within the latent-heat scale that the next
-    ! monolithic solve can absorb without crossing the phase boundary.
-    real(real64), parameter :: PHASE_PREDICTOR_MAX_INCREMENT = 1.0d-3
     integer(int32), parameter :: SOLVE_STATUS_NOT_RUN = 0
     integer(int32), parameter :: SOLVE_STATUS_CONVERGED = 1
     integer(int32), parameter :: SOLVE_STATUS_LINEAR_FAILURE = 2
     integer(int32), parameter :: SOLVE_STATUS_NONLINEAR_DIVERGED = 3
     integer(int32), parameter :: SOLVE_STATUS_NONLINEAR_LIMIT = 4
     integer(int32), parameter :: SOLVE_STATUS_PHASE_FAILURE = 5
+    integer(int32), parameter :: SOLVE_STATUS_LTE_REJECTED = 6
 
 contains
     module subroutine solve_time_step_initial_setup_ftcms(self)
@@ -27,6 +25,9 @@ contains
         ! Anderson(1) history is only meaningful within one nonlinear loop.
         self%aa_has_prev = .false.
         self%aa_gnorm_prev = -1.0d0
+        self%aa_use_count = 0
+        self%aa_gamma_max_abs = 0.0d0
+        if (allocated(self%phase_onset_reset)) self%phase_onset_reset = .false.
 
         ! [Important] Compute solver must always be PICARD or NEWTON if not NONE.
         ! Even for linear config (where iter=1 is forced), Picard discretization
@@ -111,8 +112,6 @@ contains
         do node_id = 1, size(current_ice)
             call self%Qi%get_history(node_id, ice_history)
             predicted_increment = ratio * (ice_history(2) - ice_history(3))
-            predicted_increment = min(max(predicted_increment, -PHASE_PREDICTOR_MAX_INCREMENT), &
-                                      PHASE_PREDICTOR_MAX_INCREMENT)
             current_ice(node_id) = min(max(ice_history(2) + predicted_increment, 0.0d0), &
                                        current_porosity(node_id))
         end do
@@ -332,16 +331,17 @@ contains
         integer(int32) :: iter_nl
         real(real64) :: t_res, t_inc, h_res, h_inc
 
-        ! Outer local phase-equilibrium iteration. The inner solve remains a
-        ! monolithic T-p solve with no ice DOF added to its block structure.
+        ! The primary unknowns remain T and p. Ice is eliminated locally by a
+        ! bounded constitutive return map after each coupled Modified Picard
+        ! update; no ice DOF is added to the global block structure.
         logical :: do_phase_outer
-        integer(int32) :: coupling_iter
-        ! Hansson et al. (2004) is a fully implicit single monolithic solve:
-        ! ice is a state function theta_i(T,p) (calc_ice_content) evaluated in
-        ! the residual, and the latent heat enters the fast Newton diagonal as
-        ! the apparent heat capacity C_a = C_p - Lf*rho_i*dtheta_i/dT
-        ! (thermal_coefficients.F90). No outer projection loop is needed; it is
-        ! disabled here. Set true only to A/B against the old outer-lagged path.
+        integer(int32) :: coupling_iter, node_id
+        ! Keep the former outer solver available as a diagnostic fallback.
+        ! The production path applies the same local return map at every
+        ! Modified Picard iterate, together with its T-p tangent assembled in
+        ! phase_systems.F90. Fully converging a fixed-ice T-p problem before
+        ! changing ice discards that tangent and causes the measured period-two
+        ! front oscillation.
         logical, parameter :: PHASE_USE_OUTER_PROJECTION = .false.
         ! Allow a contracting phase map to finish before ATS reduces dt.
         integer(int32), parameter :: MAX_PHASE_ITER = 240
@@ -351,14 +351,14 @@ contains
         ! The phase equation is a water-content equality. This tolerance is
         ! consistent with the configured hydraulic conserved-quantity scale.
         real(real64), parameter :: PHASE_CONTENT_TOL = 1.0d-3
-        ! Keep a local guard without forcing a mesh-dependent L-infinity solve
-        ! to the same tolerance as the volume-weighted phase balance. A 0.005
-        ! volumetric ice-content defect is accepted only when the global RMS
-        ! content error and local Clapeyron-pressure condition also pass.
-        real(real64), parameter :: PHASE_CONTENT_MAX_TOL = 5.0d-3
-        integer(int32), parameter :: PHASE_ANDERSON_DEPTH = 5
+        ! A local defect must not be hidden by the volume-weighted norm at the
+        ! thin freezing front. Use the same physical content scale locally and
+        ! globally; otherwise an ice-free node could accept a finite freezing
+        ! target solely because its support is small.
+        real(real64), parameter :: PHASE_CONTENT_MAX_TOL = PHASE_CONTENT_TOL
         real(real64), parameter :: PHASE_MIXING = 0.3d0
-        real(real64), parameter :: PHASE_MIXING_MIN = 0.05d0
+        real(real64), parameter :: PHASE_AA_GAMMA_MAX = 2.0d0
+        real(real64), parameter :: PHASE_AA_STEP_GROWTH_MAX = 4.0d0
         real(real64), parameter :: PHASE_STEP_FLOOR = 1.0d-5
         integer(int32), parameter :: PHASE_STAGNATION_LIMIT = 40
         real(real64) :: phase_increment_max, phase_increment_norm
@@ -366,19 +366,17 @@ contains
         real(real64) :: phase_current_ice, phase_projected_ice
         real(real64) :: phase_equilibrium_error
         real(real64) :: phase_step_limit, phase_step_max, phase_step_factor
-        real(real64) :: phase_mixing_current, previous_phase_increment_norm
+        real(real64) :: phase_mixing_current
+        real(real64) :: phase_aa_gamma
         real(real64) :: phase_merit, phase_best_merit
         real(real64), allocatable :: initial_residual_thermal(:), initial_residual_hydraulic(:)
         real(real64), allocatable :: phase_increments(:), previous_phase_increments(:)
         real(real64), allocatable :: phase_update(:), previous_phase_update(:)
-        real(real64), allocatable :: anderson_dF(:, :), anderson_dX(:, :)
-        real(real64), allocatable :: anderson_matrix(:, :), anderson_rhs(:), anderson_gamma(:)
         integer(int32), allocatable :: phase_active_bounds(:)
-        integer(int32) :: phase_max_node, phase_node, num_phase_nodes, anderson_count
+        integer(int32) :: phase_max_node, num_phase_nodes
         integer(int32) :: num_active_nodes
         integer(int32) :: phase_stagnation_count
-        logical :: linear_failed, phase_is_converged, anderson_success
-        logical :: phase_reset_anderson
+        logical :: linear_failed, phase_is_converged, phase_aa_usable
         logical :: phase_final_correction_applied
         logical :: min_dt_extension_announced
         integer(int32) :: max_iter_config, min_dt_iter_limit
@@ -416,14 +414,7 @@ contains
         call self%domain%get_num_nodes(num_phase_nodes)
         allocate (phase_update(num_phase_nodes), source=0.0d0)
         allocate (previous_phase_update(num_phase_nodes), source=0.0d0)
-        allocate (anderson_dF(num_phase_nodes, PHASE_ANDERSON_DEPTH), source=0.0d0)
-        allocate (anderson_dX(num_phase_nodes, PHASE_ANDERSON_DEPTH), source=0.0d0)
-        allocate (anderson_matrix(PHASE_ANDERSON_DEPTH, PHASE_ANDERSON_DEPTH), source=0.0d0)
-        allocate (anderson_rhs(PHASE_ANDERSON_DEPTH), source=0.0d0)
-        allocate (anderson_gamma(PHASE_ANDERSON_DEPTH), source=0.0d0)
-        anderson_count = 0
         phase_mixing_current = PHASE_MIXING
-        previous_phase_increment_norm = -1.0d0
         phase_best_merit = huge(1.0d0)
         phase_stagnation_count = 0
         ! Outer phase projection loop
@@ -437,6 +428,11 @@ contains
                 call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
                 call self%control%increment_total()
                 call self%control%reset_acceleration()
+                ! The local ice projection changes the fixed-point map between
+                ! outer iterations. Retain the per-attempt AA telemetry, but
+                ! never reuse a T-p secant pair across two different ice states.
+                self%aa_has_prev = .false.
+                self%aa_gnorm_prev = -1.0d0
             end if
 
             call self%control%get_max_iterations(max_iter_config)
@@ -529,13 +525,58 @@ contains
                 ! Aitken for legacy Picard, damped for Newton).
                 call self%reflect_variables()
 
+                if (.not. do_phase_outer .and. self%is_active_thermal() .and. &
+                    self%is_active_hydraulic()) then
+                    ! Hansson modified Picard phase elimination: theta_i at
+                    ! iterate k was used in the residual, its return-map tangent
+                    ! was used in the just-solved T-p matrix, and the bounded
+                    ! theta_i^(k+1) value is now committed before evaluating
+                    ! the next residual. AA(1) continues to act on the global
+                    ! T-p fixed-point map only.
+                    phase_update = 0.0d0
+                    call self%project_nodal_ice(.true., phase_update, phase_increment_max, &
+                                                phase_increment_norm, phase_max_node, phase_temperature, &
+                                                phase_pressure, phase_current_ice, phase_projected_ice, &
+                                                phase_equilibrium_error, phase_increments, phase_active_bounds, &
+                                                apply_projected_update=.true., &
+                                                projected_update_scale=phase_return_relaxation)
+                    call self%update_nodal_phases()
+
+                    num_active_nodes = count(phase_active_bounds /= 0)
+                    phase_is_converged = phase_equilibrium_error <= PHASE_PRESSURE_TOL .and. &
+                                         phase_increment_norm <= PHASE_CONTENT_TOL .and. &
+                                         phase_increment_max <= PHASE_CONTENT_MAX_TOL
+                    phase_merit = max(phase_equilibrium_error / PHASE_PRESSURE_TOL, &
+                                      phase_increment_norm / PHASE_CONTENT_TOL, &
+                                      phase_increment_max / PHASE_CONTENT_MAX_TOL)
+                    self%last_phase_metrics_available = .true.
+                    self%last_phase_converged = phase_is_converged
+                    self%last_phase_active_nodes = num_active_nodes
+                    self%last_phase_increment_max = phase_increment_max
+                    self%last_phase_increment_norm = phase_increment_norm
+                    self%last_phase_equilibrium_error = phase_equilibrium_error
+                    self%last_phase_merit = phase_merit
+                    if (phase_increment_max > tiny(1.0d0)) then
+                        write (*, '(A,I0,A,ES10.3,A,ES10.3,A,ES10.3,A,I0)') &
+                            '   [PHASE-MP] iter:', iter_nl, ' max|dQi|:', phase_increment_max, &
+                            ' rms|dQi|:', phase_increment_norm, ' eq[Pa]:', &
+                            phase_equilibrium_error, ' active_nodes:', num_active_nodes
+                    end if
+                end if
+
                 if (self%control%is_conserved()) then
                     ! The solved system was assembled at x_k. Reassemble after
-                    ! reflection so the residual and conserved fields both refer
-                    ! to x_{k+1} when convergence is tested.
+                    ! reflection and the local phase return so the residual and
+                    ! conserved fields both refer to x_{k+1} when convergence
+                    ! is tested.
                     call self%assemble()
                     call self%apply_bc(prescribed=.false.)
                     call self%solve_time_step_check_convergence_conserved()
+                    if (.not. do_phase_outer .and. self%is_active_thermal() .and. &
+                        self%is_active_hydraulic() .and. .not. phase_is_converged) then
+                        call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
+                        call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
+                    end if
                 end if
 
                 ! Force exit after one iteration when config is NONE (linear solve)
@@ -589,11 +630,9 @@ contains
             ! If inner solve failed, skip coupling check
             if (.not. is_step_converged) exit coupling_loop
 
-            ! Hansson single-solve path: ice is already the state function
-            ! theta_i(T,p) used inside the just-converged monolithic solve.
-            ! Refresh the nodal Qw/Qi/Qa/Qv fields from the converged (T,p) so
-            ! the history/output carry the consistent phase state, then exit -
-            ! no outer projection iteration.
+            ! The local phase return was already included in every inner
+            ! Modified Picard iterate. Refresh derived fields once and exit;
+            ! no fixed-ice outer solve is needed.
             if (.not. do_phase_outer) then
                 call self%update_nodal_phases()
                 exit coupling_loop
@@ -604,66 +643,41 @@ contains
                                         phase_current_ice, phase_projected_ice, &
                                         phase_equilibrium_error, phase_increments, phase_active_bounds)
 
-            phase_reset_anderson = .false.
-            if (previous_phase_increment_norm > 0.0d0) then
-                if (phase_increment_norm > 1.2d0 * previous_phase_increment_norm) then
-                    phase_mixing_current = max(PHASE_MIXING_MIN, 0.5d0 * phase_mixing_current)
-                    anderson_count = 0
-                    phase_reset_anderson = .true.
-                else if (phase_increment_norm < 0.95d0 * previous_phase_increment_norm) then
-                    phase_mixing_current = min(PHASE_MIXING, 1.2d0 * phase_mixing_current)
-                end if
+            phase_aa_gamma = 0.0d0
+            phase_aa_usable = .false.
+            if (allocated(previous_phase_increments)) then
+                call compute_aa1_coefficient(phase_increments, previous_phase_increments, &
+                                             PHASE_AA_GAMMA_MAX, phase_aa_gamma, phase_aa_usable)
             end if
-
-            if (allocated(previous_phase_increments) .and. .not. phase_reset_anderson) then
-                if (anderson_count < PHASE_ANDERSON_DEPTH) then
-                    anderson_count = anderson_count + 1
-                else
-                    anderson_dF(:, 1:PHASE_ANDERSON_DEPTH - 1) = anderson_dF(:, 2:PHASE_ANDERSON_DEPTH)
-                    anderson_dX(:, 1:PHASE_ANDERSON_DEPTH - 1) = anderson_dX(:, 2:PHASE_ANDERSON_DEPTH)
-                end if
-                anderson_dF(:, anderson_count) = phase_increments - previous_phase_increments
-                anderson_dX(:, anderson_count) = previous_phase_update
-
-                anderson_matrix(1:anderson_count, 1:anderson_count) = matmul( &
-                    transpose(anderson_dF(:, 1:anderson_count)), anderson_dF(:, 1:anderson_count))
-                anderson_rhs(1:anderson_count) = matmul( &
-                    transpose(anderson_dF(:, 1:anderson_count)), phase_increments)
-                call solve_phase_anderson_system(anderson_matrix(1:anderson_count, 1:anderson_count), &
-                                                  anderson_rhs(1:anderson_count), &
-                                                  anderson_gamma(1:anderson_count), anderson_success)
-                if (anderson_success) then
-                    phase_update = phase_mixing_current * phase_increments - matmul( &
-                        anderson_dX(:, 1:anderson_count) + phase_mixing_current * anderson_dF(:, 1:anderson_count), &
-                        anderson_gamma(1:anderson_count))
-                else
-                    phase_update = phase_mixing_current * phase_increments
-                    anderson_count = 0
-                end if
-                if (dot_product(phase_update, phase_increments) <= 0.0d0 .or. &
-                    maxval(abs(phase_update)) < 0.25d0 * phase_mixing_current * phase_increment_max) then
-                    phase_update = phase_mixing_current * phase_increments
-                    anderson_count = 0
-                end if
+            if (phase_aa_usable) then
+                phase_update = phase_mixing_current * phase_increments - phase_aa_gamma * ( &
+                    previous_phase_update + phase_mixing_current * &
+                    (phase_increments - previous_phase_increments))
             else
                 phase_update = phase_mixing_current * phase_increments
             end if
 
-            ! A global Anderson descent direction can still move an individual
-            ! node away from its bounded local phase projection. Preserve the
-            ! local phase-transfer direction without restricting the coupled
-            ! Anderson update at nodes where it already points toward the target.
-            do phase_node = 1, num_phase_nodes
-                if (abs(phase_increments(phase_node)) <= tiny(1.0d0)) then
-                    phase_update(phase_node) = 0.0d0
-                else if (phase_update(phase_node) * phase_increments(phase_node) <= 0.0d0 .or. &
-                         abs(phase_update(phase_node)) <= tiny(1.0d0)) then
-                    phase_update(phase_node) = phase_mixing_current * phase_increments(phase_node)
+            ! Bound only the accelerated step size. Do not reject a period-two
+            ! residual merely because its current branch is larger or because
+            ! AA(1) crosses a component-wise Picard direction: the predicted
+            ! residual test in compute_aa1_coefficient is the safeguard.
+            phase_step_max = maxval(abs(phase_update))
+            phase_step_limit = max(PHASE_STEP_FLOOR, &
+                                   PHASE_AA_STEP_GROWTH_MAX * phase_mixing_current * phase_increment_max)
+            if (phase_step_max > phase_step_limit) phase_update = phase_update * phase_step_limit / phase_step_max
+
+            ! Once a node is within the accepted local content width of an
+            ! active ice bound, its semismooth equation is simply Qi=0 or
+            ! Qi=Qi_max. Apply that exact projected-Newton step instead of
+            ! geometrically damping it with the global AA coefficient. This
+            ! removes artificial tail iterations without relaxing any phase
+            ! equilibrium or conservation criterion.
+            do node_id = 1, num_phase_nodes
+                if (phase_active_bounds(node_id) /= 0 .and. &
+                    abs(phase_increments(node_id)) <= PHASE_CONTENT_MAX_TOL) then
+                    phase_update(node_id) = phase_increments(node_id)
                 end if
             end do
-            phase_step_max = maxval(abs(phase_update))
-            phase_step_limit = max(PHASE_STEP_FLOOR, 2.0d0 * phase_mixing_current * phase_increment_max)
-            if (phase_step_max > phase_step_limit) phase_update = phase_update * phase_step_limit / phase_step_max
             num_active_nodes = count(phase_active_bounds /= 0)
             phase_step_factor = 0.0d0
             if (abs(phase_increments(phase_max_node)) > tiny(1.0d0)) then
@@ -721,13 +735,12 @@ contains
 
             if (allocated(previous_phase_increments)) deallocate (previous_phase_increments)
             allocate (previous_phase_increments, source=phase_increments)
-            previous_phase_increment_norm = phase_increment_norm
             phase_final_correction_applied = phase_is_converged
-            previous_phase_update = phase_update
             call self%project_nodal_ice(.true., phase_update, phase_increment_max, phase_increment_norm, &
                                         phase_max_node, phase_temperature, phase_pressure, &
                                         phase_current_ice, phase_projected_ice, &
                                         phase_equilibrium_error, phase_increments, phase_active_bounds)
+            previous_phase_update = phase_update
             call self%update_nodal_phases()
 
         end do coupling_loop
@@ -743,71 +756,6 @@ contains
         end if
 
     end subroutine solve_time_step_ftcms
-
-    !> Solve the small regularized normal equation used by outer Anderson mixing.
-    subroutine solve_phase_anderson_system(matrix, rhs, solution, success)
-        implicit none
-        real(real64), intent(in) :: matrix(:, :)
-        real(real64), intent(in) :: rhs(:)
-        real(real64), intent(inout) :: solution(:)
-        logical, intent(inout) :: success
-
-        real(real64) :: work_matrix(size(rhs), size(rhs)), work_rhs(size(rhs))
-        real(real64) :: factor, pivot_value, regularization, row_value
-        integer(int32) :: i, j, k, pivot, system_size
-
-        system_size = size(rhs)
-        solution = 0.0d0
-        success = .false.
-        if (system_size < 1) return
-
-        work_matrix = matrix
-        work_rhs = rhs
-        regularization = 0.0d0
-        do i = 1, system_size
-            regularization = regularization + abs(work_matrix(i, i))
-        end do
-        regularization = max(1.0d-24, 1.0d-10 * regularization / real(system_size, real64))
-        do i = 1, system_size
-            work_matrix(i, i) = work_matrix(i, i) + regularization
-        end do
-
-        do k = 1, system_size - 1
-            pivot = k - 1 + maxloc(abs(work_matrix(k:system_size, k)), dim=1)
-            pivot_value = abs(work_matrix(pivot, k))
-            if (pivot_value <= tiny(1.0d0)) return
-            if (pivot /= k) then
-                do j = k, system_size
-                    row_value = work_matrix(k, j)
-                    work_matrix(k, j) = work_matrix(pivot, j)
-                    work_matrix(pivot, j) = row_value
-                end do
-                row_value = work_rhs(k)
-                work_rhs(k) = work_rhs(pivot)
-                work_rhs(pivot) = row_value
-            end if
-            do i = k + 1, system_size
-                factor = work_matrix(i, k) / work_matrix(k, k)
-                work_matrix(i, k) = 0.0d0
-                work_matrix(i, k + 1:system_size) = work_matrix(i, k + 1:system_size) - &
-                                                    factor * work_matrix(k, k + 1:system_size)
-                work_rhs(i) = work_rhs(i) - factor * work_rhs(k)
-            end do
-        end do
-        if (abs(work_matrix(system_size, system_size)) <= tiny(1.0d0)) return
-
-        do i = system_size, 1, -1
-            row_value = work_rhs(i)
-            if (i < system_size) then
-                row_value = row_value - dot_product(work_matrix(i, i + 1:system_size), &
-                                                     solution(i + 1:system_size))
-            end if
-            if (abs(work_matrix(i, i)) <= tiny(1.0d0)) return
-            solution(i) = row_value / work_matrix(i, i)
-            if (.not. (solution(i) == solution(i) .and. abs(solution(i)) < huge(1.0d0))) return
-        end do
-        success = .true.
-    end subroutine solve_phase_anderson_system
 
     module subroutine solve_time_step_staggered_ftcms(self, is_step_converged)
         implicit none
@@ -1180,6 +1128,8 @@ contains
             label = "nonlinear_limit"
         case (SOLVE_STATUS_PHASE_FAILURE)
             label = "phase_failure"
+        case (SOLVE_STATUS_LTE_REJECTED)
+            label = "lte_rejected"
         case default
             label = "not_run"
         end select
@@ -1230,15 +1180,15 @@ contains
         end if
 
         write (self%solver_history_unit, &
-               '(2(I10,1X),5(ES15.7,1X),I1,1X,A18,1X,9(I10,1X),11(ES13.5,1X))') &
+               '(2(I10,1X),5(ES15.7,1X),I1,1X,A18,1X,10(I10,1X),12(ES13.5,1X))') &
             attempt, accepted_step, time_start, time_trial, time_accepted, dt_used, dt_next, &
             merge(1_int32, 0_int32, accepted), status, &
             self%last_inner_iterations, self%last_max_inner_iterations, self%last_phase_iterations, &
-            self%last_nonlinear_work, ats_iter, merge(1_int32, 0_int32, phase_spike), &
+            self%last_nonlinear_work, ats_iter, self%aa_use_count, merge(1_int32, 0_int32, phase_spike), &
             merge(1_int32, 0_int32, self%last_phase_metrics_available), &
             merge(1_int32, 0_int32, self%last_phase_converged), self%last_phase_active_nodes, &
             self%last_phase_increment_max, self%last_phase_increment_norm, &
-            self%last_phase_equilibrium_error, self%last_phase_merit, &
+            self%last_phase_equilibrium_error, self%last_phase_merit, self%aa_gamma_max_abs, &
             t_res, t_inc, h_res, h_inc, omega_used, dq_norm_used, lte_error
         flush (self%solver_history_unit)
     end subroutine write_solver_history_attempt
@@ -1286,12 +1236,19 @@ contains
             ! before the time/variable history is shifted (needs ydot_n and dt_n).
             lte_error = -1.0d0
             if (is_step_converged) lte_error = self%compute_lte_error()
+            if (is_step_converged .and. self%lte_error_control_active .and. lte_error > 1.0d0) then
+                is_step_converged = .false.
+                self%last_solve_status = SOLVE_STATUS_LTE_REJECTED
+                write (*, '(A,ES11.3,A,ES11.3)') &
+                    '   [LTE] converged step rejected: normalized error=', lte_error, ', dt[s]=', dt_used
+            end if
 
             attempt_counter = attempt_counter + 1
 
             if (is_step_converged) then
                 self%last_accepted_dt = dt_used
                 self%last_accepted_phase_iterations = phase_iter
+                call self%commit_lte_history()
                 ! Update time and adaptive time stepping
                 call self%control%update(is_step_converged, error_estimate=lte_error, &
                                          iteration_count=effective_iter)

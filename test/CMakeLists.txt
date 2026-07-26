@@ -118,6 +118,12 @@ add_solver_test(constitutive
         SOLVER::CONSTITUTIVE
 )
 
+add_solver_test(ats
+    LIBS
+        SOLVER::CORE
+        SOLVER::CONTROL
+)
+
 add_solver_test(numerical
     LIBS
         SOLVER::CORE
@@ -135,6 +141,21 @@ endif()
 
 # test_main requires all solver libraries
 add_solver_test(main
+    LIBS
+        SOLVER::CORE
+        SOLVER::LINALG
+        SOLVER::PARALLEL
+        SOLVER::SOLVER
+        SOLVER::SYSTEM
+        SOLVER::DOMAIN
+        SOLVER::INPUT
+        SOLVER::OUTPUT
+        SOLVER::CONSTITUTIVE
+        SOLVER::GOVERNING
+        SOLVER::FTCMS
+)
+
+add_solver_test(coupling_assembly
     LIBS
         SOLVER::CORE
         SOLVER::LINALG

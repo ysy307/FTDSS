@@ -423,11 +423,9 @@ contains
             ! on the raw change alone.
             dq_ok = .false.
         end if
-        ! When R(x_0) is already at the algebraic noise floor, its relative ratio
-        ! is ill-conditioned. In that case accept only with a ten-times stricter
-        ! unrelaxed conserved update and the complete energy/water balance sums.
-        is_ok = dq_ok .and. (residual_ok .or. &
-                             (dq_effective <= self%residual_eps .and. balance_ok))
+        ! Conserved changes and global balance cannot replace the assembled
+        ! field equations. All three are hard acceptance gates.
+        is_ok = dq_ok .and. residual_ok .and. balance_ok
 
         ! Globalize the coupled Picard update using the freshly assembled nonlinear
         ! residual. The conserved-quantity increment can alternate while the true

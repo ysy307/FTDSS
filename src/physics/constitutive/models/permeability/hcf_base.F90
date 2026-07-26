@@ -6,32 +6,19 @@ contains
 
     !> Suction head [m] controlling the retention-based relative permeability.
     !>
-    !> The retention-based relative permeability is evaluated at the same
-    !> generalized suction psi_eff that sets the unfrozen liquid content, so
-    !> the mobile-water saturation the permeability sees is consistent with the
-    !> content actually present. Its gradient carries the cryosuction driving
-    !> force for moisture migration toward the freezing front. Ice impedance is
-    !> applied as a separate multiplicative factor by the configured HCF model.
-    !> Falls back to the actual pore-water head when psi_eff is not set on the
-    !> state (e.g. isothermal callers that never populate effective_suction).
+    !> The primary hydraulic unknown is the pore-water pressure. Relative
+    !> permeability therefore uses its pressure head directly. Ice impedance
+    !> and viscosity corrections are applied by the configured HCF model.
     module subroutine calc_head_hcf(self, state, head)
         implicit none
         class(abst_hcf), intent(in) :: self
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: head
 
-        real(real64) :: psi_eff, pressure
-        logical :: is_set
+        real(real64) :: pressure
 
-        psi_eff = 0.0d0
-        is_set = .false.
-        call state%effective_suction%get(psi_eff, is_set)
-        if (is_set) then
-            head = -psi_eff / (rho_std * g)
-        else
-            call state%pressure%get(pressure)
-            head = pressure / (rho_std * g)
-        end if
+        call state%pressure%get(pressure)
+        head = pressure / (rho_std * g)
     end subroutine calc_head_hcf
 
     !> Impedance factor of Hansson et al. (2004):
@@ -304,7 +291,7 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: klT
 
-        real(real64) :: Klh_r, dgamma_dT
+        real(real64) :: K_lh, dgamma_dT
         real(real64) :: temperature
         real(real64) :: head
 
@@ -315,9 +302,9 @@ contains
         call self%calc_head(state, head)
 
         if (allocated(self%base)) then
-            call self%base%calc_kr(head, Klh_r)
+            call self%calc_Kflh(state, K_lh)
             dgamma_dT = -0.1425d0 - 4.76d-4 * temperature
-            klT = self%config%k_sat * Klh_r * head * self%config%gain_factor * (dgamma_dT / gamma_0)
+            klT = K_lh * head * self%config%gain_factor * (dgamma_dT / gamma_0)
         else
             klT = 0.0d0
         end if

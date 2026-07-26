@@ -39,6 +39,8 @@ module io_input_conditions
         real(real64) :: scale_retry
         logical :: use_error_control = .true.
         real(real64) :: error_relative_tolerance = 1.0d-2
+        real(real64) :: error_absolute_tolerance_temperature = 1.0d-3
+        real(real64) :: error_absolute_tolerance_pressure = 1.0d1
         real(real64) :: proportional_gain = 0.10d0
         real(real64) :: integral_gain = 0.15d0
         real(real64) :: safety_factor = 0.9d0

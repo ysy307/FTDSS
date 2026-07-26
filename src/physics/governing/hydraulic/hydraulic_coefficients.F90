@@ -81,18 +81,17 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: C_HT
 
-        real(real64) :: rho_w, rho_i
+        real(real64) :: rho_w, rho_i, Qi
+        real(real64) :: drho_w_dT, drho_i_dT, dratio_dT
         real(real64) :: dQw_dT, dQi_dT, dQv_dT
-        real(real64), pointer, contiguous, dimension(:) :: temperature_history
-        real(real64) :: temperature, dT, theta_cur, theta_old
-        real(real64) :: Qw, Qi, Qv
-        type(type_state) :: temp_state
-        real(real64), parameter :: DT_SECANT_FLOOR = 1.0d-3
-
+        drho_w_dT = 0.0d0
+        drho_i_dT = 0.0d0
+        dratio_dT = 0.0d0
         dQw_dT = 0.0d0
         dQi_dT = 0.0d0
         dQv_dT = 0.0d0
 
+        call state%ice_content%get(Qi)
         call state%dQw_dT%get(dQw_dT)
         call state%dQi_dT%get(dQi_dT)
         if (self%enable_vapor_transport) then
@@ -101,40 +100,15 @@ contains
 
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_density_ice(state, rho_i)
-
-        ! C_HT = dTheta/dT in the mixed water-content formulation. Ice is an
-        ! outer fixed state and liquid retention uses p_w, so their inner
-        ! temperature tangents vanish; vapor remains when enabled.
-        C_HT = dQw_dT + (rho_i / rho_w) * dQi_dT + dQv_dT
-
-        ! Phase-change stabilization (mirrors the thermal C_TT chord): use the
-        ! actual mixed storage change crossed over the step. Evaluated only for
-        ! |dT| above a floor so it stays bounded; below that the tangent is the
-        ! correct slope.
-        call state%get(temperature=temperature, temperature_history=temperature_history)
-        if (associated(temperature_history)) then
-            if (size(temperature_history) >= 2) then
-                dT = temperature - temperature_history(2)
-                if (abs(dT) > DT_SECANT_FLOOR) then
-                    call state%water_content%get(Qw)
-                    call state%ice_content%get(Qi)
-                    call state%vapor_content%get(Qv)
-                    theta_cur = Qw + (rho_i / rho_w) * Qi + Qv
-
-                    call temp_state%copy(state)
-                    call temp_state%temperature%set(temperature_history(2))
-                    call self%update_water_phases(material_id, temp_state)
-                    call temp_state%water_content%get(Qw)
-                    call temp_state%ice_content%get(Qi)
-                    call temp_state%vapor_content%get(Qv)
-                    call self%physics%calc_density_water(temp_state, rho_w)
-                    call self%physics%calc_density_ice(temp_state, rho_i)
-                    theta_old = Qw + (rho_i / rho_w) * Qi + Qv
-
-                    C_HT = (theta_cur - theta_old) / dT
-                end if
-            end if
+        call self%physics%calc_density_water_derivatives(material_id, state, dden_dT=drho_w_dT)
+        call self%physics%calc_density_ice_derivatives(material_id, state, dden_dT=drho_i_dT)
+        if (abs(rho_w) > tiny(1.0d0)) then
+            dratio_dT = drho_i_dT / rho_w - rho_i * drho_w_dT / (rho_w * rho_w)
         end if
+
+        ! Modified Picard freezes this physical storage tangent at the current
+        ! iterate while solving the coupled temperature-pressure increment.
+        C_HT = dQw_dT + (rho_i / rho_w) * dQi_dT + Qi * dratio_dT + dQv_dT
 
     end subroutine compute_coupling_mass_term_hydraulic
 
@@ -323,27 +297,37 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: C_eq
 
-        real(real64) :: rho_w, rho_i
+        real(real64) :: rho_w, rho_i, Qi
+        real(real64) :: drho_w_dP, drho_i_dP, dratio_dP
         real(real64) :: dQw_dP, dQi_dP, dQv_dP
         real(real64) :: compressive_capacity, compressive_storage
 
+        drho_w_dP = 0.0d0
+        drho_i_dP = 0.0d0
+        dratio_dP = 0.0d0
         dQw_dP = 0.0d0
         dQi_dP = 0.0d0
         dQv_dP = 0.0d0
 
+        call state%ice_content%get(Qi)
         call state%dQw_dP%get(dQw_dP)
         call state%dQi_dP%get(dQi_dP)
         call state%dQv_dP%get(dQv_dP)
 
         call self%physics%calc_density_water(state, rho_w)
         call self%physics%calc_density_ice(state, rho_i)
+        call self%physics%calc_density_water_derivatives(material_id, state, dden_dP=drho_w_dP)
+        call self%physics%calc_density_ice_derivatives(material_id, state, dden_dP=drho_i_dP)
+        if (abs(rho_w) > tiny(1.0d0)) then
+            dratio_dP = drho_i_dP / rho_w - rho_i * drho_w_dP / (rho_w * rho_w)
+        end if
 
-        ! C_eq = dTheta/dP = dQw_dP + (rho_i/rho_w)*dQi_dP + dQv_dP
+        ! C_eq = dTheta/dP, including the derivative of rho_i/rho_w.
         ! (rho_v ~ rho_w approximation consistent with calc_effective_density)
-        ! Clamp to non-negative roundoff. The outer ice state has zero inner
-        ! pressure tangent, while liquid retention supplies positive capacity.
+        ! Clamp to non-negative roundoff.
         call self%compute_compressive_storage(material_id, state, compressive_storage, compressive_capacity)
-        C_eq = max(0.0d0, dQw_dP + (rho_i / rho_w) * dQi_dP + dQv_dP) + compressive_capacity
+        C_eq = max(0.0d0, dQw_dP + (rho_i / rho_w) * dQi_dP + Qi * dratio_dP + dQv_dP) + &
+               compressive_capacity
     end subroutine compute_C_eq_hydraulic
 
     !> Compute the nonlinear-iteration capacity from the physical tangent and WRF bound.

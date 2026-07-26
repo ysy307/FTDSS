@@ -10,11 +10,15 @@ module app_ftcms
     use :: module_output, only:type_output_manager
 
     use :: module_control, only:type_control
+    use :: control_acceleration_aa1_coupled, only:compute_aa1_coefficient, &
+        compute_coupled_aa1_coefficient, coupled_weighted_norm
     use :: module_domain
     ! use :: module_boundary, only:
     use :: module_initial, only:type_ic_manager
     use :: module_system, only:type_jacobian_matrix, type_residual_vector
     use :: module_constitutive, only:g => gravity_acceleration
+    use :: models_phase_change_chemical_potential, only:calc_T_high_celsius
+    use :: models_phase_change_manager, only:phase_return_relaxation
     use :: module_linalg
 
     use :: module_governing
@@ -179,13 +183,18 @@ module app_ftcms
         real(real64), allocatable :: col_scale(:)
         real(real64), allocatable :: col_scale_inv(:)
 
-        ! Local-truncation-error estimate state for error-controlled ATS. Stores the
-        ! previous-step time derivative (ydot) per physics and the previous dt, used
-        ! by compute_lte_error to form the divided-difference (curvature) estimate.
+        ! Accepted-step state for transactional BDF1 LTE estimation.
+        real(real64), allocatable :: lte_state_prev_thermal(:)
+        real(real64), allocatable :: lte_state_prev_hydraulic(:)
         real(real64), allocatable :: lte_ydot_prev_thermal(:)
         real(real64), allocatable :: lte_ydot_prev_hydraulic(:)
         real(real64) :: lte_prev_dt = 0.0d0
-        logical :: lte_has_prev = .false.
+        real(real64) :: lte_rtol = 1.0d-2
+        real(real64) :: lte_atol_thermal = 1.0d-3
+        real(real64) :: lte_atol_hydraulic = 1.0d1
+        logical :: lte_error_control_active = .false.
+        logical :: lte_has_state = .false.
+        logical :: lte_has_derivative = .false.
 
         ! Anderson(1) acceleration state of the conserved coupled Picard loop:
         ! the previous iterate and previous fixed-point increment of (T, p),
@@ -196,10 +205,14 @@ module app_ftcms
         real(real64), allocatable :: aa_duT_prev(:)
         real(real64), allocatable :: aa_duP_prev(:)
         logical :: aa_has_prev = .false.
-        ! Weighted norm of the previous fixed-point increment ||g_{k-1}||_W;
-        ! negative when unset. Safeguard: Anderson mixing is applied only while
-        ! this sequence is non-increasing (contracting fixed-point iteration).
+        ! Weighted norm of the previous fixed-point increment ||g_{k-1}||_W.
+        ! Retained for nonlinear diagnostics; growth alone does not disable AA(1).
         real(real64) :: aa_gnorm_prev = -1.0d0
+        integer(int32) :: aa_use_count = 0
+        real(real64) :: aa_gamma_max_abs = 0.0d0
+        ! Per-attempt active-set marker for Hansson's one-time freezing-onset
+        ! temperature reset. It is not a primary unknown or accepted history.
+        logical, allocatable :: phase_onset_reset(:)
 
         ! Unit of Output/solver_history.log: one record per time-step attempt.
         ! The log distinguishes attempted/accepted time and dt, termination
@@ -268,6 +281,8 @@ module app_ftcms
         procedure, private, pass(self) :: project_nodal_ice => project_nodal_ice_ftcms
         procedure, private, pass(self) :: compute_nodal_conserved => compute_nodal_conserved_ftcms
         procedure, public, pass(self) :: compute_lte_error => compute_lte_error_ftcms
+        procedure, private, pass(self) :: initialize_lte_history => initialize_lte_history_ftcms
+        procedure, private, pass(self) :: commit_lte_history => commit_lte_history_ftcms
         procedure, public, pass(self) :: nonlinear_residual_norm => nonlinear_residual_norm_ftcms
         procedure, public, pass(self) :: update_variables => update_variables_ftcms
         procedure, public, pass(self) :: assemble_local => assemble_local_ftcms
@@ -479,11 +494,12 @@ module app_ftcms
         module subroutine project_nodal_ice_ftcms(self, apply_update, ice_update, max_increment, increment_norm, &
                                                    max_node, max_temperature, max_pressure, &
                                                    max_current_ice, max_projected_ice, &
-                                                   max_equilibrium_error, increments, active_bounds)
+                                                   max_equilibrium_error, increments, active_bounds, &
+                                                   apply_projected_update, projected_update_scale)
             implicit none
             class(type_ftcms), intent(inout) :: self
             logical, intent(in) :: apply_update
-            real(real64), intent(in) :: ice_update(:)
+            real(real64), intent(inout) :: ice_update(:)
             real(real64), intent(inout) :: max_increment
             real(real64), intent(inout) :: increment_norm
             integer(int32), intent(inout) :: max_node
@@ -494,11 +510,13 @@ module app_ftcms
             real(real64), intent(inout) :: max_equilibrium_error
             real(real64), allocatable, intent(inout) :: increments(:)
             integer(int32), allocatable, intent(inout) :: active_bounds(:)
+            logical, intent(in), optional :: apply_projected_update
+            real(real64), intent(in), optional :: projected_update_scale
         end subroutine project_nodal_ice_ftcms
 
         !> Evaluate the per-node conserved quantities (volumetric enthalpy density
         !> and pore-water effective density) at the current iterate, for the
-        !> conserved-quantity convergence norm and the Richardson error estimate.
+        !> conserved-quantity nonlinear convergence norm.
         module subroutine compute_nodal_conserved_ftcms(self, enthalpy, density)
             implicit none
             class(type_ftcms), intent(inout) :: self
@@ -506,21 +524,29 @@ module app_ftcms
             real(real64), allocatable, intent(inout) :: density(:)
         end subroutine compute_nodal_conserved_ftcms
 
-        !> Relative local-truncation-error estimate of the just-converged step, for
-        !> the error-controlled (PI) adaptive time stepping.
+        !> Normalized local-truncation-error estimate of the tentative BDF1 step.
         !>
         !> Uses the divided-difference (curvature) estimate of the implicit-Euler
         !> LTE: \( \text{LTE} \approx \lVert \dot y_n - \dot y_{n-1}\rVert\,
-        !> \Delta t_n^2/(\Delta t_n+\Delta t_{n-1}) \), normalized by \(\lVert y_n\rVert\)
-        !> to be dimensionless and self-scaling (no per-case absolute tolerances).
-        !> The temperature and pressure estimates are combined by a maximum.
+        !> \Delta t_n^2/(\Delta t_n+\Delta t_{n-1}) \), evaluated with a
+        !> component-wise atol/rtol weighted RMS norm.
         !> Returns -1 on the first step (no previous derivative yet) so the caller
-        !> skips error control. Advances the stored previous derivative and dt.
+        !> skips error control. This function does not mutate accepted history.
         module function compute_lte_error_ftcms(self) result(error_rel)
             implicit none
             class(type_ftcms), intent(inout) :: self
             real(real64) :: error_rel
         end function compute_lte_error_ftcms
+
+        module subroutine initialize_lte_history_ftcms(self)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+        end subroutine initialize_lte_history_ftcms
+
+        module subroutine commit_lte_history_ftcms(self)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+        end subroutine commit_lte_history_ftcms
 
         !> Euclidean norm of the assembled nonlinear conservation residual (energy
         !> and water blocks combined), used as the merit function for the
