@@ -37,6 +37,7 @@ module control_iteration_setting
         procedure, public, pass(self) :: get_current_norm => get_current_norm_iteration_setting
         procedure, public, pass(self) :: get_tolerances => get_tolerances_iteration_setting
         procedure, public, pass(self) :: update_reference_values => update_reference_values_iteration_setting
+        procedure, public, pass(self) :: set_residual_scale => set_residual_scale_iteration_setting
         ! ---- Meta / Utility ----
     end type type_iteration_setting
 
@@ -104,6 +105,15 @@ contains
         call self%convergence_control%prime_conserved_residual(residual_thermal, residual_hydraulic, &
                                                                check_thermal, check_hydraulic)
     end subroutine prime_conserved_residual_setting
+
+    subroutine set_residual_scale_iteration_setting(self, volume_total, dt)
+        implicit none
+        class(type_iteration_setting), intent(inout) :: self
+        real(real64), intent(in) :: volume_total
+        real(real64), intent(in) :: dt
+
+        call self%convergence_control%set_residual_scale(volume_total, dt)
+    end subroutine set_residual_scale_iteration_setting
 
     !> Last weighted-RMS conserved-quantity change ||dQ||_W (diagnostics).
     pure function get_conserved_dq_norm_setting(self) result(dq_norm)

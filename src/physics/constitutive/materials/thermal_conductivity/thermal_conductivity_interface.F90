@@ -218,11 +218,11 @@ module materials_thermal_conductivity
 
         end subroutine calc_thc_4
 
-        module subroutine calc_thc_4_vadoze(A, B, C, D, F1, F2, phi_water, phi_ice, phi_vapor, lambda)
+        module subroutine calc_thc_4_vadoze(A, B, C, D, F1, F2, phi_water, phi_ice, lambda)
             implicit none
             real(real64), intent(in) :: A, B, C, D
             real(real64), intent(in) :: F1, F2
-            real(real64), intent(in) :: phi_water, phi_ice, phi_vapor
+            real(real64), intent(in) :: phi_water, phi_ice
             real(real64), intent(inout) :: lambda
 
         end subroutine calc_thc_4_vadoze

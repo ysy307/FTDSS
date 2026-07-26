@@ -56,6 +56,7 @@ module control_time
         procedure, public, pass(self) :: get_dt
         !> Get current BDF order.
         procedure, public, pass(self) :: get_bdf_order
+        procedure, public, pass(self) :: get_target_bdf_order
         !> Get BDF coefficients array.
         procedure, public, pass(self) :: get_bdf_coeffs
         !> Get simulation end time.
@@ -342,6 +343,15 @@ contains
 
         bdf_order = self%current_bdf_order
     end subroutine get_bdf_order
+
+    !> Get the configured target BDF order the integrator ramps up to.
+    subroutine get_target_bdf_order(self, target_bdf_order)
+        implicit none
+        class(type_time), intent(in) :: self
+        integer(int32), intent(inout) :: target_bdf_order
+
+        target_bdf_order = self%config%target_bdf_order
+    end subroutine get_target_bdf_order
 
     !> Get pointer to current BDF coefficient array.
     subroutine get_bdf_coeffs(self, coeffs)

@@ -121,8 +121,10 @@ contains
         call self%get_phi(state, phi1, phi2, phi3, phi4)
 
         if (phi4 > 0.0d0) then
+            ! phi2 = liquid water, phi3 = ice. The gas-filled fraction phi4 is
+            ! deliberately not passed: see calc_thc_4_vadoze.
             call calc_thc_4_vadoze(self%params(1), self%params(2), self%params(3), self%params(4), &
-                                   self%params(5), self%params(6), phi2, phi3, phi4, lambda)
+                                   self%params(5), self%params(6), phi2, phi3, lambda)
         else
             call calc_thc_4(self%material1, phi1, self%material2, phi2, self%material3, phi3, self%material4, phi4, lambda)
         end if

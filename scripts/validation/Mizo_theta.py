@@ -34,6 +34,29 @@ TIME_INDEX = {0: 0, 12: 1, 24: 2, 50: 3}
 ICE_TO_WATER_VOLUME_RATIO = 917.0 / 1000.0
 
 
+def _output_interval_minutes(vtu_dir):
+    """Read the field-output interval from the project's Output.json.
+
+    The VTU index for a target time is time/interval, so a hard-coded interval
+    silently reads the wrong snapshot whenever the project changes its output
+    cadence. Search upward from the VTU directory for Input/Output.json.
+    """
+    unit_seconds = {"second": 1.0, "minute": 60.0, "hour": 3600.0, "day": 86400.0}
+    for parent in [Path(vtu_dir).resolve(), *Path(vtu_dir).resolve().parents]:
+        candidate = parent / "Input" / "Output.json"
+        if not candidate.is_file():
+            continue
+        interval = json.loads(candidate.read_text())["field_output"]["output_interval"]
+        unit = str(interval.get("unit", "second")).lower()
+        if unit not in unit_seconds:
+            raise ValueError(f"Unsupported output_interval unit '{unit}' in {candidate}")
+        return float(interval["value"]) * unit_seconds[unit] / 60.0
+    raise FileNotFoundError(
+        f"Could not locate Input/Output.json above {vtu_dir}; "
+        "pass --output_interval_minutes explicitly"
+    )
+
+
 def _vtu_path(vtu_dir, time_hours, output_interval_minutes):
     file_number = round(time_hours * 60.0 / output_interval_minutes)
     vtu_dir = Path(vtu_dir)
@@ -262,7 +285,8 @@ def main():
     parser.add_argument("--vtu_dir", type=Path, required=True)
     parser.add_argument("--time", type=int, choices=sorted(TIME_INDEX), required=True)
     parser.add_argument("--res", type=float, default=0.001)
-    parser.add_argument("--output_interval_minutes", type=float, default=5.0)
+    parser.add_argument("--output_interval_minutes", type=float,
+                        help="Overrides the interval read from Input/Output.json")
     parser.add_argument("--solver_history", type=Path)
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--rmse_limit", type=float)
@@ -273,11 +297,16 @@ def main():
     parser.add_argument("--json_output", type=Path)
     args = parser.parse_args()
 
+    interval_minutes = args.output_interval_minutes
+    if interval_minutes is None:
+        interval_minutes = _output_interval_minutes(args.vtu_dir)
+        print(f"Output interval from Input/Output.json: {interval_minutes:g} min")
+
     result = calculate_theta_error_high_precision(
         args.vtu_dir,
         args.time,
         res=args.res,
-        output_interval_minutes=args.output_interval_minutes,
+        output_interval_minutes=interval_minutes,
     )
 
     history_path = args.solver_history

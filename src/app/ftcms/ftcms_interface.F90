@@ -18,7 +18,6 @@ module app_ftcms
     use :: module_system, only:type_jacobian_matrix, type_residual_vector
     use :: module_constitutive, only:g => gravity_acceleration
     use :: models_phase_change_chemical_potential, only:calc_T_high_celsius
-    use :: models_phase_change_manager, only:phase_return_relaxation
     use :: module_linalg
 
     use :: module_governing
@@ -183,18 +182,33 @@ module app_ftcms
         real(real64), allocatable :: col_scale(:)
         real(real64), allocatable :: col_scale_inv(:)
 
-        ! Accepted-step state for transactional BDF1 LTE estimation.
+        ! Accepted-step state for transactional BDF1/BDF2 LTE estimation.
+        !
+        ! The estimator is the Newton divided-difference form
+        !   LTE_k ~ h_n**(k+1) * y[t_n, t_{n-1}, ..., t_{n-k-1}],
+        ! so order k needs the k-th difference of the previous step as history.
+        ! Storing that difference costs one array instead of one more full
+        ! solution level per order.
         real(real64), allocatable :: lte_state_prev_thermal(:)
         real(real64), allocatable :: lte_state_prev_hydraulic(:)
         real(real64), allocatable :: lte_ydot_prev_thermal(:)
         real(real64), allocatable :: lte_ydot_prev_hydraulic(:)
+        !> Second divided difference y[t_{n-1},t_{n-2},t_{n-3}] of the previous
+        !> accepted step, needed only by the BDF2 estimator.
+        real(real64), allocatable :: lte_d2_prev_thermal(:)
+        real(real64), allocatable :: lte_d2_prev_hydraulic(:)
+        !> Total mesh measure, summed once and reused by the residual floor.
+        real(real64) :: domain_measure_total = -1.0d0
         real(real64) :: lte_prev_dt = 0.0d0
+        !> t_{n-1} - t_{n-3} spanned by lte_d2_prev.
+        real(real64) :: lte_prev_span = 0.0d0
         real(real64) :: lte_rtol = 1.0d-2
         real(real64) :: lte_atol_thermal = 1.0d-3
         real(real64) :: lte_atol_hydraulic = 1.0d1
         logical :: lte_error_control_active = .false.
         logical :: lte_has_state = .false.
         logical :: lte_has_derivative = .false.
+        logical :: lte_has_second_difference = .false.
 
         ! Anderson(1) acceleration state of the conserved coupled Picard loop:
         ! the previous iterate and previous fixed-point increment of (T, p),
@@ -213,6 +227,11 @@ module app_ftcms
         ! Per-attempt active-set marker for Hansson's one-time freezing-onset
         ! temperature reset. It is not a primary unknown or accepted history.
         logical, allocatable :: phase_onset_reset(:)
+        !> Line-search telemetry: accepted step scale, trials used and the count
+        !> of iterates where no admissible step was found.
+        real(real64) :: last_line_search_scale = 1.0d0
+        integer(int32) :: last_line_search_trials = 0
+        integer(int32) :: last_line_search_failures = 0
 
         ! Unit of Output/solver_history.log: one record per time-step attempt.
         ! The log distinguishes attempted/accepted time and dt, termination

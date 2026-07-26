@@ -14,6 +14,13 @@ submodule(control_iteration_convergence) convergence_control
     !> false divergence signal. Sustained increase over this many iterations is
     !> genuine divergence and is damped as before.
     integer(int32), parameter :: CONSERVED_DIVERGE_PATIENCE = 3
+    ! A windowed net-progress test was tried here to catch the oscillating stall
+    ! that the consecutive-increase counter above cannot see. It is superseded by
+    ! the backtracking line search in ftcms_solve, which enforces a decrease at
+    ! every iterate instead of reacting after five of them, and the two actively
+    ! conflict: the line search accepts an Armijo decrease that can be arbitrarily
+    ! small, which the window test reads as stagnation and damps - measured, omega
+    ! collapsed to its floor and the step stopped advancing.
     ! Warm start of the under-relaxation across nonlinear loops: the spectrum
     ! of the coupled Picard map changes little between consecutive time steps
     ! (and between a failed attempt and its retry), so re-exploring omega from
@@ -363,7 +370,10 @@ contains
                 balanceT = abs(sum(residual_thermal)) / &
                            (sqrt(real(size(residual_thermal), real64)) * self%residual0_thermal)
             end if
-            residual_ok = residual_ok .and. (ratioT <= self%residual_eps)
+            residual_ok = residual_ok .and. &
+                          (rT <= residual_floor(self%atol_enthalpy, self%residual_volume_total, &
+                                                self%residual_dt, size(residual_thermal)) + &
+                           self%residual_eps * self%residual0_thermal)
             balance_ok = balance_ok .and. (balanceT <= self%residual_eps)
         else if (check_thermal) then
             residual_ok = .false.
@@ -376,7 +386,10 @@ contains
                 balanceH = abs(sum(residual_hydraulic)) / &
                            (sqrt(real(size(residual_hydraulic), real64)) * self%residual0_hydraulic)
             end if
-            residual_ok = residual_ok .and. (ratioH <= self%residual_eps) .and. &
+            residual_ok = residual_ok .and. &
+                          (rH <= residual_floor(self%atol_density, self%residual_volume_total, &
+                                                self%residual_dt, size(residual_hydraulic)) + &
+                           self%residual_eps * self%residual0_hydraulic) .and. &
                           (balanceH <= self%residual_eps)
             balance_ok = balance_ok .and. (balanceH <= self%residual_eps)
         else if (check_hydraulic) then
@@ -545,6 +558,34 @@ contains
         self%relaxation_omega = min(1.0d0, max(CONSERVED_OMEGA_WARM_FLOOR, &
                                                CONSERVED_OMEGA_WARM_RELEASE * self%relaxation_omega))
     end subroutine reset_conserved_state
+
+    module subroutine set_residual_scale_convergence_control(self, volume_total, dt)
+        implicit none
+        class(type_convergence_control), intent(inout) :: self
+        real(real64), intent(in) :: volume_total
+        real(real64), intent(in) :: dt
+
+        self%residual_volume_total = volume_total
+        self%residual_dt = dt
+    end subroutine set_residual_scale_convergence_control
+
+    !> Absolute residual floor for a block, from its conserved-quantity atol.
+    !>
+    !> An imbalance R_i sustained over the step changes the nodal conserved
+    !> quantity by R_i*dt/V_i, so requiring that change to stay under atol gives
+    !> |R_i| <= atol*V_i/dt and, for the L2 norm over N nodes with a mean control
+    !> volume V_total/N, ||R||_2 <= atol*V_total/(dt*sqrt(N)). Returns zero when
+    !> the scales are unset, which reproduces the pure-ratio gate exactly.
+    pure function residual_floor(atol, volume_total, dt, num_nodes) result(floor_value)
+        implicit none
+        real(real64), intent(in) :: atol, volume_total, dt
+        integer(int32), intent(in) :: num_nodes
+        real(real64) :: floor_value
+
+        floor_value = 0.0d0
+        if (volume_total <= 0.0d0 .or. dt <= 0.0d0 .or. num_nodes <= 0) return
+        floor_value = atol * volume_total / (dt * sqrt(real(num_nodes, real64)))
+    end function residual_floor
 
     !> L2 norm of the complete block residual, including its mean component.
     function block_residual_norm(r) result(norm)

@@ -140,6 +140,17 @@ module control_iteration_convergence
         real(real64), private :: rtol_conserved = 1.0d-3
         !> Per-block residual ratio tolerance eps_R [-]
         real(real64), private :: residual_eps = 1.0d-3
+        !> Physical scales that turn the residual gate from a pure ratio into the
+        !> standard atol + rtol form. A ratio to the step's own initial residual
+        !> is not scale invariant: once the iteration has reduced the residual to
+        !> the floor the frozen-coefficient linearization can reach, the ratio
+        !> saturates and the gate becomes unreachable even though the conserved
+        !> quantities and the global balance are both well inside tolerance.
+        !> The floor is derived, not tuned: an imbalance R may not move the nodal
+        !> conserved quantity by more than its own atol over the step, so
+        !> |R_i| <= atol * V_i / dt, hence ||R||_2 <= atol * V_total / (dt*sqrt(N)).
+        real(real64), private :: residual_volume_total = -1.0d0
+        real(real64), private :: residual_dt = -1.0d0
         !> Nodal conserved quantities at the previous nonlinear iterate
         real(real64), allocatable, private :: enthalpy_prev(:)
         real(real64), allocatable, private :: density_prev(:)
@@ -167,6 +178,7 @@ module control_iteration_convergence
         ! ---- Mutator ----
         procedure, public, pass(self) :: reset => reset_convergence_control
         procedure, public, pass(self) :: update_reference_values => update_reference_values_convergence_control
+        procedure, public, pass(self) :: set_residual_scale => set_residual_scale_convergence_control
         ! ---- Algorithm / Operation ----
         procedure, public, pass(self) :: check_convergence => check_convergence_control
         ! ---- Inquiry ----
@@ -285,6 +297,15 @@ module control_iteration_convergence
             real(real64), intent(in) :: reference_values(:)
 
         end subroutine update_reference_values_convergence_control
+
+        !> Supply the discretization scales used by the residual floor.
+        module subroutine set_residual_scale_convergence_control(self, volume_total, dt)
+            implicit none
+            class(type_convergence_control), intent(inout) :: self
+            real(real64), intent(in) :: volume_total
+            real(real64), intent(in) :: dt
+
+        end subroutine set_residual_scale_convergence_control
 
         !> Returns true when the conserved-quantity convergence mode is selected.
         module pure function is_conserved_convergence_control(self) result(is_conserved)

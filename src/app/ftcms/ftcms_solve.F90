@@ -26,6 +26,9 @@ contains
         self%aa_has_prev = .false.
         self%aa_gnorm_prev = -1.0d0
         self%aa_use_count = 0
+        self%last_line_search_failures = 0
+        self%last_line_search_trials = 0
+        self%last_line_search_scale = 1.0d0
         self%aa_gamma_max_abs = 0.0d0
         if (allocated(self%phase_onset_reset)) self%phase_onset_reset = .false.
 
@@ -38,6 +41,26 @@ contains
 
         call self%control%increment_total()
         call self%control%reset_acceleration()
+
+        ! Supply the discretization scales the residual floor is derived from.
+        ! The mesh measure is fixed, so it is summed once and cached; dt changes
+        ! every attempt, so the floor is refreshed here rather than at setup.
+        block
+            real(real64) :: dt_now, measure
+            integer(int32) :: i_elem, num_elements
+
+            if (self%domain_measure_total <= 0.0d0) then
+                call self%domain%get_num_fe(num_elements)
+                self%domain_measure_total = 0.0d0
+                do i_elem = 1, num_elements
+                    measure = 0.0d0
+                    call self%domain%calc_measure(i_elem, measure)
+                    self%domain_measure_total = self%domain_measure_total + abs(measure)
+                end do
+            end if
+            call self%control%get_dt(dt_now)
+            call self%control%set_residual_scale(self%domain_measure_total, dt_now)
+        end block
 
         ! Save previous step values (Previous <- Current)
         call self%porosity%get_previous(u)
@@ -369,6 +392,18 @@ contains
         real(real64) :: phase_mixing_current
         real(real64) :: phase_aa_gamma
         real(real64) :: phase_merit, phase_best_merit
+        ! --- Backtracking line-search state ---
+        integer(int32), parameter :: LINE_SEARCH_MAX_TRIALS = 8
+        real(real64), parameter :: LINE_SEARCH_BACKTRACK = 5.0d-1
+        real(real64), parameter :: LINE_SEARCH_MIN_SCALE = 1.0d-3
+        !> Armijo sufficient-decrease coefficient on the residual norm.
+        real(real64), parameter :: LINE_SEARCH_ARMIJO = 1.0d-4
+        integer(int32) :: ls_trial
+        real(real64) :: ls_scale, ls_reference_norm, ls_trial_norm, ls_aa_gnorm
+        logical :: ls_accepted, ls_aa_has_prev
+        real(real64), allocatable :: ls_T_saved(:), ls_P_saved(:)
+        real(real64), allocatable :: ls_aa_T(:), ls_aa_P(:), ls_aa_duT(:), ls_aa_duP(:)
+        logical, allocatable :: ls_onset_saved(:)
         real(real64), allocatable :: initial_residual_thermal(:), initial_residual_hydraulic(:)
         real(real64), allocatable :: phase_increments(:), previous_phase_increments(:)
         real(real64), allocatable :: phase_update(:), previous_phase_update(:)
@@ -497,6 +532,14 @@ contains
                     if (allocated(initial_residual_hydraulic)) deallocate (initial_residual_hydraulic)
                 end if
 
+                ! Reference residual norm for the line search, taken BEFORE the
+                ! linear solve: solve() calls jacobi_equilibrate_bsr, which scales
+                ! K and F in place to fix the 1e13 T/p conditioning disparity. Only
+                ! du is unscaled afterwards, so F is left equilibrated and reading
+                ! it after the solve compares a scaled residual against a freshly
+                ! assembled unscaled one.
+                if (self%control%is_conserved()) call ls_capture_reference(self, ls_reference_norm)
+
                 ! Linear solve (K * du = F)
                 call self%solve()
 
@@ -521,62 +564,70 @@ contains
                 ! Convergence check; always converged when config is NONE
                 call self%solve_time_step_check_convergence()
 
-                ! Update solution with relaxation (adaptive omega for conserved mode,
-                ! Aitken for legacy Picard, damped for Newton).
-                call self%reflect_variables()
-
-                if (.not. do_phase_outer .and. self%is_active_thermal() .and. &
-                    self%is_active_hydraulic()) then
-                    ! Hansson modified Picard phase elimination: theta_i at
-                    ! iterate k was used in the residual, its return-map tangent
-                    ! was used in the just-solved T-p matrix, and the bounded
-                    ! theta_i^(k+1) value is now committed before evaluating
-                    ! the next residual. AA(1) continues to act on the global
-                    ! T-p fixed-point map only.
-                    phase_update = 0.0d0
-                    call self%project_nodal_ice(.true., phase_update, phase_increment_max, &
-                                                phase_increment_norm, phase_max_node, phase_temperature, &
-                                                phase_pressure, phase_current_ice, phase_projected_ice, &
-                                                phase_equilibrium_error, phase_increments, phase_active_bounds, &
-                                                apply_projected_update=.true., &
-                                                projected_update_scale=phase_return_relaxation)
-                    call self%update_nodal_phases()
-
-                    num_active_nodes = count(phase_active_bounds /= 0)
-                    phase_is_converged = phase_equilibrium_error <= PHASE_PRESSURE_TOL .and. &
-                                         phase_increment_norm <= PHASE_CONTENT_TOL .and. &
-                                         phase_increment_max <= PHASE_CONTENT_MAX_TOL
-                    phase_merit = max(phase_equilibrium_error / PHASE_PRESSURE_TOL, &
-                                      phase_increment_norm / PHASE_CONTENT_TOL, &
-                                      phase_increment_max / PHASE_CONTENT_MAX_TOL)
-                    self%last_phase_metrics_available = .true.
-                    self%last_phase_converged = phase_is_converged
-                    self%last_phase_active_nodes = num_active_nodes
-                    self%last_phase_increment_max = phase_increment_max
-                    self%last_phase_increment_norm = phase_increment_norm
-                    self%last_phase_equilibrium_error = phase_equilibrium_error
-                    self%last_phase_merit = phase_merit
-                    if (phase_increment_max > tiny(1.0d0)) then
-                        write (*, '(A,I0,A,ES10.3,A,ES10.3,A,ES10.3,A,I0)') &
-                            '   [PHASE-MP] iter:', iter_nl, ' max|dQi|:', phase_increment_max, &
-                            ' rms|dQi|:', phase_increment_norm, ' eq[Pa]:', &
-                            phase_equilibrium_error, ' active_nodes:', num_active_nodes
-                    end if
-                end if
-
                 if (self%control%is_conserved()) then
-                    ! The solved system was assembled at x_k. Reassemble after
-                    ! reflection and the local phase return so the residual and
-                    ! conserved fields both refer to x_{k+1} when convergence
-                    ! is tested.
-                    call self%assemble()
-                    call self%apply_bc(prescribed=.false.)
-                    call self%solve_time_step_check_convergence_conserved()
-                    if (.not. do_phase_outer .and. self%is_active_thermal() .and. &
-                        self%is_active_hydraulic() .and. .not. phase_is_converged) then
-                        call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
-                        call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
+                    ! Backtracking line search on the assembled residual norm.
+                    !
+                    ! The Picard direction is not guaranteed to be a descent
+                    ! direction at full step where the freezing curve is steep,
+                    ! and a heuristic that damps only after detecting stagnation
+                    ! is always one step behind. Choosing the step length so that
+                    ! ||R|| actually decreases makes progress monotone by
+                    ! construction and, when no admissible step exists, says so
+                    ! immediately - that distinguishes a step-length problem from
+                    ! a wrong-direction problem instead of hiding both.
+                    !
+                    ! The system was assembled at x_k, so its residual norm is
+                    ! the reference. Each trial restores x_k, applies the scaled
+                    ! update, and reassembles: the reassembly was already being
+                    ! done once per iteration, so a converging search costs
+                    ! nothing extra and only hard iterates pay for retries.
+                    call ls_snapshot(self, ls_T_saved, ls_P_saved, ls_onset_saved, &
+                                     ls_aa_T, ls_aa_P, ls_aa_duT, ls_aa_duP, &
+                                     ls_aa_has_prev, ls_aa_gnorm)
+                    ls_scale = 1.0d0
+                    ls_accepted = .false.
+                    do ls_trial = 1, LINE_SEARCH_MAX_TRIALS
+                        if (ls_trial > 1) then
+                            call ls_restore(self, ls_T_saved, ls_P_saved, ls_onset_saved, &
+                                            ls_aa_T, ls_aa_P, ls_aa_duT, ls_aa_duP, &
+                                            ls_aa_has_prev, ls_aa_gnorm)
+                        end if
+                        call self%reflect_variables(step_scale=ls_scale)
+                        call self%assemble()
+                        call self%apply_bc(prescribed=.false.)
+                        call ls_capture_reference(self, ls_trial_norm)
+                        if (ls_reference_norm <= 0.0d0) then
+                            ls_accepted = .true.
+                            exit
+                        end if
+                        if (ls_trial_norm <= (1.0d0 - LINE_SEARCH_ARMIJO * ls_scale) * ls_reference_norm) then
+                            ls_accepted = .true.
+                            exit
+                        end if
+                        if (ls_scale <= LINE_SEARCH_MIN_SCALE) exit
+                        ls_scale = max(LINE_SEARCH_MIN_SCALE, LINE_SEARCH_BACKTRACK * ls_scale)
+                    end do
+                    self%last_line_search_scale = ls_scale
+                    self%last_line_search_trials = ls_trial
+                    if (.not. ls_accepted) then
+                        self%last_line_search_failures = self%last_line_search_failures + 1
+                        ! No admissible step exists along this direction: the
+                        ! Picard direction is not a descent direction for ||R||
+                        ! here, which is a direction problem, not a step-length
+                        ! problem. Report it so the two are never confused.
+                        write (*, '(A,I0,A,ES11.3,A,ES11.3,A,ES9.2)') &
+                            '   [LS] no descent at iter ', iter_nl, &
+                            ': ||R_k||=', ls_reference_norm, ' ||R_trial||=', ls_trial_norm, &
+                            ' alpha=', ls_scale
                     end if
+
+                    ! theta_i is a state function of (T,p) evaluated inside the
+                    ! reassembly above, so there is no separate phase criterion.
+                    call self%solve_time_step_check_convergence_conserved()
+                else
+                    ! Update solution with relaxation (Aitken for legacy Picard,
+                    ! damped for Newton).
+                    call self%reflect_variables()
                 end if
 
                 ! Force exit after one iteration when config is NONE (linear solve)
@@ -756,6 +807,130 @@ contains
         end if
 
     end subroutine solve_time_step_ftcms
+
+    !> Combined L2 norm of the assembled block residuals at the current iterate.
+    !> This is the merit function the line search reduces; it is the same norm
+    !> the conserved convergence gate ratios, so a step that satisfies the search
+    !> also makes progress against the acceptance criterion.
+    subroutine ls_capture_reference(self, norm_value)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        real(real64), intent(inout) :: norm_value
+
+        real(real64), allocatable :: r_thermal(:), r_hydraulic(:)
+
+        norm_value = 0.0d0
+        if (self%is_active_thermal()) then
+            call self%get_variable_residual(PHYSICS_TYPES%THERMAL, r_thermal)
+            if (allocated(r_thermal)) norm_value = norm_value + dot_product(r_thermal, r_thermal)
+        end if
+        if (self%is_active_hydraulic()) then
+            call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, r_hydraulic)
+            if (allocated(r_hydraulic)) norm_value = norm_value + dot_product(r_hydraulic, r_hydraulic)
+        end if
+        norm_value = sqrt(norm_value)
+        if (allocated(r_thermal)) deallocate (r_thermal)
+        if (allocated(r_hydraulic)) deallocate (r_hydraulic)
+    end subroutine ls_capture_reference
+
+    !> Save everything a line-search trial mutates. The AA(1) secant pair is
+    !> included because prepare_coupled_aa_step commits it unconditionally: a
+    !> rejected trial must not leave its pair in the history, or the next
+    !> iteration extrapolates from a step that was never taken. The per-node
+    !> phase-onset flags are included for the same reason - they are once-per-step
+    !> by design, so a rejected trial firing one would silently change the
+    !> remaining trials.
+    subroutine ls_snapshot(self, T_saved, P_saved, onset_saved, &
+                           aa_T, aa_P, aa_duT, aa_duP, aa_has_prev, aa_gnorm)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        real(real64), allocatable, intent(inout) :: T_saved(:), P_saved(:)
+        logical, allocatable, intent(inout) :: onset_saved(:)
+        real(real64), allocatable, intent(inout) :: aa_T(:), aa_P(:), aa_duT(:), aa_duP(:)
+        logical, intent(inout) :: aa_has_prev
+        real(real64), intent(inout) :: aa_gnorm
+
+        real(real64), pointer, contiguous :: field(:)
+
+        nullify (field)
+        if (self%is_active_thermal()) then
+            call self%temperature%get_current(field)
+            if (associated(field)) then
+                if (allocated(T_saved)) deallocate (T_saved)
+                allocate (T_saved, source=field)
+            end if
+            nullify (field)
+        end if
+        if (self%is_active_hydraulic()) then
+            call self%pressure%get_current(field)
+            if (associated(field)) then
+                if (allocated(P_saved)) deallocate (P_saved)
+                allocate (P_saved, source=field)
+            end if
+            nullify (field)
+        end if
+        if (allocated(self%phase_onset_reset)) then
+            if (allocated(onset_saved)) deallocate (onset_saved)
+            allocate (onset_saved, source=self%phase_onset_reset)
+        end if
+        call copy_alloc(aa_T, self%aa_T_prev)
+        call copy_alloc(aa_P, self%aa_P_prev)
+        call copy_alloc(aa_duT, self%aa_duT_prev)
+        call copy_alloc(aa_duP, self%aa_duP_prev)
+        aa_has_prev = self%aa_has_prev
+        aa_gnorm = self%aa_gnorm_prev
+    end subroutine ls_snapshot
+
+    !> Restore the state saved by ls_snapshot so the next trial starts from x_k.
+    subroutine ls_restore(self, T_saved, P_saved, onset_saved, &
+                          aa_T, aa_P, aa_duT, aa_duP, aa_has_prev, aa_gnorm)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        real(real64), allocatable, intent(in) :: T_saved(:), P_saved(:)
+        logical, allocatable, intent(in) :: onset_saved(:)
+        real(real64), allocatable, intent(in) :: aa_T(:), aa_P(:), aa_duT(:), aa_duP(:)
+        logical, intent(in) :: aa_has_prev
+        real(real64), intent(in) :: aa_gnorm
+
+        real(real64), pointer, contiguous :: field(:)
+
+        nullify (field)
+        if (allocated(T_saved) .and. self%is_active_thermal()) then
+            call self%temperature%get_current(field)
+            if (associated(field)) then
+                if (size(field) == size(T_saved)) field(:) = T_saved(:)
+            end if
+            nullify (field)
+        end if
+        if (allocated(P_saved) .and. self%is_active_hydraulic()) then
+            call self%pressure%get_current(field)
+            if (associated(field)) then
+                if (size(field) == size(P_saved)) field(:) = P_saved(:)
+            end if
+            nullify (field)
+        end if
+        if (allocated(onset_saved) .and. allocated(self%phase_onset_reset)) then
+            if (size(self%phase_onset_reset) == size(onset_saved)) &
+                self%phase_onset_reset(:) = onset_saved(:)
+        end if
+        call copy_alloc(self%aa_T_prev, aa_T)
+        call copy_alloc(self%aa_P_prev, aa_P)
+        call copy_alloc(self%aa_duT_prev, aa_duT)
+        call copy_alloc(self%aa_duP_prev, aa_duP)
+        self%aa_has_prev = aa_has_prev
+        self%aa_gnorm_prev = aa_gnorm
+    end subroutine ls_restore
+
+    !> Copy an allocatable array, propagating the unallocated state.
+    subroutine copy_alloc(dst, src)
+        implicit none
+        real(real64), allocatable, intent(inout) :: dst(:)
+        real(real64), allocatable, intent(in) :: src(:)
+
+        if (allocated(dst)) deallocate (dst)
+        if (allocated(src)) allocate (dst, source=src)
+    end subroutine copy_alloc
+
 
     module subroutine solve_time_step_staggered_ftcms(self, is_step_converged)
         implicit none

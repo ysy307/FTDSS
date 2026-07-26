@@ -3,6 +3,11 @@ submodule(app_ftcms) ftcms_base
     use :: module_linalg, only:vector_norm2
     implicit none
 
+    !> Highest BDF order the divided-difference local-error estimator implements.
+    !> Error control refuses to run above this rather than reusing a lower-order
+    !> defect, which would under-estimate the error by a factor O(h).
+    integer(int32), parameter :: LTE_MAX_SUPPORTED_ORDER = 2
+
     ! Bridge experiment (see plan spicy-sauteeing-scroll.md, WP3 refinement):
     ! where freezing impedance has collapsed hydraulic conductivity, a node no
     ! longer exchanges water with its neighbors within a time step, so its
@@ -2076,7 +2081,8 @@ contains
         class(type_ftcms), intent(inout) :: self
         real(real64) :: error_rel
 
-        real(real64) :: dt_n, dt_factor, e_thermal, e_hydraulic
+        real(real64) :: dt_n, e_thermal, e_hydraulic
+        integer(int32) :: bdf_order
 
         error_rel = -1.0d0
         call self%control%get_dt(dt_n)
@@ -2084,33 +2090,57 @@ contains
         if (.not. self%lte_has_state .or. .not. self%lte_has_derivative) return
         if (dt_n + self%lte_prev_dt <= 0.0d0) return
 
-        dt_factor = dt_n * dt_n / (dt_n + self%lte_prev_dt)
+        ! The estimator must match the integrator's order: reusing the BDF1
+        ! defect under BDF2 silently under-estimates the error by O(h), so the
+        ! controller would accept steps that violate the tolerance. Orders above
+        ! the implemented set are refused rather than approximated.
+        call self%control%get_bdf_coeffs(bdf_order=bdf_order)
+        if (bdf_order > LTE_MAX_SUPPORTED_ORDER) then
+            write (*, '(A,I0,A,I0,A)') '   [LTE] error: no local-error estimator for BDF order ', &
+                bdf_order, ' (implemented up to ', LTE_MAX_SUPPORTED_ORDER, ')'
+            error stop 'compute_lte_error: unsupported BDF order for error control.'
+        end if
+        ! BDF2 needs the previous second difference; until it exists (the first
+        ! two accepted steps) fall back to the BDF1 estimate, which is a valid
+        ! bound because the run is still first order there anyway.
+        if (bdf_order >= 2 .and. .not. self%lte_has_second_difference) bdf_order = 1
+        if (bdf_order >= 2 .and. dt_n + self%lte_prev_span <= 0.0d0) bdf_order = 1
+
         e_thermal = -1.0d0
         e_hydraulic = -1.0d0
 
         if (self%is_active_thermal()) then
             call physics_lte(self%temperature, self%lte_state_prev_thermal, &
-                             self%lte_ydot_prev_thermal, self%lte_atol_thermal, e_thermal)
+                             self%lte_ydot_prev_thermal, self%lte_d2_prev_thermal, &
+                             self%lte_atol_thermal, bdf_order, e_thermal)
         end if
         if (self%is_active_hydraulic()) then
             call physics_lte(self%pressure, self%lte_state_prev_hydraulic, &
-                             self%lte_ydot_prev_hydraulic, self%lte_atol_hydraulic, e_hydraulic)
+                             self%lte_ydot_prev_hydraulic, self%lte_d2_prev_hydraulic, &
+                             self%lte_atol_hydraulic, bdf_order, e_hydraulic)
         end if
 
         error_rel = max(e_thermal, e_hydraulic)
 
     contains
 
-        subroutine physics_lte(var, state_prev, ydot_prev, atol, e_norm)
+        subroutine physics_lte(var, state_prev, ydot_prev, d2_prev, atol, order, e_norm)
             implicit none
             type(type_variable), intent(inout) :: var
             real(real64), allocatable, intent(in) :: state_prev(:)
             real(real64), allocatable, intent(in) :: ydot_prev(:)
+            real(real64), allocatable, intent(in) :: d2_prev(:)
             real(real64), intent(in) :: atol
+            integer(int32), intent(in) :: order
             real(real64), intent(inout) :: e_norm
 
             real(real64), pointer, contiguous :: y(:)
-            real(real64), allocatable :: ydot(:), defect(:), weight(:)
+            real(real64), allocatable :: ydot(:), d2(:), defect(:), weight(:)
+            real(real64) :: span_local(2), span_global(2), y_span
+            real(real64) :: accum_local(2), accum_global(2)
+#ifdef _MPI
+            integer(int32) :: ierr
+#endif
 
             e_norm = -1.0d0
             nullify (y)
@@ -2119,12 +2149,59 @@ contains
             if (.not. allocated(state_prev) .or. .not. allocated(ydot_prev)) return
             if (size(state_prev) /= size(y) .or. size(ydot_prev) /= size(y)) return
             if (size(y) == 0) return
+            if (order >= 2) then
+                if (.not. allocated(d2_prev)) return
+                if (size(d2_prev) /= size(y)) return
+            end if
 
-            allocate (ydot(size(y)), defect(size(y)), weight(size(y)))
+            ! Reference scale flooring the relative part of the weight. A purely
+            ! relative tolerance is meaningless for a variable whose zero is not
+            ! a natural zero: Celsius temperature has its origin AT the
+            ! phase-change point, so rtol*|T| vanishes exactly at the freezing
+            ! front and the weight collapses to atol there while the rest of the
+            ! domain is weighted by rtol*|T|. That makes the norm one to two
+            ! orders stricter at the front than anywhere else, and a handful of
+            ! front nodes then dominate the estimate and make it jump
+            ! non-smoothly with dt. Flooring at the field's own span restores a
+            ! uniform criterion. Gauge pressure has the same arbitrary origin.
+            ! Reduce with MPI_MAX on (max, -min) so the span is the global one.
+            span_local(1) = maxval(state_prev)
+            span_local(2) = -minval(state_prev)
+#ifdef _MPI
+            call MPI_Allreduce(span_local, span_global, 2, MPI_REAL8, MPI_MAX, MPI_COMM_WORLD, ierr)
+#else
+            span_global = span_local
+#endif
+            y_span = max(0.0d0, span_global(1) + span_global(2))
+
+            allocate (ydot(size(y)), d2(size(y)), defect(size(y)), weight(size(y)))
             ydot(:) = (y(:) - state_prev(:)) / dt_n
-            defect(:) = dt_factor * (ydot(:) - ydot_prev(:))
-            weight(:) = atol + self%lte_rtol * max(abs(y(:)), abs(state_prev(:)))
-            e_norm = sqrt(sum((defect(:) / max(weight(:), tiny(1.0d0)))**2) / real(size(y), real64))
+
+            ! Newton divided differences on the accepted times:
+            !   y[t_n,t_{n-1}]                 = ydot
+            !   y[t_n,t_{n-1},t_{n-2}]         = (ydot - ydot_prev)/(h_n + h_{n-1})
+            !   y[t_n,...,t_{n-3}]             = (d2 - d2_prev)/(h_n + span_prev)
+            ! and LTE_k ~ h_n**(k+1) * y[t_n,...,t_{n-k-1}].
+            d2(:) = (ydot(:) - ydot_prev(:)) / (dt_n + self%lte_prev_dt)
+            if (order >= 2) then
+                defect(:) = dt_n**3 * (d2(:) - d2_prev(:)) / (dt_n + self%lte_prev_span)
+            else
+                defect(:) = dt_n**2 * d2(:)
+            end if
+
+            weight(:) = atol + self%lte_rtol * max(abs(y(:)), abs(state_prev(:)), y_span)
+
+            ! One weighted RMS over the whole distributed problem: a per-rank
+            ! norm would hand each rank a different dt and desynchronize them.
+            accum_local(1) = sum((defect(:) / max(weight(:), tiny(1.0d0)))**2)
+            accum_local(2) = real(size(y), real64)
+#ifdef _MPI
+            call MPI_Allreduce(accum_local, accum_global, 2, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, ierr)
+#else
+            accum_global = accum_local
+#endif
+            if (accum_global(2) <= 0.0d0) return
+            e_norm = sqrt(accum_global(1) / accum_global(2))
         end subroutine physics_lte
 
     end function compute_lte_error_ftcms
@@ -2133,9 +2210,27 @@ contains
         implicit none
         class(type_ftcms), intent(inout) :: self
 
+        integer(int32) :: target_order
+
         self%lte_has_state = .false.
         self%lte_has_derivative = .false.
+        self%lte_has_second_difference = .false.
         self%lte_prev_dt = 0.0d0
+        self%lte_prev_span = 0.0d0
+
+        ! Refuse an unsupported target order up front rather than mid-run: the
+        ! integrator ramps current_bdf_order up to the target, so a target above
+        ! what the estimator implements would silently start under-estimating
+        ! the error once the ramp reaches it.
+        if (self%lte_error_control_active) then
+            call self%control%get_target_bdf_order(target_order)
+            if (target_order > LTE_MAX_SUPPORTED_ORDER) then
+                write (*, '(A,I0,A,I0,A)') ' Error: error-controlled stepping requests BDF order ', &
+                    target_order, ' but the local-error estimator implements up to ', &
+                    LTE_MAX_SUPPORTED_ORDER, '.'
+                error stop 'initialize_lte_history: unsupported bdf_order for error control.'
+            end if
+        end if
 
         if (self%is_active_thermal()) then
             call copy_current(self%temperature, self%lte_state_prev_thermal)
@@ -2166,35 +2261,47 @@ contains
         class(type_ftcms), intent(inout) :: self
 
         real(real64) :: dt_n
-        logical :: committed
+        logical :: committed, second_difference_ready
 
         call self%control%get_dt(dt_n)
         if (dt_n <= 0.0d0) return
         committed = .false.
+        ! A second difference can only be formed once ydot_prev already holds
+        ! the previous step's slope, i.e. from the second accepted step on.
+        second_difference_ready = self%lte_has_derivative .and. dt_n + self%lte_prev_dt > 0.0d0
 
         if (self%is_active_thermal()) then
             call commit_physics(self%temperature, self%lte_state_prev_thermal, &
-                                self%lte_ydot_prev_thermal, committed)
+                                self%lte_ydot_prev_thermal, self%lte_d2_prev_thermal, committed)
         end if
         if (self%is_active_hydraulic()) then
             call commit_physics(self%pressure, self%lte_state_prev_hydraulic, &
-                                self%lte_ydot_prev_hydraulic, committed)
+                                self%lte_ydot_prev_hydraulic, self%lte_d2_prev_hydraulic, committed)
         end if
 
         if (committed) then
+            ! lte_prev_span is the time t_n - t_{n-2} that the second difference
+            ! just stored was formed over; after the shift it plays the role of
+            ! t_{n-1} - t_{n-3} for the next step's third difference.
+            if (second_difference_ready) then
+                self%lte_prev_span = dt_n + self%lte_prev_dt
+                self%lte_has_second_difference = .true.
+            end if
             self%lte_prev_dt = dt_n
             self%lte_has_state = .true.
             self%lte_has_derivative = .true.
         end if
 
     contains
-        subroutine commit_physics(var, state_prev, ydot_prev, did_commit)
+        subroutine commit_physics(var, state_prev, ydot_prev, d2_prev, did_commit)
             implicit none
             type(type_variable), intent(inout) :: var
             real(real64), allocatable, intent(inout) :: state_prev(:)
             real(real64), allocatable, intent(inout) :: ydot_prev(:)
+            real(real64), allocatable, intent(inout) :: d2_prev(:)
             logical, intent(inout) :: did_commit
             real(real64), pointer, contiguous :: current(:)
+            real(real64), allocatable :: ydot_new(:)
 
             nullify (current)
             call var%get_current(current)
@@ -2211,8 +2318,21 @@ contains
             if (allocated(ydot_prev)) then
                 if (size(ydot_prev) /= size(current)) deallocate (ydot_prev)
             end if
+
+            allocate (ydot_new(size(current)))
+            ydot_new(:) = (current(:) - state_prev(:)) / dt_n
+
+            ! Store y[t_n,t_{n-1},t_{n-2}] before ydot_prev is overwritten.
+            if (allocated(ydot_prev) .and. second_difference_ready) then
+                if (allocated(d2_prev)) then
+                    if (size(d2_prev) /= size(current)) deallocate (d2_prev)
+                end if
+                if (.not. allocated(d2_prev)) allocate (d2_prev(size(current)))
+                d2_prev(:) = (ydot_new(:) - ydot_prev(:)) / (dt_n + self%lte_prev_dt)
+            end if
+
             if (.not. allocated(ydot_prev)) allocate (ydot_prev(size(current)))
-            ydot_prev(:) = (current(:) - state_prev(:)) / dt_n
+            ydot_prev(:) = ydot_new(:)
             state_prev(:) = current(:)
             did_commit = .true.
         end subroutine commit_physics

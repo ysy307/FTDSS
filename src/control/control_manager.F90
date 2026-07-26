@@ -54,6 +54,7 @@ module control_control_manager
         procedure, public, pass(self) :: check_convergence => check_convergence_control
         procedure, public, pass(self) :: prime_conserved_residual => prime_conserved_residual_control
         procedure, public, pass(self) :: check_convergence_conserved => check_convergence_conserved_control
+        procedure, public, pass(self) :: set_residual_scale => set_residual_scale_control
         procedure, public, pass(self) :: compute_error_norm => compute_error_norm_control
         ! - acceleration
         procedure, public, pass(self) :: compute_relaxation => compute_relaxation_control
@@ -87,6 +88,7 @@ module control_control_manager
         procedure, public, pass(self) :: get_output_time => get_output_time_control
         procedure, public, pass(self) :: get_output_step => get_output_step_control
         procedure, public, pass(self) :: get_bdf_coeffs => get_bdf_coeffs_control
+        procedure, public, pass(self) :: get_target_bdf_order => get_target_bdf_order_control
         ! - iteration
         procedure, public, pass(self) :: get_nonlinear_solver => get_nonlinear_solver_control
         procedure, public, pass(self) :: get_nonlinear_iter => get_nonlinear_iter_control
@@ -244,6 +246,14 @@ contains
 
         coupling_mode => self%coupling_mode
     end subroutine get_coupling_mode_control
+
+    subroutine get_target_bdf_order_control(self, target_bdf_order)
+        implicit none
+        class(type_control), intent(in) :: self
+        integer(int32), intent(inout) :: target_bdf_order
+
+        call self%time%get_target_bdf_order(target_bdf_order)
+    end subroutine get_target_bdf_order_control
 
     subroutine get_bdf_coeffs_control(self, bdf_order, bdf_coeffs)
         implicit none
@@ -615,6 +625,15 @@ contains
 
     !> Conserved-quantity convergence check (PDF 6.2.4): a single coupled indicator
     !> from the nodal enthalpy/effective-density increments and per-block residuals.
+    subroutine set_residual_scale_control(self, volume_total, dt)
+        implicit none
+        class(type_control), intent(inout) :: self
+        real(real64), intent(in) :: volume_total
+        real(real64), intent(in) :: dt
+
+        call self%iteration%set_residual_scale(volume_total, dt)
+    end subroutine set_residual_scale_control
+
     subroutine check_convergence_conserved_control(self, enthalpy, density, &
                                                    residual_thermal, residual_hydraulic, &
                                                    check_thermal, check_hydraulic)

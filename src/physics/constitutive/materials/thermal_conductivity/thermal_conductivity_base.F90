@@ -110,18 +110,38 @@ contains
 
     end subroutine calc_thc_4
 
-    module subroutine calc_thc_4_vadoze(A, B, C, D, F1, F2, phi_water, phi_ice, phi_vapor, lambda)
+    !> Campbell (1985) apparent thermal conductivity with the frozen-soil
+    !> extension of Hansson et al. (2004), Eq. [13b], [14] and [15]:
+    !>
+    !>   F        = 1 + F1 * theta_i**F2
+    !>   lambda_0 = C1 + C2*(theta + F*theta_i)
+    !>              - (C1 - C4)*exp{-[C3*(theta + F*theta_i)]**C5},  C5 = 4
+    !>
+    !> theta is the LIQUID water content only. Hansson et al. state this
+    !> explicitly: "Equation [13b] cannot be used for subzero temperatures since
+    !> ice conducts heat much better than water; hence, only the liquid water
+    !> content is included in the present equation" - the ice enters solely
+    !> through F*theta_i, which is what F is for.
+    !>
+    !> The gas-filled pore fraction must NOT be added here. It previously was
+    !> (the caller passed get_phi's phi4), and because phi_w + phi_gas + phi_i
+    !> equals the porosity that made the argument
+    !>   theta_eff = porosity + F1*theta_i**(1+F2),
+    !> i.e. independent of the liquid content: the conductivity stopped
+    !> responding to drying at all, which is meaningless for a vadose-zone model
+    !> and wrong for this correlation.
+    module subroutine calc_thc_4_vadoze(A, B, C, D, F1, F2, phi_water, phi_ice, lambda)
         implicit none
         real(real64), intent(in) :: A, B, C, D
         real(real64), intent(in) :: F1, F2
-        real(real64), intent(in) :: phi_water, phi_ice, phi_vapor
+        real(real64), intent(in) :: phi_water, phi_ice
         real(real64), intent(inout) :: lambda
 
         real(real64) :: F_ice
         real(real64) :: theta
 
         F_ice = 1.0d0 + F1 * phi_ice**F2
-        theta = phi_water + phi_vapor + F_ice * phi_ice
+        theta = phi_water + F_ice * phi_ice
 
         lambda = A + B * theta - (A - D) * exp(-(C * theta)**4)
 

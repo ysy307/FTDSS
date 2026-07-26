@@ -59,8 +59,9 @@ module core_types_physics_state
         type(type_field_dp) :: vapor_content ! Vapor content [-]
         type(type_field_dp) :: air_content ! Air content [-]
         type(type_field_dp) :: porosity ! Porosity [-]
-        ! Capillary suction max(0,-p_w) [Pa] of the actual pore-water
-        ! pressure. Retention and relative permeability use this value.
+        ! Generalized suction psi_cap + psi_cryo [Pa]. Retention, relative
+        ! permeability and the Darcy total potential are all evaluated at this
+        ! value, so storage, mobility and driving force stay consistent.
         type(type_field_dp) :: effective_suction ! [Pa]
 
         type(type_field_array_dp) :: temperature_history ! Temperature history [C]

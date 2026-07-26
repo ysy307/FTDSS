@@ -40,7 +40,7 @@ contains
         real(real64) :: sph_water, sph_ice
         real(real64) :: density_water, density_ice
         real(real64) :: vhc_water, vhc_ice
-        real(real64) :: latent_heat_fusion, dQw_dT
+        real(real64) :: latent_heat_fusion, dQi_dT
 
         call self%get_phi(state, phi1, phi2, phi3)
 
@@ -54,10 +54,10 @@ contains
         vhc_ice = density_ice * sph_ice
 
         call state%latent_heat_fusion%get(latent_heat_fusion)
-        call state%dQw_dT%get(dQw_dT)
+        call state%dQi_dT%get(dQi_dT)
 
         call calc_vhc_3a(self%material1, phi1, vhc_water, phi2, vhc_ice, phi3, &
-                         density_water, latent_heat_fusion, dQw_dT, vhc)
+                         density_ice, latent_heat_fusion, dQi_dT, vhc)
     end subroutine calc_vhc_gp_3phase
 
     module subroutine calc_vhc_gp_4phase(self, state, vhc)
@@ -70,7 +70,7 @@ contains
         real(real64) :: sph_water, sph_ice, sph_vapor
         real(real64) :: density_water, density_ice, density_vapor
         real(real64) :: vhc_water, vhc_ice, vhc_vapor
-        real(real64) :: latent_heat_fusion, dQw_dT
+        real(real64) :: latent_heat_fusion, dQi_dT
         real(real64) :: latent_heat_vaporization, dQv_dT
 
         call self%get_phi(state, phi1, phi2, phi3, phi4)
@@ -89,12 +89,12 @@ contains
         vhc_vapor = density_water * sph_vapor
 
         call state%latent_heat_fusion%get(latent_heat_fusion)
-        call state%dQw_dT%get(dQw_dT)
+        call state%dQi_dT%get(dQi_dT)
         call state%latent_heat_vaporization%get(latent_heat_vaporization)
         call state%dQv_dT%get(dQv_dT)
 
         call calc_vhc_4a(self%material1, phi1, vhc_water, phi2, vhc_ice, phi3, vhc_vapor, phi4, density_water, &
-                         latent_heat_fusion, dQw_dT, latent_heat_vaporization, dQv_dT, vhc)
+                         density_ice, latent_heat_fusion, dQi_dT, latent_heat_vaporization, dQv_dT, vhc)
     end subroutine calc_vhc_gp_4phase
 
 end submodule heat_capacity_multiphase

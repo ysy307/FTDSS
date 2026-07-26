@@ -115,10 +115,27 @@ contains
             end if
         end do
 
-        ! Mass matrix (LHS, factor bdf0) — lumped to satisfy discrete maximum principle
-        ! Consistent mass matrix creates positive off-diagonals (bdf0*M_ij ≫ K2_ij)
-        ! causing interior temperatures to spuriously exceed boundary values (DMP violation).
-        call workspace%compute_K1_lumped(workspace%work_C, workspace%work_matrix)
+        ! Mass matrix (LHS, factor bdf0), consistent - this is the EXACT
+        ! derivative of the residual's transient term.
+        !
+        ! The residual integrates the Gauss-point enthalpy rate consistently
+        ! (compute_R1 below), so the discrete equations being solved are the
+        ! consistent-mass ones and the converged solution is whatever zeroes
+        ! that residual. A lumped K_TT is therefore only an iteration matrix:
+        ! it cannot enforce a discrete maximum principle the residual does not
+        ! contain, so the previous DMP justification for lumping here does not
+        ! hold - lumping changed no solution, only the convergence rate.
+        !
+        ! And it changed it badly where it matters. d/dT_j of
+        ! int psi_i * c0 * U(T) dOmega is c0 * int psi_i C_a psi_j dOmega; the
+        ! row-sum lump diag(int psi_i C_a dOmega) approximates that well only
+        ! when C_a is smooth over the element. At the freezing front C_a is
+        ! dominated by -Lf*rho_i*dtheta_i/dT and varies by orders of magnitude
+        ! between adjacent nodes, so the lumped tangent drives the Picard
+        ! contraction factor toward one: measured, the thermal residual stalled
+        ! at 11 percent of its step-initial value for all 30 iterations while
+        ! the hydraulic block contracted at 0.82 per iteration.
+        call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
         if (associated(K_TT_val)) then
             K_TT_val(1:n_nodes, 1:n_nodes) = &
                 K_TT_val(1:n_nodes, 1:n_nodes) + &
@@ -126,7 +143,7 @@ contains
         end if
 
         if (hydraulic_target .and. associated(K_TH_val)) then
-            call workspace%compute_K1_lumped(work_C_TH, workspace%work_matrix)
+            call workspace%compute_K1(work_C_TH, workspace%work_matrix)
             K_TH_val(1:n_nodes, 1:n_nodes) = &
                 K_TH_val(1:n_nodes, 1:n_nodes) + &
                 bdf0 * workspace%work_matrix(1:n_nodes, 1:n_nodes)

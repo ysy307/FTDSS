@@ -76,7 +76,18 @@ contains
         real(real64) :: work_D_HT(workspace%num_fe_dimension, workspace%num_fe_dimension, workspace%num_fe_gauss)
         real(real64) :: work_matrix_coupling(workspace%num_fe_nodes, workspace%num_fe_nodes)
         real(real64) :: D_HT_tmp(workspace%num_fe_dimension, workspace%num_fe_dimension)
+        ! Nodal total-potential head driving the liquid Darcy flux, expressed as
+        ! a pressure: P_gen = -psi_eff = -(psi_cap + psi_cryo). It equals the
+        ! pore pressure where unfrozen and adds the cryosuction where frozen,
+        ! and because d psi_eff/d psi_cap = 1 the K_HH pressure diagonal remains
+        ! the consistent tangent while the cryogenic part migrates water to the
+        ! freezing front.
+        real(real64) :: P_gen_node(workspace%num_fe_nodes), psi_eff_i
+        ! dP_gen/dT [Pa/K] = -d psi_cryo/dT per node: the consistent temperature
+        ! tangent of the cryosuction flux, assembled into K_HT.
+        real(real64) :: dPgen_dT_node(workspace%num_fe_nodes), dh_dT_i
         logical :: thermal_target, coupling_mass_needed, coupling_flux_needed
+        logical :: coupling_block_needed
 
         n_nodes = workspace%num_fe_nodes
         n_gauss = workspace%num_fe_gauss
@@ -84,6 +95,7 @@ contains
         thermal_target = control%is_target(PHYSICS_TYPES%THERMAL, workspace%material_id)
         coupling_mass_needed = present(K_HT) .and. thermal_target
         coupling_flux_needed = (present(F_H) .or. present(K_HT)) .and. thermal_target
+        coupling_block_needed = present(K_HT) .and. thermal_target
 
         bdf0 = workspace%bdf_coeffs(1)
         dt_local = 0.0d0
@@ -155,6 +167,20 @@ contains
             end if
         end do
 
+        ! Total-potential nodal driver (pore pressure + cryosuction) and its
+        ! temperature sensitivity.
+        do i = 1, n_nodes
+            call workspace%state(i)%effective_suction%get(psi_eff_i)
+            P_gen_node(i) = -psi_eff_i
+        end do
+        dPgen_dT_node(:) = 0.0d0
+        if (coupling_block_needed) then
+            do i = 1, n_nodes
+                call self%physics%calc_cryo_head_dT(workspace%material_id, workspace%state(i), dh_dT_i)
+                dPgen_dT_node(i) = rho_std * g * dh_dT_i
+            end do
+        end if
+
         ! ----------------------------------------------------------------
         ! 2. Mass Matrix K1 (LHS, factor bdf0)
         ! ----------------------------------------------------------------
@@ -207,10 +233,26 @@ contains
                     end do
                 end do
             end if
+            ! K_HT: consistent T-tangent of the total-potential flux
+            ! -K2(D_HH)*P_gen, i.e. column j of K2(D_HH) scaled by dP_gen/dT.
+            ! This block is NOT optional once P_gen drives the residual:
+            ! dP_gen/dT = -d psi_cryo/dT is ~1.2e6 Pa/K, so omitting it leaves
+            ! the pressure equation absorbing ~1e5 Pa of unmodelled forcing per
+            ! 0.1 K of temperature change - measured, resH/0 then runs to 5.6e3
+            ! and the conserved increment overflows. The dangerous off-diagonal
+            ! product with the thermal block is broken on the K_TH side instead
+            ! (thermal_matrix.F90), giving one-way T->p coupling.
+            if (coupling_block_needed) then
+                do j = 1, n_nodes
+                    do i = 1, n_nodes
+                        call K_HT%set(MATRIX_OPS%ADD, i, j, workspace%work_matrix(i, j) * dPgen_dT_node(j))
+                    end do
+                end do
+            end if
             if (present(F_H)) then
                 do i = 1, n_nodes
                     do j = 1, n_nodes
-                        local_vec_res(i) = local_vec_res(i) + workspace%work_matrix(i, j) * workspace%P_node(j)
+                        local_vec_res(i) = local_vec_res(i) + workspace%work_matrix(i, j) * P_gen_node(j)
                     end do
                 end do
             end if
@@ -281,13 +323,14 @@ contains
             if (present(K_HT) .and. thermal_target) then
                 do j = 1, n_nodes
                     do i = 1, n_nodes
-                        call K_HT%set(MATRIX_OPS%ADD, i, j, mat_HT_sub(i, j))
+                        call K_HT%set(MATRIX_OPS%ADD, i, j, &
+                                      mat_HT_sub(i, j) + mat_HH_sub(i, j) * dPgen_dT_node(j))
                     end do
                 end do
             end if
             if (present(F_H)) then
                 workspace%work_vec(:) = 0.0d0
-                call matvec(mat_HH_sub, workspace%P_node, workspace%work_vec, ierr)
+                call matvec(mat_HH_sub, P_gen_node, workspace%work_vec, ierr)
                 do i = 1, n_nodes
                     local_vec_res(i) = local_vec_res(i) + workspace%work_vec(i)
                 end do

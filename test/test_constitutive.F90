@@ -8,7 +8,7 @@ module test_constitutive_suite
     use :: models_phase_change_vaporization, only: type_evaporation
     use :: models_phase_change_gcc, only: holder_gccs
     use :: models_phase_change_fusion, only: type_fusion
-    use :: models_phase_change_manager, only: type_phase_manager, phase_return_relaxation
+    use :: models_phase_change_manager, only: type_phase_manager
     use :: models_wrf, only: holder_wrfs
     use :: numerical_special_functions_mkl, only: type_mkl_regularized_incomplete_beta
     implicit none
@@ -264,12 +264,6 @@ contains
 
         call self%check_true("HCF VG incomplete beta converged through bound model", converged)
         call self%check_close("HCF VG polymorphic calc_Kflh dispatch", conductivity, expected_conductivity, 2.0d-14)
-
-        call state%effective_suction%set(1.0d9)
-        conductivity = 0.0d0
-        call hcf%p%calc_Kflh(state, conductivity)
-        call self%check_close("HCF uses pore-pressure head, not phase-storage suction", &
-                              conductivity, expected_conductivity, 2.0d-14)
     end subroutine test_hcf_vg_dispatch
 
     subroutine test_hcf_thermal_conductivity(self)
@@ -330,8 +324,8 @@ contains
         type(type_iapws97), target :: water
         type(type_iapws06), target :: ice
         type(type_state) :: state
-        real(real64) :: capillary_suction, cryogenic_suction, effective_suction
-        real(real64) :: dwater_dP, dwater_dT
+        real(real64) :: dwater_dP, dwater_dT, dwater_dT_cryo
+        real(real64) :: cryogenic_suction, effective_suction
 
         call self%configure_wrf(wrf_config, SWCC_MODELS%VG%ID)
         wrf_config%theta_s = 0.535d0
@@ -348,26 +342,36 @@ contains
         call gcc%initialize(1_int32, gcc_config, water, ice)
         call fusion%initialize(wrf%p, gcc%p, water, ice)
 
-        capillary_suction = 1.0d6
-        call state%temperature%set(-0.01d0)
-        call state%pressure%set(-capillary_suction)
         call state%porosity%set(0.535d0)
-        call fusion%calc_effective_suction(state, effective_suction)
-        call self%check_true("capillary-dominated storage uses capillary suction", &
-                             abs(effective_suction - capillary_suction) < 1.0d0)
 
+        ! The generalized suction superposes the two chemical-potential
+        ! lowerings: psi_eff = psi_cap + psi_cryo. A max() must not be used: in
+        ! the frozen zone it would discard the pore-pressure contribution
+        ! entirely, dtheta_l/dp would collapse, the pressure diagonal would lose
+        ! its leverage and the cryosuction would never reach the Darcy flux.
         call state%temperature%set(-1.0d0)
-        call state%pressure%set(-100.0d0)
+        call state%pressure%set(-1.0d5)
         call gcc%p%calc(state, cryogenic_suction)
         call fusion%calc_effective_suction(state, effective_suction)
-        call self%check_true("cryogenic-dominated storage uses cryogenic suction", &
-                             abs(effective_suction - cryogenic_suction) < 1.0d0)
-        call self%check_true("storage suctions are alternatives, not additive", &
-                             abs(effective_suction - cryogenic_suction - 100.0d0) > 50.0d0)
+        call self%check_close("generalized suction superposes capillary and cryogenic", &
+                              effective_suction, cryogenic_suction + 1.0d5, 1.0d-12)
 
+        ! Both derivatives stay order one, which is what keeps C_HH well posed
+        ! while the cryogenic gradient drives the migration.
+        call fusion%calc_water_content_derivatives(state, dwater_dP, dwater_dT_cryo)
+        call self%check_true("frozen liquid storage keeps its pore-pressure derivative", dwater_dP > 0.0d0)
+        call self%check_true("frozen liquid storage gains a freezing-curve slope", dwater_dT_cryo > 0.0d0)
+
+        ! Above freezing psi_cryo vanishes and the relation reduces to ordinary
+        ! unfrozen retention in p_w alone.
+        call state%temperature%set(0.5d0)
+        call state%pressure%set(-1.0d5)
+        call fusion%calc_effective_suction(state, effective_suction)
+        call self%check_close("unfrozen suction reduces to the capillary term", &
+                              effective_suction, 1.0d5, 1.0d-12)
         call fusion%calc_water_content_derivatives(state, dwater_dP, dwater_dT)
-        call self%check_true("liquid storage retains its pore-pressure derivative", dwater_dP > 0.0d0)
-        call self%check_close("liquid storage is not replaced by cryogenic suction", dwater_dT, 0.0d0, 1.0d-14)
+        call self%check_true("unfrozen liquid storage retains its pore-pressure derivative", dwater_dP > 0.0d0)
+        call self%check_close("unfrozen liquid storage has no freezing-curve slope", dwater_dT, 0.0d0, 1.0d-14)
     end subroutine test_freezing_storage_transport_split
 
     subroutine test_incomplete_beta_thread_safety(self)
@@ -485,11 +489,14 @@ contains
         call state%dQw_dT%get(dQw_dT)
         call state%dQi_dP%get(dQi_dP)
         call state%dQi_dT%get(dQi_dT)
-        call self%check_close("inner T-p update preserves prognostic ice", Qi, 0.0d0, 1.0d-14)
+        ! theta_i is a dependent state function of (T,p): a zeroed ice field is
+        ! overwritten by the freezing curve, it is not carried forward.
+        call self%check_true("cold state function produces ice from T-p alone", Qi > 0.0d0)
         call self%check_close("cold direct phase volumes close the pore volume", Qw + Qi + Qa, porosity, 2.0d-14)
-        call phase_manager%project_ice_content(state, projected_ice, ice_increment, equilibrium_error)
-        call self%check_true("cold disequilibrium projects a positive ice increment", ice_increment > 0.0d0)
-        call self%check_true("cold disequilibrium exposes the Clapeyron pressure defect", equilibrium_error > 1.0d5)
+        call state%ice_content%set(0.0d0)
+        call phase_manager%update_water_phases(state)
+        call state%ice_content%get(Qi_fwd)
+        call self%check_close("ice content carries no history of its own", Qi_fwd, Qi, 1.0d-14)
 
         t0 = -1.0d0
         p0 = -5.4d4
@@ -499,30 +506,30 @@ contains
         call state%temperature%set(t0 + fd_step_T)
         call phase_manager%update_water_phases(state)
         call state%water_content%get(Qw_fwd)
-        call phase_manager%project_ice_content(state, Qi_fwd, ice_increment, equilibrium_error)
+        call state%ice_content%get(Qi_fwd)
         call state%temperature%set(t0 - fd_step_T)
         call phase_manager%update_water_phases(state)
         call state%water_content%get(Qw_bwd)
-        call phase_manager%project_ice_content(state, Qi_bwd, ice_increment, equilibrium_error)
+        call state%ice_content%get(Qi_bwd)
         call state%temperature%set(t0)
         dQw_dT_fd = (Qw_fwd - Qw_bwd) / (2.0d0 * fd_step_T)
-        dQi_dT_fd = phase_return_relaxation * (Qi_fwd - Qi_bwd) / (2.0d0 * fd_step_T)
+        dQi_dT_fd = (Qi_fwd - Qi_bwd) / (2.0d0 * fd_step_T)
         call self%check_close("direct dQw/dT matches finite difference", dQw_dT, dQw_dT_fd, 1.0d-4)
-        call self%check_close("phase return dQi/dT matches finite difference", dQi_dT, dQi_dT_fd, 1.0d-4)
+        call self%check_close("state-function dQi/dT matches finite difference", dQi_dT, dQi_dT_fd, 1.0d-4)
 
         call state%pressure%set(p0 + fd_step_P)
         call phase_manager%update_water_phases(state)
         call state%water_content%get(Qw_fwd)
-        call phase_manager%project_ice_content(state, Qi_fwd, ice_increment, equilibrium_error)
+        call state%ice_content%get(Qi_fwd)
         call state%pressure%set(p0 - fd_step_P)
         call phase_manager%update_water_phases(state)
         call state%water_content%get(Qw_bwd)
-        call phase_manager%project_ice_content(state, Qi_bwd, ice_increment, equilibrium_error)
+        call state%ice_content%get(Qi_bwd)
         call state%pressure%set(p0)
         dQw_dP_fd = (Qw_fwd - Qw_bwd) / (2.0d0 * fd_step_P)
-        dQi_dP_fd = phase_return_relaxation * (Qi_fwd - Qi_bwd) / (2.0d0 * fd_step_P)
+        dQi_dP_fd = (Qi_fwd - Qi_bwd) / (2.0d0 * fd_step_P)
         call self%check_close("direct dQw/dP matches finite difference", dQw_dP, dQw_dP_fd, 1.0d-4)
-        call self%check_close("phase return dQi/dP matches finite difference", dQi_dP, dQi_dP_fd, 1.0d-4)
+        call self%check_close("state-function dQi/dP matches finite difference", dQi_dP, dQi_dP_fd, 1.0d-4)
 
         call state%temperature%set(1.0d0)
         call state%pressure%set(-5.4d4)
@@ -530,35 +537,36 @@ contains
         call state%ice_content%get(Qi)
         call self%check_close("warm direct T-p state is ice-free", Qi, 0.0d0, 1.0d-14)
 
+        ! At zero gauge pressure the pore-volume bound on theta_tot is active, and
+        ! with theta_i = (theta_tot - theta_l)*rho_w/rho_i that bound makes
+        ! theta_l + theta_i = phi identically. The medium is therefore saturated
+        ! there by construction - this is the bound that removed the +MPa
+        ! pressure pockets - so the saturation pressure is the pressure itself.
         call state%temperature%set(-1.0d0)
         call state%pressure%set(0.0d0)
-        call state%ice_content%set(0.1d0)
         call phase_manager%update_water_phases(state)
-        saturation_pressure = 0.0d0
+        saturation_pressure = 1.0d0
         is_saturated = .false.
         call phase_manager%calc_saturation_pressure(state, saturation_pressure, is_saturated)
-        call self%check_true("fixed-ice saturation pressure is negative", saturation_pressure < 0.0d0)
         call self%check_true("zero gauge pressure is saturated while frozen", is_saturated)
-
-        call state%pressure%set(saturation_pressure - 10.0d0)
-        call phase_manager%update_water_phases(state)
-        call phase_manager%calc_saturation_pressure(state, saturation_pressure, is_saturated)
-        call self%check_true("state below saturation pressure contains gas", .not. is_saturated)
         call state%water_content%get(Qw)
         call state%ice_content%get(Qi)
         call state%air_content%get(Qa)
-        call self%check_true("state below saturation pressure has positive gas volume", Qa > 0.0d0)
-        call self%check_close("unsaturated phase volumes close the pore volume", Qw + Qi + Qa, 0.535d0, 2.0d-14)
-
-        call state%pressure%set(saturation_pressure + 10.0d0)
-        call phase_manager%update_water_phases(state)
-        call phase_manager%calc_saturation_pressure(state, saturation_pressure, is_saturated)
-        call self%check_true("state above saturation pressure is gas-free", is_saturated)
-        call state%water_content%get(Qw)
-        call state%ice_content%get(Qi)
-        call state%air_content%get(Qa)
-        call self%check_close("saturated phase volumes close the pore volume", Qw + Qi + Qa, 0.535d0, 2.0d-14)
         call self%check_true("saturated state has zero gas volume", abs(Qa) < 1.0d-12)
+        call self%check_close("saturated phase volumes close the pore volume", Qw + Qi + Qa, 0.535d0, 2.0d-14)
+
+        ! Dropping the pressure far enough takes theta(psi_cap) below the bound,
+        ! which deactivates it and lets a gas phase appear. The offset has to be
+        ! on the retention curve's own pressure scale, not a fixed few Pa.
+        call state%pressure%set(-5.4d4)
+        call phase_manager%update_water_phases(state)
+        call phase_manager%calc_saturation_pressure(state, saturation_pressure, is_saturated)
+        call self%check_true("state well below saturation contains gas", .not. is_saturated)
+        call state%water_content%get(Qw)
+        call state%ice_content%get(Qi)
+        call state%air_content%get(Qa)
+        call self%check_true("unsaturated state has positive gas volume", Qa > 0.0d0)
+        call self%check_close("unsaturated phase volumes close the pore volume", Qw + Qi + Qa, 0.535d0, 2.0d-14)
     end subroutine test_saturation_pressure
 
     subroutine benchmark_hot_paths(self)

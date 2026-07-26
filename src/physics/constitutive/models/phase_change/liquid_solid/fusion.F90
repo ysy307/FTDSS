@@ -5,7 +5,6 @@ module models_phase_change_fusion
     use :: constitutive_constants, only: &
         Tf0 => water_freezing_point_at_standard_atmospheric_pressure, &
         g => gravity_acceleration, rho_std => reference_water_density, &
-        SUCTION_BLEND_EPS => suction_blend_epsilon, &
         Lf0 => latent_heat_fusion_water_0C, &
         TtoK => celsius_to_kelvin
     use :: physics_constitutive_base, only:abst_constitutive
@@ -47,19 +46,32 @@ contains
         real(real64), intent(inout) :: psi_eff
         real(real64), intent(inout), optional :: dpsi_eff_dpsi_cap, dpsi_eff_dpsi_cryo
 
-        ! The freezing-as-drying relation evaluates retention at the larger of
-        ! the air-water and ice-water suctions. This relation determines phase
-        ! storage only; Darcy transport remains driven by pore pressure and the
-        ! separate thermal liquid conductivity. The smooth maximum keeps the
-        ! phase derivatives defined at the switching surface.
-        real(real64) :: delta_psi, blend_denom
+        ! Total soil-water suction as the SUPERPOSITION of the two
+        ! chemical-potential lowerings acting on the liquid: the air-water
+        ! capillary suction psi_cap and the ice-water cryogenic suction
+        ! psi_cryo add. The water chemical potential is
+        !   mu_w = mu_w^sat - v_w * psi_eff,   psi_eff = psi_cap + psi_cryo,
+        ! so the single retention relation theta_l = F_WRF(psi_eff) holds both
+        ! unfrozen and frozen, and the Darcy flux driven by grad(mu_w) ~
+        ! grad(psi_eff) carries the pressure gradient AND the cryogenic one.
+        !
+        ! A max() must not be used here, and this was measured: with max() the
+        ! frozen zone has psi_cryo >> psi_cap (3.4 MPa against 0.05 MPa at
+        ! -2.8 C), so d psi_eff/d psi_cap collapses to ~1e-9, the storage
+        ! derivative dtheta_l/dp goes with it, and the pressure diagonal C_HH
+        ! loses its leverage - the 50 h validation run stalled with the
+        ! hydraulic residual ratio stuck at 14 while the thermal residual
+        ! converged normally. It also leaves p_w with no reason to move, so the
+        ! Clapeyron suction never reaches the flux and moisture migration
+        ! vanishes (measured redistribution was -0.8% of the experiment).
+        ! Addition keeps d psi_eff/d psi_cap = 1 everywhere, so the pressure
+        ! diagonal stays well posed while the cryogenic gradient migrates water
+        ! to the freezing front. Above freezing psi_cryo = 0 and psi_eff
+        ! reduces to the ordinary capillary suction.
+        psi_eff = psi_cap + psi_cryo
 
-        delta_psi = psi_cap - psi_cryo
-        blend_denom = sqrt(delta_psi*delta_psi + SUCTION_BLEND_EPS*SUCTION_BLEND_EPS)
-        psi_eff = 0.5d0*(psi_cap + psi_cryo + blend_denom)
-
-        if (present(dpsi_eff_dpsi_cap)) dpsi_eff_dpsi_cap = 0.5d0*(1.0d0 + delta_psi/blend_denom)
-        if (present(dpsi_eff_dpsi_cryo)) dpsi_eff_dpsi_cryo = 0.5d0*(1.0d0 - delta_psi/blend_denom)
+        if (present(dpsi_eff_dpsi_cap)) dpsi_eff_dpsi_cap = 1.0d0
+        if (present(dpsi_eff_dpsi_cryo)) dpsi_eff_dpsi_cryo = 1.0d0
     end subroutine compute_effective_suction
 
     !>
@@ -292,21 +304,25 @@ contains
         real(real64), intent(inout) :: water_content
 
         real(real64) :: pressure
-        real(real64) :: pressure_head
+        real(real64) :: psi_cap, psi_cryo, psi_eff
 
         call state%pressure%get(pressure)
 
         if (pressure < 0.0d0) then
-            pressure_head = pressure / (rho_std * g)
+            psi_cap = -pressure
         else
-            pressure_head = 0.0d0
+            psi_cap = 0.0d0
         end if
 
-        ! Hansson mixed form: the unfrozen liquid storage is theta_l(h), where
-        ! h is the solved pore-water pressure head. Temperature determines the
-        ! Clapeyron equilibrium target for the separate ice projection, not a
-        ! replacement retention argument in this routine.
-        call self%wrf%calc(pressure_head, water_content)
+        ! Generalized-suction (freezing = drying analogy): the unfrozen liquid
+        ! content follows the retention curve evaluated at the generalized
+        ! suction psi_eff = max(psi_cap, psi_cryo). Below freezing the
+        ! cryogenic suction psi_cryo(T) lowers the unfrozen content, which is
+        ! what makes theta_l temperature-dependent and supplies the apparent
+        ! heat capacity to the energy equation.
+        call self%gcc%calc(state, psi_cryo)
+        call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
+        call self%wrf%calc(-psi_eff / (rho_std * g), water_content)
 
     end subroutine calc_water_content
 
@@ -320,20 +336,41 @@ contains
         real(real64), intent(inout) :: dwater_dP !> d(theta_l)/dP
         real(real64), intent(inout) :: dwater_dT !> d(theta_l)/dT
 
-        real(real64) :: pressure, pressure_head
-        real(real64) :: d_theta_liquid_dhead
+        real(real64) :: pressure
+        real(real64) :: psi_cap, psi_cryo, psi_eff
+        real(real64) :: d_psi_cap_dP, d_psi_cryo_dP, d_psi_cryo_dT
+        real(real64) :: d_psi_eff_dpsi_cap, d_psi_eff_dpsi_cryo
+        real(real64) :: d_psi_eff_dP, d_psi_eff_dT
+        real(real64) :: d_theta_liquid_dPress
 
         call state%pressure%get(pressure)
 
+        ! Capillary suction
         if (pressure < 0.0d0) then
-            pressure_head = pressure / (rho_std * g)
-            call self%wrf%deriv(pressure_head, d_theta_liquid_dhead)
-            dwater_dP = d_theta_liquid_dhead / (rho_std * g)
+            psi_cap = -pressure
+            d_psi_cap_dP = -1.0d0
         else
-            dwater_dP = 0.0d0
+            psi_cap = 0.0d0
+            d_psi_cap_dP = 0.0d0
         end if
 
-        dwater_dT = 0.0d0
+        ! Generalized suction psi_eff = max(psi_cap, psi_cryo(T)). The T
+        ! dependence flows through psi_cryo, giving a nonzero dwater_dT: this
+        ! is the freezing-curve slope that becomes the apparent heat capacity
+        ! in the energy equation's C_TT (thermal_coefficients.F90).
+        call self%gcc%calc(state, psi_cryo)
+        call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
+        call self%gcc%deriv_temperature(state, d_psi_cryo_dT)
+
+        call compute_effective_suction(psi_cap, psi_cryo, psi_eff, d_psi_eff_dpsi_cap, d_psi_eff_dpsi_cryo)
+        d_psi_eff_dP = d_psi_eff_dpsi_cap * d_psi_cap_dP + d_psi_eff_dpsi_cryo * d_psi_cryo_dP
+        d_psi_eff_dT = d_psi_eff_dpsi_cryo * d_psi_cryo_dT
+
+        call self%wrf%deriv(-psi_eff / (rho_std * g), d_theta_liquid_dPress)
+
+        ! Chain rule: dTheta/dX = (dTheta/dh) * (-d_psi_eff/dX) / (rho_std g).
+        dwater_dP = d_theta_liquid_dPress * (-d_psi_eff_dP) / (rho_std * g)
+        dwater_dT = d_theta_liquid_dPress * (-d_psi_eff_dT) / (rho_std * g)
 
     end subroutine calc_water_content_derivatives
 

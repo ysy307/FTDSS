@@ -71,6 +71,7 @@ module control_iteration_manager
         procedure, public, pass(self) :: get_current_norm => get_current_norm_iteration
         procedure, public, pass(self) :: get_tolerances => get_tolerances_iteration
         procedure, public, pass(self) :: update_reference_values => update_reference_values_iteration
+        procedure, public, pass(self) :: set_residual_scale => set_residual_scale_iteration
         ! ---- Meta / Utility ----
     end type type_iteration
 
@@ -442,5 +443,14 @@ contains
 
         call self%settings%update_reference_values(reference_values)
     end subroutine update_reference_values_iteration
+
+    subroutine set_residual_scale_iteration(self, volume_total, dt)
+        implicit none
+        class(type_iteration), intent(inout) :: self
+        real(real64), intent(in) :: volume_total
+        real(real64), intent(in) :: dt
+
+        call self%settings%set_residual_scale(volume_total, dt)
+    end subroutine set_residual_scale_iteration
 
 end module control_iteration_manager

@@ -117,7 +117,7 @@ module materials_heat_capacity
         end subroutine calc_vhc_2
 
         module subroutine calc_vhc_3a(vhc_soil, phi_soil, vhc_water, phi_water, &
-                                      vhc_ice, phi_ice, density_water, latent_heat_fusion, dQw_dT, vhc)
+                                      vhc_ice, phi_ice, density_ice, latent_heat_fusion, dQi_dT, vhc)
             implicit none
             real(real64), intent(in) :: vhc_soil
             real(real64), intent(in) :: phi_soil
@@ -125,16 +125,16 @@ module materials_heat_capacity
             real(real64), intent(in) :: phi_water
             real(real64), intent(in) :: vhc_ice
             real(real64), intent(in) :: phi_ice
-            real(real64), intent(in) :: density_water
+            real(real64), intent(in) :: density_ice
             real(real64), intent(in) :: latent_heat_fusion
-            real(real64), intent(in) :: dQw_dT
+            real(real64), intent(in) :: dQi_dT
             real(real64), intent(inout) :: vhc
 
         end subroutine calc_vhc_3a
 
         module subroutine calc_vhc_4a(vhc_soil, phi_soil, vhc_water, phi_water, &
-                                      vhc_ice, phi_ice, phi_vapor, vhc_vapor, density_water, latent_heat_fusion, &
-                                      dQw_dT, latent_heat_vaporization, dQv_dT, vhc)
+                                      vhc_ice, phi_ice, phi_vapor, vhc_vapor, density_water, density_ice, &
+                                      latent_heat_fusion, dQi_dT, latent_heat_vaporization, dQv_dT, vhc)
             implicit none
             real(real64), intent(in) :: vhc_soil
             real(real64), intent(in) :: phi_soil
@@ -145,8 +145,9 @@ module materials_heat_capacity
             real(real64), intent(in) :: phi_vapor
             real(real64), intent(in) :: vhc_vapor
             real(real64), intent(in) :: density_water
+            real(real64), intent(in) :: density_ice
             real(real64), intent(in) :: latent_heat_fusion
-            real(real64), intent(in) :: dQw_dT
+            real(real64), intent(in) :: dQi_dT
             real(real64), intent(in) :: latent_heat_vaporization
             real(real64), intent(in) :: dQv_dT
             real(real64), intent(inout) :: vhc
