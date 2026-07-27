@@ -310,11 +310,19 @@ contains
                         do i = 1, num_nodes_loc
                             call self%F%add(physics_type%ID, connectivity(i), psi(i) * q_flux * w_vol)
 
+                            ! K holds dR/du while F holds -R, and the boundary
+                            ! influx enters the residual as -int(psi*q), so its
+                            ! tangent is -int(psi * dq/du * psi) - the opposite
+                            ! sign of the force it accompanies. For a Robin
+                            ! condition dq/du = -h, which recovers the standard
+                            ! +h*int(psi*psi) boundary stiffness; adding
+                            ! -h*int(psi*psi) instead weakens the very diagonal
+                            ! the condition is supposed to strengthen.
                             if (abs(dq_du) > 0.0d0) then
                                 do j = 1, num_nodes_loc
                                     call self%K%add(physics_type%ID, physics_type%ID, &
                                                     connectivity(i), connectivity(j), &
-                                                    psi(i) * dq_du * psi(j) * w_vol)
+                                                    -psi(i) * dq_du * psi(j) * w_vol)
                                 end do
                             end if
                         end do

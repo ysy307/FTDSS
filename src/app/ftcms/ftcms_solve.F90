@@ -9,6 +9,13 @@ submodule(app_ftcms) ftcms_solve
     integer(int32), parameter :: SOLVE_STATUS_PHASE_FAILURE = 5
     integer(int32), parameter :: SOLVE_STATUS_LTE_REJECTED = 6
 
+    !> Audit the assembled tangent against the element finite-difference tangent
+    !> once, at the first iterate where the line search finds no usable step.
+    !> Diagnostic only: it costs O(4 n_node) element residual evaluations per
+    !> element and must not be left on for production runs.
+    logical, parameter :: FD_JACOBIAN_AUDIT = .false.
+    logical, save :: fd_audit_done = .false.
+
 contains
     module subroutine solve_time_step_initial_setup_ftcms(self)
         implicit none
@@ -398,8 +405,18 @@ contains
         real(real64), parameter :: LINE_SEARCH_MIN_SCALE = 1.0d-3
         !> Armijo sufficient-decrease coefficient on the residual norm.
         real(real64), parameter :: LINE_SEARCH_ARMIJO = 1.0d-4
-        integer(int32) :: ls_trial
+        integer(int32) :: ls_trial, ls_diag
         real(real64) :: ls_scale, ls_reference_norm, ls_trial_norm, ls_aa_gnorm
+        !> Per-block residual norms at the trial iterate and the step-initial
+        !> norms the merit is scaled by.
+        real(real64) :: ls_norm_T, ls_norm_H
+        real(real64) :: ls_ref0_thermal, ls_ref0_hydraulic
+        !> Per-trial backtracking record, kept only to separate a wrong direction
+        !> from a step length the search does not actually control.
+        real(real64) :: ls_trial_alpha(LINE_SEARCH_MAX_TRIALS)
+        real(real64) :: ls_trial_ratio(LINE_SEARCH_MAX_TRIALS)
+        real(real64) :: ls_trial_ratio_T(LINE_SEARCH_MAX_TRIALS)
+        real(real64) :: ls_trial_ratio_H(LINE_SEARCH_MAX_TRIALS)
         logical :: ls_accepted, ls_aa_has_prev
         real(real64), allocatable :: ls_T_saved(:), ls_P_saved(:)
         real(real64), allocatable :: ls_aa_T(:), ls_aa_P(:), ls_aa_duT(:), ls_aa_duP(:)
@@ -419,6 +436,10 @@ contains
 
 
         is_step_converged = .false.
+        ls_ref0_thermal = 0.0d0
+        ls_ref0_hydraulic = 0.0d0
+        ls_norm_T = 0.0d0
+        ls_norm_H = 0.0d0
 
         self%last_phase_iterations = 1
         self%last_inner_iterations = 0
@@ -528,17 +549,30 @@ contains
                                                                initial_residual_hydraulic, &
                                                                self%is_active_thermal(), &
                                                                self%is_active_hydraulic())
+                    ! Same R^0 the acceptance gate ratios against, reused to make
+                    ! the line-search merit dimensionless and block-balanced.
+                    ls_ref0_thermal = 0.0d0
+                    ls_ref0_hydraulic = 0.0d0
+                    if (allocated(initial_residual_thermal)) then
+                        ls_ref0_thermal = sqrt(dot_product(initial_residual_thermal, initial_residual_thermal))
+                    end if
+                    if (allocated(initial_residual_hydraulic)) then
+                        ls_ref0_hydraulic = sqrt(dot_product(initial_residual_hydraulic, initial_residual_hydraulic))
+                    end if
                     if (allocated(initial_residual_thermal)) deallocate (initial_residual_thermal)
                     if (allocated(initial_residual_hydraulic)) deallocate (initial_residual_hydraulic)
                 end if
 
-                ! Reference residual norm for the line search, taken BEFORE the
-                ! linear solve: solve() calls jacobi_equilibrate_bsr, which scales
-                ! K and F in place to fix the 1e13 T/p conditioning disparity. Only
-                ! du is unscaled afterwards, so F is left equilibrated and reading
-                ! it after the solve compares a scaled residual against a freshly
+                ! Reference merit for the line search, taken BEFORE the linear
+                ! solve: solve() calls jacobi_equilibrate_bsr, which scales K and
+                ! F in place to fix the 1e13 T/p conditioning disparity. Only du
+                ! is unscaled afterwards, so F is left equilibrated and reading it
+                ! after the solve compares a scaled residual against a freshly
                 ! assembled unscaled one.
-                if (self%control%is_conserved()) call ls_capture_reference(self, ls_reference_norm)
+                if (self%control%is_conserved()) then
+                    call ls_block_norms(self, ls_norm_T, ls_norm_H)
+                    ls_reference_norm = ls_merit(ls_norm_T, ls_norm_H, ls_ref0_thermal, ls_ref0_hydraulic)
+                end if
 
                 ! Linear solve (K * du = F)
                 call self%solve()
@@ -586,6 +620,10 @@ contains
                                      ls_aa_has_prev, ls_aa_gnorm)
                     ls_scale = 1.0d0
                     ls_accepted = .false.
+                    ls_trial_ratio(:) = -1.0d0
+                    ls_trial_alpha(:) = -1.0d0
+                    ls_trial_ratio_T(:) = -1.0d0
+                    ls_trial_ratio_H(:) = -1.0d0
                     do ls_trial = 1, LINE_SEARCH_MAX_TRIALS
                         if (ls_trial > 1) then
                             call ls_restore(self, ls_T_saved, ls_P_saved, ls_onset_saved, &
@@ -595,11 +633,16 @@ contains
                         call self%reflect_variables(step_scale=ls_scale)
                         call self%assemble()
                         call self%apply_bc(prescribed=.false.)
-                        call ls_capture_reference(self, ls_trial_norm)
+                        call ls_block_norms(self, ls_norm_T, ls_norm_H)
+                        ls_trial_norm = ls_merit(ls_norm_T, ls_norm_H, ls_ref0_thermal, ls_ref0_hydraulic)
                         if (ls_reference_norm <= 0.0d0) then
                             ls_accepted = .true.
                             exit
                         end if
+                        ls_trial_alpha(ls_trial) = ls_scale
+                        ls_trial_ratio(ls_trial) = ls_trial_norm / ls_reference_norm
+                        ls_trial_ratio_T(ls_trial) = ls_norm_T / max(ls_ref0_thermal, tiny(1.0d0))
+                        ls_trial_ratio_H(ls_trial) = ls_norm_H / max(ls_ref0_hydraulic, tiny(1.0d0))
                         if (ls_trial_norm <= (1.0d0 - LINE_SEARCH_ARMIJO * ls_scale) * ls_reference_norm) then
                             ls_accepted = .true.
                             exit
@@ -611,14 +654,33 @@ contains
                     self%last_line_search_trials = ls_trial
                     if (.not. ls_accepted) then
                         self%last_line_search_failures = self%last_line_search_failures + 1
-                        ! No admissible step exists along this direction: the
-                        ! Picard direction is not a descent direction for ||R||
-                        ! here, which is a direction problem, not a step-length
-                        ! problem. Report it so the two are never confused.
-                        write (*, '(A,I0,A,ES11.3,A,ES11.3,A,ES9.2)') &
-                            '   [LS] no descent at iter ', iter_nl, &
-                            ': ||R_k||=', ls_reference_norm, ' ||R_trial||=', ls_trial_norm, &
-                            ' alpha=', ls_scale
+                        ! One-shot tangent audit at the first iterate where no
+                        ! step length works. The state here is the one the
+                        ! linearization has to explain, so measuring anywhere
+                        ! else answers a different question.
+                        if (FD_JACOBIAN_AUDIT .and. .not. fd_audit_done) then
+                            fd_audit_done = .true.
+                            call self%report_fd_jacobian('line-search failure')
+                        end if
+                        ! Report the whole backtracking sequence, not just its
+                        ! last entry. The two failure mechanisms are only
+                        ! distinguishable from the trend in alpha:
+                        !   ratio - 1 proportional to alpha  -> the direction is
+                        !     genuinely an ascent direction for ||R||, i.e. the
+                        !     linearization is wrong;
+                        !   ratio - 1 constant in alpha      -> part of the update
+                        !     does not scale with alpha, i.e. the search is not
+                        !     actually controlling the step length.
+                        write (*, '(A,I0,A,ES11.3)') &
+                            '   [LS] no descent at iter ', iter_nl, ': ||R_k||=', ls_reference_norm
+                        do ls_diag = 1, LINE_SEARCH_MAX_TRIALS
+                            if (ls_trial_alpha(ls_diag) < 0.0d0) cycle
+                            write (*, '(A,ES9.2,A,F12.6,A,ES11.3,A,ES11.3)') &
+                                '        alpha=', ls_trial_alpha(ls_diag), &
+                                '  merit/merit_k=', ls_trial_ratio(ls_diag), &
+                                '  resT/0=', ls_trial_ratio_T(ls_diag), &
+                                '  resH/0=', ls_trial_ratio_H(ls_diag)
+                        end do
                     end if
 
                     ! theta_i is a state function of (T,p) evaluated inside the
@@ -808,30 +870,64 @@ contains
 
     end subroutine solve_time_step_ftcms
 
-    !> Combined L2 norm of the assembled block residuals at the current iterate.
-    !> This is the merit function the line search reduces; it is the same norm
-    !> the conserved convergence gate ratios, so a step that satisfies the search
-    !> also makes progress against the acceptance criterion.
-    subroutine ls_capture_reference(self, norm_value)
+    !> L2 norms of the assembled thermal and hydraulic block residuals,
+    !> separately, at the current iterate.
+    !>
+    !> They must stay separate: the thermal residual is an energy rate [W] and
+    !> the hydraulic one a volumetric water rate [m3/s], and on this problem they
+    !> differ by about nine orders of magnitude. Their raw sum of squares is the
+    !> thermal norm to machine precision, so a merit built from it cannot see the
+    !> hydraulic block at all. Callers normalize each block before combining.
+    subroutine ls_block_norms(self, norm_thermal, norm_hydraulic)
         implicit none
         class(type_ftcms), intent(inout) :: self
-        real(real64), intent(inout) :: norm_value
+        real(real64), intent(inout) :: norm_thermal
+        real(real64), intent(inout) :: norm_hydraulic
 
         real(real64), allocatable :: r_thermal(:), r_hydraulic(:)
 
-        norm_value = 0.0d0
+        norm_thermal = 0.0d0
+        norm_hydraulic = 0.0d0
         if (self%is_active_thermal()) then
             call self%get_variable_residual(PHYSICS_TYPES%THERMAL, r_thermal)
-            if (allocated(r_thermal)) norm_value = norm_value + dot_product(r_thermal, r_thermal)
+            if (allocated(r_thermal)) norm_thermal = sqrt(dot_product(r_thermal, r_thermal))
         end if
         if (self%is_active_hydraulic()) then
             call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, r_hydraulic)
-            if (allocated(r_hydraulic)) norm_value = norm_value + dot_product(r_hydraulic, r_hydraulic)
+            if (allocated(r_hydraulic)) norm_hydraulic = sqrt(dot_product(r_hydraulic, r_hydraulic))
         end if
-        norm_value = sqrt(norm_value)
         if (allocated(r_thermal)) deallocate (r_thermal)
         if (allocated(r_hydraulic)) deallocate (r_hydraulic)
-    end subroutine ls_capture_reference
+    end subroutine ls_block_norms
+
+    !> Dimensionless line-search merit: each block residual divided by its own
+    !> step-initial norm, combined in L2.
+    !>
+    !> This is deliberately the same quantity the conserved acceptance gate
+    !> ratios (per-block relative residual against R^0), so the search and the
+    !> gate cannot disagree about what progress means. With the previous raw
+    !> merit the search rejected every step that reduced a hydraulic residual
+    !> sitting at resH/0 = 3.12 against a tolerance of 0.1, because the same step
+    !> raised the nine-orders-larger thermal block by 1.6-1.9 percent; it then
+    !> exhausted its backtracking budget and left alpha = 7.8e-3, which advances
+    !> nothing. Measured: the iterate was bit-for-bit unchanged across successive
+    !> nonlinear iterations while resT/0 stayed at 0.1145.
+    pure function ls_merit(norm_thermal, norm_hydraulic, ref_thermal, ref_hydraulic) result(merit)
+        implicit none
+        real(real64), intent(in) :: norm_thermal, norm_hydraulic
+        real(real64), intent(in) :: ref_thermal, ref_hydraulic
+        real(real64) :: merit
+        real(real64) :: scaled_thermal, scaled_hydraulic
+
+        ! A block whose step-initial residual is zero is already solved; leave it
+        ! unscaled rather than dividing by zero, so it contributes nothing.
+        scaled_thermal = norm_thermal
+        if (ref_thermal > 0.0d0) scaled_thermal = norm_thermal / ref_thermal
+        scaled_hydraulic = norm_hydraulic
+        if (ref_hydraulic > 0.0d0) scaled_hydraulic = norm_hydraulic / ref_hydraulic
+
+        merit = sqrt(scaled_thermal**2 + scaled_hydraulic**2)
+    end function ls_merit
 
     !> Save everything a line-search trial mutates. The AA(1) secant pair is
     !> included because prepare_coupled_aa_step commits it unconditionally: a

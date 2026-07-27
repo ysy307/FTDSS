@@ -306,6 +306,8 @@ module app_ftcms
         procedure, public, pass(self) :: update_variables => update_variables_ftcms
         procedure, public, pass(self) :: assemble_local => assemble_local_ftcms
         procedure, public, pass(self) :: assemble => assemble_ftcms
+        procedure, public, pass(self) :: report_fd_jacobian => report_fd_jacobian_ftcms
+        procedure, private, pass(self) :: assemble_coupling_fd => assemble_coupling_fd_ftcms
         procedure, private, pass(self) :: assemble_initialize => assemble_initialize_ftcms
         procedure, private, pass(self) :: assemble_destroy => assemble_destroy_ftcms
 
@@ -625,6 +627,48 @@ module app_ftcms
             type(type_vector_dp), intent(inout), optional :: local_F_T, local_F_H
 
         end subroutine assemble_local_ftcms
+
+        !> Compare every assembled block against the element-level
+        !> finite-difference tangent of the same residual.
+        !>
+        !> Reports, per block and separately for freezing-front and control
+        !> elements, the relative Frobenius error and the norm ratio
+        !> \( \|J_{fd}\| / \|K\| \). Assumes both physics are active; returns
+        !> immediately otherwise. Cost: \(O(N_{elem} \cdot 4 n_{node})\) element
+        !> residual evaluations, so this is a diagnostic entry point, not a
+        !> per-iteration path.
+        module subroutine report_fd_jacobian_ftcms(self, tag, mean_rel_error, element_stride)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            !> Short label identifying the calling context in the log
+            character(len=*), intent(in) :: tag
+            !> Per-block mean relative error in report order
+            !> (TT, TH, HT, HH, TH_fd); negative where nothing was sampled
+            real(real64), intent(inout), optional :: mean_rel_error(:)
+            !> Sample every n-th freezing-front element, >= 1 (default: all)
+            integer(int32), intent(in), optional :: element_stride
+
+        end subroutine report_fd_jacobian_ftcms
+
+        !> Overwrite the thermal-pressure coupling block with the element
+        !> finite-difference tangent \( \partial R_T/\partial p \).
+        !>
+        !> Assumes `local_F_T` holds the element thermal residual at the
+        !> unperturbed state; it is restored on exit and the workspace is left
+        !> on the unperturbed state. Cost: \(n_{node}\) extra thermal residual
+        !> evaluations per element. Failure behavior: none - the difference
+        !> quotient is always defined.
+        module subroutine assemble_coupling_fd_ftcms(self, workspace, local_F_T, K_TH)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            type(type_assemble_workspace), intent(inout) :: workspace
+            !> Element thermal residual; restored unchanged on exit
+            type(type_vector_dp), intent(inout) :: local_F_T
+            !> Overwritten with the finite-difference coupling block
+            type(type_matrix_dense), intent(inout) :: K_TH
+
+        end subroutine assemble_coupling_fd_ftcms
+
         module subroutine assemble_initialize_ftcms(self, element_id, workspace, local_K_TT, local_K_TH, &
                                                     local_K_HH, local_K_HT, local_F_T, local_F_H, &
                                                     coordinates, raw_coordinates, connectivity)

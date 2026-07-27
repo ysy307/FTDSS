@@ -1,6 +1,21 @@
 submodule(app_ftcms) ftcms_assemble
     implicit none
 
+    !> Build the thermal-pressure coupling block by differencing the element
+    !> thermal residual instead of using the hand-written storage tangent.
+    !>
+    !> The hand-written block is bdf0*K1(dU/dp) only. Audited against the
+    !> element finite-difference tangent it is 18 times too small in the far
+    !> field and 1798 times too small at the freezing front (relative Frobenius
+    !> error 1.0, i.e. the assembled block is negligible against the true one),
+    !> while TT, HT and HH agree to 1e-4. The omitted physics is the pressure
+    !> dependence of the advective heat flux: water carries heat at a Darcy
+    !> velocity containing -K_wP*grad p. With the coupling block that wrong, the
+    !> pressure increment is over-predicted by the same factor, which is what
+    !> drove the hydraulic residual to 1e3 times its step-initial value and left
+    !> the line search with no admissible step.
+    logical, parameter :: COUPLING_TH_FINITE_DIFFERENCE = .true.
+
 contains
 
     module subroutine assemble_ftcms(self)
@@ -79,6 +94,10 @@ contains
 
                     call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
                                              local_F_T, local_F_H)
+
+                    if (COUPLING_TH_FINITE_DIFFERENCE .and. do_thermal_elem .and. do_hydraulic_elem) then
+                        call self%assemble_coupling_fd(workspace, local_F_T, local_K_TH)
+                    end if
 
                     num_nodes_local = workspace%num_fe_nodes
 

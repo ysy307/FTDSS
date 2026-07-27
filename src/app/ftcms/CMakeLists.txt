@@ -11,6 +11,7 @@ target_sources(SOLVER_FTCMS PRIVATE
     ftcms_base.F90
     ftcms_boundary.F90
     ftcms_assemble.F90
+    ftcms_fd_jacobian.F90
     ftcms_compute.F90
     ftcms_solve.F90
     ftcms_assimilation.F90

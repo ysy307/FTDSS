@@ -330,7 +330,7 @@ contains
                compressive_capacity
     end subroutine compute_C_eq_hydraulic
 
-    !> Compute the nonlinear-iteration capacity from the physical tangent and WRF bound.
+    !> Compute the nonlinear-iteration capacity of the pressure block.
     module subroutine compute_iteration_capacity_hydraulic(self, material_id, state, capacity)
         implicit none
         class(type_hydraulic), intent(in) :: self
@@ -338,10 +338,27 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: capacity
 
-        real(real64) :: physical_capacity
-        physical_capacity = 0.0d0
-        call self%compute_C_eq(material_id, state, physical_capacity)
-        capacity = max(physical_capacity, self%iteration_capacity_bound(material_id))
+        ! Modified Picard requires the mass matrix to be the pressure derivative
+        ! of the storage term the residual integrates, i.e. C_eq = dTheta/dp at
+        ! the current iterate. This used to return
+        !   max(C_eq, iteration_capacity_bound)
+        ! where the bound is the material-wide L-scheme constant
+        ! L = max_h(dtheta/dh) / (rho_std g). Replacing the tangent by a fixed
+        ! upper bound turns the pressure block into an L-scheme, whose
+        ! contraction factor is 1 - C_eq/L:
+        !   Mizoguchi VG curve (theta_s 0.535, theta_r 0.05, alpha 1.11, n 1.48,
+        !   m 0.2) gives L = 8.1e-6 1/Pa, while the column's initial state
+        !   (p_w = -5.41e4 Pa, |h| = 5.51 m) has C_eq = 1.4e-6 1/Pa, so
+        !   L/C_eq = 5.6 and 1 - C_eq/L = 0.82 - the measured per-iteration ratio
+        !   of the hydraulic residual. Where the pore volume binds C_eq collapses
+        !   and the ratio reaches 1e4, so the tolerance is unreachable within any
+        !   iteration budget. An L-scheme step also reduces only the L-weighted
+        !   norm, never ||R||_2, so it is not a descent direction for the line
+        !   search either.
+        ! The tangent is small but not singular where the pore volume binds: that
+        ! state is saturated, so the specific-storage term inside compute_C_eq
+        ! carries the remaining capacity.
+        call self%compute_C_eq(material_id, state, capacity)
     end subroutine compute_iteration_capacity_hydraulic
 
     !> @brief Compute BDF approximation of dTheta/dt for Mixed formulation.
