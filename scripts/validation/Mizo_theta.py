@@ -32,6 +32,7 @@ EXPERIMENTAL_DATA = {
 }
 TIME_INDEX = {0: 0, 12: 1, 24: 2, 50: 3}
 ICE_TO_WATER_VOLUME_RATIO = 917.0 / 1000.0
+DZ_DEFAULT = 0.01
 
 
 def _output_interval_minutes(vtu_dir):
@@ -187,6 +188,120 @@ def _redistribution_metrics(initial_rows, target_rows, dz):
     }
 
 
+def _bin_centres():
+    return np.asarray([end - 0.5 * DZ_DEFAULT for end in EXPERIMENTAL_DATA])
+
+
+def _zero_crossing_depth(changes):
+    """Depth where the water-content change switches from gain to loss.
+
+    Mizoguchi's columns wet near the cold end and dry below it, so the crossing
+    depth is the front position the redistribution has reached. Returns None when
+    the profile never changes sign (no redistribution, or all one way).
+    """
+    centres = _bin_centres()
+    values = np.asarray(changes, dtype=float)
+    finite = np.isfinite(values)
+    if finite.sum() < 2:
+        return None
+    centres, values = centres[finite], values[finite]
+    order = np.argsort(centres)
+    centres, values = centres[order], values[order]
+    for i in range(len(values) - 1):
+        a, b = values[i], values[i + 1]
+        if a > 0.0 >= b:
+            # Linear interpolation of the sign change between bin centres.
+            span = a - b
+            if span == 0.0:
+                return float(centres[i])
+            return float(centres[i] + (centres[i + 1] - centres[i]) * a / span)
+    return None
+
+
+def _skill_score(rows, baseline_key="experimental_initial"):
+    """Skill of the simulation against a no-redistribution reference.
+
+    The reference prediction is "the profile never changed", taken from the
+    measured initial profile so the reference is independent of the model.
+    score = 1 - MSE(model)/MSE(reference); positive means the simulation beats
+    assuming no redistribution at all, which is the minimum a freezing model has
+    to clear to be saying anything.
+    """
+    initial = EXPERIMENTAL_DATA
+    model_sq, ref_sq = [], []
+    for row, values in zip(rows, initial.values()):
+        if row["simulated"] is None:
+            continue
+        model_sq.append((row["simulated"] - row["experimental"]) ** 2)
+        ref_sq.append((values[TIME_INDEX[0]] - row["experimental"]) ** 2)
+    if not model_sq:
+        return None
+    mse_model = float(np.mean(model_sq))
+    mse_ref = float(np.mean(ref_sq))
+    if mse_ref == 0.0:
+        return None
+    return 1.0 - mse_model / mse_ref
+
+
+def _profile_changes(initial_rows, target_rows):
+    changes = []
+    for initial, target in zip(initial_rows, target_rows):
+        if initial["simulated"] is None or target["simulated"] is None:
+            changes.append(np.nan)
+        else:
+            changes.append(target["simulated"] - initial["simulated"])
+    return changes
+
+
+def _experimental_changes(time_hours):
+    idx0, idx = TIME_INDEX[0], TIME_INDEX[time_hours]
+    return [values[idx] - values[idx0] for values in EXPERIMENTAL_DATA.values()]
+
+
+def _sampling_sensitivity(vtu_dir, time_hours, dz, res, interval_minutes):
+    """Largest bin-mean difference between res and res/2 sampling.
+
+    The depth bins are 10 mm and the sampling grid is 1 mm, so a bin mean should
+    not depend on the grid. If it does, the reported profile is a sampling
+    artefact rather than a result.
+    """
+    path = _vtu_path(vtu_dir, time_hours, interval_minutes)
+    coarse = _depth_profile(*_sample_total_water(path, res), time_hours, dz)
+    fine = _depth_profile(*_sample_total_water(path, 0.5 * res), time_hours, dz)
+    deltas = [
+        abs(c["simulated"] - f["simulated"])
+        for c, f in zip(coarse, fine)
+        if c["simulated"] is not None and f["simulated"] is not None
+    ]
+    return {
+        "resolution_m": res,
+        "refined_resolution_m": 0.5 * res,
+        "max_abs_bin_difference": float(max(deltas)) if deltas else None,
+    }
+
+
+def _write_csv(path, results):
+    import csv
+
+    with Path(path).open("w", newline="", encoding="utf-8") as stream:
+        writer = csv.writer(stream)
+        writer.writerow(
+            ["time_hours", "depth_start_m", "depth_end_m", "simulated", "experimental", "error"]
+        )
+        for result in results:
+            for row in result["profile"]:
+                writer.writerow(
+                    [
+                        result["time_hours"],
+                        f"{row['depth_start_m']:.4f}",
+                        f"{row['depth_end_m']:.4f}",
+                        "" if row["simulated"] is None else f"{row['simulated']:.6f}",
+                        f"{row['experimental']:.6f}",
+                        "" if row["error"] is None else f"{row['error']:.6f}",
+                    ]
+                )
+
+
 def _read_solver_history(path):
     names = None
     records = []
@@ -258,12 +373,39 @@ def calculate_theta_error_high_precision(
     )
 
     result = {"time_hours": target_time_hours, "profile": rows, "profile_metrics": metrics}
+
+    skill = _skill_score(rows)
+    result["skill_vs_no_redistribution"] = skill
+    if skill is not None:
+        print(f"Skill vs no-redistribution reference: {skill:+.4f}")
+
     if target_time_hours > 0:
         initial_path = _vtu_path(vtu_base_dir, 0, output_interval_minutes)
         initial_depths, initial_theta = _sample_total_water(initial_path, res)
         initial_rows = _depth_profile(initial_depths, initial_theta, 0, dz)
         redistribution = _redistribution_metrics(initial_rows, rows, dz)
         result["redistribution"] = redistribution
+
+        changes = _profile_changes(initial_rows, rows)
+        zc_sim = _zero_crossing_depth(changes)
+        zc_exp = _zero_crossing_depth(_experimental_changes(target_time_hours))
+        result["zero_crossing"] = {
+            "simulated_m": zc_sim,
+            "experimental_m": zc_exp,
+            "difference_m": (
+                None if zc_sim is None or zc_exp is None else zc_sim - zc_exp
+            ),
+        }
+        print(
+            "Zero-crossing depth: "
+            f"simulated={'n/a' if zc_sim is None else f'{zc_sim:.4f} m'}, "
+            f"experimental={'n/a' if zc_exp is None else f'{zc_exp:.4f} m'}"
+            + (
+                ""
+                if zc_sim is None or zc_exp is None
+                else f", difference={zc_sim - zc_exp:+.4f} m"
+            )
+        )
         print(
             "Redistribution: "
             f"upper gain={redistribution['upper_0_005m_gain_m']:+.6e} m, "
@@ -280,10 +422,84 @@ def calculate_theta_error_high_precision(
     return result
 
 
+def _gate_failures(result, time_hours, solver, args):
+    """Gate checks for one evaluated time, returned as human-readable strings."""
+    failures = []
+    label = f"{time_hours} h"
+    metrics = result["profile_metrics"]
+    if args.rmse_limit is not None and metrics["rmse"] > args.rmse_limit:
+        failures.append(f"{label}: RMSE {metrics['rmse']:.6f} exceeds {args.rmse_limit:.6f}")
+
+    skill = result.get("skill_vs_no_redistribution")
+    if time_hours > 0 and skill is not None and skill <= 0.0:
+        failures.append(
+            f"{label}: skill {skill:+.4f} is not positive, so the simulation is no "
+            "better than assuming no redistribution"
+        )
+
+    if time_hours > 0:
+        redistribution = result["redistribution"]
+        if redistribution["upper_0_005m_gain_m"] <= 0.0:
+            failures.append(f"{label}: no upward water gain in the upper 0.05 m")
+        if args.min_upper_gain_fraction is not None:
+            fraction = redistribution["upper_gain_fraction_of_experiment"]
+            if fraction is None or fraction < args.min_upper_gain_fraction:
+                failures.append(
+                    f"{label}: upper water gain is "
+                    f"{'n/a' if fraction is None else f'{fraction:.3f}'} of the experiment, "
+                    f"below {args.min_upper_gain_fraction:.3f}"
+                )
+        if args.max_abs_column_change_m is not None:
+            change = abs(redistribution["column_0_020m_change_m"])
+            if change > args.max_abs_column_change_m:
+                failures.append(
+                    f"{label}: absolute column-water change {change:.6e} m exceeds "
+                    f"{args.max_abs_column_change_m:.6e} m"
+                )
+        if args.max_zero_crossing_error_m is not None:
+            difference = (result.get("zero_crossing") or {}).get("difference_m")
+            if difference is None or abs(difference) > args.max_zero_crossing_error_m:
+                failures.append(
+                    f"{label}: zero-crossing error "
+                    f"{'n/a' if difference is None else f'{difference:+.4f} m'} exceeds "
+                    f"{args.max_zero_crossing_error_m:.4f} m"
+                )
+
+    sensitivity = result.get("sampling_sensitivity")
+    if sensitivity is not None and args.max_sampling_difference is not None:
+        difference = sensitivity["max_abs_bin_difference"]
+        if difference is None or difference > args.max_sampling_difference:
+            failures.append(
+                f"{label}: sampling difference "
+                f"{'n/a' if difference is None else f'{difference:.6f}'} exceeds "
+                f"{args.max_sampling_difference:.6f}"
+            )
+
+    if solver is None:
+        failures.append(f"{label}: solver history is required for --check")
+    else:
+        if solver["final_accepted_time_s"] + 1.0e-8 < time_hours * 3600.0:
+            failures.append(f"{label}: simulation did not reach this validation time")
+        if solver["nonlinear_rejection_fraction"] > args.max_nonlinear_rejection_fraction:
+            failures.append(
+                f"{label}: nonlinear rejection fraction "
+                f"{solver['nonlinear_rejection_fraction']:.3f} exceeds "
+                f"{args.max_nonlinear_rejection_fraction:.3f}"
+            )
+        if args.require_aa and solver["aa_uses"] <= 0:
+            failures.append(f"{label}: Anderson acceleration was never used")
+    return failures
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--vtu_dir", type=Path, required=True)
-    parser.add_argument("--time", type=int, choices=sorted(TIME_INDEX), required=True)
+    parser.add_argument(
+        "--time",
+        required=True,
+        help="Target time in hours (%s) or 'all' to evaluate every gate time in order"
+        % ", ".join(str(k) for k in sorted(TIME_INDEX)),
+    )
     parser.add_argument("--res", type=float, default=0.001)
     parser.add_argument("--output_interval_minutes", type=float,
                         help="Overrides the interval read from Input/Output.json")
@@ -292,31 +508,46 @@ def main():
     parser.add_argument("--rmse_limit", type=float)
     parser.add_argument("--min_upper_gain_fraction", type=float)
     parser.add_argument("--max_abs_column_change_m", type=float)
+    parser.add_argument(
+        "--max_zero_crossing_error_m",
+        type=float,
+        help="Gate on |simulated - experimental| zero-crossing depth, e.g. 0.02 for two bins",
+    )
+    parser.add_argument("--max_sampling_difference", type=float)
     parser.add_argument("--max_nonlinear_rejection_fraction", type=float, default=0.2)
     parser.add_argument("--require_aa", action="store_true")
     parser.add_argument("--json_output", type=Path)
+    parser.add_argument("--csv_output", type=Path, help="Per-bin profiles for every evaluated time")
+    parser.add_argument(
+        "--sampling_sensitivity",
+        action="store_true",
+        help="Also sample at res/2 and report the largest bin-mean difference",
+    )
     args = parser.parse_args()
+
+    if str(args.time).lower() == "all":
+        target_times = sorted(TIME_INDEX)
+    else:
+        try:
+            requested = int(args.time)
+        except ValueError:
+            parser.error(f"--time must be an integer or 'all', got {args.time!r}")
+        if requested not in TIME_INDEX:
+            parser.error(f"--time must be one of {sorted(TIME_INDEX)} or 'all'")
+        target_times = [requested]
 
     interval_minutes = args.output_interval_minutes
     if interval_minutes is None:
         interval_minutes = _output_interval_minutes(args.vtu_dir)
         print(f"Output interval from Input/Output.json: {interval_minutes:g} min")
 
-    result = calculate_theta_error_high_precision(
-        args.vtu_dir,
-        args.time,
-        res=args.res,
-        output_interval_minutes=interval_minutes,
-    )
-
     history_path = args.solver_history
     if history_path is None:
         candidate = args.vtu_dir.parent / "solver_history.log"
         if candidate.is_file():
             history_path = candidate
-    if history_path is not None:
-        solver = _solver_metrics(history_path)
-        result["solver"] = solver
+    solver = _solver_metrics(history_path) if history_path is not None else None
+    if solver is not None:
         print(
             "Solver metrics: "
             f"attempts={solver['attempts']}, accepted={solver['accepted_steps']}, "
@@ -326,50 +557,74 @@ def main():
             f"final accepted time={solver['final_accepted_time_s'] / 3600.0:.3f} h, "
             f"AA uses={solver['aa_uses']}, max|AA gamma|={solver['max_abs_aa_gamma']:.3f}"
         )
+        print()
 
+    results = []
     failures = []
-    if args.check:
-        if args.rmse_limit is not None and result["profile_metrics"]["rmse"] > args.rmse_limit:
-            failures.append(
-                f"RMSE {result['profile_metrics']['rmse']:.6f} exceeds {args.rmse_limit:.6f}"
+    for target_time in target_times:
+        # A time the run never reached has no output file; report it as a failed
+        # gate rather than dying on FileNotFoundError, so 'all' still summarises
+        # everything the run did produce.
+        try:
+            result = calculate_theta_error_high_precision(
+                args.vtu_dir,
+                target_time,
+                res=args.res,
+                output_interval_minutes=interval_minutes,
             )
-        if args.time > 0 and result["redistribution"]["upper_0_005m_gain_m"] <= 0.0:
-            failures.append("no upward water gain was detected in the upper 0.05 m")
-        if args.time > 0 and args.min_upper_gain_fraction is not None:
-            gain_fraction = result["redistribution"]["upper_gain_fraction_of_experiment"]
-            if gain_fraction < args.min_upper_gain_fraction:
-                failures.append(
-                    "upper water gain is only "
-                    f"{gain_fraction:.3f} of the experimental gain, below "
-                    f"{args.min_upper_gain_fraction:.3f}"
-                )
-        if args.time > 0 and args.max_abs_column_change_m is not None:
-            column_change = abs(result["redistribution"]["column_0_020m_change_m"])
-            if column_change > args.max_abs_column_change_m:
-                failures.append(
-                    f"absolute column-water change {column_change:.6e} m exceeds "
-                    f"{args.max_abs_column_change_m:.6e} m"
-                )
-        if "solver" not in result:
-            failures.append("solver history is required for --check")
-        else:
-            solver = result["solver"]
-            if solver["final_accepted_time_s"] + 1.0e-8 < args.time * 3600.0:
-                failures.append("simulation did not reach the requested validation time")
-            if solver["nonlinear_rejection_fraction"] > args.max_nonlinear_rejection_fraction:
-                failures.append(
-                    "nonlinear rejection fraction "
-                    f"{solver['nonlinear_rejection_fraction']:.3f} exceeds "
-                    f"{args.max_nonlinear_rejection_fraction:.3f}"
-                )
-            if solver["max_accepted_lte"] > 1.0 + 1.0e-12:
-                failures.append(f"accepted step has normalized LTE {solver['max_accepted_lte']:.6f} > 1")
-            if args.require_aa and solver["aa_uses"] == 0:
-                failures.append("AA(1) was required but was not used by any nonlinear attempt")
+        except (FileNotFoundError, ValueError) as error:
+            print(f"[{target_time} h] not evaluated: {error}")
+            failures.append(f"{target_time} h could not be evaluated: {error}")
+            print()
+            continue
 
-    result["check_failures"] = failures
+        if args.sampling_sensitivity:
+            sensitivity = _sampling_sensitivity(
+                args.vtu_dir, target_time, DZ_DEFAULT, args.res, interval_minutes
+            )
+            result["sampling_sensitivity"] = sensitivity
+            difference = sensitivity["max_abs_bin_difference"]
+            print(
+                "Sampling sensitivity "
+                f"({sensitivity['resolution_m']:g} m vs {sensitivity['refined_resolution_m']:g} m): "
+                f"max|bin difference|={'n/a' if difference is None else f'{difference:.6f}'}"
+            )
+
+        if solver is not None:
+            result["solver"] = solver
+        results.append(result)
+
+        if args.check:
+            failures.extend(_gate_failures(result, target_time, solver, args))
+        print()
+
+    if args.csv_output is not None and results:
+        _write_csv(args.csv_output, results)
+        print(f"Wrote per-bin profiles to {args.csv_output}")
+
+    if len(results) > 1:
+        print("Summary")
+        header = f"{'t [h]':>6} {'RMSE':>10} {'bias':>10} {'skill':>9} {'zc_sim':>9} {'zc_exp':>9}"
+        print(header)
+        for result in results:
+            metrics = result["profile_metrics"]
+            skill = result.get("skill_vs_no_redistribution")
+            crossing = result.get("zero_crossing") or {}
+            fields = [
+                f"{result['time_hours']:6d}",
+                f"{metrics['rmse']:10.6f}",
+                f"{metrics['bias']:+10.6f}",
+                "      n/a" if skill is None else f"{skill:+9.4f}",
+            ]
+            for key in ("simulated_m", "experimental_m"):
+                value = crossing.get(key)
+                fields.append("      n/a" if value is None else f"{value:9.4f}")
+            print(" ".join(fields))
+        print()
+
     if args.json_output is not None:
-        args.json_output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+        payload = results[0] if len(results) == 1 else {"times": results}
+        args.json_output.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     if failures:
         for failure in failures:
             print(f"CHECK FAILED: {failure}")
