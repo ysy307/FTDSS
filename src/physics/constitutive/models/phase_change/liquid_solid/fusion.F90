@@ -29,6 +29,7 @@ module models_phase_change_fusion
         procedure, pass(self), public :: calc_water_content
         procedure, pass(self), public :: calc_water_content_derivatives
         procedure, pass(self), public :: calc_cryo_head_dT
+        procedure, pass(self), public :: calc_phase_split
         procedure, pass(self), public :: calc_effective_suction
         procedure, pass(self), public :: project_ice_content
         procedure, pass(self), public :: calc_conserved_target
@@ -40,39 +41,115 @@ module models_phase_change_fusion
 
 contains
 
+    !> Effective suction governing the liquid water content, smoothed max.
+    !>
+    !> \[ s_{eff} = \tfrac12\left[s_m + s_f + \sqrt{(s_m-s_f)^2+\varepsilon_s^2}\right] \]
+    !>
+    !> The matric suction s_m and the freezing-equivalent suction s_f are two
+    !> constraints on the SAME liquid chemical potential, not two contributions
+    !> to it: capillarity fixes mu_w through the air-water interface, ice-water
+    !> equilibrium fixes it through the generalized Clapeyron relation, and at
+    !> equilibrium the two agree. The binding one therefore governs, which is a
+    !> maximum, not a sum. Adding them counts the same potential twice and makes
+    !> the transport potential differ from the storage potential, so the pair is
+    !> not conjugate and the equation has no reachable equilibrium: measured,
+    !> that drove the pore to complete saturation within 1500 s against an
+    !> experiment that redistributes over 50 h.
+    !>
+    !> epsilon_s is the suction equivalent of 0.01 K through the Clapeyron slope
+    !> rho_w L_f/T_m, i.e. below any temperature difference the discretization
+    !> resolves; it exists only so the switch is differentiable for the Newton
+    !> linearization.
     pure subroutine compute_effective_suction(psi_cap, psi_cryo, psi_eff, dpsi_eff_dpsi_cap, dpsi_eff_dpsi_cryo)
         implicit none
         real(real64), intent(in) :: psi_cap, psi_cryo
         real(real64), intent(inout) :: psi_eff
         real(real64), intent(inout), optional :: dpsi_eff_dpsi_cap, dpsi_eff_dpsi_cryo
 
-        ! Total soil-water suction as the SUPERPOSITION of the two
-        ! chemical-potential lowerings acting on the liquid: the air-water
-        ! capillary suction psi_cap and the ice-water cryogenic suction
-        ! psi_cryo add. The water chemical potential is
-        !   mu_w = mu_w^sat - v_w * psi_eff,   psi_eff = psi_cap + psi_cryo,
-        ! so the single retention relation theta_l = F_WRF(psi_eff) holds both
-        ! unfrozen and frozen, and the Darcy flux driven by grad(mu_w) ~
-        ! grad(psi_eff) carries the pressure gradient AND the cryogenic one.
-        !
-        ! A max() must not be used here, and this was measured: with max() the
-        ! frozen zone has psi_cryo >> psi_cap (3.4 MPa against 0.05 MPa at
-        ! -2.8 C), so d psi_eff/d psi_cap collapses to ~1e-9, the storage
-        ! derivative dtheta_l/dp goes with it, and the pressure diagonal C_HH
-        ! loses its leverage - the 50 h validation run stalled with the
-        ! hydraulic residual ratio stuck at 14 while the thermal residual
-        ! converged normally. It also leaves p_w with no reason to move, so the
-        ! Clapeyron suction never reaches the flux and moisture migration
-        ! vanishes (measured redistribution was -0.8% of the experiment).
-        ! Addition keeps d psi_eff/d psi_cap = 1 everywhere, so the pressure
-        ! diagonal stays well posed while the cryogenic gradient migrates water
-        ! to the freezing front. Above freezing psi_cryo = 0 and psi_eff
-        ! reduces to the ordinary capillary suction.
-        psi_eff = psi_cap + psi_cryo
+        real(real64), parameter :: SUCTION_SMOOTHING = 1.0d-2 * rho_std * Lf0 / (Tf0 + TtoK)
+        real(real64) :: difference, root
 
-        if (present(dpsi_eff_dpsi_cap)) dpsi_eff_dpsi_cap = 1.0d0
-        if (present(dpsi_eff_dpsi_cryo)) dpsi_eff_dpsi_cryo = 1.0d0
+        difference = psi_cap - psi_cryo
+        root = sqrt(difference * difference + SUCTION_SMOOTHING * SUCTION_SMOOTHING)
+        psi_eff = 0.5d0 * (psi_cap + psi_cryo + root)
+
+        if (present(dpsi_eff_dpsi_cap)) dpsi_eff_dpsi_cap = 0.5d0 * (1.0d0 + difference / root)
+        if (present(dpsi_eff_dpsi_cryo)) dpsi_eff_dpsi_cryo = 0.5d0 * (1.0d0 - difference / root)
     end subroutine compute_effective_suction
+
+
+    !> Cryogenic suction the liquid actually feels, limited by the ice pressure.
+    !>
+    !> The generalized Clapeyron relation with a non-zero ice pressure is
+    !>   p_w/rho_w - p_i/rho_i = L_f ln(T/T_0),
+    !> so p_w = -psi_cryo + (rho_w/rho_i) p_i: pressure on the ice raises the
+    !> liquid pressure and therefore lowers the suction the liquid experiences.
+    !>
+    !> While the pore has room the ice is unstressed, p_i = 0, and the full
+    !> psi_cryo applies. Once theta_l + theta_i reaches the porosity the ice can
+    !> no longer expand, p_i rises, and the suction stops growing. Without this
+    !> the suction increases without bound as T falls, so there is no state at
+    !> which the inflow stops and water is drawn in until the pore fills - which
+    !> at fixed porosity is not a state the soil can occupy. Measured before
+    !> this limit: theta_l + theta_i reached the porosity exactly at t = 1500 s,
+    !> against an experiment that redistributes over 50 h without saturating.
+    !>
+    !> The limit is found by bisection on the cryogenic part, which is monotone:
+    !> f(psi) = theta_l + theta_i - phi increases with psi and is non-positive at
+    !> psi = 0, so a root exists whenever the unlimited value would overfill.
+    subroutine calc_limited_cryo_suction(self, state, psi_cap, psi_cryo, psi_cryo_limited, is_limited)
+        implicit none
+        class(type_fusion), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(in) :: psi_cap, psi_cryo
+        real(real64), intent(inout) :: psi_cryo_limited
+        logical, intent(inout) :: is_limited
+
+        integer(int32), parameter :: MAX_BISECTION = 60
+        real(real64) :: porosity, rho_w, rho_i, density_ratio
+        real(real64) :: theta_total, low, high, mid
+        integer(int32) :: k
+
+        psi_cryo_limited = psi_cryo
+        is_limited = .false.
+        if (psi_cryo <= 0.0d0) return
+
+        call state%porosity%get(porosity)
+        if (porosity <= 0.0d0) return
+        call self%calc_rho_water(state, rho_w)
+        call self%calc_rho_ice(state, rho_i)
+        if (rho_w <= tiny(1.0d0) .or. rho_i <= tiny(1.0d0)) return
+        density_ratio = rho_w / rho_i
+
+        call self%wrf%calc(-psi_cap / (rho_std * g), theta_total)
+        if (pore_excess(psi_cryo) <= 0.0d0) return
+
+        is_limited = .true.
+        low = 0.0d0
+        high = psi_cryo
+        do k = 1, MAX_BISECTION
+            mid = 0.5d0 * (low + high)
+            if (pore_excess(mid) > 0.0d0) then
+                high = mid
+            else
+                low = mid
+            end if
+        end do
+        psi_cryo_limited = low
+
+    contains
+
+        !> theta_l + theta_i - phi at a trial cryogenic suction.
+        function pore_excess(psi_trial) result(excess)
+            implicit none
+            real(real64), intent(in) :: psi_trial
+            real(real64) :: excess
+            real(real64) :: theta_liquid
+
+            call self%wrf%calc(-(psi_cap + psi_trial) / (rho_std * g), theta_liquid)
+            excess = theta_liquid + max(0.0d0, theta_total - theta_liquid) * density_ratio - porosity
+        end function pore_excess
+    end subroutine calc_limited_cryo_suction
 
     !>
     !> @brief Initialize fusion model.
@@ -90,6 +167,91 @@ contains
         self%water => water
         self%ice => ice
     end subroutine initialize_type_fusion
+
+
+    !> Local phase state: the total water follows the pore pressure, the
+    !> effective suction decides how much of it stays liquid.
+    !>
+    !> \[ \Theta = \theta_{SWRC}(s_m),\qquad
+    !>    \theta_w = \theta_{SWRC}(s_{eff}),\qquad
+    !>    \theta_i = \frac{\rho_w}{\rho_i}\max(0,\Theta-\theta_w) \]
+    !>
+    !> with \( s_m = p_a - p_w \) and \( s_{eff} = \max(s_m, s_f) \). Freezing
+    !> does not change the conserved water at a node, it only moves it between
+    !> the phases, so
+    !> \( \Theta = \theta_w + (\rho_i/\rho_w)\theta_i \) holds identically and
+    !> \( \partial\Theta/\partial T = 0 \): temperature changes the split, not
+    !> the sum. The storage tangent \( \partial\Theta/\partial p_w \) therefore
+    !> survives into the frozen zone, where a pressure change moves ice rather
+    !> than liquid - the pressure equation never loses its diagonal.
+    !>
+    !> p_w is never assigned from the Clapeyron relation. It stays the unknown
+    !> of the mass balance; the relation enters only through s_f, which sets how
+    !> much liquid the temperature permits.
+    subroutine calc_phase_split(self, state, total_water, theta_liquid, theta_ice, &
+                                dliquid_dP, dliquid_dT, dice_dP, dice_dT, dtotal_dP)
+        implicit none
+        class(type_fusion), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: total_water, theta_liquid, theta_ice
+        real(real64), intent(inout), optional :: dliquid_dP, dliquid_dT, dice_dP, dice_dT
+        real(real64), intent(inout), optional :: dtotal_dP
+
+        real(real64) :: pressure, suction_matric, suction_freezing, suction_effective
+        real(real64) :: dsuction_eff_dmatric, dsuction_eff_dfreezing
+        real(real64) :: dfreezing_dP, dfreezing_dT
+        real(real64) :: dtheta_dhead_matric, dtheta_dhead_effective
+        real(real64) :: dtotal_dpressure, dliquid_dpressure, dliquid_dtemperature
+        real(real64) :: rho_w, rho_i, density_ratio
+
+        call state%pressure%get(pressure)
+        call self%calc_rho_water(state, rho_w)
+        call self%calc_rho_ice(state, rho_i)
+        density_ratio = 1.0d0
+        if (rho_i > tiny(1.0d0)) density_ratio = rho_w / rho_i
+
+        ! Air pressure is the gauge datum, so the matric suction is -p_w. No
+        ! clamp at zero: the retention curve is already flat above saturation
+        ! and clamping would put a kink where the physics has none.
+        suction_matric = -pressure
+
+        call self%gcc%calc(state, suction_freezing)
+        call self%gcc%deriv_pressure(state, dfreezing_dP)
+        call self%gcc%deriv_temperature(state, dfreezing_dT)
+
+        call compute_effective_suction(suction_matric, suction_freezing, suction_effective, &
+                                       dsuction_eff_dmatric, dsuction_eff_dfreezing)
+
+        call self%wrf%calc(-suction_matric / (rho_std * g), total_water)
+        call self%wrf%deriv(-suction_matric / (rho_std * g), dtheta_dhead_matric)
+        call self%wrf%calc(-suction_effective / (rho_std * g), theta_liquid)
+        call self%wrf%deriv(-suction_effective / (rho_std * g), dtheta_dhead_effective)
+
+        theta_ice = density_ratio * max(0.0d0, total_water - theta_liquid)
+
+        ! d s_m/d p_w = -1, so d h_m/d p_w = 1/(rho g) and the storage tangent is
+        ! positive for a monotone retention curve.
+        dtotal_dpressure = dtheta_dhead_matric / (rho_std * g)
+        dliquid_dpressure = dtheta_dhead_effective * dsuction_eff_dmatric / (rho_std * g)
+        dliquid_dtemperature = -dtheta_dhead_effective * &
+                               (dsuction_eff_dfreezing * dfreezing_dT) / (rho_std * g)
+        ! The pressure dependence of the freezing suction is retained for
+        ! completeness; it is small next to the matric branch.
+        dliquid_dpressure = dliquid_dpressure - dtheta_dhead_effective * &
+                            (dsuction_eff_dfreezing * dfreezing_dP) / (rho_std * g)
+
+        if (present(dtotal_dP)) dtotal_dP = dtotal_dpressure
+        if (present(dliquid_dP)) dliquid_dP = dliquid_dpressure
+        if (present(dliquid_dT)) dliquid_dT = dliquid_dtemperature
+        ! Ice takes the complement, so that dQw + (rho_i/rho_w) dQi reproduces
+        ! dTheta exactly and the assembled storage tangent is the retention one.
+        if (present(dice_dP)) dice_dP = density_ratio * (dtotal_dpressure - dliquid_dpressure)
+        if (present(dice_dT)) dice_dT = -density_ratio * dliquid_dtemperature
+        if (total_water <= theta_liquid) then
+            if (present(dice_dP)) dice_dP = 0.0d0
+            if (present(dice_dT)) dice_dT = 0.0d0
+        end if
+    end subroutine calc_phase_split
 
     !---------------------------------------------------------------------------
     ! Ice Calculations
@@ -304,7 +466,8 @@ contains
         real(real64), intent(inout) :: water_content
 
         real(real64) :: pressure
-        real(real64) :: psi_cap, psi_cryo, psi_eff
+        real(real64) :: psi_cap, psi_cryo, psi_eff, psi_cryo_limited
+        logical :: is_limited
 
         call state%pressure%get(pressure)
 
@@ -321,7 +484,8 @@ contains
         ! what makes theta_l temperature-dependent and supplies the apparent
         ! heat capacity to the energy equation.
         call self%gcc%calc(state, psi_cryo)
-        call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
+        call calc_limited_cryo_suction(self, state, psi_cap, psi_cryo, psi_cryo_limited, is_limited)
+        call compute_effective_suction(psi_cap, psi_cryo_limited, psi_eff)
         call self%wrf%calc(-psi_eff / (rho_std * g), water_content)
 
     end subroutine calc_water_content
@@ -409,12 +573,14 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: psi_eff
 
-        real(real64) :: pressure, psi_cap, psi_cryo
+        real(real64) :: pressure, psi_cap, psi_cryo, psi_cryo_limited
+        logical :: is_limited
 
         call state%pressure%get(pressure)
         psi_cap = max(0.0d0, -pressure)
         call self%gcc%calc(state, psi_cryo)
-        call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
+        call calc_limited_cryo_suction(self, state, psi_cap, psi_cryo, psi_cryo_limited, is_limited)
+        call compute_effective_suction(psi_cap, psi_cryo_limited, psi_eff)
     end subroutine calc_effective_suction
 
     !> Project the outer ice state onto local ice-water equilibrium.

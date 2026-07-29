@@ -16,7 +16,9 @@ module app_ftcms
     ! use :: module_boundary, only:
     use :: module_initial, only:type_ic_manager
     use :: module_system, only:type_jacobian_matrix, type_residual_vector
-    use :: module_constitutive, only:g => gravity_acceleration
+    use :: module_constitutive, only:g => gravity_acceleration, rho_std => reference_water_density, &
+        Lf0 => latent_heat_fusion_water_0C, Tf0 => water_freezing_point_at_standard_atmospheric_pressure, &
+        TtoK => celsius_to_kelvin
     use :: models_phase_change_chemical_potential, only:calc_T_high_celsius
     use :: module_linalg
 
@@ -126,6 +128,10 @@ module app_ftcms
         type(type_variable) :: porosity
         type(type_variable) :: temperature
         type(type_variable) :: pressure
+
+        !> Nodal d(psi_cryo)/dT [Pa/K]. The hydraulic increment is solved in the
+        !> total-potential variable du_g = du_p - c du_T and recovered with this.
+        real(real64), allocatable :: cryo_slope(:)
 
         type(type_variable) :: Qw
         type(type_variable) :: Qi

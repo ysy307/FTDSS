@@ -16,6 +16,33 @@ submodule(app_ftcms) ftcms_assemble
     !> the line search with no admissible step.
     logical, parameter :: COUPLING_TH_FINITE_DIFFERENCE = .true.
 
+    !> Solve the hydraulic block in the total potential rather than in the pore
+    !> pressure.
+    !>
+    !> Measured over a failing nonlinear loop, max|du_p| ran at 1e5 to 3e6 Pa
+    !> against an ambient -5.4e4 Pa, and the ratio du_p/du_T sat at about
+    !> 1.0e6 Pa/K every iteration - which is d(psi_cryo)/dT = 1.22e6 Pa/K, the
+    !> generalized Clapeyron slope. The pressure increment is therefore not a
+    !> runaway but the equilibrium response: cooling a node by dT lowers the
+    !> liquid pressure by 1.22e6 dT. In the pore pressure that stiffness is
+    !> carried by the unknown itself, so the linearization is valid over a tiny
+    !> fraction of the step. In the total potential P_gen = p - psi_cryo(T) the
+    !> same state has du_g of ordinary size.
+    !>
+    !> Substituting du_p = du_g + c du_T, c = d(psi_cryo)/dT, adds K_TH c to
+    !> K_TT and K_HH c to K_HT. Since the flux contributes -K2(D_HH) c to K_HT
+    !> and K2(D_HH) to K_HH, that term cancels exactly - which is why the
+    !> reference formulation solves for the total head.
+    logical, parameter :: TOTAL_POTENTIAL_UNKNOWN = .false.
+
+    !> Overwrite the Gauss-point dQi/dT with the node-interpolated value.
+    !>
+    !> update_water_phases computes dQi/dT consistently at the Gauss point from
+    !> that point's own (T, p); replacing it by an interpolation of the nodal
+    !> values makes the apparent heat capacity in K_TT a different number from
+    !> the derivative of the enthalpy the residual integrates at that point.
+    logical, parameter :: LERP_NODAL_DQI_DT = .true.
+
 contains
 
     module subroutine assemble_ftcms(self)
@@ -47,6 +74,19 @@ contains
 
         call self%K%zero()
         call self%F%zero()
+
+        if (TOTAL_POTENTIAL_UNKNOWN) then
+            block
+                integer(int32) :: num_nodes_total
+                call self%domain%get_num_nodes(num_nodes_total)
+                if (.not. allocated(self%cryo_slope)) allocate (self%cryo_slope(num_nodes_total))
+                if (size(self%cryo_slope) /= num_nodes_total) then
+                    deallocate (self%cryo_slope)
+                    allocate (self%cryo_slope(num_nodes_total))
+                end if
+                self%cryo_slope(:) = 0.0d0
+            end block
+        end if
 
         call self%domain%get_num_colors(num_colors)
 
@@ -97,6 +137,11 @@ contains
 
                     if (COUPLING_TH_FINITE_DIFFERENCE .and. do_thermal_elem .and. do_hydraulic_elem) then
                         call self%assemble_coupling_fd(workspace, local_F_T, local_K_TH)
+                    end if
+
+                    if (TOTAL_POTENTIAL_UNKNOWN .and. do_thermal_elem .and. do_hydraulic_elem) then
+                        call transform_to_total_potential(self, workspace, &
+                                                          local_K_TT, local_K_TH, local_K_HH, local_K_HT)
                     end if
 
                     num_nodes_local = workspace%num_fe_nodes
@@ -178,7 +223,7 @@ contains
 
         call self%update_physical_properties_bulk(material_id, workspace%state_gp)
 
-        call workspace%lerp_dqi_dt()
+        if (LERP_NODAL_DQI_DT) call workspace%lerp_dqi_dt()
 
         call fe%get_num_nodes(num_nodes)
 
@@ -267,6 +312,49 @@ contains
         end if
 
     end subroutine assemble_local_ftcms
+
+    !> Apply the column substitution du_p = du_g + c du_T to one element.
+    subroutine transform_to_total_potential(self, workspace, K_TT, K_TH, K_HH, K_HT)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        type(type_assemble_workspace), intent(inout) :: workspace
+        type(type_matrix_dense), intent(inout) :: K_TT, K_TH, K_HH, K_HT
+
+        real(real64), pointer :: TT(:, :), TH(:, :), HH(:, :), HT(:, :)
+        real(real64) :: slope(workspace%num_fe_nodes), dh_dT
+        integer(int32) :: i, j, n_nodes, node_id
+        integer(int32), pointer, contiguous :: connectivity(:)
+
+        n_nodes = workspace%num_fe_nodes
+        nullify (connectivity)
+        call self%domain%get_fe_connectivity(workspace%element_id, connectivity)
+
+        do j = 1, n_nodes
+            call self%hydraulic%calc_cryo_head_dT(workspace%material_id, workspace%state(j), dh_dT)
+            ! dPgen/dT = rho_std g dh/dT and c = d psi_cryo/dT = -dPgen/dT.
+            slope(j) = -rho_std * g * dh_dT
+            if (associated(connectivity)) then
+                node_id = connectivity(j)
+                if (allocated(self%cryo_slope)) then
+                    if (node_id >= 1 .and. node_id <= size(self%cryo_slope)) self%cryo_slope(node_id) = slope(j)
+                end if
+            end if
+        end do
+
+        nullify (TT, TH, HH, HT)
+        TT => K_TT%get_val()
+        TH => K_TH%get_val()
+        HH => K_HH%get_val()
+        HT => K_HT%get_val()
+        do j = 1, n_nodes
+            if (slope(j) == 0.0d0) cycle
+            do i = 1, n_nodes
+                TT(i, j) = TT(i, j) + TH(i, j) * slope(j)
+                HT(i, j) = HT(i, j) + HH(i, j) * slope(j)
+            end do
+        end do
+        nullify (TT, TH, HH, HT)
+    end subroutine transform_to_total_potential
 
     module subroutine assemble_destroy_ftcms(self, workspace, local_K_TT, local_K_TH, &
                                              local_K_HH, local_K_HT, local_F_T, local_F_H)

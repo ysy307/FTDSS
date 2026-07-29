@@ -462,6 +462,8 @@ contains
             self%dt_controller = next_dt
             self%dt = next_dt
             self%current_bdf_order = 1
+            ! Suppress PI growth on the next accepted step (see pi_controller_dt).
+            self%ats%after_rejection = .true.
         end if
         call self%compute_bdf_coefficients()
     end subroutine update_type_time

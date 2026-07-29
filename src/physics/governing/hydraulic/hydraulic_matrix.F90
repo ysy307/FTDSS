@@ -76,6 +76,11 @@ contains
         real(real64) :: work_D_HT(workspace%num_fe_dimension, workspace%num_fe_dimension, workspace%num_fe_gauss)
         real(real64) :: work_matrix_coupling(workspace%num_fe_nodes, workspace%num_fe_nodes)
         real(real64) :: D_HT_tmp(workspace%num_fe_dimension, workspace%num_fe_dimension)
+        ! Nodal transport coefficients and the element values formed from them.
+        real(real64) :: D_HH_node(workspace%num_fe_nodes), D_HT_node(workspace%num_fe_nodes)
+        real(real64) :: V_node_mag(workspace%num_fe_nodes)
+        real(real64) :: D_HH_elem, D_HT_elem, V_elem_mag
+        real(real64) :: V_dir(workspace%num_fe_dimension), V_node_tmp(workspace%num_fe_dimension)
         ! Nodal total-potential head driving the liquid Darcy flux, expressed as
         ! a pressure: P_gen = -psi_eff = -(psi_cap + psi_cryo). It equals the
         ! pore pressure where unfrozen and adds the cryosuction where frozen,
@@ -86,6 +91,8 @@ contains
         ! dP_gen/dT [Pa/K] = -d psi_cryo/dT per node: the consistent temperature
         ! tangent of the cryosuction flux, assembled into K_HT.
         real(real64) :: dPgen_dT_node(workspace%num_fe_nodes), dh_dT_i
+        integer(int32) :: nonlinear_iteration
+        real(real64) :: capacity_regularization
         logical :: thermal_target, coupling_mass_needed, coupling_flux_needed
         logical :: coupling_block_needed
 
@@ -139,33 +146,108 @@ contains
         ! 1. Gauss loop: storage and sink terms at all Gauss points;
         !    flux coefficients only for uncut elements.
         ! ----------------------------------------------------------------
+        ! Pseudo-transient regularization of the pressure block.
+        !
+        ! At the freezing front the storage capacity dTheta/dp collapses on the
+        ! pore-volume bound and the conductivity collapses under the impedance,
+        ! so the pressure row loses both of its terms at once and the Jacobian
+        ! becomes nearly singular. The Newton step is then unbounded - measured,
+        ! max|du_p| = 2.8e5 Pa against an ambient 5.4e4 Pa, with the residual
+        ! growing superlinearly in the step length, which is what left the line
+        ! search with no admissible alpha.
+        !
+        ! The time-derivative term cannot regularize this: it enters as
+        ! bdf0*K1(C_eq), so when C_eq itself vanishes the row stays singular no
+        ! matter how small dt becomes. That is why cutting dt never helped -
+        ! measured, dt = 26.9 s and 13.4 s failed where 73.4 s had succeeded.
+        !
+        ! A capacity is therefore added to the MATRIX only, decaying as 1/k with
+        ! the nonlinear iteration so the operator starts strictly diagonally
+        ! reinforced and approaches the true tangent as the iteration converges.
+        ! The residual keeps the exact storage term, so the converged solution
+        ! is untouched; only the path to it is bounded.
+        call control%get_nonlinear_iter(nonlinear_iteration)
+        capacity_regularization = 0.0d0
+        if (allocated(self%iteration_capacity_bound)) then
+            if (workspace%material_id >= 1 .and. &
+                workspace%material_id <= size(self%iteration_capacity_bound)) then
+                capacity_regularization = self%iteration_capacity_bound(workspace%material_id) / &
+                                          real(max(1, nonlinear_iteration), real64)
+            end if
+        end if
+
         do i = 1, n_gauss
             call self%compute_iteration_capacity(workspace%material_id, workspace%state_gp(i), workspace%work_C(i))
+            workspace%work_C(i) = workspace%work_C(i) + capacity_regularization
             if (coupling_mass_needed) then
                 call self%compute_coupling_mass_term(workspace%material_id, workspace%state_gp(i), work_C_HT(i))
             end if
             call self%compute_transient_term_mixed(workspace%material_id, workspace%state_gp(i), &
                                                    workspace%bdf_coeffs, workspace%work_d_dt(i))
 
-            if (.not. is_cut) then
-                call self%compute_advective_term(workspace%material_id, workspace%state_gp(i), &
-                                                 workspace%work_V(:, i))
-                call self%compute_diffusion_term(workspace%material_id, workspace%state_gp(i), workspace%work_D(:, :, i))
-
-                if (coupling_flux_needed) then
-                    D_HT_tmp(:, :) = 0.0d0
-                    call self%compute_coupling_diffusion_term(workspace%material_id, &
-                                                              workspace%state_gp(i), D_HT_tmp)
-                    do d = 1, n_dim
-                        work_D_HT(d, d, i) = D_HT_tmp(1, 1)
-                    end do
-                end if
-            end if
 
             if (thermal_target) then
                 call self%calc_segregation_sink(workspace%material_id, workspace%state_gp(i), dt_local, work_sink(i))
             end if
         end do
+
+        ! ----------------------------------------------------------------
+        ! Element transport coefficients from the GEOMETRIC mean of the nodal
+        ! values, not from quadrature of the coefficient itself.
+        !
+        ! K collapses by about eight orders of magnitude over the first kelvin
+        ! of undercooling - k_r falls with the cryosuction head and the Hansson
+        ! impedance 10^(-Omega Q) falls with the ice fraction - while the
+        ! driving potential does the opposite: psi_cryo runs at 1.22e6 Pa/K, so
+        ! 0.1 K across a 1 mm element is a gradient of 1.2e8 Pa/m. Sampling K at
+        ! Gauss points and integrating gives the element the conductivity of its
+        ! warmest sample, which is 1e3 to 1e8 times the cold-side value, so an
+        ! element straddling the front conducts as if it were unfrozen. With the
+        ! warm-side K that is a Darcy flux of order 10 mm/h through a 200 mm
+        ! column, against an experiment that redistributes a few percent of its
+        ! water over 50 h - and the resulting imbalance is what left the
+        ! hydraulic residual at 0.3 in water content per step, unreachable by
+        ! any step length or time step.
+        !
+        ! The geometric mean is the standard internodal weighting for a
+        ! coefficient that varies exponentially: it is exact for exponential K
+        ! between two points and cannot exceed the larger nodal value.
+        ! ----------------------------------------------------------------
+        if (.not. is_cut) then
+            do i = 1, n_nodes
+                coeff_sub_mat(:, :) = 0.0d0
+                call self%compute_diffusion_term(workspace%material_id, workspace%state(i), coeff_sub_mat)
+                D_HH_node(i) = coeff_sub_mat(1, 1)
+
+                D_HT_node(i) = 0.0d0
+                if (coupling_flux_needed) then
+                    coeff_sub_mat(:, :) = 0.0d0
+                    call self%compute_coupling_diffusion_term(workspace%material_id, &
+                                                              workspace%state(i), coeff_sub_mat)
+                    D_HT_node(i) = coeff_sub_mat(1, 1)
+                end if
+
+                V_node_tmp(:) = 0.0d0
+                call self%compute_advective_term(workspace%material_id, workspace%state(i), V_node_tmp)
+                V_node_mag(i) = sqrt(sum(V_node_tmp(:)**2))
+                if (i == 1) then
+                    V_dir(:) = 0.0d0
+                    if (V_node_mag(i) > 0.0d0) V_dir(:) = V_node_tmp(:) / V_node_mag(i)
+                end if
+            end do
+
+            D_HH_elem = geometric_mean(D_HH_node(1:n_nodes))
+            D_HT_elem = signed_geometric_mean(D_HT_node(1:n_nodes))
+            V_elem_mag = geometric_mean(V_node_mag(1:n_nodes))
+
+            do i = 1, n_gauss
+                do d = 1, n_dim
+                    workspace%work_D(d, d, i) = D_HH_elem
+                    work_D_HT(d, d, i) = D_HT_elem
+                end do
+                workspace%work_V(:, i) = V_elem_mag * V_dir(:)
+            end do
+        end if
 
         ! Total-potential nodal driver (pore pressure + cryosuction) and its
         ! temperature sensitivity.
@@ -371,5 +453,47 @@ contains
         end if
 
     end subroutine assemble_local_picard_hydraulic
+
+    !> Geometric mean of non-negative nodal values.
+    !>
+    !> Returns zero if any node is zero: a single impermeable node blocks the
+    !> element, which is the physically correct series behaviour.
+    pure function geometric_mean(values) result(mean_value)
+        implicit none
+        real(real64), intent(in) :: values(:)
+        real(real64) :: mean_value
+
+        integer(int32) :: i
+
+        mean_value = 0.0d0
+        if (size(values) == 0) return
+        do i = 1, size(values)
+            if (values(i) <= 0.0d0) return
+        end do
+        mean_value = exp(sum(log(values)) / real(size(values), real64))
+    end function geometric_mean
+
+    !> Geometric mean of values that share a sign; zero on a sign change.
+    !>
+    !> The thermo-osmotic coefficient is negative wherever the total-potential
+    !> head is negative, so it is averaged on its magnitude and the common sign
+    !> is restored. A sign change inside one element has no geometric mean and
+    !> is treated as no coupling there rather than as an arbitrary branch.
+    pure function signed_geometric_mean(values) result(mean_value)
+        implicit none
+        real(real64), intent(in) :: values(:)
+        real(real64) :: mean_value
+
+        integer(int32) :: i
+        logical :: all_positive, all_negative
+
+        mean_value = 0.0d0
+        if (size(values) == 0) return
+        all_positive = all(values > 0.0d0)
+        all_negative = all(values < 0.0d0)
+        if (.not. (all_positive .or. all_negative)) return
+        mean_value = exp(sum(log(abs(values))) / real(size(values), real64))
+        if (all_negative) mean_value = -mean_value
+    end function signed_geometric_mean
 
 end submodule hydraulic_matrix

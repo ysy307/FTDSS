@@ -1,4 +1,5 @@
 submodule(app_ftcms) ftcms_solve
+    use :: models_phase_change_chemical_potential, only:calc_T_high_celsius
     implicit none
 
     integer(int32), parameter :: SOLVE_STATUS_NOT_RUN = 0
@@ -13,8 +14,34 @@ submodule(app_ftcms) ftcms_solve
     !> once, at the first iterate where the line search finds no usable step.
     !> Diagnostic only: it costs O(4 n_node) element residual evaluations per
     !> element and must not be left on for production runs.
-    logical, parameter :: FD_JACOBIAN_AUDIT = .false.
+    logical, parameter :: FD_JACOBIAN_AUDIT = .true.
     logical, save :: fd_audit_done = .false.
+
+    !> One-shot scan of the residual along the Newton direction at a genuinely
+    !> stalled iterate. Diagnostic only.
+    logical, parameter :: RESIDUAL_SCAN = .true.
+    integer(int32), parameter :: RESIDUAL_SCAN_ITER = 12
+    logical, save :: residual_scan_done = .false.
+    logical, save :: branch_report_done = .false.
+
+    !> Freezing-band telemetry at the iterations that exhaust the budget.
+    integer(int32), parameter :: FREEZE_REPORT_ITER = 10
+    integer(int32), parameter :: FREEZE_REPORT_LIMIT = 40
+    integer(int32), save :: freeze_report_count = 0
+    real(real64), allocatable, save :: freeze_prev_liquid(:), freeze_prev_ice(:)
+
+    !> Predictor used to start each nonlinear iteration.
+    !>
+    !>   0  previous step (zeroth order)
+    !>   1  linear extrapolation of T and p
+    !>   2  linear extrapolation clipped at the freezing point
+    !>   3  linear extrapolation of the conserved quantities, inverted for T
+    !>
+    !> Mode 1 is kept only as the measured counter-example: extrapolating T
+    !> linearly through the phase boundary drove the second step to p = 4.2e5 Pa
+    !> with a pressure increment of -3.5e9 Pa. T(t) has a kink where a node
+    !> freezes, so a straight line through it lands far past the transition.
+    integer(int32), parameter :: PREDICTOR_MODE = 0
 
 contains
     module subroutine solve_time_step_initial_setup_ftcms(self)
@@ -120,6 +147,239 @@ contains
         end if
 
     end subroutine solve_time_step_initial_setup_ftcms
+
+    !> Extrapolate the accepted solution history to start the nonlinear
+    !> iteration from a predicted state rather than from the previous step.
+    !>
+    !> The iteration otherwise starts at y_n, which is a zeroth-order predictor:
+    !> the whole change over the step has to be produced by the Newton
+    !> corrections. At the freezing onset that means one correction has to carry
+    !> several hundred nodes across the phase boundary at once, which is exactly
+    !> the step that overshoots. A linear predictor
+    !>   y^(0) = y_n + (dt_{n+1}/dt_n) (y_n - y_{n-1})
+    !> starts with the front already advanced, so the corrections stay small.
+    !> After advance() the history holds y_n in slots 1 and 2 and y_{n-1} in
+    !> slot 3, which is the convention apply_phase_predictor also uses.
+    !>
+    !> This changes the starting point only; the converged state is unchanged.
+    subroutine apply_solution_predictor(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        !> Never extrapolate further than the step is allowed to grow.
+        real(real64), parameter :: PREDICTOR_MAX_RATIO = 2.0d0
+        real(real64) :: dt_new, ratio, history(3)
+        real(real64), allocatable :: pressure_pred(:)
+        real(real64), pointer, contiguous :: current(:)
+        real(real64), pointer, contiguous :: bdf_coeffs(:)
+        integer(int32) :: node_id, num_nodes, bdf_order
+
+        ! Two genuine accepted steps are required before anything can be
+        ! extrapolated. With only one, the oldest history slot still holds the
+        ! initial condition, and y_1 - y_0 is the response to switching the
+        ! boundary conditions on - a startup transient, not a rate. Predicting
+        ! from it doubles that transient: measured, it drove the second step to
+        ! p = 4.2e5 Pa. lte_has_second_difference is exactly the flag that says
+        ! two steps have been committed.
+        if (.not. self%lte_has_second_difference) return
+        if (self%last_accepted_dt <= tiny(1.0d0)) return
+        call self%control%get_dt(dt_new)
+        if (dt_new <= 0.0d0) return
+        ratio = min(dt_new / self%last_accepted_dt, PREDICTOR_MAX_RATIO)
+
+        call self%domain%get_num_nodes(num_nodes)
+        nullify (current, bdf_coeffs)
+
+        ! Pressure is predicted linearly in every mode: p carries no phase-change
+        ! kink of its own, the cryosuction kink lives in psi_cryo(T).
+        allocate (pressure_pred(num_nodes), source=0.0d0)
+        if (self%is_active_hydraulic()) then
+            call self%pressure%get_current(current)
+            if (associated(current)) then
+                do node_id = 1, min(num_nodes, size(current))
+                    call self%pressure%get_history(node_id, history)
+                    pressure_pred(node_id) = min(max(history(2) + ratio * (history(2) - history(3)), &
+                                                     WALL_PRESS_MIN_PA), WALL_PRESS_MAX_PA)
+                    current(node_id) = pressure_pred(node_id)
+                end do
+            end if
+            nullify (current)
+        end if
+
+        if (self%is_active_thermal()) then
+            select case (PREDICTOR_MODE)
+            case (1)
+                call predict_temperature_linear(self, num_nodes, ratio)
+            case (2)
+                call predict_temperature_clipped(self, num_nodes, ratio, pressure_pred)
+            case (3)
+                call predict_temperature_from_enthalpy(self, num_nodes, dt_new, ratio, pressure_pred)
+            end select
+        end if
+
+        if (allocated(pressure_pred)) deallocate (pressure_pred)
+
+        ! Everything derived from the primary variables has to follow the
+        ! prediction, or the first residual is assembled from a mixed state.
+        call self%calc_gradient_temperature()
+        call self%calc_gradient_pressure()
+        call self%update_nodal_phases()
+        call self%control%get_bdf_coeffs(bdf_order, bdf_coeffs)
+        if (self%is_active_thermal()) call self%temperature%compute_time_derivative(bdf_coeffs, bdf_order)
+        if (self%is_active_hydraulic()) call self%pressure%compute_time_derivative(bdf_coeffs, bdf_order)
+    end subroutine apply_solution_predictor
+
+    !> Mode 1: straight line through the last two accepted temperatures.
+    subroutine predict_temperature_linear(self, num_nodes, ratio)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(in) :: num_nodes
+        real(real64), intent(in) :: ratio
+
+        real(real64), pointer, contiguous :: current(:)
+        real(real64) :: history(3)
+        integer(int32) :: node_id
+
+        nullify (current)
+        call self%temperature%get_current(current)
+        if (.not. associated(current)) return
+        do node_id = 1, min(num_nodes, size(current))
+            call self%temperature%get_history(node_id, history)
+            current(node_id) = min(max(history(2) + ratio * (history(2) - history(3)), &
+                                       WALL_TEMP_MIN_C), WALL_TEMP_MAX_C)
+        end do
+        nullify (current)
+    end subroutine predict_temperature_linear
+
+    !> Mode 2: the same line, stopped at the freezing point.
+    !>
+    !> A node still above its pressure-dependent freezing temperature is
+    !> predicted no further than that temperature. The prediction may bring the
+    !> front up to the transition but never through it, which is where the
+    !> straight line stops being an extrapolation of anything: the latent heat
+    !> holds T near T_crit while enthalpy keeps falling, so the slope on the far
+    !> side bears no relation to the slope on this one. Crossing is left to the
+    !> Newton correction, which has the apparent heat capacity to price it.
+    subroutine predict_temperature_clipped(self, num_nodes, ratio, pressure_pred)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(in) :: num_nodes
+        real(real64), intent(in) :: ratio
+        real(real64), intent(in) :: pressure_pred(:)
+
+        type(type_state) :: state
+        real(real64), pointer, contiguous :: current(:)
+        real(real64) :: history(3), predicted, rho_water, critical_temperature
+        integer(int32) :: node_id, row_start, repr_elem
+
+        nullify (current)
+        call self%temperature%get_current(current)
+        if (.not. associated(current)) return
+
+        do node_id = 1, min(num_nodes, size(current))
+            call self%temperature%get_history(node_id, history)
+            predicted = min(max(history(2) + ratio * (history(2) - history(3)), &
+                                WALL_TEMP_MIN_C), WALL_TEMP_MAX_C)
+
+            if (predicted < history(2)) then
+                row_start = self%node_material_table%ptr(node_id)
+                if (row_start < self%node_material_table%ptr(node_id + 1)) then
+                    repr_elem = self%node_material_table%repr_element(row_start)
+                    call self%set_state(node_id, repr_elem, state, calc_physics=.false., include_fluxes=.false.)
+                    call self%thermal%calc_density_water(state, rho_water)
+                    call calc_T_high_celsius(pressure_pred(node_id), rho_water, critical_temperature)
+                    if (history(2) > critical_temperature .and. predicted < critical_temperature) then
+                        predicted = critical_temperature
+                    end if
+                end if
+            end if
+            current(node_id) = predicted
+        end do
+        nullify (current)
+    end subroutine predict_temperature_clipped
+
+    !> Mode 3: extrapolate the conserved quantity, then invert it for T.
+    !>
+    !> Enthalpy has no kink at the transition - that is what makes the enthalpy
+    !> formulation well behaved - so a straight line through it is a sound
+    !> extrapolation everywhere, including across freezing. Inverting
+    !> U(T, p) = H_pred at the predicted pressure then places T wherever the
+    !> latent heat says it belongs: a node absorbing latent heat has its
+    !> enthalpy advanced while its temperature stays near T_crit, which is the
+    !> behaviour a temperature extrapolation cannot produce.
+    !>
+    !> The enthalpy history is the one the local-error estimator already keeps.
+    subroutine predict_temperature_from_enthalpy(self, num_nodes, dt_new, ratio, pressure_pred)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(in) :: num_nodes
+        real(real64), intent(in) :: dt_new, ratio
+        real(real64), intent(in) :: pressure_pred(:)
+
+        integer(int32), parameter :: MAX_INVERSION_ITER = 20
+        type(type_state) :: state
+        real(real64), pointer, contiguous :: current(:)
+        real(real64) :: history(3), target_enthalpy, temperature, enthalpy, capacity
+        real(real64) :: increment, tolerance
+        integer(int32) :: node_id, row_start, repr_elem, material_id, iter
+        logical :: converged
+
+        if (.not. allocated(self%lte_state_prev_thermal)) then
+            call predict_temperature_clipped(self, num_nodes, ratio, pressure_pred)
+            return
+        end if
+        if (.not. allocated(self%lte_ydot_prev_thermal)) then
+            call predict_temperature_clipped(self, num_nodes, ratio, pressure_pred)
+            return
+        end if
+
+        nullify (current)
+        call self%temperature%get_current(current)
+        if (.not. associated(current)) return
+        if (size(self%lte_state_prev_thermal) /= size(current)) then
+            call predict_temperature_clipped(self, num_nodes, ratio, pressure_pred)
+            return
+        end if
+
+        do node_id = 1, min(num_nodes, size(current))
+            call self%temperature%get_history(node_id, history)
+            target_enthalpy = self%lte_state_prev_thermal(node_id) + &
+                              dt_new * self%lte_ydot_prev_thermal(node_id)
+
+            row_start = self%node_material_table%ptr(node_id)
+            if (row_start >= self%node_material_table%ptr(node_id + 1)) cycle
+            repr_elem = self%node_material_table%repr_element(row_start)
+            call self%domain%get_material_id(repr_elem, material_id)
+            call self%set_state(node_id, repr_elem, state, calc_physics=.false., include_fluxes=.false.)
+            call state%pressure%set(pressure_pred(node_id))
+
+            ! Absolute enthalpy tolerance: the same scale the acceptance gate
+            ! uses for the thermal conserved quantity.
+            tolerance = 1.0d0
+            temperature = history(2)
+            converged = .false.
+            do iter = 1, MAX_INVERSION_ITER
+                call state%temperature%set(temperature)
+                call self%thermal%update_water_phases(material_id, state)
+                call self%thermal%calc_enthalpy_density(material_id, state, enthalpy)
+                if (abs(enthalpy - target_enthalpy) <= tolerance) then
+                    converged = .true.
+                    exit
+                end if
+                call self%thermal%compute_mass_term(material_id, state, capacity)
+                if (abs(capacity) <= tiny(1.0d0)) exit
+                increment = -(enthalpy - target_enthalpy) / capacity
+                temperature = min(max(temperature + increment, WALL_TEMP_MIN_C), WALL_TEMP_MAX_C)
+            end do
+
+            if (converged) then
+                current(node_id) = temperature
+            else
+                current(node_id) = history(2)
+            end if
+        end do
+        nullify (current)
+    end subroutine predict_temperature_from_enthalpy
 
     !> Extrapolate the accepted ice history to provide the next outer-loop
     !> initial guess. The bounded projection and the monolithic T-p solve still
@@ -422,6 +682,8 @@ contains
         real(real64), allocatable :: ls_aa_T(:), ls_aa_P(:), ls_aa_duT(:), ls_aa_duP(:)
         logical, allocatable :: ls_onset_saved(:)
         real(real64), allocatable :: initial_residual_thermal(:), initial_residual_hydraulic(:)
+        !> Per-node frozen flags, used only by the active-set telemetry.
+        logical, allocatable :: frozen_now(:), frozen_previous(:)
         real(real64), allocatable :: phase_increments(:), previous_phase_increments(:)
         real(real64), allocatable :: phase_update(:), previous_phase_update(:)
         integer(int32), allocatable :: phase_active_bounds(:)
@@ -466,9 +728,12 @@ contains
 
         ! Initialize per-time-step state only once.
         call self%solve_time_step_initial_setup()
+        if (PREDICTOR_MODE > 0) call apply_solution_predictor(self)
         if (do_phase_outer) call apply_phase_predictor(self)
         call self%domain%get_num_nodes(num_phase_nodes)
         allocate (phase_update(num_phase_nodes), source=0.0d0)
+        allocate (frozen_now(num_phase_nodes), source=.false.)
+        allocate (frozen_previous(num_phase_nodes), source=.false.)
         allocate (previous_phase_update(num_phase_nodes), source=0.0d0)
         phase_mixing_current = PHASE_MIXING
         phase_best_merit = huge(1.0d0)
@@ -549,16 +814,27 @@ contains
                                                                initial_residual_hydraulic, &
                                                                self%is_active_thermal(), &
                                                                self%is_active_hydraulic())
-                    ! Same R^0 the acceptance gate ratios against, reused to make
-                    ! the line-search merit dimensionless and block-balanced.
+                    ! Merit scales for the line search.
+                    !
+                    ! Not the step-initial norms. A block that starts the step
+                    ! already satisfied has ||R^0|| at round-off - measured,
+                    ! ||R_H^0|| = 2.75e-11 against ||R_T^0|| = 2.48e-01, ten
+                    ! orders apart - so dividing by it makes any later residual
+                    ! in that block dominate the merit no matter how small it is
+                    ! physically. Scanned along the Newton direction at a stalled
+                    ! iterate, the thermal block fell 33 percent at alpha = 0.46
+                    ! while the ratio-normalized hydraulic block outweighed it
+                    ! 2000 to 1 and pinned the search at alpha = 0.007.
+                    !
+                    ! Each block is scaled instead by its own absolute residual
+                    ! floor: the imbalance it may carry over the step without
+                    ! moving its conserved quantity past that quantity's absolute
+                    ! tolerance. That is the same floor the acceptance gate uses,
+                    ! it has the units of the block residual, and it does not
+                    ! collapse when the block starts converged.
                     ls_ref0_thermal = 0.0d0
                     ls_ref0_hydraulic = 0.0d0
-                    if (allocated(initial_residual_thermal)) then
-                        ls_ref0_thermal = sqrt(dot_product(initial_residual_thermal, initial_residual_thermal))
-                    end if
-                    if (allocated(initial_residual_hydraulic)) then
-                        ls_ref0_hydraulic = sqrt(dot_product(initial_residual_hydraulic, initial_residual_hydraulic))
-                    end if
+                    call self%control%get_residual_floors(num_phase_nodes, ls_ref0_thermal, ls_ref0_hydraulic)
                     if (allocated(initial_residual_thermal)) deallocate (initial_residual_thermal)
                     if (allocated(initial_residual_hydraulic)) deallocate (initial_residual_hydraulic)
                 end if
@@ -615,6 +891,11 @@ contains
                     ! update, and reassembles: the reassembly was already being
                     ! done once per iteration, so a converging search costs
                     ! nothing extra and only hard iterates pay for retries.
+                    if (RESIDUAL_SCAN .and. .not. residual_scan_done .and. iter_nl >= RESIDUAL_SCAN_ITER) then
+                        residual_scan_done = .true.
+                        call scan_residual_along_direction(self, iter_nl, ls_ref0_thermal, ls_ref0_hydraulic)
+                    end if
+
                     call ls_snapshot(self, ls_T_saved, ls_P_saved, ls_onset_saved, &
                                      ls_aa_T, ls_aa_P, ls_aa_duT, ls_aa_duP, &
                                      ls_aa_has_prev, ls_aa_gnorm)
@@ -654,13 +935,24 @@ contains
                     self%last_line_search_trials = ls_trial
                     if (.not. ls_accepted) then
                         self%last_line_search_failures = self%last_line_search_failures + 1
-                        ! One-shot tangent audit at the first iterate where no
-                        ! step length works. The state here is the one the
-                        ! linearization has to explain, so measuring anywhere
-                        ! else answers a different question.
-                        if (FD_JACOBIAN_AUDIT .and. .not. fd_audit_done) then
-                            fd_audit_done = .true.
-                            call self%report_fd_jacobian('line-search failure')
+                        ! Put the iterate back where the search started.
+                        !
+                        ! Leaving the last trial in place applies a step that was
+                        ! just measured to raise the merit, every iteration, so
+                        ! the sequence is not monotone and can and does diverge:
+                        ! with the iteration cap lifted to 300 the loop reached
+                        ! the divergence guard at 45 iterations rather than
+                        ! converging. A globalization that keeps a step it
+                        ! rejected is not a globalization.
+                        call ls_restore(self, ls_T_saved, ls_P_saved, ls_onset_saved, &
+                                        ls_aa_T, ls_aa_P, ls_aa_duT, ls_aa_duP, &
+                                        ls_aa_has_prev, ls_aa_gnorm)
+                        call self%reflect_variables(step_scale=0.0d0)
+                        call self%assemble()
+                        call self%apply_bc(prescribed=.false.)
+                        if (.not. branch_report_done .and. iter_nl >= 10) then
+                            branch_report_done = .true.
+                            call report_active_branches(self)
                         end if
                         ! Report the whole backtracking sequence, not just its
                         ! last entry. The two failure mechanisms are only
@@ -682,6 +974,68 @@ contains
                                 '  resH/0=', ls_trial_ratio_H(ls_diag)
                         end do
                     end if
+
+                    ! Increment magnitudes. With the tangent and the linear
+                    ! solve both verified, the size of du is the remaining
+                    ! observable that says whether the step is bounded.
+                    if (iter_nl >= 5) then
+                        block
+                            real(real64), allocatable :: du_report_T(:), du_report_P(:)
+                            real(real64) :: max_du_T, max_du_P
+
+                            call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du_report_T)
+                            call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, du_report_P)
+                            max_du_T = 0.0d0
+                            max_du_P = 0.0d0
+                            if (allocated(du_report_T)) max_du_T = maxval(abs(du_report_T))
+                            if (allocated(du_report_P)) max_du_P = maxval(abs(du_report_P))
+                            write (*, '(A,I0,A,ES11.3,A,ES11.3)') '   [DU] iter ', iter_nl, &
+                                ' max|du_T|=', max_du_T, ' max|du_p|=', max_du_P
+                        end block
+                    end if
+
+                    if (iter_nl >= FREEZE_REPORT_ITER .and. freeze_report_count < FREEZE_REPORT_LIMIT) then
+                        freeze_report_count = freeze_report_count + 1
+                        call report_freezing_band(self, iter_nl)
+                    end if
+
+                    ! Active-set telemetry.
+                    !
+                    ! The element tangent (all four blocks, audited against the
+                    ! finite-difference tangent) and the linear solve (defect
+                    ! below 1e-8) are both exact, so a Newton step that still
+                    ! needs 14 to 30 iterations cannot be explained by either.
+                    ! What is left is that the residual is only piecewise
+                    ! smooth: theta_i switches at T = 0, at the pore-volume
+                    ! bound, and at the phase-content clamps. A finite-difference
+                    ! probe cannot see those - its perturbation is far too small
+                    ! to straddle one - but a full Newton step is not. Counting
+                    ! how many nodes change frozen state per iteration separates
+                    ! a set that settles (smooth Newton) from one that keeps
+                    ! flipping (semismooth chattering).
+                    block
+                        real(real64), pointer, contiguous :: active_set_temperature(:)
+                        integer(int32) :: node, num_flipped
+
+                        nullify (active_set_temperature)
+                        call self%temperature%get_current(active_set_temperature)
+                        if (associated(active_set_temperature) .and. allocated(frozen_now)) then
+                            num_flipped = 0
+                            do node = 1, min(size(active_set_temperature), num_phase_nodes)
+                                frozen_now(node) = active_set_temperature(node) < 0.0d0
+                                if (iter_nl > 1) then
+                                    if (frozen_now(node) .neqv. frozen_previous(node)) &
+                                        num_flipped = num_flipped + 1
+                                end if
+                            end do
+                            if (iter_nl > 1 .and. num_flipped > 0) then
+                                write (*, '(A,I0,A,I0,A,I0)') '   [ACTIVE-SET] iter ', iter_nl, &
+                                    ': frozen nodes=', count(frozen_now), ', flipped=', num_flipped
+                            end if
+                            frozen_previous(:) = frozen_now(:)
+                        end if
+                        nullify (active_set_temperature)
+                    end block
 
                     ! theta_i is a state function of (T,p) evaluated inside the
                     ! reassembly above, so there is no separate phase criterion.
@@ -710,6 +1064,14 @@ contains
                     self%last_solve_status = SOLVE_STATUS_NONLINEAR_DIVERGED
                 else
                     self%last_solve_status = SOLVE_STATUS_NONLINEAR_LIMIT
+                end if
+                ! One-shot tangent audit at the first attempt the nonlinear
+                ! solve gives up on. That state - not the first line-search
+                ! failure, which happens before any ice forms - is the one the
+                ! linearization has to explain.
+                if (FD_JACOBIAN_AUDIT .and. .not. fd_audit_done) then
+                    fd_audit_done = .true.
+                    call self%report_fd_jacobian('nonlinear failure')
                 end if
                 t_res = 0.0d0
                 t_inc = 0.0d0
@@ -1016,6 +1378,458 @@ contains
         self%aa_has_prev = aa_has_prev
         self%aa_gnorm_prev = aa_gnorm
     end subroutine ls_restore
+
+    !> One-shot scan of the block residuals along the Newton direction.
+    !>
+    !> Eight backtracking points on a combined norm are not enough to say what
+    !> shape the merit has. This walks alpha over four decades and reports each
+    !> block separately, together with the node each block's maximum sits on and
+    !> that node's thermodynamic state, so a smooth-but-ascending direction, a
+    !> kink, and a flat plateau can be told apart.
+    subroutine scan_residual_along_direction(self, iter_nl, ref_T, ref_H)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(in) :: iter_nl
+        real(real64), intent(in) :: ref_T, ref_H
+
+        integer(int32), parameter :: NUM_SCAN = 25
+        real(real64), allocatable :: T_saved(:), P_saved(:)
+        logical, allocatable :: onset_saved(:)
+        real(real64), allocatable :: aa_T(:), aa_P(:), aa_duT(:), aa_duP(:)
+        logical :: aa_has_prev
+        real(real64) :: aa_gnorm
+        real(real64), allocatable :: r_thermal(:), r_hydraulic(:), du_T(:), du_P(:)
+        real(real64), pointer, contiguous :: field(:)
+        real(real64) :: alpha, norm_T, norm_H, linf_T, linf_H
+        integer(int32) :: k, node_T, node_H
+
+        call ls_snapshot(self, T_saved, P_saved, onset_saved, &
+                         aa_T, aa_P, aa_duT, aa_duP, aa_has_prev, aa_gnorm)
+
+        call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du_T)
+        call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, du_P)
+
+        write (*, '(A,I0)') '   [SCAN] residual along the Newton direction at iter ', iter_nl
+        write (*, '(A,ES13.5,A,ES13.5)') '   [SCAN] step-initial norms: ||R_T^0||=', ref_T, &
+            ' ||R_H^0||=', ref_H
+        if (allocated(du_T) .and. allocated(du_P)) then
+            write (*, '(A,ES11.3,A,ES11.3)') '   [SCAN] max|du_T|=', maxval(abs(du_T)), &
+                ' max|du_p|=', maxval(abs(du_P))
+        end if
+        write (*, '(A)') '   [SCAN]     alpha      ||R_T||/0      ||R_H||/0     maxR_T@node     maxR_H@node'
+
+        do k = 1, NUM_SCAN
+            alpha = 10.0d0**(-4.0d0 * real(k - 1, real64) / real(NUM_SCAN - 1, real64))
+            call ls_restore(self, T_saved, P_saved, onset_saved, &
+                            aa_T, aa_P, aa_duT, aa_duP, aa_has_prev, aa_gnorm)
+            call self%reflect_variables(step_scale=alpha)
+            call self%assemble()
+            call self%apply_bc(prescribed=.false.)
+
+            call self%get_variable_residual(PHYSICS_TYPES%THERMAL, r_thermal)
+            call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, r_hydraulic)
+            norm_T = 0.0d0; norm_H = 0.0d0
+            linf_T = 0.0d0; linf_H = 0.0d0
+            node_T = 0; node_H = 0
+            if (allocated(r_thermal)) then
+                norm_T = sqrt(dot_product(r_thermal, r_thermal))
+                node_T = maxloc(abs(r_thermal), dim=1)
+                linf_T = abs(r_thermal(node_T))
+            end if
+            if (allocated(r_hydraulic)) then
+                norm_H = sqrt(dot_product(r_hydraulic, r_hydraulic))
+                node_H = maxloc(abs(r_hydraulic), dim=1)
+                linf_H = abs(r_hydraulic(node_H))
+            end if
+            write (*, '(A,ES10.3,2(2X,ES13.5),2(2X,ES10.3,A,I0))') '   [SCAN] ', alpha, &
+                norm_T / max(ref_T, tiny(1.0d0)), norm_H / max(ref_H, tiny(1.0d0)), &
+                linf_T, '@', node_T, linf_H, '@', node_H
+        end do
+
+        ! Report the state of the nodes that dominate each block at the base
+        ! iterate, which is what the direction has to fix.
+        call ls_restore(self, T_saved, P_saved, onset_saved, &
+                        aa_T, aa_P, aa_duT, aa_duP, aa_has_prev, aa_gnorm)
+        call self%reflect_variables(step_scale=0.0d0)
+        call self%assemble()
+        call self%apply_bc(prescribed=.false.)
+        call self%get_variable_residual(PHYSICS_TYPES%THERMAL, r_thermal)
+        call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, r_hydraulic)
+        if (allocated(r_thermal)) node_T = maxloc(abs(r_thermal), dim=1)
+        if (allocated(r_hydraulic)) node_H = maxloc(abs(r_hydraulic), dim=1)
+        call report_node(self, node_T, 'max R_T', du_T, du_P)
+        call report_node(self, node_H, 'max R_H', du_T, du_P)
+
+        call ls_restore(self, T_saved, P_saved, onset_saved, &
+                        aa_T, aa_P, aa_duT, aa_duP, aa_has_prev, aa_gnorm)
+        call self%reflect_variables(step_scale=0.0d0)
+        call self%assemble()
+        call self%apply_bc(prescribed=.false.)
+    end subroutine scan_residual_along_direction
+
+    !> Verify the analytic constitutive tangent against the state function it
+    !> claims to differentiate, at one node, by central differences.
+    !>
+    !> A large apparent heat capacity is not by itself a fault: with the
+    !> Clapeyron slope and a steep retention curve, dH/dT of order 1e8 is
+    !> reachable. What matters is whether that tangent is the derivative of the
+    !> H the residual actually evaluates. If it is, a correct Jacobian carrying
+    !> it will SHRINK the temperature update, not enlarge it - so a single
+    !> iteration moving the liquid content by a third of the pore volume points
+    !> at a mismatch between the assembled tangent and the state update, not at
+    !> the stiffness itself.
+    !>
+    !> The quotients must approach the analytic value as epsilon falls and then
+    !> stop improving when round-off takes over. A ratio that stays away from
+    !> one at every epsilon is a wrong derivative; one that drifts with epsilon
+    !> without settling is a non-differentiable state function.
+    subroutine verify_local_tangent(self, node_id)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(in) :: node_id
+
+        integer(int32), parameter :: NUM_EPSILON = 4
+        integer(int32), parameter :: NUM_ALPHA = 6
+        real(real64), parameter :: ALPHA_SCAN(NUM_ALPHA) = &
+            [1.0d0, 1.0d-1, 1.0d-2, 1.0d-3, 1.0d-4, 1.0d-5]
+        real(real64), parameter :: EPSILON_TEMPERATURE(NUM_EPSILON) = &
+            [1.0d-6, 1.0d-5, 1.0d-4, 1.0d-3]
+        type(type_state) :: state
+        real(real64) :: temperature, pressure
+        real(real64) :: enthalpy_plus, enthalpy_minus, liquid_plus, liquid_minus
+        real(real64) :: ice_plus, ice_minus
+        real(real64) :: analytic_dH_dT, analytic_dQw_dT, analytic_dQi_dT
+        real(real64) :: fd_dH_dT, fd_dQw_dT, fd_dQi_dT
+        real(real64) :: analytic_dH_dP, analytic_dQw_dP, step_T, step_P
+        real(real64) :: enthalpy_base, liquid_base, predicted_H, predicted_Qw
+        real(real64), allocatable :: increment_T(:), increment_P(:)
+        integer(int32) :: k, row_start, repr_elem, material_id
+
+        row_start = self%node_material_table%ptr(node_id)
+        if (row_start >= self%node_material_table%ptr(node_id + 1)) return
+        repr_elem = self%node_material_table%repr_element(row_start)
+        call self%domain%get_material_id(repr_elem, material_id)
+
+        call self%set_state(node_id, repr_elem, state, calc_physics=.true., include_fluxes=.false.)
+        call state%temperature%get(temperature)
+        call state%pressure%get(pressure)
+        call state%dQw_dT%get(analytic_dQw_dT)
+        call state%dQw_dP%get(analytic_dQw_dP)
+        call state%dQi_dT%get(analytic_dQi_dT)
+        analytic_dH_dT = 0.0d0
+        call self%thermal%compute_mass_term(material_id, state, analytic_dH_dT)
+
+        write (*, '(A,I0,A,ES12.4,A,ES12.4,A,ES12.4)') &
+            '   [TANGENT] node ', node_id, ' analytic dH/dT=', analytic_dH_dT, &
+            ' dQw/dT=', analytic_dQw_dT, ' dQi/dT=', analytic_dQi_dT
+        write (*, '(A)') '   [TANGENT]      eps_T        dH/dT_fd     ratio      dQw/dT_fd    ratio' // &
+            '      dQi/dT_fd    ratio'
+
+        ! Linear prediction against the actual change along the Newton
+        ! direction. The tangent may be exact and still be the wrong operator
+        ! for the step the solver takes; this is the test that separates the
+        ! two. r -> 1 as alpha falls means the linearization is valid and the
+        ! step is simply too long; r staying away from 1 means the tangent does
+        ! not describe the update.
+        call self%get_variable_increment(PHYSICS_TYPES%THERMAL, increment_T)
+        call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, increment_P)
+        step_T = 0.0d0
+        step_P = 0.0d0
+        if (allocated(increment_T)) then
+            if (node_id <= size(increment_T)) step_T = increment_T(node_id)
+        end if
+        if (allocated(increment_P)) then
+            if (node_id <= size(increment_P)) step_P = increment_P(node_id)
+        end if
+        analytic_dH_dP = 0.0d0
+        call self%thermal%compute_coupling_mass_term(material_id, state, analytic_dH_dP)
+        call self%thermal%calc_enthalpy_density(material_id, state, enthalpy_base)
+        call state%water_content%get(liquid_base)
+
+        write (*, '(A,ES11.3,A,ES11.3,A,ES12.4)') '   [TANGENT] step du_T=', step_T, &
+            ' du_p=', step_P, ' analytic dH/dp=', analytic_dH_dP
+        write (*, '(A)') '   [TANGENT]      alpha        dH_lin       dH_act      r_H' // &
+            '        dQw_lin      dQw_act     r_Qw'
+        do k = 1, NUM_ALPHA
+            call evaluate_step(ALPHA_SCAN(k), enthalpy_plus, liquid_plus, ice_plus)
+            predicted_H = (analytic_dH_dT * step_T + analytic_dH_dP * step_P) * ALPHA_SCAN(k)
+            predicted_Qw = (analytic_dQw_dT * step_T + analytic_dQw_dP * step_P) * ALPHA_SCAN(k)
+            write (*, '(A,ES11.3,2(2X,ES12.4),1X,F9.4,2(2X,ES12.4),1X,F9.4)') '   [TANGENT] ', &
+                ALPHA_SCAN(k), predicted_H, enthalpy_plus - enthalpy_base, &
+                safe_ratio(enthalpy_plus - enthalpy_base, predicted_H), &
+                predicted_Qw, liquid_plus - liquid_base, &
+                safe_ratio(liquid_plus - liquid_base, predicted_Qw)
+        end do
+
+        do k = 1, NUM_EPSILON
+            call evaluate_at(temperature + EPSILON_TEMPERATURE(k), enthalpy_plus, liquid_plus, ice_plus)
+            call evaluate_at(temperature - EPSILON_TEMPERATURE(k), enthalpy_minus, liquid_minus, ice_minus)
+            fd_dH_dT = (enthalpy_plus - enthalpy_minus) / (2.0d0 * EPSILON_TEMPERATURE(k))
+            fd_dQw_dT = (liquid_plus - liquid_minus) / (2.0d0 * EPSILON_TEMPERATURE(k))
+            fd_dQi_dT = (ice_plus - ice_minus) / (2.0d0 * EPSILON_TEMPERATURE(k))
+            write (*, '(A,ES11.3,3(2X,ES12.4,1X,F9.4))') '   [TANGENT] ', EPSILON_TEMPERATURE(k), &
+                fd_dH_dT, safe_ratio(fd_dH_dT, analytic_dH_dT), &
+                fd_dQw_dT, safe_ratio(fd_dQw_dT, analytic_dQw_dT), &
+                fd_dQi_dT, safe_ratio(fd_dQi_dT, analytic_dQi_dT)
+        end do
+
+    contains
+
+        subroutine evaluate_step(alpha, enthalpy, liquid, ice)
+            implicit none
+            real(real64), intent(in) :: alpha
+            real(real64), intent(inout) :: enthalpy, liquid, ice
+
+            type(type_state) :: trial_state
+
+            call trial_state%copy(state)
+            call trial_state%temperature%set(temperature + alpha * step_T)
+            call trial_state%pressure%set(pressure + alpha * step_P)
+            call self%thermal%update_water_phases(material_id, trial_state)
+            call self%thermal%calc_enthalpy_density(material_id, trial_state, enthalpy)
+            call trial_state%water_content%get(liquid)
+            call trial_state%ice_content%get(ice)
+        end subroutine evaluate_step
+
+        subroutine evaluate_at(trial_temperature, enthalpy, liquid, ice)
+            implicit none
+            real(real64), intent(in) :: trial_temperature
+            real(real64), intent(inout) :: enthalpy, liquid, ice
+
+            type(type_state) :: trial_state
+
+            call trial_state%copy(state)
+            call trial_state%temperature%set(trial_temperature)
+            call self%thermal%update_water_phases(material_id, trial_state)
+            call self%thermal%calc_enthalpy_density(material_id, trial_state, enthalpy)
+            call trial_state%water_content%get(liquid)
+            call trial_state%ice_content%get(ice)
+        end subroutine evaluate_at
+
+        pure function safe_ratio(numerator, denominator) result(ratio)
+            implicit none
+            real(real64), intent(in) :: numerator, denominator
+            real(real64) :: ratio
+
+            ratio = 0.0d0
+            if (abs(denominator) > tiny(1.0d0)) ratio = numerator / denominator
+        end function safe_ratio
+    end subroutine verify_local_tangent
+
+    !> State and constitutive derivatives across the freezing band.
+    !>
+    !> Reports, for an iteration that is not converging: how many nodes sit
+    !> where the matric and freezing suctions cross (s_m = s_f is where the
+    !> effective suction switches branch), the largest phase-content movement
+    !> between iterations, and at the node that moves most the suctions and the
+    !> three derivatives the linearization depends on. A non-smooth local update
+    !> shows up as a large phase movement concentrated on the band with
+    !> derivatives that jump between iterations.
+    subroutine report_freezing_band(self, iter_nl)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(in) :: iter_nl
+
+        real(real64), parameter :: CLAPEYRON_SLOPE = rho_std * Lf0 / (Tf0 + TtoK)
+        real(real64), parameter :: BAND_WIDTH_PA = 1.0d4
+        type(type_state) :: state
+        real(real64), pointer, contiguous :: liquid(:), ice(:)
+        real(real64) :: temperature, pressure, suction_matric, suction_freezing, suction_effective
+        real(real64) :: change_liquid, change_ice, max_change_liquid, max_change_ice
+        real(real64) :: dliquid_dP, dice_dP, dliquid_dT, dice_dT, heat_capacity
+        integer(int32) :: node_id, num_nodes, band_count, worst_node
+        integer(int32) :: row_start, repr_elem, material_id
+
+        nullify (liquid, ice)
+        call self%domain%get_num_nodes(num_nodes)
+        call self%Qw%get_current(liquid)
+        call self%Qi%get_current(ice)
+        if (.not. (associated(liquid) .and. associated(ice))) return
+
+        if (.not. allocated(freeze_prev_liquid)) allocate (freeze_prev_liquid(num_nodes), source=0.0d0)
+        if (.not. allocated(freeze_prev_ice)) allocate (freeze_prev_ice(num_nodes), source=0.0d0)
+
+        band_count = 0
+        max_change_liquid = 0.0d0
+        max_change_ice = 0.0d0
+        worst_node = 0
+        do node_id = 1, min(num_nodes, size(liquid))
+            call self%temperature%get_current(node_id, temperature)
+            call self%pressure%get_current(node_id, pressure)
+            suction_matric = -pressure
+            suction_freezing = 0.0d0
+            if (temperature < Tf0) suction_freezing = CLAPEYRON_SLOPE * (Tf0 - temperature)
+            if (abs(suction_matric - suction_freezing) < BAND_WIDTH_PA) band_count = band_count + 1
+
+            change_liquid = abs(liquid(node_id) - freeze_prev_liquid(node_id))
+            change_ice = abs(ice(node_id) - freeze_prev_ice(node_id))
+            max_change_liquid = max(max_change_liquid, change_liquid)
+            if (change_ice > max_change_ice) then
+                max_change_ice = change_ice
+                worst_node = node_id
+            end if
+        end do
+
+        write (*, '(A,I0,A,I0,A,ES11.3,A,ES11.3)') '   [FREEZE] iter ', iter_nl, &
+            '  band|s_m-s_f|<1e4 Pa: ', band_count, '  max|dQw|=', max_change_liquid, &
+            '  max|dQi|=', max_change_ice
+
+        if (worst_node >= 1) then
+            row_start = self%node_material_table%ptr(worst_node)
+            if (row_start < self%node_material_table%ptr(worst_node + 1)) then
+                repr_elem = self%node_material_table%repr_element(row_start)
+                call self%domain%get_material_id(repr_elem, material_id)
+                call self%set_state(worst_node, repr_elem, state, calc_physics=.true., include_fluxes=.false.)
+                call self%temperature%get_current(worst_node, temperature)
+                call self%pressure%get_current(worst_node, pressure)
+                suction_matric = -pressure
+                suction_freezing = 0.0d0
+                if (temperature < Tf0) suction_freezing = CLAPEYRON_SLOPE * (Tf0 - temperature)
+                suction_effective = 0.0d0
+                call state%effective_suction%get(suction_effective)
+                call state%dQw_dP%get(dliquid_dP)
+                call state%dQi_dP%get(dice_dP)
+                call state%dQw_dT%get(dliquid_dT)
+                call state%dQi_dT%get(dice_dT)
+                heat_capacity = 0.0d0
+                call self%thermal%compute_mass_term(material_id, state, heat_capacity)
+                write (*, '(A,I0,A,F10.5,A,ES11.3,A,ES11.3,A,ES11.3,A,ES11.3)') &
+                    '   [FREEZE]   worst dQi node=', worst_node, ' T=', temperature, &
+                    ' s_m=', suction_matric, ' s_f=', suction_freezing, ' s_eff=', suction_effective, &
+                    ' p=', pressure
+                write (*, '(A,ES12.4,A,ES12.4,A,ES12.4,A,ES12.4,A,ES12.4)') &
+                    '   [FREEZE]   dQw/dp=', dliquid_dP, ' dQi/dp=', dice_dP, &
+                    ' dQw/dT=', dliquid_dT, ' dQi/dT=', dice_dT, ' dH/dT=', heat_capacity
+                if (freeze_report_count <= 2) call verify_local_tangent(self, worst_node)
+            end if
+        end if
+
+        do node_id = 1, min(num_nodes, size(liquid))
+            freeze_prev_liquid(node_id) = liquid(node_id)
+            freeze_prev_ice(node_id) = ice(node_id)
+        end do
+        nullify (liquid, ice)
+    end subroutine report_freezing_band
+
+    !> Report which constitutive branch the dominant residual nodes sit on.
+    !>
+    !> The element tangent matches a finite difference and the linear solve is
+    !> exact, yet no step length reduces the merit. For an exact two-sided
+    !> Jacobian that cannot happen, so the residual must only be piecewise
+    !> differentiable there and the iterate must be sitting on a kink. The
+    !> constitutive branches that can produce one are the pore-volume bound on
+    !> the total water, the ice-content clamps at 0 and at the porosity, the
+    !> saturation of the impedance ratio, and the phase-volume closure. All of
+    !> them are decidable from the published nodal phase fields.
+    subroutine report_active_branches(self)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+
+        integer(int32), parameter :: NUM_REPORTED = 5
+        real(real64), allocatable :: r_thermal(:), r_hydraulic(:)
+        real(real64), pointer, contiguous :: field(:)
+        real(real64) :: temperature, pressure, ice, water, porosity
+        real(real64) :: theta_total, volume_bound, ratio_denominator, impedance_ratio
+        real(real64) :: density_ratio
+        integer(int32) :: k, node_id
+        integer(int32) :: ranked(NUM_REPORTED)
+
+        density_ratio = 917.0d0 / 1000.0d0
+        call self%get_variable_residual(PHYSICS_TYPES%THERMAL, r_thermal)
+        call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, r_hydraulic)
+
+        write (*, '(A)') '   [BRANCH] nodes carrying the largest residuals'
+        write (*, '(A)') '   [BRANCH]  block  node        T          p        Qw       Qi      phi' // &
+            '   theta_tot     bound    margin   Q_imp'
+
+        call rank_nodes(r_thermal, ranked)
+        do k = 1, NUM_REPORTED
+            node_id = ranked(k)
+            if (node_id < 1) cycle
+            call emit('R_T', node_id)
+        end do
+        call rank_nodes(r_hydraulic, ranked)
+        do k = 1, NUM_REPORTED
+            node_id = ranked(k)
+            if (node_id < 1) cycle
+            call emit('R_H', node_id)
+        end do
+
+        if (allocated(r_thermal)) deallocate (r_thermal)
+        if (allocated(r_hydraulic)) deallocate (r_hydraulic)
+
+    contains
+
+        subroutine rank_nodes(residual, ranking)
+            implicit none
+            real(real64), allocatable, intent(in) :: residual(:)
+            integer(int32), intent(inout) :: ranking(:)
+
+            real(real64), allocatable :: work(:)
+            integer(int32) :: j
+
+            ranking(:) = 0
+            if (.not. allocated(residual)) return
+            allocate (work, source=abs(residual))
+            do j = 1, size(ranking)
+                if (size(work) == 0) exit
+                ranking(j) = maxloc(work, dim=1)
+                work(ranking(j)) = -1.0d0
+            end do
+        end subroutine rank_nodes
+
+        subroutine emit(label, node)
+            implicit none
+            character(len=*), intent(in) :: label
+            integer(int32), intent(in) :: node
+
+            call self%temperature%get_current(node, temperature)
+            call self%pressure%get_current(node, pressure)
+            call self%Qw%get_current(node, water)
+            call self%Qi%get_current(node, ice)
+            call self%porosity%get_current(node, porosity)
+
+            theta_total = water + density_ratio * ice
+            volume_bound = porosity * density_ratio + water * (1.0d0 - density_ratio)
+            ratio_denominator = water + ice
+            impedance_ratio = 0.0d0
+            if (ratio_denominator > tiny(1.0d0)) impedance_ratio = ice / ratio_denominator
+
+            write (*, '(A,A,2X,I6,F10.4,ES12.3,5F10.5,F9.4)') '   [BRANCH]  ', label, node, &
+                temperature, pressure, water, ice, porosity, theta_total, volume_bound, &
+                theta_total - volume_bound, impedance_ratio
+        end subroutine emit
+    end subroutine report_active_branches
+
+    !> Print the primary and phase state of one node.
+    subroutine report_node(self, node_id, label, du_T, du_P)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(in) :: node_id
+        character(len=*), intent(in) :: label
+        real(real64), allocatable, intent(in) :: du_T(:), du_P(:)
+
+        real(real64) :: temperature, pressure, ice, water, porosity
+        real(real64) :: step_T, step_P
+
+        if (node_id < 1) return
+        call self%temperature%get_current(node_id, temperature)
+        call self%pressure%get_current(node_id, pressure)
+        call self%Qi%get_current(node_id, ice)
+        call self%Qw%get_current(node_id, water)
+        call self%porosity%get_current(node_id, porosity)
+        step_T = 0.0d0
+        step_P = 0.0d0
+        if (allocated(du_T)) then
+            if (node_id <= size(du_T)) step_T = du_T(node_id)
+        end if
+        if (allocated(du_P)) then
+            if (node_id <= size(du_P)) step_P = du_P(node_id)
+        end if
+        write (*, '(A,A,A,I0,A,F10.5,A,ES12.4,A,F8.5,A,F8.5,A,F8.5,A,ES11.3,A,ES11.3)') &
+            '   [SCAN] ', label, ' node=', node_id, ' T=', temperature, ' p=', pressure, &
+            ' Qi=', ice, ' Qw=', water, ' phi=', porosity, ' du_T=', step_T, ' du_p=', step_P
+    end subroutine report_node
 
     !> Copy an allocatable array, propagating the unallocated state.
     subroutine copy_alloc(dst, src)

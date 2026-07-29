@@ -97,13 +97,17 @@ contains
         !    C_a = C_p - Lf*rho_i*dtheta_i/dT to the C_TT diagonal
         !    (thermal_coefficients.F90), so the latent heat is resolved by the
         !    fast coupled solve instead of an outer projection iteration.
-        call self%fusion%calc_ice_content(state, ice_content)
-        call self%fusion%calc_ice_content_derivatives(state, dQi_dP, dQi_dT)
-
-        ! 3. Liquid water is the unfrozen content on the same generalized
-        !    suction, temperature-dependent through psi_cryo.
-        call self%fusion%calc_water_content(state, water_content)
-        call self%fusion%calc_water_content_derivatives(state, dQw_dP, dQw_dT)
+        ! The phases are redistributed at fixed total water: theta_tot is what
+        ! the mass balance transports, the effective suction decides how much of
+        ! it can stay liquid, and the rest is ice. p_w is never assigned here -
+        ! it remains the unknown of the mass balance, and the Clapeyron relation
+        ! enters only through the freezing-equivalent suction.
+        block
+            real(real64) :: theta_total
+            theta_total = 0.0d0
+            call self%fusion%calc_phase_split(state, theta_total, water_content, ice_content, &
+                                              dQw_dP, dQw_dT, dQi_dP, dQi_dT)
+        end block
         water_content = max(0.0d0, water_content)
 
         ! Phase-volume bounds. Keep the one-sided thermodynamic derivatives

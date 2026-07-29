@@ -38,6 +38,7 @@ module control_iteration_setting
         procedure, public, pass(self) :: get_tolerances => get_tolerances_iteration_setting
         procedure, public, pass(self) :: update_reference_values => update_reference_values_iteration_setting
         procedure, public, pass(self) :: set_residual_scale => set_residual_scale_iteration_setting
+        procedure, public, pass(self) :: get_residual_floors => get_residual_floors_iteration_setting
         ! ---- Meta / Utility ----
     end type type_iteration_setting
 
@@ -105,6 +106,16 @@ contains
         call self%convergence_control%prime_conserved_residual(residual_thermal, residual_hydraulic, &
                                                                check_thermal, check_hydraulic)
     end subroutine prime_conserved_residual_setting
+
+    subroutine get_residual_floors_iteration_setting(self, num_nodes, floor_thermal, floor_hydraulic)
+        implicit none
+        class(type_iteration_setting), intent(in) :: self
+        integer(int32), intent(in) :: num_nodes
+        real(real64), intent(inout) :: floor_thermal
+        real(real64), intent(inout) :: floor_hydraulic
+
+        call self%convergence_control%get_residual_floors(num_nodes, floor_thermal, floor_hydraulic)
+    end subroutine get_residual_floors_iteration_setting
 
     subroutine set_residual_scale_iteration_setting(self, volume_total, dt)
         implicit none

@@ -10,6 +10,12 @@ submodule(app_ftcms) ftcms_compute
     use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     use :: module_core, only:type_matrix_bsr, type_matrix_info
     implicit none
+
+    !> Verify that the linear solve returns an increment that actually satisfies
+    !> the assembled system. Cheap (one extra matrix-vector product) and silent
+    !> unless the defect exceeds the threshold.
+    logical, parameter :: LINEAR_RESIDUAL_CHECK = .true.
+    real(real64), parameter :: LINEAR_RESIDUAL_WARN = 1.0d-8
 contains
 
     !> Smooth element-wise state variables to nodal values
@@ -179,6 +185,44 @@ contains
                 ': solver did not converge'
         end if
 
+        ! Did the solver actually solve the system it was handed? Every other
+        ! diagnostic downstream - the line search, the residual gate, the
+        ! finite-difference tangent audit - assumes it did, so the assumption is
+        ! checked here rather than inferred. Measured on the equilibrated system,
+        ! which is the one passed to the solver.
+        if (LINEAR_RESIDUAL_CHECK .and. .not. linear_failed) then
+            block
+                type(type_vector_dp) :: product_work
+                real(real64), pointer :: product_data(:), rhs_data(:)
+                real(real64) :: norm_defect, norm_rhs
+                integer(int32) :: matvec_ierr
+
+                nullify (product_data, rhs_data)
+                ! get_size() reports nodes, not degrees of freedom; the coupled
+                ! vector carries one entry per (node, physics).
+                rhs_data => F_ptr%get_data()
+                if (associated(rhs_data)) call product_work%initialize(size(rhs_data))
+                matvec_ierr = 0
+                call matvec(K_ptr, du_ptr, product_work, matvec_ierr)
+                product_data => product_work%get_data()
+                if (associated(product_data) .and. associated(rhs_data)) then
+                    norm_defect = sqrt(sum((product_data - rhs_data)**2))
+                    norm_rhs = sqrt(sum(rhs_data**2))
+                    if (norm_rhs > 0.0d0 .and. norm_defect > LINEAR_RESIDUAL_WARN * norm_rhs) then
+                        write (*, '(A,ES11.3,A,ES11.3)') '   [LINEAR] inaccurate solve: ||K du - F||/||F|| = ', &
+                            norm_defect / norm_rhs, ', ||F|| = ', norm_rhs
+                    end if
+                end if
+                nullify (product_data, rhs_data)
+                call product_work%destroy()
+            end block
+        end if
+
+        ! Recover the pore-pressure increment from the total-potential one:
+        ! du_p = du_g + c du_T (see transform_to_total_potential). Done before
+        ! the equilibration unscaling would be wrong - the stored increments are
+        ! still in the scaled variable there - so it follows it below.
+
         ! Unscale the equilibrated solution: the solver returned y = D^-1 du, so the
         ! physical increment is du = D y.
         if (allocated(equil_scale)) then
@@ -187,6 +231,31 @@ contains
             if (associated(dudat)) then
                 if (size(dudat) == size(equil_scale)) dudat(:) = dudat(:) * equil_scale(:)
             end if
+        end if
+
+        if (allocated(self%cryo_slope) .and. .not. self%control%is_staggered()) then
+            block
+                real(real64), pointer :: increment(:)
+                integer(int32) :: thermal_offset, hydraulic_offset, node, num_nodes_total
+                integer(int32) :: num_dofs_per_node
+
+                nullify (increment)
+                increment => du_ptr%get_data()
+                call self%domain%get_num_nodes(num_nodes_total)
+                if (associated(increment) .and. size(self%cryo_slope) == num_nodes_total) then
+                    num_dofs_per_node = size(increment) / max(1, num_nodes_total)
+                    if (num_dofs_per_node == PHYSICS_TYPES%NUM_ID .or. num_dofs_per_node == 2) then
+                        thermal_offset = PHYSICS_TYPES%THERMAL%ID
+                        hydraulic_offset = PHYSICS_TYPES%HYDRAULIC%ID
+                        do node = 1, num_nodes_total
+                            increment((node - 1) * num_dofs_per_node + hydraulic_offset) = &
+                                increment((node - 1) * num_dofs_per_node + hydraulic_offset) + &
+                                self%cryo_slope(node) * increment((node - 1) * num_dofs_per_node + thermal_offset)
+                        end do
+                    end if
+                end if
+                nullify (increment)
+            end block
         end if
 
         call self%control%profiler_stop(PROFILER_TYPES%SOLVE)

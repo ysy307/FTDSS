@@ -179,6 +179,7 @@ module control_iteration_convergence
         procedure, public, pass(self) :: reset => reset_convergence_control
         procedure, public, pass(self) :: update_reference_values => update_reference_values_convergence_control
         procedure, public, pass(self) :: set_residual_scale => set_residual_scale_convergence_control
+        procedure, public, pass(self) :: get_residual_floors => get_residual_floors_convergence_control
         ! ---- Algorithm / Operation ----
         procedure, public, pass(self) :: check_convergence => check_convergence_control
         ! ---- Inquiry ----
@@ -299,6 +300,19 @@ module control_iteration_convergence
         end subroutine update_reference_values_convergence_control
 
         !> Supply the discretization scales used by the residual floor.
+        !> Absolute residual floors of the two conserved blocks, in the units of
+        !> the assembled residuals: the largest imbalance that can be sustained
+        !> over the step without moving the conserved quantity past its absolute
+        !> tolerance. Zero where the discretization scales are not yet set.
+        module subroutine get_residual_floors_convergence_control(self, num_nodes, floor_thermal, floor_hydraulic)
+            implicit none
+            class(type_convergence_control), intent(in) :: self
+            !> Number of nodes in the block
+            integer(int32), intent(in) :: num_nodes
+            real(real64), intent(inout) :: floor_thermal
+            real(real64), intent(inout) :: floor_hydraulic
+        end subroutine get_residual_floors_convergence_control
+
         module subroutine set_residual_scale_convergence_control(self, volume_total, dt)
             implicit none
             class(type_convergence_control), intent(inout) :: self

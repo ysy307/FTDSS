@@ -37,6 +37,7 @@ module physics_governing_hydraulic
         procedure, pass(self), public :: compute_coupling_diffusion_term => compute_coupling_diffusion_term_hydraulic
 
         ! --- Helper Procedures ---
+        procedure, pass(self), public :: calc_cryo_head_dT => calc_cryo_head_dT_hydraulic
         procedure, pass(self), public :: calc_K_wT => calc_K_wT_hydraulic
         procedure, pass(self), public :: calc_K_wP => calc_K_wP_hydraulic
         procedure, pass(self), public :: calc_K_vT => calc_K_vT_hydraulic
@@ -123,6 +124,15 @@ module physics_governing_hydraulic
         end subroutine compute_coupling_diffusion_term_hydraulic
 
         ! --- Helper Interfaces ---
+        !> Temperature sensitivity of the total-potential head, dh/dT [m/K].
+        module subroutine calc_cryo_head_dT_hydraulic(self, material_id, state, dh_dT)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            integer(int32), intent(in) :: material_id
+            type(type_state), intent(in) :: state
+            real(real64), intent(inout) :: dh_dT
+        end subroutine calc_cryo_head_dT_hydraulic
+
         module subroutine calc_K_wT_hydraulic(self, target_id, state, K_wT)
             implicit none
             class(type_hydraulic), intent(in) :: self

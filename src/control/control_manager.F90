@@ -55,6 +55,7 @@ module control_control_manager
         procedure, public, pass(self) :: prime_conserved_residual => prime_conserved_residual_control
         procedure, public, pass(self) :: check_convergence_conserved => check_convergence_conserved_control
         procedure, public, pass(self) :: set_residual_scale => set_residual_scale_control
+        procedure, public, pass(self) :: get_residual_floors => get_residual_floors_control
         procedure, public, pass(self) :: compute_error_norm => compute_error_norm_control
         ! - acceleration
         procedure, public, pass(self) :: compute_relaxation => compute_relaxation_control
@@ -625,6 +626,16 @@ contains
 
     !> Conserved-quantity convergence check (PDF 6.2.4): a single coupled indicator
     !> from the nodal enthalpy/effective-density increments and per-block residuals.
+    subroutine get_residual_floors_control(self, num_nodes, floor_thermal, floor_hydraulic)
+        implicit none
+        class(type_control), intent(in) :: self
+        integer(int32), intent(in) :: num_nodes
+        real(real64), intent(inout) :: floor_thermal
+        real(real64), intent(inout) :: floor_hydraulic
+
+        call self%iteration%get_residual_floors(num_nodes, floor_thermal, floor_hydraulic)
+    end subroutine get_residual_floors_control
+
     subroutine set_residual_scale_control(self, volume_total, dt)
         implicit none
         class(type_control), intent(inout) :: self

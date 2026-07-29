@@ -559,6 +559,19 @@ contains
                                                CONSERVED_OMEGA_WARM_RELEASE * self%relaxation_omega))
     end subroutine reset_conserved_state
 
+    module subroutine get_residual_floors_convergence_control(self, num_nodes, floor_thermal, floor_hydraulic)
+        implicit none
+        class(type_convergence_control), intent(in) :: self
+        integer(int32), intent(in) :: num_nodes
+        real(real64), intent(inout) :: floor_thermal
+        real(real64), intent(inout) :: floor_hydraulic
+
+        floor_thermal = residual_floor(self%atol_enthalpy, self%residual_volume_total, &
+                                       self%residual_dt, num_nodes)
+        floor_hydraulic = residual_floor(self%atol_density, self%residual_volume_total, &
+                                         self%residual_dt, num_nodes)
+    end subroutine get_residual_floors_convergence_control
+
     module subroutine set_residual_scale_convergence_control(self, volume_total, dt)
         implicit none
         class(type_convergence_control), intent(inout) :: self

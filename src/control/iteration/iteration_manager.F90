@@ -72,6 +72,7 @@ module control_iteration_manager
         procedure, public, pass(self) :: get_tolerances => get_tolerances_iteration
         procedure, public, pass(self) :: update_reference_values => update_reference_values_iteration
         procedure, public, pass(self) :: set_residual_scale => set_residual_scale_iteration
+        procedure, public, pass(self) :: get_residual_floors => get_residual_floors_iteration
         ! ---- Meta / Utility ----
     end type type_iteration
 
@@ -443,6 +444,16 @@ contains
 
         call self%settings%update_reference_values(reference_values)
     end subroutine update_reference_values_iteration
+
+    subroutine get_residual_floors_iteration(self, num_nodes, floor_thermal, floor_hydraulic)
+        implicit none
+        class(type_iteration), intent(in) :: self
+        integer(int32), intent(in) :: num_nodes
+        real(real64), intent(inout) :: floor_thermal
+        real(real64), intent(inout) :: floor_hydraulic
+
+        call self%settings%get_residual_floors(num_nodes, floor_thermal, floor_hydraulic)
+    end subroutine get_residual_floors_iteration
 
     subroutine set_residual_scale_iteration(self, volume_total, dt)
         implicit none

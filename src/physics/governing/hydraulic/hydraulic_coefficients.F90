@@ -145,6 +145,16 @@ contains
     ! ==========================================================================
     ! Helper Wrappers (Existing)
     ! ==========================================================================
+    module subroutine calc_cryo_head_dT_hydraulic(self, material_id, state, dh_dT)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: dh_dT
+
+        call self%physics%calc_cryo_head_dT(material_id, state, dh_dT)
+    end subroutine calc_cryo_head_dT_hydraulic
+
     module subroutine calc_K_wT_hydraulic(self, target_id, state, K_wT)
         implicit none
         class(type_hydraulic), intent(in) :: self

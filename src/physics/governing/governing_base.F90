@@ -32,6 +32,8 @@ module physics_governing_base
         real(real64), allocatable :: phi_gp(:)
         real(real64), allocatable :: Qi_node(:)
         real(real64), allocatable :: Qi_gp(:)
+        real(real64), allocatable :: Qw_node(:)
+        real(real64), allocatable :: Qw_gp(:)
 
         ! --- Workspaces ---
         real(real64), allocatable :: work_node(:, :)
@@ -184,11 +186,13 @@ contains
         call allocate_and_init(self%P_node, self%num_fe_nodes)
         call allocate_and_init(self%phi_node, self%num_fe_nodes)
         call allocate_and_init(self%Qi_node, self%num_fe_nodes)
+        call allocate_and_init(self%Qw_node, self%num_fe_nodes)
 
         call allocate_and_init(self%T_gp, self%num_fe_gauss)
         call allocate_and_init(self%P_gp, self%num_fe_gauss)
         call allocate_and_init(self%phi_gp, self%num_fe_gauss)
         call allocate_and_init(self%Qi_gp, self%num_fe_gauss)
+        call allocate_and_init(self%Qw_gp, self%num_fe_gauss)
 
         call allocate_and_init_2d(self%work_node, self%bdf_order + 1, self%num_fe_nodes)
         call allocate_and_init(self%work_bdf_buffer, self%bdf_order + 1)
@@ -286,6 +290,7 @@ contains
         self%P_node(:) = 0.0d0
         self%phi_node(:) = 0.0d0
         self%Qi_node(:) = 0.0d0
+        self%Qw_node(:) = 0.0d0
         self%work_bdf_buffer(:) = 0.0d0
 
         ! 1. Temperature (THERMAL)
@@ -410,6 +415,20 @@ contains
         do i = 1, self%num_fe_gauss
             call self%fe%lerp(gp(i), self%Qi_node(1:self%num_fe_nodes), self%Qi_gp(i))
             call self%state_gp(i)%ice_content%set(self%Qi_gp(i))
+        end do
+
+        ! Liquid water is interpolated too: together with the ice it carries the
+        ! total water content the phase split redistributes at fixed mass. Only
+        ! the ice used to be interpolated, because the liquid was rebuilt from
+        ! the pressure - which is exactly the closure that had to go.
+        do i = 1, self%num_fe_nodes
+            is_set = .false.
+            call self%state(i)%water_content%get(work_value, is_set=is_set)
+            if (is_set) self%Qw_node(i) = work_value
+        end do
+        do i = 1, self%num_fe_gauss
+            call self%fe%lerp(gp(i), self%Qw_node(1:self%num_fe_nodes), self%Qw_gp(i))
+            call self%state_gp(i)%water_content%set(self%Qw_gp(i))
         end do
 
         do j = 1, self%num_fe_gauss
@@ -562,10 +581,12 @@ contains
             if (allocated(self%P_node)) deallocate (self%P_node)
             if (allocated(self%phi_node)) deallocate (self%phi_node)
             if (allocated(self%Qi_node)) deallocate (self%Qi_node)
+            if (allocated(self%Qw_node)) deallocate (self%Qw_node)
             if (allocated(self%T_gp)) deallocate (self%T_gp)
             if (allocated(self%P_gp)) deallocate (self%P_gp)
             if (allocated(self%phi_gp)) deallocate (self%phi_gp)
             if (allocated(self%Qi_gp)) deallocate (self%Qi_gp)
+            if (allocated(self%Qw_gp)) deallocate (self%Qw_gp)
             if (allocated(self%coordinates)) deallocate (self%coordinates)
 
             if (allocated(self%work_node)) deallocate (self%work_node)

@@ -78,7 +78,21 @@ contains
 
         ! Gauss Loop
         do i = 1, workspace%num_fe_gauss
-            call self%compute_mass_term(workspace%material_id, workspace%state_gp(i), workspace%work_C(i))
+            ! Chord, not tangent, for the apparent heat capacity.
+            !
+            ! dU/dT at the iterate is the exact derivative there and the wrong
+            ! number for a step that crosses the freezing point: the capacity
+            ! rises by two to three orders of magnitude within 0.1 K of T_crit,
+            ! so a step sized on the unfrozen side overshoots by that factor,
+            ! and re-linearizing on the frozen side then makes the next step
+            ! that much too small. Measured, one such step froze 401 nodes at
+            ! once and the iterate stopped moving for 27 iterations. The chord
+            ! [U(T^m) - U(T^n)]/(T^m - T^n) averages the capacity over the
+            ! excursion the step actually makes, which is the quantity the step
+            ! needs. The residual is assembled in enthalpy form, so this is an
+            ! iteration matrix only: the converged solution is unchanged.
+            call self%compute_mass_term(workspace%material_id, workspace%state_gp(i), workspace%work_C(i), &
+                                        scheme_opt=SCHEME_SECANT)
             if (hydraulic_target .and. associated(K_TH_val)) then
                 call self%compute_coupling_mass_term(workspace%material_id, workspace%state_gp(i), work_C_TH(i))
             end if

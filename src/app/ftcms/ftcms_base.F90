@@ -8,6 +8,19 @@ submodule(app_ftcms) ftcms_base
     !> defect, which would under-estimate the error by a factor O(h).
     integer(int32), parameter :: LTE_MAX_SUPPORTED_ORDER = 2
 
+    !> Pin a node that crosses the freezing point to its critical temperature,
+    !> following Hansson et al. (2004).
+    !>
+    !> Disabling this was tried and is worse, not better. The reset does place
+    !> every crossing node exactly on the constitutive kink - 401 nodes in one
+    !> Newton step, after which the hydraulic residual jumped 250-fold and the
+    !> iterate stopped moving - but removing it does not recover that step and
+    !> costs elsewhere: measured over the same interval, nonlinear-limit
+    !> failures 1 -> 3, line-search failures 10 -> 41, mean inner iterations
+    !> 6.88 -> 8.61, with the same simulated time reached. The kink is a symptom
+    !> of the freezing-onset stall, not its cause.
+    logical, parameter :: PHASE_ONSET_TEMPERATURE_RESET = .true.
+
     ! Bridge experiment (see plan spicy-sauteeing-scroll.md, WP3 refinement):
     ! where freezing impedance has collapsed hydraulic conductivity, a node no
     ! longer exchanges water with its neighbors within a time step, so its
@@ -1013,7 +1026,12 @@ contains
         real(real64) :: aa_gamma
         real(real64) :: aa_alpha_joint
         real(real64), allocatable :: aa_step_T(:), aa_step_P(:)
-        logical, parameter :: AA_ENABLED = .true.
+        ! Anderson(1) replaces the computed direction with its own
+        ! extrapolation. With the element tangent verified against a finite
+        ! difference and the linear solve verified to 1e-8, -J^-1 R is a descent
+        ! direction for ||R||^2 by identity, so a search reporting no descent is
+        ! not searching along it. Disabled to test exactly that.
+        logical, parameter :: AA_ENABLED = .false.
         real(real64), parameter :: AA_GAMMA_MAX = 2.0d0
         real(real64), parameter :: AA_STEP_GROWTH_MAX = 4.0d0
         real(real64), parameter :: AA_WEIGHT_P = 1.0d0 / 9.81d3  ! pressure-head scaling [m/Pa]
@@ -1253,7 +1271,7 @@ contains
             end if
         end if
 
-        if (self%is_active_thermal() .and. self%is_active_hydraulic() .and. &
+        if (PHASE_ONSET_TEMPERATURE_RESET .and. self%is_active_thermal() .and. self%is_active_hydraulic() .and. &
             allocated(temperature_before_phase)) then
             nullify (current)
             call self%temperature%get_current(current)
@@ -2083,6 +2101,9 @@ contains
 
         real(real64) :: dt_n, e_thermal, e_hydraulic
         integer(int32) :: bdf_order
+        !> Nodal enthalpy [J/m3] and effective density [kg/m3]: the quantities
+        !> the error is measured on. See the call sites below for why.
+        real(real64), allocatable :: enthalpy(:), density(:)
 
         error_rel = -1.0d0
         call self%control%get_dt(dt_n)
@@ -2109,24 +2130,46 @@ contains
         e_thermal = -1.0d0
         e_hydraulic = -1.0d0
 
-        if (self%is_active_thermal()) then
-            call physics_lte(self%temperature, self%lte_state_prev_thermal, &
+        ! The error is measured on the conserved quantities, not on T and p.
+        !
+        ! A divided-difference estimator assumes the quantity it differences is
+        ! smooth in time. Temperature is not: a node crossing the freezing point
+        ! has a kink in T(t), because the latent heat is absorbed at a nearly
+        ! constant temperature. Its divided differences then scale like h, not
+        ! h^(k+1), so the estimate does not fall when the step is cut. Measured
+        ! from one accepted state: dt 111.8 s -> E 1.427, dt 84.2 s -> E 4.427,
+        ! dt 36.0 s -> E 1.456, where BDF2 requires E to drop by 30 over that
+        ! range. The controller then rejects every step and the run dies by
+        ! attrition without the nonlinear solve ever failing.
+        !
+        ! Enthalpy and water mass are smooth across the transition - that is the
+        ! defining property of the enthalpy formulation - so their divided
+        ! differences do converge, and they are also what the residual actually
+        ! conserves and what the acceptance gate already measures.
+        call self%compute_nodal_conserved(enthalpy, density)
+
+        ! atol is left at zero here. An absolute floor in J/m3 or kg/m3 has no
+        ! natural value, and the weight already carries the field's own span as
+        ! a floor, which is what the temperature atol was standing in for.
+        if (self%is_active_thermal() .and. allocated(enthalpy)) then
+            call physics_lte(enthalpy, self%lte_state_prev_thermal, &
                              self%lte_ydot_prev_thermal, self%lte_d2_prev_thermal, &
-                             self%lte_atol_thermal, bdf_order, e_thermal)
+                             0.0d0, bdf_order, e_thermal)
         end if
-        if (self%is_active_hydraulic()) then
-            call physics_lte(self%pressure, self%lte_state_prev_hydraulic, &
+        if (self%is_active_hydraulic() .and. allocated(density)) then
+            call physics_lte(density, self%lte_state_prev_hydraulic, &
                              self%lte_ydot_prev_hydraulic, self%lte_d2_prev_hydraulic, &
-                             self%lte_atol_hydraulic, bdf_order, e_hydraulic)
+                             0.0d0, bdf_order, e_hydraulic)
         end if
 
         error_rel = max(e_thermal, e_hydraulic)
 
     contains
 
-        subroutine physics_lte(var, state_prev, ydot_prev, d2_prev, atol, order, e_norm)
+        subroutine physics_lte(y, state_prev, ydot_prev, d2_prev, atol, order, e_norm)
             implicit none
-            type(type_variable), intent(inout) :: var
+            !> Conserved quantity at the accepted iterate
+            real(real64), intent(in) :: y(:)
             real(real64), allocatable, intent(in) :: state_prev(:)
             real(real64), allocatable, intent(in) :: ydot_prev(:)
             real(real64), allocatable, intent(in) :: d2_prev(:)
@@ -2134,7 +2177,6 @@ contains
             integer(int32), intent(in) :: order
             real(real64), intent(inout) :: e_norm
 
-            real(real64), pointer, contiguous :: y(:)
             real(real64), allocatable :: ydot(:), d2(:), defect(:), weight(:)
             real(real64) :: span_local(2), span_global(2), y_span
             real(real64) :: accum_local(2), accum_global(2)
@@ -2143,9 +2185,6 @@ contains
 #endif
 
             e_norm = -1.0d0
-            nullify (y)
-            call var%get_current(y)
-            if (.not. associated(y)) return
             if (.not. allocated(state_prev) .or. .not. allocated(ydot_prev)) return
             if (size(state_prev) /= size(y) .or. size(ydot_prev) /= size(y)) return
             if (size(y) == 0) return
@@ -2232,25 +2271,25 @@ contains
             end if
         end if
 
-        if (self%is_active_thermal()) then
-            call copy_current(self%temperature, self%lte_state_prev_thermal)
-        end if
-        if (self%is_active_hydraulic()) then
-            call copy_current(self%pressure, self%lte_state_prev_hydraulic)
-        end if
+        ! The estimator differences the conserved quantities (see
+        ! compute_lte_error), so the history it starts from must hold those.
+        block
+            real(real64), allocatable :: enthalpy(:), density(:)
+
+            call self%compute_nodal_conserved(enthalpy, density)
+            if (self%is_active_thermal()) call copy_current(enthalpy, self%lte_state_prev_thermal)
+            if (self%is_active_hydraulic()) call copy_current(density, self%lte_state_prev_hydraulic)
+        end block
         self%lte_has_state = allocated(self%lte_state_prev_thermal) .or. &
                              allocated(self%lte_state_prev_hydraulic)
 
     contains
-        subroutine copy_current(var, state_copy)
+        subroutine copy_current(current, state_copy)
             implicit none
-            type(type_variable), intent(inout) :: var
+            real(real64), allocatable, intent(in) :: current(:)
             real(real64), allocatable, intent(inout) :: state_copy(:)
-            real(real64), pointer, contiguous :: current(:)
 
-            nullify (current)
-            call var%get_current(current)
-            if (.not. associated(current)) return
+            if (.not. allocated(current)) return
             if (allocated(state_copy)) deallocate (state_copy)
             allocate (state_copy, source=current)
         end subroutine copy_current
@@ -2270,14 +2309,19 @@ contains
         ! the previous step's slope, i.e. from the second accepted step on.
         second_difference_ready = self%lte_has_derivative .and. dt_n + self%lte_prev_dt > 0.0d0
 
-        if (self%is_active_thermal()) then
-            call commit_physics(self%temperature, self%lte_state_prev_thermal, &
-                                self%lte_ydot_prev_thermal, self%lte_d2_prev_thermal, committed)
-        end if
-        if (self%is_active_hydraulic()) then
-            call commit_physics(self%pressure, self%lte_state_prev_hydraulic, &
-                                self%lte_ydot_prev_hydraulic, self%lte_d2_prev_hydraulic, committed)
-        end if
+        block
+            real(real64), allocatable :: enthalpy(:), density(:)
+
+            call self%compute_nodal_conserved(enthalpy, density)
+            if (self%is_active_thermal() .and. allocated(enthalpy)) then
+                call commit_physics(enthalpy, self%lte_state_prev_thermal, &
+                                    self%lte_ydot_prev_thermal, self%lte_d2_prev_thermal, committed)
+            end if
+            if (self%is_active_hydraulic() .and. allocated(density)) then
+                call commit_physics(density, self%lte_state_prev_hydraulic, &
+                                    self%lte_ydot_prev_hydraulic, self%lte_d2_prev_hydraulic, committed)
+            end if
+        end block
 
         if (committed) then
             ! lte_prev_span is the time t_n - t_{n-2} that the second difference
@@ -2293,19 +2337,17 @@ contains
         end if
 
     contains
-        subroutine commit_physics(var, state_prev, ydot_prev, d2_prev, did_commit)
+        subroutine commit_physics(current, state_prev, ydot_prev, d2_prev, did_commit)
             implicit none
-            type(type_variable), intent(inout) :: var
+            !> Conserved quantity at the newly accepted step
+            real(real64), intent(in) :: current(:)
             real(real64), allocatable, intent(inout) :: state_prev(:)
             real(real64), allocatable, intent(inout) :: ydot_prev(:)
             real(real64), allocatable, intent(inout) :: d2_prev(:)
             logical, intent(inout) :: did_commit
-            real(real64), pointer, contiguous :: current(:)
             real(real64), allocatable :: ydot_new(:)
 
-            nullify (current)
-            call var%get_current(current)
-            if (.not. associated(current)) return
+            if (size(current) == 0) return
             if (.not. allocated(state_prev)) then
                 allocate (state_prev, source=current)
                 return

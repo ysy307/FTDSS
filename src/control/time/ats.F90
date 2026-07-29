@@ -20,6 +20,9 @@ module control_time_ats
         real(real64) :: scale_up = 1.2d0
         real(real64) :: scale_down = 0.8d0
         real(real64) :: scale_retry = 0.5d0
+        !> Set when a step is rejected, cleared by the first step accepted after
+        !> it. While set, the PI controller may not grow dt.
+        logical :: after_rejection = .false.
 
         real(real64) :: safety_factor = 0.9d0
         real(real64) :: max_growth_rate = 2.0d0
@@ -167,6 +170,20 @@ contains
 
         ratio = self%safety_factor * e_cur**(-(self%pi_k_i + self%pi_k_p)) * e_prev**(self%pi_k_p)
         ratio = min(max(ratio, 1.0d0 / self%max_growth_rate), self%max_growth_rate)
+
+        ! Gustafsson's rule: the PI term is only meaningful on a run of accepted
+        ! steps. Right after a rejection the error history describes a step that
+        ! was never taken, and the step that did succeed is small precisely
+        ! because the previous one failed - so its small error argues for growth
+        ! exactly where growth is least safe. Measured at the freezing onset: a
+        ! step accepted at dt = 73.4 s with E = 0.049 was followed by a proposal
+        ! of 111.7 s, which failed, and the run then alternated between failing
+        ! and recovering without advancing. Holding dt until one clean step has
+        ! been taken costs one step of growth and removes that cycle.
+        if (self%after_rejection) then
+            ratio = min(ratio, 1.0d0)
+            self%after_rejection = .false.
+        end if
 
         next_dt = max(self%dt_min, min(current_dt * ratio, self%dt_max))
         self%error_prev = e_cur
