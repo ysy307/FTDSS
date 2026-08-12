@@ -9,11 +9,17 @@
 !> the exact element tangent up to truncation, including every constitutive
 !> derivative the hand-written blocks omit.
 submodule(app_ftcms) ftcms_fd_jacobian
+    use, intrinsic :: ieee_arithmetic, only:ieee_is_finite
     implicit none
 
     !> Relative perturbation. eps^(1/3) balances truncation against round-off
     !> for a central difference in double precision.
     real(real64), parameter :: FD_RELATIVE = 6.0d-6
+    !> Difference the production tangent centrally. FD_RELATIVE above is the
+    !> step a central difference wants; differencing forward at it leaves an
+    !> O(delta) R'' term, and R'' is large at the front. Costs one extra
+    !> residual evaluation per perturbed node.
+    logical, parameter :: FD_CENTRAL_TANGENT = .true.
     !> Absolute perturbation floors, so a primary variable passing through zero
     !> still receives a meaningful increment: 1 K and 1 kPa.
     real(real64), parameter :: FD_FLOOR_TEMPERATURE = 1.0d0
@@ -119,6 +125,235 @@ contains
         nullify (residual)
     end subroutine assemble_coupling_fd_ftcms
 
+    !> Replace K_TT, K_TH, K_HT and K_HH together by finite-differencing the
+    !> element thermal and hydraulic residuals against every nodal (T, p).
+    !>
+    !> Extends assemble_coupling_fd_ftcms's argument (see its doc comment) from
+    !> the coupling block to all four: once the residual is C^1, the true
+    !> element tangent is the difference quotient of the residual regardless of
+    !> which block is being read off, and the remaining hand-written blocks are
+    !> Modified-Picard blocks (transport coefficients frozen at the current
+    !> iterate) rather than that tangent. One perturbation of a nodal variable
+    !> changes both residuals at once, so both output columns are read from
+    !> each perturbed evaluation: n_nodes temperature perturbations give
+    !> K_TT(:,b) and K_HT(:,b) together, and n_nodes pressure perturbations
+    !> give K_TH(:,b) and K_HH(:,b) together.
+    !>
+    !> Unlike assemble_coupling_fd_ftcms, the perturbation here must go through
+    !> set_and_refresh (full nodal update_physical_properties_bulk, then lerp,
+    !> then the Gauss-point update), not the cheaper refresh_gauss_states:
+    !> hydraulic_matrix.F90's assemble_local_picard_hydraulic reads
+    !> workspace%state(i) directly for the diffusion, coupling-diffusion and
+    !> advective coefficients and for effective_suction and its tangents, so F_H,
+    !> unlike F_T, depends on the perturbed node's own NODAL derived state, not
+    !> only on the Gauss-point interpolation of it. Restoring a node's value in
+    !> the loop uses a raw %set() (no refresh), exactly like
+    !> assemble_coupling_fd_ftcms: the next set_and_refresh call - on the next
+    !> node, or the closing one below - refreshes every node's derived state
+    !> from its current (already-correct) raw value, so no residual is ever
+    !> read against a stale node.
+    module subroutine assemble_tangent_fd_ftcms(self, workspace, local_F_T, local_F_H, &
+                                                K_TT, K_TH, K_HT, K_HH, ok)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        type(type_assemble_workspace), intent(inout) :: workspace
+        !> Element thermal residual on entry; restored unchanged on exit
+        type(type_vector_dp), intent(inout) :: local_F_T
+        !> Element hydraulic residual on entry; restored unchanged on exit
+        type(type_vector_dp), intent(inout) :: local_F_H
+        !> Overwritten with d R_T / d T if ok
+        type(type_matrix_dense), intent(inout) :: K_TT
+        !> Overwritten with d R_T / d p if ok
+        type(type_matrix_dense), intent(inout) :: K_TH
+        !> Overwritten with d R_H / d T if ok
+        type(type_matrix_dense), intent(inout) :: K_HT
+        !> Overwritten with d R_H / d p if ok
+        type(type_matrix_dense), intent(inout) :: K_HH
+        !> .true. if every column below was finite and the blocks were
+        !> overwritten; .false. leaves K_TT/K_TH/K_HT/K_HH untouched
+        logical, intent(inout) :: ok
+
+        real(real64) :: caller_residual_T(workspace%num_fe_nodes), caller_residual_H(workspace%num_fe_nodes)
+        real(real64) :: base_residual_T(workspace%num_fe_nodes), base_residual_H(workspace%num_fe_nodes)
+        ! Staged columns: not written into K_TT/K_TH/K_HT/K_HH until every
+        ! column has proven finite, so a failed element keeps its analytic
+        ! blocks (the sanity-guarded fallback selected in ftcms_assemble.F90).
+        real(real64) :: stage_TT(workspace%num_fe_nodes, workspace%num_fe_nodes)
+        real(real64) :: stage_TH(workspace%num_fe_nodes, workspace%num_fe_nodes)
+        real(real64) :: stage_HT(workspace%num_fe_nodes, workspace%num_fe_nodes)
+        real(real64) :: stage_HH(workspace%num_fe_nodes, workspace%num_fe_nodes)
+        ! For a forward difference "minus" holds the base evaluation.
+        real(real64) :: plus_T(workspace%num_fe_nodes), plus_H(workspace%num_fe_nodes)
+        real(real64) :: minus_T(workspace%num_fe_nodes), minus_H(workspace%num_fe_nodes)
+        real(real64), pointer :: residual_T(:), residual_H(:), values(:, :)
+        real(real64), pointer, contiguous :: saved_bdf_coeffs(:)
+        real(real64), target :: current_level_coeff(1)
+        integer(int32) :: b, i, n_nodes
+        real(real64) :: base_temperature, base_pressure, delta, denominator
+
+        n_nodes = workspace%num_fe_nodes
+
+        ! Keep the residuals the caller is about to scatter.
+        nullify (residual_T, residual_H)
+        residual_T => local_F_T%get_data()
+        residual_H => local_F_H%get_data()
+        caller_residual_T(1:n_nodes) = residual_T(1:n_nodes)
+        caller_residual_H(1:n_nodes) = residual_H(1:n_nodes)
+        nullify (residual_T, residual_H)
+
+        ! Drop the BDF history from the differenced residuals; see the
+        ! rationale comment in assemble_coupling_fd_ftcms above. Both residuals
+        ! must use the same truncated variant, so both bases are re-evaluated
+        ! below rather than reusing the caller's.
+        saved_bdf_coeffs => workspace%bdf_coeffs
+        current_level_coeff(1) = saved_bdf_coeffs(1)
+        workspace%bdf_coeffs => current_level_coeff
+
+        call local_F_T%zero()
+        call local_F_H%zero()
+        call self%thermal%assemble_local(control=self%control, workspace=workspace, F_T=local_F_T)
+        call self%hydraulic%assemble_local(control=self%control, workspace=workspace, F_H=local_F_H)
+        residual_T => local_F_T%get_data()
+        residual_H => local_F_H%get_data()
+        base_residual_T(1:n_nodes) = residual_T(1:n_nodes)
+        base_residual_H(1:n_nodes) = residual_H(1:n_nodes)
+        nullify (residual_T, residual_H)
+
+        ok = .true.
+
+        ! Temperature perturbations: K_TT(:,b) and K_HT(:,b) share one
+        ! evaluation of both residuals.
+        do b = 1, n_nodes
+            call workspace%state(b)%temperature%get(base_temperature)
+            delta = FD_RELATIVE * max(abs(base_temperature), FD_FLOOR_TEMPERATURE)
+
+            call set_and_refresh(self, workspace, b, PHYSICS_TYPES%THERMAL%ID, base_temperature + delta)
+
+            call local_F_T%zero()
+            call local_F_H%zero()
+            call self%thermal%assemble_local(control=self%control, workspace=workspace, F_T=local_F_T)
+            call self%hydraulic%assemble_local(control=self%control, workspace=workspace, F_H=local_F_H)
+
+            residual_T => local_F_T%get_data()
+            residual_H => local_F_H%get_data()
+            plus_T(1:n_nodes) = residual_T(1:n_nodes)
+            plus_H(1:n_nodes) = residual_H(1:n_nodes)
+            nullify (residual_T, residual_H)
+
+            if (FD_CENTRAL_TANGENT) then
+                call set_and_refresh(self, workspace, b, PHYSICS_TYPES%THERMAL%ID, base_temperature - delta)
+                call local_F_T%zero()
+                call local_F_H%zero()
+                call self%thermal%assemble_local(control=self%control, workspace=workspace, F_T=local_F_T)
+                call self%hydraulic%assemble_local(control=self%control, workspace=workspace, F_H=local_F_H)
+                residual_T => local_F_T%get_data()
+                residual_H => local_F_H%get_data()
+                minus_T(1:n_nodes) = residual_T(1:n_nodes)
+                minus_H(1:n_nodes) = residual_H(1:n_nodes)
+                nullify (residual_T, residual_H)
+                denominator = 2.0d0 * delta
+            else
+                minus_T(1:n_nodes) = base_residual_T(1:n_nodes)
+                minus_H(1:n_nodes) = base_residual_H(1:n_nodes)
+                denominator = delta
+            end if
+
+            ! The assembled vector is F = -R, so the residual tangent is -dF/dT.
+            do i = 1, n_nodes
+                stage_TT(i, b) = -(plus_T(i) - minus_T(i)) / denominator
+                stage_HT(i, b) = -(plus_H(i) - minus_H(i)) / denominator
+            end do
+            if (any(.not. ieee_is_finite(stage_TT(1:n_nodes, b))) .or. &
+                any(.not. ieee_is_finite(stage_HT(1:n_nodes, b)))) ok = .false.
+
+            call workspace%state(b)%temperature%set(base_temperature)
+        end do
+
+        ! Pressure perturbations: K_TH(:,b) and K_HH(:,b) share the other
+        ! evaluation of both residuals.
+        do b = 1, n_nodes
+            call workspace%state(b)%pressure%get(base_pressure)
+            delta = FD_RELATIVE * max(abs(base_pressure), FD_FLOOR_PRESSURE)
+
+            call set_and_refresh(self, workspace, b, PHYSICS_TYPES%HYDRAULIC%ID, base_pressure + delta)
+
+            call local_F_T%zero()
+            call local_F_H%zero()
+            call self%thermal%assemble_local(control=self%control, workspace=workspace, F_T=local_F_T)
+            call self%hydraulic%assemble_local(control=self%control, workspace=workspace, F_H=local_F_H)
+
+            residual_T => local_F_T%get_data()
+            residual_H => local_F_H%get_data()
+            plus_T(1:n_nodes) = residual_T(1:n_nodes)
+            plus_H(1:n_nodes) = residual_H(1:n_nodes)
+            nullify (residual_T, residual_H)
+
+            if (FD_CENTRAL_TANGENT) then
+                call set_and_refresh(self, workspace, b, PHYSICS_TYPES%HYDRAULIC%ID, base_pressure - delta)
+                call local_F_T%zero()
+                call local_F_H%zero()
+                call self%thermal%assemble_local(control=self%control, workspace=workspace, F_T=local_F_T)
+                call self%hydraulic%assemble_local(control=self%control, workspace=workspace, F_H=local_F_H)
+                residual_T => local_F_T%get_data()
+                residual_H => local_F_H%get_data()
+                minus_T(1:n_nodes) = residual_T(1:n_nodes)
+                minus_H(1:n_nodes) = residual_H(1:n_nodes)
+                nullify (residual_T, residual_H)
+                denominator = 2.0d0 * delta
+            else
+                minus_T(1:n_nodes) = base_residual_T(1:n_nodes)
+                minus_H(1:n_nodes) = base_residual_H(1:n_nodes)
+                denominator = delta
+            end if
+
+            do i = 1, n_nodes
+                stage_TH(i, b) = -(plus_T(i) - minus_T(i)) / denominator
+                stage_HH(i, b) = -(plus_H(i) - minus_H(i)) / denominator
+            end do
+            if (any(.not. ieee_is_finite(stage_TH(1:n_nodes, b))) .or. &
+                any(.not. ieee_is_finite(stage_HH(1:n_nodes, b)))) ok = .false.
+
+            call workspace%state(b)%pressure%set(base_pressure)
+        end do
+
+        ! Put the workspace back on the unperturbed state and full BDF order,
+        ! and hand the caller back both residuals it is about to scatter, on
+        ! every exit path (whether or not the staged blocks are accepted).
+        !
+        ! Every restore above used a raw %set() with no refresh, deferring the
+        ! (expensive) full nodal update to whichever set_and_refresh call came
+        ! next; after the last one there is none, so one explicit full nodal
+        ! refresh is needed here to leave every node's derived state - not only
+        ! the Gauss-point one - consistent with the now fully-restored raw
+        ! values, matching this routine's "workspace left on the unperturbed
+        ! state" contract.
+        workspace%bdf_coeffs => saved_bdf_coeffs
+        nullify (saved_bdf_coeffs)
+        call self%update_physical_properties_bulk(workspace%material_id, workspace%state)
+        call refresh_gauss_states(self, workspace)
+        residual_T => local_F_T%get_data()
+        residual_H => local_F_H%get_data()
+        residual_T(1:n_nodes) = caller_residual_T(1:n_nodes)
+        residual_H(1:n_nodes) = caller_residual_H(1:n_nodes)
+        nullify (residual_T, residual_H)
+
+        if (.not. ok) return
+
+        nullify (values)
+        values => K_TT%get_val()
+        values(1:n_nodes, 1:n_nodes) = stage_TT(1:n_nodes, 1:n_nodes)
+        nullify (values)
+        values => K_TH%get_val()
+        values(1:n_nodes, 1:n_nodes) = stage_TH(1:n_nodes, 1:n_nodes)
+        nullify (values)
+        values => K_HT%get_val()
+        values(1:n_nodes, 1:n_nodes) = stage_HT(1:n_nodes, 1:n_nodes)
+        nullify (values)
+        values => K_HH%get_val()
+        values(1:n_nodes, 1:n_nodes) = stage_HH(1:n_nodes, 1:n_nodes)
+        nullify (values)
+    end subroutine assemble_tangent_fd_ftcms
+
     !> Re-derive what the element thermal residual reads after a nodal primary
     !> variable changed.
     !>
@@ -180,7 +415,18 @@ contains
         do_thermal = self%is_active_thermal()
         do_hydraulic = self%is_active_hydraulic()
         if (present(mean_rel_error)) mean_rel_error(:) = -1.0d0
-        if (.not. (do_thermal .and. do_hydraulic)) return
+
+        ! The re-assembled "analytic" K_HH block below must be regularization-
+        ! free to be comparable against the FD residual tangent: the pseudo-
+        ! transient capacity_regularization (hydraulic_matrix.F90) is added to
+        ! the matrix only, never the residual, so leaving it enabled would make
+        ! the audit compare two different operators. Restored .false. on every
+        ! exit path, including this early return.
+        call self%hydraulic%set_disable_capacity_regularization(.true.)
+        if (.not. (do_thermal .and. do_hydraulic)) then
+            call self%hydraulic%set_disable_capacity_regularization(.false.)
+            return
+        end if
 
         front_stride = 1
         if (present(element_stride)) front_stride = max(1, element_stride)
@@ -281,6 +527,8 @@ contains
                 end do
             end if
         end if
+
+        call self%hydraulic%set_disable_capacity_regularization(.false.)
 
     contains
 
@@ -401,7 +649,16 @@ contains
         call self%update_physical_properties_bulk(workspace%material_id, workspace%state)
         call workspace%lerp()
         call self%update_physical_properties_bulk(workspace%material_id, workspace%state_gp)
-        call workspace%lerp_dqi_dt()
+        ! Gate on the same switch the production assembly uses (ftcms_assemble.F90)
+        ! so the audit compares the analytic Jacobian against the residual path
+        ! actually used in production, whichever LERP_NODAL_DQI_DT selects.
+        if (LERP_NODAL_DQI_DT) call workspace%lerp_dqi_dt()
+        ! The perturbed node moves the freezing interface, and the element
+        ! integration rule follows it. Dropping the cached split makes the
+        ! differentiated residual use the same rule the residual itself would
+        ! be assembled with at this state; see the invalidate routine's
+        ! docstring for why the omitted term is first order, not small.
+        call workspace%invalidate_interface_subcell()
     end subroutine set_and_refresh
 
     !> Evaluate the element residual only, leaving the matrix blocks untouched.

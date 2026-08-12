@@ -14,12 +14,12 @@ submodule(app_ftcms) ftcms_solve
     !> once, at the first iterate where the line search finds no usable step.
     !> Diagnostic only: it costs O(4 n_node) element residual evaluations per
     !> element and must not be left on for production runs.
-    logical, parameter :: FD_JACOBIAN_AUDIT = .true.
+    logical, parameter :: FD_JACOBIAN_AUDIT = .false.
     logical, save :: fd_audit_done = .false.
 
     !> One-shot scan of the residual along the Newton direction at a genuinely
     !> stalled iterate. Diagnostic only.
-    logical, parameter :: RESIDUAL_SCAN = .true.
+    logical, parameter :: RESIDUAL_SCAN = .false.
     integer(int32), parameter :: RESIDUAL_SCAN_ITER = 12
     logical, save :: residual_scan_done = .false.
     logical, save :: branch_report_done = .false.
@@ -81,9 +81,12 @@ contains
         ! every attempt, so the floor is refreshed here rather than at setup.
         block
             real(real64) :: dt_now, measure
+            real(real64) :: atol_temperature_u, atol_pressure_u, rtol_u
             integer(int32) :: i_elem, num_elements
+            logical :: first_setup
 
-            if (self%domain_measure_total <= 0.0d0) then
+            first_setup = (self%domain_measure_total <= 0.0d0)
+            if (first_setup) then
                 call self%domain%get_num_fe(num_elements)
                 self%domain_measure_total = 0.0d0
                 do i_elem = 1, num_elements
@@ -91,9 +94,23 @@ contains
                     call self%domain%calc_measure(i_elem, measure)
                     self%domain_measure_total = self%domain_measure_total + abs(measure)
                 end do
+                call build_nodal_volume(self, num_elements)
             end if
             call self%control%get_dt(dt_now)
-            call self%control%set_residual_scale(self%domain_measure_total, dt_now)
+            if (first_setup) then
+                ! ATS error-control tolerances (Conditions.json:
+                ! adaptive_stepping/error_control) are static run
+                ! configuration, so they are read once here and cached inside
+                ! convergence_control, reused as the primary-variable
+                ! tolerance scale of the local error measure (see
+                ! local_error_block in convergence_control.F90).
+                call self%control%get_error_control_tolerances(atol_temperature_u, atol_pressure_u, rtol_u)
+                call self%control%set_residual_scale(self%domain_measure_total, dt_now, self%nodal_volume, &
+                                                     atol_temperature_u=atol_temperature_u, &
+                                                     atol_pressure_u=atol_pressure_u, rtol_u=rtol_u)
+            else
+                call self%control%set_residual_scale(self%domain_measure_total, dt_now, self%nodal_volume)
+            end if
         end block
 
         ! Save previous step values (Previous <- Current)
@@ -529,6 +546,8 @@ contains
 
         real(real64), allocatable :: enthalpy(:)
         real(real64), allocatable :: density(:)
+        real(real64), allocatable :: dH_dT(:)
+        real(real64), allocatable :: drho_dp(:)
         real(real64), allocatable :: residual_thermal(:)
         real(real64), allocatable :: residual_hydraulic(:)
         logical :: check_thermal, check_hydraulic
@@ -595,20 +614,93 @@ contains
             nullify (field)
         end if
 
-        ! Nodal conserved quantities at the updated iterate
-        call self%compute_nodal_conserved(enthalpy, density)
+        ! Nodal conserved quantities at the updated iterate, together with the
+        ! matching nodal storage sensitivities (dH/dT, d rho_eq/dp) the
+        ! primary-variable local error measure needs (local_error_block).
+        ! Both are as state-dependent as enthalpy/density themselves, so they
+        ! are recomputed at the same cadence, here, rather than once at setup.
+        call self%compute_nodal_conserved(enthalpy, density, dH_dT, drho_dp)
 
         ! Per-block residuals from the assembly at the updated iterate.
         if (check_thermal) call self%get_variable_residual(PHYSICS_TYPES%THERMAL, residual_thermal)
         if (check_hydraulic) call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, residual_hydraulic)
+
+        ! Refresh the convergence gate's cached sensitivity/primary-variable
+        ! snapshot before the gate below reads them. nodal_volume and the ATS
+        ! tolerances are left untouched: unsupplied optional arguments keep
+        ! the values set once at solve_time_step_initial_setup. A disassociated
+        ! pointer (inactive physics) is treated as an absent optional argument.
+        block
+            real(real64), pointer, contiguous, dimension(:) :: T_current, p_current
+            real(real64) :: dt_now
+
+            nullify (T_current, p_current)
+            if (check_thermal) call self%temperature%get_current(T_current)
+            if (check_hydraulic) call self%pressure%get_current(p_current)
+            call self%control%get_dt(dt_now)
+            call self%control%set_residual_scale(self%domain_measure_total, dt_now, &
+                                                 dH_dT=dH_dT, drho_dp=drho_dp, &
+                                                 u_thermal=T_current, u_hydraulic=p_current)
+            nullify (T_current, p_current)
+        end block
 
         ! Unallocated residual arrays propagate as absent optional arguments.
         call self%control%check_convergence_conserved(enthalpy, density, &
                                                       residual_thermal, residual_hydraulic, &
                                                       check_thermal, check_hydraulic)
 
+        ! Pore-overflow guard: the accepted nodal water+ice content must not
+        ! exceed the pore space. Transient iterates within the nonlinear loop
+        ! are allowed to overshoot (phase_systems.F90 no longer clamps them),
+        ! so the check runs only once the convergence gate above has declared
+        ! the iterate acceptable; a violation then vetoes the acceptance via
+        ! the same set_diverged/dt-retry mechanism as the wall-pinning guards.
+        if (check_hydraulic .and. self%control%is_converged()) then
+            block
+                real(real64), pointer, contiguous, dimension(:) :: Qw_field, Qi_field, porosity_field
+                real(real64) :: excess, worst_excess
+                integer(int32) :: i_node, worst_node
+                real(real64), parameter :: PORE_OVERFLOW_TOL = 1.0d-8
+                ! Diagnostic switch: report the overflow but do not veto the
+                ! acceptance. The rigid-pore model has no pressure-relief
+                ! physics, so freezing a near-saturated node necessarily
+                ! overflows the pore volume by up to (rho_w/rho_i - 1)*Theta;
+                ! warn-only runs measure how large that overflow actually
+                ! grows before deciding the rejection policy.
+                logical, parameter :: PORE_OVERFLOW_WARN_ONLY = .false.
+
+                nullify (Qw_field, Qi_field, porosity_field)
+                call self%Qw%get_current(Qw_field)
+                call self%Qi%get_current(Qi_field)
+                call self%porosity%get_current(porosity_field)
+                if (associated(Qw_field) .and. associated(Qi_field) .and. associated(porosity_field)) then
+                    worst_excess = PORE_OVERFLOW_TOL
+                    worst_node = 0
+                    do i_node = 1, size(porosity_field)
+                        excess = Qw_field(i_node) + Qi_field(i_node) - porosity_field(i_node)
+                        if (excess > worst_excess) then
+                            worst_excess = excess
+                            worst_node = i_node
+                        end if
+                    end do
+                    if (worst_node > 0) then
+                        write (*, '(A,I0,A,ES11.3)') &
+                            '   [GUARD] pore-volume overflow at accepted step; node=', worst_node, &
+                            ' excess=', worst_excess
+                        if (.not. PORE_OVERFLOW_WARN_ONLY) then
+                            call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
+                            call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
+                        end if
+                    end if
+                end if
+                nullify (Qw_field, Qi_field, porosity_field)
+            end block
+        end if
+
         if (allocated(enthalpy)) deallocate (enthalpy)
         if (allocated(density)) deallocate (density)
+        if (allocated(dH_dT)) deallocate (dH_dT)
+        if (allocated(drho_dp)) deallocate (drho_dp)
         if (allocated(residual_thermal)) deallocate (residual_thermal)
         if (allocated(residual_hydraulic)) deallocate (residual_hydraulic)
     end subroutine solve_time_step_check_convergence_conserved_ftcms
@@ -660,23 +752,26 @@ contains
         real(real64) :: phase_aa_gamma
         real(real64) :: phase_merit, phase_best_merit
         ! --- Backtracking line-search state ---
-        integer(int32), parameter :: LINE_SEARCH_MAX_TRIALS = 8
-        real(real64), parameter :: LINE_SEARCH_BACKTRACK = 5.0d-1
-        real(real64), parameter :: LINE_SEARCH_MIN_SCALE = 1.0d-3
+        ! The measured descent region lies below alpha ~ 1e-5; backtracking by
+        ! 1/4 reaches 2.4e-7 within MAX_TRIALS.
+        integer(int32), parameter :: LINE_SEARCH_MAX_TRIALS = 12
+        real(real64), parameter :: LINE_SEARCH_BACKTRACK = 2.5d-1
+        real(real64), parameter :: LINE_SEARCH_MIN_SCALE = 1.0d-6
         !> Armijo sufficient-decrease coefficient on the residual norm.
         real(real64), parameter :: LINE_SEARCH_ARMIJO = 1.0d-4
         integer(int32) :: ls_trial, ls_diag
         real(real64) :: ls_scale, ls_reference_norm, ls_trial_norm, ls_aa_gnorm
-        !> Per-block residual norms at the trial iterate and the step-initial
-        !> norms the merit is scaled by.
-        real(real64) :: ls_norm_T, ls_norm_H
+        !> Per-block local error measure at the trial iterate (E_T, E_H; see
+        !> local_error_block) and the mean-volume-floor fallback scale used
+        !> only when the exact per-node data is not yet available.
+        real(real64) :: ls_E_T, ls_E_H
         real(real64) :: ls_ref0_thermal, ls_ref0_hydraulic
         !> Per-trial backtracking record, kept only to separate a wrong direction
         !> from a step length the search does not actually control.
         real(real64) :: ls_trial_alpha(LINE_SEARCH_MAX_TRIALS)
         real(real64) :: ls_trial_ratio(LINE_SEARCH_MAX_TRIALS)
-        real(real64) :: ls_trial_ratio_T(LINE_SEARCH_MAX_TRIALS)
-        real(real64) :: ls_trial_ratio_H(LINE_SEARCH_MAX_TRIALS)
+        real(real64) :: ls_trial_E_T(LINE_SEARCH_MAX_TRIALS)
+        real(real64) :: ls_trial_E_H(LINE_SEARCH_MAX_TRIALS)
         logical :: ls_accepted, ls_aa_has_prev
         real(real64), allocatable :: ls_T_saved(:), ls_P_saved(:)
         real(real64), allocatable :: ls_aa_T(:), ls_aa_P(:), ls_aa_duT(:), ls_aa_duP(:)
@@ -700,8 +795,8 @@ contains
         is_step_converged = .false.
         ls_ref0_thermal = 0.0d0
         ls_ref0_hydraulic = 0.0d0
-        ls_norm_T = 0.0d0
-        ls_norm_H = 0.0d0
+        ls_E_T = 0.0d0
+        ls_E_H = 0.0d0
 
         self%last_phase_iterations = 1
         self%last_inner_iterations = 0
@@ -814,24 +909,26 @@ contains
                                                                initial_residual_hydraulic, &
                                                                self%is_active_thermal(), &
                                                                self%is_active_hydraulic())
-                    ! Merit scales for the line search.
-                    !
-                    ! Not the step-initial norms. A block that starts the step
-                    ! already satisfied has ||R^0|| at round-off - measured,
-                    ! ||R_H^0|| = 2.75e-11 against ||R_T^0|| = 2.48e-01, ten
-                    ! orders apart - so dividing by it makes any later residual
-                    ! in that block dominate the merit no matter how small it is
-                    ! physically. Scanned along the Newton direction at a stalled
-                    ! iterate, the thermal block fell 33 percent at alpha = 0.46
-                    ! while the ratio-normalized hydraulic block outweighed it
-                    ! 2000 to 1 and pinned the search at alpha = 0.007.
-                    !
-                    ! Each block is scaled instead by its own absolute residual
-                    ! floor: the imbalance it may carry over the step without
-                    ! moving its conserved quantity past that quantity's absolute
-                    ! tolerance. That is the same floor the acceptance gate uses,
-                    ! it has the units of the block residual, and it does not
-                    ! collapse when the block starts converged.
+                    ! Fallback merit scale for the line search, used only when
+                    ! local_error_block's exact per-node measure is not yet
+                    ! available (nodal_volume or the storage-sensitivity
+                    ! snapshot missing - only possible during the first
+                    ! iterations of the very first step, before
+                    ! solve_time_step_check_convergence_conserved has run
+                    ! once). It must NOT be the step-initial residual norm
+                    ! itself: a block that starts the step already satisfied
+                    ! has ||R^0|| at round-off - measured, ||R_H^0|| = 2.75e-11
+                    ! against ||R_T^0|| = 2.48e-01, ten orders apart - so
+                    ! dividing by it makes any later residual in that block
+                    ! dominate the merit no matter how small it is physically.
+                    ! Scanned along the Newton direction at a stalled iterate,
+                    ! the thermal block fell 33 percent at alpha = 0.46 while
+                    ! the ratio-normalized hydraulic block outweighed it 2000
+                    ! to 1 and pinned the search at alpha = 0.007. The floor
+                    ! below is the imbalance a block may carry over the step
+                    ! without moving its conserved quantity past its own
+                    ! absolute tolerance; it does not collapse when the block
+                    ! starts converged.
                     ls_ref0_thermal = 0.0d0
                     ls_ref0_hydraulic = 0.0d0
                     call self%control%get_residual_floors(num_phase_nodes, ls_ref0_thermal, ls_ref0_hydraulic)
@@ -846,8 +943,8 @@ contains
                 ! after the solve compares a scaled residual against a freshly
                 ! assembled unscaled one.
                 if (self%control%is_conserved()) then
-                    call ls_block_norms(self, ls_norm_T, ls_norm_H)
-                    ls_reference_norm = ls_merit(ls_norm_T, ls_norm_H, ls_ref0_thermal, ls_ref0_hydraulic)
+                    call ls_block_norms(self, ls_E_T, ls_E_H, ls_ref0_thermal, ls_ref0_hydraulic)
+                    ls_reference_norm = ls_merit(ls_E_T, ls_E_H)
                 end if
 
                 ! Linear solve (K * du = F)
@@ -903,8 +1000,8 @@ contains
                     ls_accepted = .false.
                     ls_trial_ratio(:) = -1.0d0
                     ls_trial_alpha(:) = -1.0d0
-                    ls_trial_ratio_T(:) = -1.0d0
-                    ls_trial_ratio_H(:) = -1.0d0
+                    ls_trial_E_T(:) = -1.0d0
+                    ls_trial_E_H(:) = -1.0d0
                     do ls_trial = 1, LINE_SEARCH_MAX_TRIALS
                         if (ls_trial > 1) then
                             call ls_restore(self, ls_T_saved, ls_P_saved, ls_onset_saved, &
@@ -914,16 +1011,16 @@ contains
                         call self%reflect_variables(step_scale=ls_scale)
                         call self%assemble()
                         call self%apply_bc(prescribed=.false.)
-                        call ls_block_norms(self, ls_norm_T, ls_norm_H)
-                        ls_trial_norm = ls_merit(ls_norm_T, ls_norm_H, ls_ref0_thermal, ls_ref0_hydraulic)
+                        call ls_block_norms(self, ls_E_T, ls_E_H, ls_ref0_thermal, ls_ref0_hydraulic)
+                        ls_trial_norm = ls_merit(ls_E_T, ls_E_H)
                         if (ls_reference_norm <= 0.0d0) then
                             ls_accepted = .true.
                             exit
                         end if
                         ls_trial_alpha(ls_trial) = ls_scale
                         ls_trial_ratio(ls_trial) = ls_trial_norm / ls_reference_norm
-                        ls_trial_ratio_T(ls_trial) = ls_norm_T / max(ls_ref0_thermal, tiny(1.0d0))
-                        ls_trial_ratio_H(ls_trial) = ls_norm_H / max(ls_ref0_hydraulic, tiny(1.0d0))
+                        ls_trial_E_T(ls_trial) = ls_E_T
+                        ls_trial_E_H(ls_trial) = ls_E_H
                         if (ls_trial_norm <= (1.0d0 - LINE_SEARCH_ARMIJO * ls_scale) * ls_reference_norm) then
                             ls_accepted = .true.
                             exit
@@ -967,11 +1064,19 @@ contains
                             '   [LS] no descent at iter ', iter_nl, ': ||R_k||=', ls_reference_norm
                         do ls_diag = 1, LINE_SEARCH_MAX_TRIALS
                             if (ls_trial_alpha(ls_diag) < 0.0d0) cycle
-                            write (*, '(A,ES9.2,A,F12.6,A,ES11.3,A,ES11.3)') &
+                            ! E_T/E_H are the same local_error_block measure the
+                            ! [Conserved] line's locT/locH prints (<=1 passes),
+                            ! so the two logs are directly comparable.
+                            ! ES, not F: a rejected trial can raise the merit by
+                            ! many orders of magnitude, and an F field that
+                            ! overflows aborts the run on a Fortran output
+                            ! conversion error - a diagnostic must never be able
+                            ! to kill the solve it is reporting on.
+                            write (*, '(A,ES9.2,A,ES12.4,A,ES11.3,A,ES11.3)') &
                                 '        alpha=', ls_trial_alpha(ls_diag), &
                                 '  merit/merit_k=', ls_trial_ratio(ls_diag), &
-                                '  resT/0=', ls_trial_ratio_T(ls_diag), &
-                                '  resH/0=', ls_trial_ratio_H(ls_diag)
+                                '  E_T=', ls_trial_E_T(ls_diag), &
+                                '  E_H=', ls_trial_E_H(ls_diag)
                         end do
                     end if
 
@@ -1158,8 +1263,11 @@ contains
             if (abs(phase_increments(phase_max_node)) > tiny(1.0d0)) then
                 phase_step_factor = phase_update(phase_max_node) / phase_increments(phase_max_node)
             end if
-            write (*, '(A,I0,A,ES10.3,A,ES10.3,A,I0,A,F9.4,A,ES11.3,' // &
-                        'A,ES10.3,A,ES10.3,A,ES10.3,A,F6.3,A,I0)') &
+            ! ES for every unbounded field: a diverging iterate can push T or
+            ! the step factor past any fixed F width, and an overflowing F
+            ! descriptor aborts the run on an output conversion error.
+            write (*, '(A,I0,A,ES10.3,A,ES10.3,A,I0,A,ES11.3,A,ES11.3,' // &
+                        'A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3,A,I0)') &
                 '   [PHASE] outer:', coupling_iter, ' max|dQi|:', phase_increment_max, &
                 ' rms|dQi|:', phase_increment_norm, ' node:', phase_max_node, &
                 ' T:', phase_temperature, ' p:', phase_pressure, &
@@ -1232,63 +1340,83 @@ contains
 
     end subroutine solve_time_step_ftcms
 
-    !> L2 norms of the assembled thermal and hydraulic block residuals,
-    !> separately, at the current iterate.
+    !> Local nonlinear-error measure (E_T, E_H) of the thermal and hydraulic
+    !> blocks, separately, at the current (trial) iterate.
     !>
-    !> They must stay separate: the thermal residual is an energy rate [W] and
-    !> the hydraulic one a volumetric water rate [m3/s], and on this problem they
-    !> differ by about nine orders of magnitude. Their raw sum of squares is the
-    !> thermal norm to machine precision, so a merit built from it cannot see the
-    !> hydraulic block at all. Callers normalize each block before combining.
-    subroutine ls_block_norms(self, norm_thermal, norm_hydraulic)
+    !> Delegates to convergence_control:local_error_block, the SAME formula
+    !> and SAME cached per-node scales (nodal_volume, dH/dT or d rho_eq/dp,
+    !> the primary-variable snapshot, the ATS tolerances) the conserved
+    !> acceptance gate's local criterion (locT/locH in the [Conserved] line)
+    !> evaluates, so the line search and the gate cannot disagree about what
+    !> progress means. They must stay separate rather than combined into one
+    !> raw residual norm: the thermal residual is an energy rate [W] and the
+    !> hydraulic one a mass rate [kg/s], and on this problem they differ by
+    !> about nine orders of magnitude, so a merit built from their raw sum of
+    !> squares would be the thermal norm to machine precision and could not
+    !> see the hydraulic block at all - local_error_block's per-block K/Pa
+    !> scaling is what makes combining them in ls_merit meaningful.
+    !>
+    !> Falls back to the block residual ratioed against the mean-volume-floor
+    !> scale (floor_thermal/floor_hydraulic, from get_residual_floors) when
+    !> local_error_block reports its data as unavailable (sentinel < 0) -
+    !> only possible during the first iterations of the very first step,
+    !> before solve_time_step_check_convergence_conserved has run once.
+    subroutine ls_block_norms(self, e_thermal, e_hydraulic, floor_thermal, floor_hydraulic)
         implicit none
         class(type_ftcms), intent(inout) :: self
-        real(real64), intent(inout) :: norm_thermal
-        real(real64), intent(inout) :: norm_hydraulic
+        real(real64), intent(inout) :: e_thermal
+        real(real64), intent(inout) :: e_hydraulic
+        !> Mean-volume-floor fallback scale for each block (see get_residual_floors)
+        real(real64), intent(in) :: floor_thermal, floor_hydraulic
 
         real(real64), allocatable :: r_thermal(:), r_hydraulic(:)
+        real(real64) :: norm_thermal, norm_hydraulic
 
-        norm_thermal = 0.0d0
-        norm_hydraulic = 0.0d0
+        e_thermal = 0.0d0
+        e_hydraulic = 0.0d0
         if (self%is_active_thermal()) then
             call self%get_variable_residual(PHYSICS_TYPES%THERMAL, r_thermal)
-            if (allocated(r_thermal)) norm_thermal = sqrt(dot_product(r_thermal, r_thermal))
+            if (allocated(r_thermal)) then
+                e_thermal = self%control%local_error_block(PHYSICS_TYPES%THERMAL, r_thermal)
+                if (e_thermal < 0.0d0) then
+                    norm_thermal = sqrt(dot_product(r_thermal, r_thermal))
+                    e_thermal = norm_thermal / max(floor_thermal, tiny(1.0d0))
+                end if
+            end if
         end if
         if (self%is_active_hydraulic()) then
             call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, r_hydraulic)
-            if (allocated(r_hydraulic)) norm_hydraulic = sqrt(dot_product(r_hydraulic, r_hydraulic))
+            if (allocated(r_hydraulic)) then
+                e_hydraulic = self%control%local_error_block(PHYSICS_TYPES%HYDRAULIC, r_hydraulic)
+                if (e_hydraulic < 0.0d0) then
+                    norm_hydraulic = sqrt(dot_product(r_hydraulic, r_hydraulic))
+                    e_hydraulic = norm_hydraulic / max(floor_hydraulic, tiny(1.0d0))
+                end if
+            end if
         end if
         if (allocated(r_thermal)) deallocate (r_thermal)
         if (allocated(r_hydraulic)) deallocate (r_hydraulic)
     end subroutine ls_block_norms
 
-    !> Dimensionless line-search merit: each block residual divided by its own
-    !> step-initial norm, combined in L2.
+    !> Dimensionless line-search merit: L2 combination of the two blocks'
+    !> local error measures E_T, E_H (ls_block_norms).
     !>
-    !> This is deliberately the same quantity the conserved acceptance gate
-    !> ratios (per-block relative residual against R^0), so the search and the
-    !> gate cannot disagree about what progress means. With the previous raw
-    !> merit the search rejected every step that reduced a hydraulic residual
-    !> sitting at resH/0 = 3.12 against a tolerance of 0.1, because the same step
-    !> raised the nine-orders-larger thermal block by 1.6-1.9 percent; it then
-    !> exhausted its backtracking budget and left alpha = 7.8e-3, which advances
-    !> nothing. Measured: the iterate was bit-for-bit unchanged across successive
-    !> nonlinear iterations while resT/0 stayed at 0.1145.
-    pure function ls_merit(norm_thermal, norm_hydraulic, ref_thermal, ref_hydraulic) result(merit)
+    !> This is deliberately the same quantity the conserved acceptance gate's
+    !> local criterion evaluates per block (locT/locH <= 1), so the search and
+    !> the gate cannot disagree about what progress means. With the previous
+    !> raw-residual-over-R0 merit the search rejected every step that reduced
+    !> a hydraulic residual sitting at resH/0 = 3.12 against a tolerance of
+    !> 0.1, because the same step raised the nine-orders-larger thermal block
+    !> by 1.6-1.9 percent; it then exhausted its backtracking budget and left
+    !> alpha = 7.8e-3, which advances nothing. Measured: the iterate was
+    !> bit-for-bit unchanged across successive nonlinear iterations while
+    !> resT/0 stayed at 0.1145.
+    pure function ls_merit(e_thermal, e_hydraulic) result(merit)
         implicit none
-        real(real64), intent(in) :: norm_thermal, norm_hydraulic
-        real(real64), intent(in) :: ref_thermal, ref_hydraulic
+        real(real64), intent(in) :: e_thermal, e_hydraulic
         real(real64) :: merit
-        real(real64) :: scaled_thermal, scaled_hydraulic
 
-        ! A block whose step-initial residual is zero is already solved; leave it
-        ! unscaled rather than dividing by zero, so it contributes nothing.
-        scaled_thermal = norm_thermal
-        if (ref_thermal > 0.0d0) scaled_thermal = norm_thermal / ref_thermal
-        scaled_hydraulic = norm_hydraulic
-        if (ref_hydraulic > 0.0d0) scaled_hydraulic = norm_hydraulic / ref_hydraulic
-
-        merit = sqrt(scaled_thermal**2 + scaled_hydraulic**2)
+        merit = sqrt(e_thermal**2 + e_hydraulic**2)
     end function ls_merit
 
     !> Save everything a line-search trial mutates. The AA(1) secant pair is
@@ -1554,7 +1682,9 @@ contains
             call evaluate_step(ALPHA_SCAN(k), enthalpy_plus, liquid_plus, ice_plus)
             predicted_H = (analytic_dH_dT * step_T + analytic_dH_dP * step_P) * ALPHA_SCAN(k)
             predicted_Qw = (analytic_dQw_dT * step_T + analytic_dQw_dP * step_P) * ALPHA_SCAN(k)
-            write (*, '(A,ES11.3,2(2X,ES12.4),1X,F9.4,2(2X,ES12.4),1X,F9.4)') '   [TANGENT] ', &
+            ! ES, not F: safe_ratio spans many decades at a rejected iterate
+            ! and an overflowing F field aborts the run from inside a print.
+            write (*, '(A,ES11.3,2(2X,ES12.4),1X,ES11.3,2(2X,ES12.4),1X,ES11.3)') '   [TANGENT] ', &
                 ALPHA_SCAN(k), predicted_H, enthalpy_plus - enthalpy_base, &
                 safe_ratio(enthalpy_plus - enthalpy_base, predicted_H), &
                 predicted_Qw, liquid_plus - liquid_base, &
@@ -1567,7 +1697,7 @@ contains
             fd_dH_dT = (enthalpy_plus - enthalpy_minus) / (2.0d0 * EPSILON_TEMPERATURE(k))
             fd_dQw_dT = (liquid_plus - liquid_minus) / (2.0d0 * EPSILON_TEMPERATURE(k))
             fd_dQi_dT = (ice_plus - ice_minus) / (2.0d0 * EPSILON_TEMPERATURE(k))
-            write (*, '(A,ES11.3,3(2X,ES12.4,1X,F9.4))') '   [TANGENT] ', EPSILON_TEMPERATURE(k), &
+            write (*, '(A,ES11.3,3(2X,ES12.4,1X,ES11.3))') '   [TANGENT] ', EPSILON_TEMPERATURE(k), &
                 fd_dH_dT, safe_ratio(fd_dH_dT, analytic_dH_dT), &
                 fd_dQw_dT, safe_ratio(fd_dQw_dT, analytic_dQw_dT), &
                 fd_dQi_dT, safe_ratio(fd_dQi_dT, analytic_dQi_dT)
@@ -1693,7 +1823,7 @@ contains
                 call state%dQi_dT%get(dice_dT)
                 heat_capacity = 0.0d0
                 call self%thermal%compute_mass_term(material_id, state, heat_capacity)
-                write (*, '(A,I0,A,F10.5,A,ES11.3,A,ES11.3,A,ES11.3,A,ES11.3)') &
+                write (*, '(A,I0,A,ES11.3,A,ES11.3,A,ES11.3,A,ES11.3,A,ES11.3)') &
                     '   [FREEZE]   worst dQi node=', worst_node, ' T=', temperature, &
                     ' s_m=', suction_matric, ' s_f=', suction_freezing, ' s_eff=', suction_effective, &
                     ' p=', pressure
@@ -2293,6 +2423,8 @@ contains
         logical :: phase_iteration_spike
         real(real64) :: time_s, time_start_s, time_trial_s, dt_s, dt_used
         real(real64) :: lte_error
+        !> BDF order lte_error was measured at; the retry is resized at it
+        integer(int32) :: lte_order
         integer(int32), parameter :: MAX_CONSECUTIVE_FAILURES = 50
         integer(int32), parameter :: PHASE_SPIKE_MIN_ITER = 16
 
@@ -2320,7 +2452,8 @@ contains
             ! Local-truncation-error estimate for error-controlled ATS, evaluated
             ! before the time/variable history is shifted (needs ydot_n and dt_n).
             lte_error = -1.0d0
-            if (is_step_converged) lte_error = self%compute_lte_error()
+            lte_order = 1
+            if (is_step_converged) lte_error = self%compute_lte_error(order_used=lte_order)
             if (is_step_converged .and. self%lte_error_control_active .and. lte_error > 1.0d0) then
                 is_step_converged = .false.
                 self%last_solve_status = SOLVE_STATUS_LTE_REJECTED
@@ -2333,10 +2466,20 @@ contains
             if (is_step_converged) then
                 self%last_accepted_dt = dt_used
                 self%last_accepted_phase_iterations = phase_iter
+                ! Genuine step acceptance: is_step_converged has already
+                ! survived the LTE rejection check above, so the conserved-
+                ! quantity drift measured at the nonlinear loop's last
+                ! iterate (check_conserved_convergence_control, criterion 2)
+                ! is the one that actually becomes part of the accepted
+                ! history. Fold it into the cumulative budget here, not at
+                ! every nonlinear iteration, since an iterate that satisfies
+                ! the nonlinear gate can still be discarded by LTE or the
+                ! outer phase loop before reaching this point.
+                call self%control%commit_conserved_drift()
                 call self%commit_lte_history()
                 ! Update time and adaptive time stepping
                 call self%control%update(is_step_converged, error_estimate=lte_error, &
-                                         iteration_count=effective_iter)
+                                         iteration_count=effective_iter, error_order=lte_order)
 
                 consecutive_failures = 0
                 step_counter = step_counter + 1
@@ -2359,7 +2502,7 @@ contains
             else
                 ! Update time and adaptive time stepping
                 call self%control%update(is_step_converged, error_estimate=lte_error, &
-                                         iteration_count=effective_iter)
+                                         iteration_count=effective_iter, error_order=lte_order)
 
                 ! Retry with smaller dt
                 consecutive_failures = consecutive_failures + 1
@@ -2385,4 +2528,68 @@ contains
         end do time_loop
 
     end subroutine run_ftcms
+
+    !> Build the nodal control-volume array V_i = sum_e int psi_i dOmega used
+    !> by the convergence control's exact per-node local conservation gate
+    !> (check_conserved_convergence_control, criterion 1). Computed once per
+    !> run - the mesh is static - from the FE row-sum-lumped mass matrix with
+    !> a unit coefficient: the same primitive governing_base uses to build a
+    !> lumped physical capacity matrix (compute_K1_lumped), just with A_gp=1
+    !> so the result is a pure geometric volume.
+    !>
+    !> No other nodal-volume provider exists in src/domain or src/numerical:
+    !> the node_material_table built in ftcms_base.F90 sums whole adjacent-
+    !> element measures per node to weight material averages, which is not
+    !> integrated against shape functions and double-counts the volume shared
+    !> between elements, so it is not a control volume.
+    !>
+    !> Cost: O(N_elem) FE evaluations, paid once.
+    subroutine build_nodal_volume(self, num_elements)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(in) :: num_elements
+
+        class(abst_fe), pointer :: fe
+        integer(int32), pointer, contiguous, dimension(:) :: connectivity
+        real(real64), allocatable :: coordinates(:, :)
+        real(real64), allocatable :: unit_gp(:)
+        real(real64), allocatable :: elem_volume(:, :)
+        integer(int32) :: num_nodes_total, num_nodes_local, num_gauss_local
+        integer(int32) :: i_elem, i_node
+
+        nullify (fe)
+        nullify (connectivity)
+
+        call self%domain%get_num_nodes(num_nodes_total)
+        call allocate_array(self%nodal_volume, num_nodes_total)
+        self%nodal_volume = 0.0d0
+        if (num_nodes_total <= 0) return
+
+        do i_elem = 1, num_elements
+            call self%domain%get_fe(i_elem, fe)
+            if (.not. associated(fe)) cycle
+            call self%domain%get_fe_connectivity(i_elem, connectivity)
+            if (.not. associated(connectivity)) cycle
+            call self%domain%get_fe_coordinate(i_elem, coordinates)
+
+            call fe%get_num_nodes(num_nodes_local)
+            call fe%get_num_gauss(num_gauss_local)
+            call allocate_array(unit_gp, num_gauss_local)
+            unit_gp = 1.0d0
+            call allocate_array(elem_volume, num_nodes_local, num_nodes_local)
+
+            call fe%compute_K1_lumped(coordinates, unit_gp, elem_volume)
+            do i_node = 1, num_nodes_local
+                self%nodal_volume(connectivity(i_node)) = self%nodal_volume(connectivity(i_node)) &
+                                                          + elem_volume(i_node, i_node)
+            end do
+        end do
+
+        nullify (fe)
+        nullify (connectivity)
+        if (allocated(coordinates)) deallocate (coordinates)
+        if (allocated(unit_gp)) deallocate (unit_gp)
+        if (allocated(elem_volume)) deallocate (elem_volume)
+    end subroutine build_nodal_volume
+
 end submodule ftcms_solve

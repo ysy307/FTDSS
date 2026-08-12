@@ -1,7 +1,16 @@
 submodule(physics_governing_hydraulic) hydraulic_matrix
-    use :: domain_fe_subcell, only: type_subcell_qp, SUBCELL_QP_CAP, build_interface_quadrature_points
-    use :: models_phase_change_chemical_potential, only: calc_T_high_celsius
+    use :: domain_fe_subcell, only: type_subcell_quadrature_point, SUBCELL_QUADRATURE_CAPACITY
     implicit none
+
+    !> TEMPORARY Step-0 verification diagnostic (see report_subcell_debug_counts_hydraulic).
+    !> Default .false.; flip to .true. only to re-measure the firing rate.
+    logical, parameter :: DEBUG_SUBCELL_COUNTER = .false.
+
+    integer(int32), save :: dbg_elements_considered = 0
+    integer(int32), save :: dbg_elements_cut = 0
+    real(real64), save :: dbg_phi_min = huge(1.0d0)
+    real(real64), save :: dbg_phi_max = -huge(1.0d0)
+    real(real64), save :: dbg_abs_phi_min = huge(1.0d0)
 
 contains
 
@@ -25,7 +34,8 @@ contains
     !> interpolated state (no nodal pre-evaluation / lerp of coefficients).
     !>
     !> The transport coefficients can change sharply across the freezing
-    !> interface \(\phi = T_{high}(p_w) - T = 0\).  Elements cut by the
+    !> interface, where ice first appears (see the cut-detection block below
+    !> for the level-set definition).  Elements cut by the
     !> interface are therefore integrated with the interface-split subcell rule
     !> (build_interface_quadrature_points), which REPLACES the standard Gauss
     !> rule for the pressure, temperature, and gravity fluxes in those elements.
@@ -33,8 +43,12 @@ contains
     !> avoids a discrete imbalance caused solely by sampling the same flux at
     !> different points.
     !>
-    !> Storage C_eq, mixed transient, and segregation sink keep the standard
-    !> Gauss rule in all elements.
+    !> The storage term (C_eq -> K1, and its residual counterpart d(Theta)/dt)
+    !> is likewise moved onto the subcell rule for cut elements, in the SAME
+    !> q_s loop as the fluxes: dTheta/dp collapses across the same front the
+    !> flux coefficients do, so sampling it at Gauss points would reintroduce
+    !> the discrete imbalance the flux subcell rule was built to remove.
+    !> The segregation sink keeps the standard Gauss rule in all elements.
     !>
     !> In Modified Picard, the transport coefficients are frozen at the current
     !> iterate while both primary increments remain coupled. The K_HT block is
@@ -52,12 +66,11 @@ contains
         real(real64) :: bdf0, dt_local
 
         ! --- Interface-split subcell variables ---
-        type(type_subcell_qp) :: sub_qps(SUBCELL_QP_CAP)
-        integer(int32) :: n_sub_qps, q_s
+        type(type_subcell_quadrature_point) :: subcell_quadrature_points(SUBCELL_QUADRATURE_CAPACITY)
+        integer(int32) :: num_subcell_quadrature_points, q_s
         logical :: use_subcell, is_cut
         real(real64) :: phi_nodes(workspace%num_fe_nodes)
         real(real64) :: porosity_nodes(workspace%num_fe_nodes)
-        real(real64) :: rho_w_node_sub, T_high_node
         real(real64) :: T_q_sub, P_q_sub, porosity_q_sub, Qi_q_sub
         real(real64) :: D_HH_sub, D_HT_sub, eff_weight_sub, det_J_sub
         real(real64) :: V_sub(workspace%num_fe_dimension)
@@ -68,6 +81,22 @@ contains
         real(real64) :: dpsi_dx_sub(workspace%num_fe_dimension, workspace%num_fe_nodes)
         type(type_coordinate_dp) :: r_sub
         type(type_state) :: state_sub
+        ! --- Storage term on the subcell rule (Step 3: C_eq has the same
+        !     sub-element front as the flux coefficients above) ---
+        real(real64) :: psi_sub(workspace%num_fe_nodes)
+        real(real64) :: C_eq_sub, C_HT_storage_sub, d_dt_sub
+        real(real64) :: mat_C_sub(workspace%num_fe_nodes, workspace%num_fe_nodes)
+        real(real64) :: mat_C_HT_sub(workspace%num_fe_nodes, workspace%num_fe_nodes)
+        real(real64) :: vec_ddt_sub(workspace%num_fe_nodes)
+        integer(int32) :: k, n_hist, hlen
+        real(real64) :: T_hist_node(workspace%bdf_order + 1, workspace%num_fe_nodes)
+        real(real64) :: P_hist_node(workspace%bdf_order + 1, workspace%num_fe_nodes)
+        real(real64) :: Qi_hist_node(workspace%bdf_order + 1, workspace%num_fe_nodes)
+        real(real64) :: T_hist_sub(workspace%bdf_order + 1)
+        real(real64) :: P_hist_sub(workspace%bdf_order + 1)
+        real(real64) :: Qi_hist_sub(workspace%bdf_order + 1)
+        real(real64), pointer, contiguous, dimension(:) :: hist_ptr
+        logical :: hist_is_set
 
         ! --- Standard assembly variables ---
         real(real64) :: local_vec_res(workspace%num_fe_nodes)
@@ -81,16 +110,10 @@ contains
         real(real64) :: V_node_mag(workspace%num_fe_nodes)
         real(real64) :: D_HH_elem, D_HT_elem, V_elem_mag
         real(real64) :: V_dir(workspace%num_fe_dimension), V_node_tmp(workspace%num_fe_dimension)
-        ! Nodal total-potential head driving the liquid Darcy flux, expressed as
-        ! a pressure: P_gen = -psi_eff = -(psi_cap + psi_cryo). It equals the
-        ! pore pressure where unfrozen and adds the cryosuction where frozen,
-        ! and because d psi_eff/d psi_cap = 1 the K_HH pressure diagonal remains
-        ! the consistent tangent while the cryogenic part migrates water to the
-        ! freezing front.
+        ! Nodal Darcy driver and its tangents in the two primary unknowns.
         real(real64) :: P_gen_node(workspace%num_fe_nodes), psi_eff_i
-        ! dP_gen/dT [Pa/K] = -d psi_cryo/dT per node: the consistent temperature
-        ! tangent of the cryosuction flux, assembled into K_HT.
-        real(real64) :: dPgen_dT_node(workspace%num_fe_nodes), dh_dT_i
+        real(real64) :: dPgen_dP_node(workspace%num_fe_nodes), dSeff_dP_i
+        real(real64) :: dPgen_dT_node(workspace%num_fe_nodes), dSeff_dT_i
         integer(int32) :: nonlinear_iteration
         real(real64) :: capacity_regularization
         logical :: thermal_target, coupling_mass_needed, coupling_flux_needed
@@ -118,28 +141,55 @@ contains
         work_D_HT(:, :, :) = 0.0d0
 
         ! ----------------------------------------------------------------
-        ! 0. Cut detection: nodal level set phi = T_high(p_w) - T.
+        ! 0. Cut detection: nodal level set phi = (s_f - s_m) + eps_s, the
+        !    SAME switch calc_phase_split uses to decide ice existence
+        !    (s_m = -p_w, s_f = the raw generalized-Clapeyron suction; see
+        !    type_fusion%calc_freezing_level_set for the full derivation and
+        !    why phi>0 iff ice_content>0 exactly, given the compact-support
+        !    smoothing in fusion.F90). Computing phi from the split's own
+        !    s_m,s_f - rather than from a separately defined critical
+        !    temperature T_high(p_w) - is what keeps "cut" elements from
+        !    drifting away from where the constitutive split actually places
+        !    the phase change.
         !    The subcell split supports 2D triangle/quad elements; other
         !    element families fall back to the standard rule.
+        !
+        !    workspace%compute_interface_subcell computes this ONCE per
+        !    element and caches it on the workspace: THERMAL calls the same
+        !    method with its own (identical) constitutive manager, so the two
+        !    blocks always agree on where the interface is and never redo the
+        !    per-node calc_freezing_level_set evaluation twice.
         ! ----------------------------------------------------------------
-        is_cut = .false.
         use_subcell = self%enable_fringe_subcell_quadrature &
                       .and. self%physics%has_cryo_transport(workspace%material_id) &
                       .and. n_dim == 2
-        n_sub_qps = 0
-        if (use_subcell) then
+        call workspace%compute_interface_subcell(self%physics, workspace%material_id, &
+                                                 self%enable_fringe_subcell_quadrature)
+        is_cut = workspace%is_cut
+        num_subcell_quadrature_points = workspace%num_subcell_quadrature_points
+        if (num_subcell_quadrature_points > 0) then
+            subcell_quadrature_points(1:num_subcell_quadrature_points) = &
+                workspace%subcell_quadrature_points(1:num_subcell_quadrature_points)
+        end if
+
+        if (DEBUG_SUBCELL_COUNTER .and. use_subcell) then
+            ! Diagnostic-only: phi is recomputed locally here (cheap, O(n_nodes))
+            ! rather than exposed by compute_interface_subcell, since this
+            ! counter is dead in production (DEBUG_SUBCELL_COUNTER = .false.).
             do i = 1, n_nodes
-                call self%physics%calc_density_water(workspace%state(i), rho_w_node_sub)
-                call calc_T_high_celsius(workspace%P_node(i), rho_w_node_sub, T_high_node)
-                phi_nodes(i) = T_high_node - workspace%T_node(i)
+                call self%physics%calc_freezing_level_set(workspace%material_id, workspace%state(i), phi_nodes(i))
             end do
-            is_cut = any(phi_nodes(1:n_nodes) > 0.0d0) .and. any(phi_nodes(1:n_nodes) <= 0.0d0)
+            !$OMP ATOMIC UPDATE
+            dbg_elements_considered = dbg_elements_considered + 1
             if (is_cut) then
-                call build_interface_quadrature_points(workspace%fe, phi_nodes(1:n_nodes), sub_qps, n_sub_qps)
-                ! Unsupported element family: fall back to the standard rule
-                ! rather than silently dropping the diffusion integral.
-                if (n_sub_qps == 0) is_cut = .false.
+                !$OMP ATOMIC UPDATE
+                dbg_elements_cut = dbg_elements_cut + 1
             end if
+            !$OMP CRITICAL(subcell_debug_phi)
+            dbg_phi_min = min(dbg_phi_min, minval(phi_nodes(1:n_nodes)))
+            dbg_phi_max = max(dbg_phi_max, maxval(phi_nodes(1:n_nodes)))
+            dbg_abs_phi_min = min(dbg_abs_phi_min, minval(abs(phi_nodes(1:n_nodes))))
+            !$OMP END CRITICAL(subcell_debug_phi)
         end if
 
         ! ----------------------------------------------------------------
@@ -168,11 +218,17 @@ contains
         ! is untouched; only the path to it is bounded.
         call control%get_nonlinear_iter(nonlinear_iteration)
         capacity_regularization = 0.0d0
-        if (allocated(self%iteration_capacity_bound)) then
-            if (workspace%material_id >= 1 .and. &
-                workspace%material_id <= size(self%iteration_capacity_bound)) then
-                capacity_regularization = self%iteration_capacity_bound(workspace%material_id) / &
-                                          real(max(1, nonlinear_iteration), real64)
+        ! Diagnostic-only bypass for the FD-Jacobian audit (see
+        ! disable_capacity_regularization member doc): the term below is added
+        ! to the MATRIX only, never the residual, so the audit's FD comparison
+        ! target must be assembled without it to be comparable.
+        if (CAPACITY_REGULARIZATION_ENABLED .and. .not. self%disable_capacity_regularization) then
+            if (allocated(self%iteration_capacity_bound)) then
+                if (workspace%material_id >= 1 .and. &
+                    workspace%material_id <= size(self%iteration_capacity_bound)) then
+                    capacity_regularization = self%iteration_capacity_bound(workspace%material_id) / &
+                                              real(max(1, nonlinear_iteration), real64)
+                end if
             end if
         end if
 
@@ -213,33 +269,35 @@ contains
         ! coefficient that varies exponentially: it is exact for exponential K
         ! between two points and cannot exceed the larger nodal value.
         ! ----------------------------------------------------------------
-        if (.not. is_cut) then
-            do i = 1, n_nodes
+        ! Element transport coefficients, shared by the standard and subcell
+        ! paths so a cut/uncut flip does not change the discrete operator.
+        do i = 1, n_nodes
+            coeff_sub_mat(:, :) = 0.0d0
+            call self%compute_diffusion_term(workspace%material_id, workspace%state(i), coeff_sub_mat)
+            D_HH_node(i) = coeff_sub_mat(1, 1)
+
+            D_HT_node(i) = 0.0d0
+            if (coupling_flux_needed) then
                 coeff_sub_mat(:, :) = 0.0d0
-                call self%compute_diffusion_term(workspace%material_id, workspace%state(i), coeff_sub_mat)
-                D_HH_node(i) = coeff_sub_mat(1, 1)
+                call self%compute_coupling_diffusion_term(workspace%material_id, &
+                                                          workspace%state(i), coeff_sub_mat)
+                D_HT_node(i) = coeff_sub_mat(1, 1)
+            end if
 
-                D_HT_node(i) = 0.0d0
-                if (coupling_flux_needed) then
-                    coeff_sub_mat(:, :) = 0.0d0
-                    call self%compute_coupling_diffusion_term(workspace%material_id, &
-                                                              workspace%state(i), coeff_sub_mat)
-                    D_HT_node(i) = coeff_sub_mat(1, 1)
-                end if
+            V_node_tmp(:) = 0.0d0
+            call self%compute_advective_term(workspace%material_id, workspace%state(i), V_node_tmp)
+            V_node_mag(i) = sqrt(sum(V_node_tmp(:)**2))
+            if (i == 1) then
+                V_dir(:) = 0.0d0
+                if (V_node_mag(i) > 0.0d0) V_dir(:) = V_node_tmp(:) / V_node_mag(i)
+            end if
+        end do
 
-                V_node_tmp(:) = 0.0d0
-                call self%compute_advective_term(workspace%material_id, workspace%state(i), V_node_tmp)
-                V_node_mag(i) = sqrt(sum(V_node_tmp(:)**2))
-                if (i == 1) then
-                    V_dir(:) = 0.0d0
-                    if (V_node_mag(i) > 0.0d0) V_dir(:) = V_node_tmp(:) / V_node_mag(i)
-                end if
-            end do
+        D_HH_elem = geometric_mean(D_HH_node(1:n_nodes))
+        D_HT_elem = signed_geometric_mean(D_HT_node(1:n_nodes))
+        V_elem_mag = geometric_mean(V_node_mag(1:n_nodes))
 
-            D_HH_elem = geometric_mean(D_HH_node(1:n_nodes))
-            D_HT_elem = signed_geometric_mean(D_HT_node(1:n_nodes))
-            V_elem_mag = geometric_mean(V_node_mag(1:n_nodes))
-
+        if (.not. is_cut) then
             do i = 1, n_gauss
                 do d = 1, n_dim
                     workspace%work_D(d, d, i) = D_HH_elem
@@ -249,39 +307,48 @@ contains
             end do
         end if
 
-        ! Total-potential nodal driver (pore pressure + cryosuction) and its
-        ! temperature sensitivity.
+        ! p_w is the total-water-equivalent pressure of the closure, so the
+        ! liquid pressure is p_l = -s_eff. s_eff is read from the state the
+        ! phase split published (unclamped s_m), not from the public accessor.
         do i = 1, n_nodes
-            call workspace%state(i)%effective_suction%get(psi_eff_i)
-            P_gen_node(i) = -psi_eff_i
+            if (HYDRAULIC_DRIVER_TOTAL_POTENTIAL) then
+                call workspace%state(i)%effective_suction%get(psi_eff_i)
+                call workspace%state(i)%dSeff_dP%get(dSeff_dP_i)
+                call workspace%state(i)%dSeff_dT%get(dSeff_dT_i)
+                P_gen_node(i) = -psi_eff_i
+                dPgen_dP_node(i) = -dSeff_dP_i
+                dPgen_dT_node(i) = -dSeff_dT_i
+            else
+                P_gen_node(i) = workspace%P_node(i)
+                dPgen_dP_node(i) = 1.0d0
+                dPgen_dT_node(i) = 0.0d0
+            end if
         end do
-        dPgen_dT_node(:) = 0.0d0
-        if (coupling_block_needed) then
-            do i = 1, n_nodes
-                call self%physics%calc_cryo_head_dT(workspace%material_id, workspace%state(i), dh_dT_i)
-                dPgen_dT_node(i) = rho_std * g * dh_dT_i
-            end do
-        end if
 
         ! ----------------------------------------------------------------
-        ! 2. Mass Matrix K1 (LHS, factor bdf0)
+        ! 2. Mass Matrix K1 (LHS, factor bdf0).
+        !    Uncut element: standard Gauss rule (C_eq/C_HT from step 1).
+        !    Cut element: interface-split subcell rule, built in the SAME
+        !    q_s loop as the fluxes below (mat_C_sub/mat_C_HT_sub).
         ! ----------------------------------------------------------------
-        call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
-        if (present(K_HH)) then
-            do j = 1, n_nodes
-                do i = 1, n_nodes
-                    call K_HH%set(MATRIX_OPS%ADD, i, j, bdf0 * workspace%work_matrix(i, j))
+        if (.not. is_cut) then
+            call workspace%compute_K1(workspace%work_C, workspace%work_matrix)
+            if (present(K_HH)) then
+                do j = 1, n_nodes
+                    do i = 1, n_nodes
+                        call K_HH%set(MATRIX_OPS%ADD, i, j, bdf0 * workspace%work_matrix(i, j))
+                    end do
                 end do
-            end do
-        end if
+            end if
 
-        if (coupling_mass_needed) then
-            call workspace%compute_K1(work_C_HT, workspace%work_matrix)
-            do j = 1, n_nodes
-                do i = 1, n_nodes
-                    call K_HT%set(MATRIX_OPS%ADD, i, j, bdf0 * workspace%work_matrix(i, j))
+            if (coupling_mass_needed) then
+                call workspace%compute_K1(work_C_HT, workspace%work_matrix)
+                do j = 1, n_nodes
+                    do i = 1, n_nodes
+                        call K_HT%set(MATRIX_OPS%ADD, i, j, bdf0 * workspace%work_matrix(i, j))
+                    end do
                 end do
-            end do
+            end if
         end if
 
         ! ----------------------------------------------------------------
@@ -308,22 +375,16 @@ contains
             end if
 
             call workspace%compute_K2(workspace%work_D, workspace%work_matrix)
+            ! Column j of K2(D_HH) scaled by dP_gen/dp_w.
             if (present(K_HH)) then
                 do j = 1, n_nodes
                     do i = 1, n_nodes
-                        call K_HH%set(MATRIX_OPS%ADD, i, j, workspace%work_matrix(i, j))
+                        call K_HH%set(MATRIX_OPS%ADD, i, j, workspace%work_matrix(i, j) * dPgen_dP_node(j))
                     end do
                 end do
             end if
-            ! K_HT: consistent T-tangent of the total-potential flux
-            ! -K2(D_HH)*P_gen, i.e. column j of K2(D_HH) scaled by dP_gen/dT.
-            ! This block is NOT optional once P_gen drives the residual:
-            ! dP_gen/dT = -d psi_cryo/dT is ~1.2e6 Pa/K, so omitting it leaves
-            ! the pressure equation absorbing ~1e5 Pa of unmodelled forcing per
-            ! 0.1 K of temperature change - measured, resH/0 then runs to 5.6e3
-            ! and the conserved increment overflows. The dangerous off-diagonal
-            ! product with the thermal block is broken on the K_TH side instead
-            ! (thermal_matrix.F90), giving one-way T->p coupling.
+            ! K_HT also takes K2(D_HH) scaled by dP_gen/dT, independent of the
+            ! thermo-osmotic K2(D_HT) added above.
             if (coupling_block_needed) then
                 do j = 1, n_nodes
                     do i = 1, n_nodes
@@ -346,10 +407,47 @@ contains
             mat_HH_sub(:, :) = 0.0d0
             mat_HT_sub(:, :) = 0.0d0
             vec_V_sub(:) = 0.0d0
+            mat_C_sub(:, :) = 0.0d0
+            mat_C_HT_sub(:, :) = 0.0d0
+            vec_ddt_sub(:) = 0.0d0
 
-            do q_s = 1, n_sub_qps
-                r_sub%x = sub_qps(q_s)%xi
-                r_sub%y = sub_qps(q_s)%eta
+            ! Gather nodal BDF history once (T, P, ice content only -
+            ! compute_transient_term_mixed does not read porosity history).
+            ! Unset node history contributes zero, exactly as lerp_states
+            ! fills state_gp's history (see governing_base.F90).
+            n_hist = workspace%bdf_order + 1
+            T_hist_node(:, :) = 0.0d0
+            P_hist_node(:, :) = 0.0d0
+            Qi_hist_node(:, :) = 0.0d0
+            do i = 1, n_nodes
+                nullify (hist_ptr)
+                hist_is_set = .false.
+                call workspace%state(i)%temperature_history%get(hist_ptr, is_set=hist_is_set)
+                if (hist_is_set .and. associated(hist_ptr)) then
+                    hlen = min(size(hist_ptr), n_hist)
+                    T_hist_node(1:hlen, i) = hist_ptr(1:hlen)
+                end if
+
+                nullify (hist_ptr)
+                hist_is_set = .false.
+                call workspace%state(i)%pressure_history%get(hist_ptr, is_set=hist_is_set)
+                if (hist_is_set .and. associated(hist_ptr)) then
+                    hlen = min(size(hist_ptr), n_hist)
+                    P_hist_node(1:hlen, i) = hist_ptr(1:hlen)
+                end if
+
+                nullify (hist_ptr)
+                hist_is_set = .false.
+                call workspace%state(i)%ice_content_history%get(hist_ptr, is_set=hist_is_set)
+                if (hist_is_set .and. associated(hist_ptr)) then
+                    hlen = min(size(hist_ptr), n_hist)
+                    Qi_hist_node(1:hlen, i) = hist_ptr(1:hlen)
+                end if
+            end do
+
+            do q_s = 1, num_subcell_quadrature_points
+                r_sub%x = subcell_quadrature_points(q_s)%xi
+                r_sub%y = subcell_quadrature_points(q_s)%eta
                 r_sub%z = 0.0d0
 
                 call workspace%fe%lerp(r_sub, workspace%T_node(1:n_nodes), T_q_sub)
@@ -357,29 +455,44 @@ contains
                 call workspace%fe%lerp(r_sub, porosity_nodes(1:n_nodes), porosity_q_sub)
                 call workspace%fe%lerp(r_sub, workspace%Qi_node(1:n_nodes), Qi_q_sub)
 
+                do k = 1, n_hist
+                    call workspace%fe%lerp(r_sub, T_hist_node(k, 1:n_nodes), T_hist_sub(k))
+                    call workspace%fe%lerp(r_sub, P_hist_node(k, 1:n_nodes), P_hist_sub(k))
+                    call workspace%fe%lerp(r_sub, Qi_hist_node(k, 1:n_nodes), Qi_hist_sub(k))
+                end do
+
                 call state_sub%copy(workspace%state(1))
                 call state_sub%temperature%set(T_q_sub)
                 call state_sub%pressure%set(P_q_sub)
                 call state_sub%porosity%set(porosity_q_sub)
                 call state_sub%ice_content%set(Qi_q_sub)
+                call state_sub%temperature_history%set(T_hist_sub(1:n_hist))
+                call state_sub%pressure_history%set(P_hist_sub(1:n_hist))
+                call state_sub%ice_content_history%set(Qi_hist_sub(1:n_hist))
                 call self%update_water_phases(workspace%material_id, state_sub)
 
+                psi_sub(:) = 0.0d0
                 dpsi_dx_sub(:, :) = 0.0d0
-                call workspace%fe%calc_shape_function(r_sub, workspace%coordinates, &
+                call workspace%fe%calc_shape_function(r_sub, workspace%coordinates, psi=psi_sub, &
                                                       dpsi_dx=dpsi_dx_sub, determinant_jacobian=det_J_sub)
 
-                eff_weight_sub = sub_qps(q_s)%weight * abs(det_J_sub)
+                eff_weight_sub = subcell_quadrature_points(q_s)%weight * abs(det_J_sub)
 
-                coeff_sub_mat(:, :) = 0.0d0
-                call self%compute_diffusion_term(workspace%material_id, state_sub, coeff_sub_mat)
-                D_HH_sub = coeff_sub_mat(1, 1)
+                D_HH_sub = D_HH_elem
+                D_HT_sub = D_HT_elem
+                V_sub(:) = V_elem_mag * V_dir(:)
 
-                coeff_sub_mat(:, :) = 0.0d0
-                call self%compute_coupling_diffusion_term(workspace%material_id, state_sub, coeff_sub_mat)
-                D_HT_sub = coeff_sub_mat(1, 1)
-
-                V_sub(:) = 0.0d0
-                call self%compute_advective_term(workspace%material_id, state_sub, V_sub)
+                ! Storage term (Step 3): C_eq = dTheta/dp at the subcell point,
+                ! same pseudo-transient regularization as the Gauss-rule path,
+                ! plus its residual counterpart d(Theta)/dt.
+                call self%compute_iteration_capacity(workspace%material_id, state_sub, C_eq_sub)
+                C_eq_sub = C_eq_sub + capacity_regularization
+                C_HT_storage_sub = 0.0d0
+                if (coupling_mass_needed) then
+                    call self%compute_coupling_mass_term(workspace%material_id, state_sub, C_HT_storage_sub)
+                end if
+                call self%compute_transient_term_mixed(workspace%material_id, state_sub, &
+                                                       workspace%bdf_coeffs, d_dt_sub)
 
                 do j = 1, n_nodes
                     do i = 1, n_nodes
@@ -387,18 +500,23 @@ contains
                                            dot_product(dpsi_dx_sub(:, i), dpsi_dx_sub(:, j))
                         mat_HT_sub(i, j) = mat_HT_sub(i, j) + eff_weight_sub * D_HT_sub * &
                                            dot_product(dpsi_dx_sub(:, i), dpsi_dx_sub(:, j))
+                        mat_C_sub(i, j) = mat_C_sub(i, j) + eff_weight_sub * C_eq_sub * psi_sub(i) * psi_sub(j)
+                        mat_C_HT_sub(i, j) = mat_C_HT_sub(i, j) + &
+                                             eff_weight_sub * C_HT_storage_sub * psi_sub(i) * psi_sub(j)
                     end do
                 end do
                 do i = 1, n_nodes
                     vec_V_sub(i) = vec_V_sub(i) + eff_weight_sub * &
                                    dot_product(dpsi_dx_sub(:, i), V_sub)
+                    vec_ddt_sub(i) = vec_ddt_sub(i) + eff_weight_sub * d_dt_sub * psi_sub(i)
                 end do
             end do
 
             if (present(K_HH)) then
                 do j = 1, n_nodes
                     do i = 1, n_nodes
-                        call K_HH%set(MATRIX_OPS%ADD, i, j, mat_HH_sub(i, j))
+                        call K_HH%set(MATRIX_OPS%ADD, i, j, &
+                                      mat_HH_sub(i, j) * dPgen_dP_node(j) + bdf0 * mat_C_sub(i, j))
                     end do
                 end do
             end if
@@ -406,7 +524,8 @@ contains
                 do j = 1, n_nodes
                     do i = 1, n_nodes
                         call K_HT%set(MATRIX_OPS%ADD, i, j, &
-                                      mat_HT_sub(i, j) + mat_HH_sub(i, j) * dPgen_dT_node(j))
+                                      mat_HT_sub(i, j) + mat_HH_sub(i, j) * dPgen_dT_node(j) + &
+                                      bdf0 * mat_C_HT_sub(i, j))
                     end do
                 end do
             end if
@@ -431,9 +550,13 @@ contains
         ! 5. Residual Assembly
         ! ----------------------------------------------------------------
         if (present(F_H)) then
-            workspace%work_vec(:) = 0.0d0
-            call workspace%compute_R1(workspace%work_d_dt, workspace%work_vec)
-            local_vec_res(:) = local_vec_res(:) + workspace%work_vec(:)
+            if (is_cut) then
+                local_vec_res(:) = local_vec_res(:) + vec_ddt_sub(:)
+            else
+                workspace%work_vec(:) = 0.0d0
+                call workspace%compute_R1(workspace%work_d_dt, workspace%work_vec)
+                local_vec_res(:) = local_vec_res(:) + workspace%work_vec(:)
+            end if
 
             if (is_cut) then
                 local_vec_res(:) = local_vec_res(:) - vec_V_sub(:)
@@ -495,5 +618,21 @@ contains
         mean_value = exp(sum(log(abs(values))) / real(size(values), real64))
         if (all_negative) mean_value = -mean_value
     end function signed_geometric_mean
+
+    !> TEMPORARY Step-0 verification diagnostic; see interface doc comment.
+    module subroutine report_subcell_debug_counts_hydraulic(self)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+
+        if (.not. DEBUG_SUBCELL_COUNTER) return
+        write (*, '(A,I0,A,I0,A,ES12.4,A,ES12.4,A,ES12.4,A)') '   [SUBCELL-DEBUG] elements cut = ', dbg_elements_cut, &
+            ' / considered = ', dbg_elements_considered, ' | phi_min=', dbg_phi_min, ' phi_max=', dbg_phi_max, &
+            ' min|phi|=', dbg_abs_phi_min, ' (this assembly)'
+        dbg_elements_considered = 0
+        dbg_elements_cut = 0
+        dbg_phi_min = huge(1.0d0)
+        dbg_phi_max = -huge(1.0d0)
+        dbg_abs_phi_min = huge(1.0d0)
+    end subroutine report_subcell_debug_counts_hydraulic
 
 end submodule hydraulic_matrix

@@ -14,6 +14,13 @@ submodule(app_ftcms) ftcms_compute
     !> Verify that the linear solve returns an increment that actually satisfies
     !> the assembled system. Cheap (one extra matrix-vector product) and silent
     !> unless the defect exceeds the threshold.
+    !> Dump the assembled coupled system once for offline spectral analysis.
+    !> Diagnostic only; writes one plain-text triplet file and exits nothing.
+    logical, parameter :: JACOBIAN_DUMP = .false.
+    !> Nonlinear iteration at which to take the snapshot: deep enough that the
+    !> solve is already in trouble, before the iteration limit ends the step.
+    integer(int32), parameter :: JACOBIAN_DUMP_ITER = 25
+    logical, save :: jacobian_dump_done = .false.
     logical, parameter :: LINEAR_RESIDUAL_CHECK = .true.
     real(real64), parameter :: LINEAR_RESIDUAL_WARN = 1.0d-8
 contains
@@ -159,6 +166,23 @@ contains
         ! The T/p column-scale disparity (dH/dT ~ 1e6 vs dH/dp ~ 1e-3, cond ~ 1e13)
         ! otherwise makes even the direct solver return O(0.1) relative residuals.
         ! Solve (D A D)(D^-1 du) = D b; du is unscaled (du = D y) after the solve.
+        ! Spectral diagnostic: dump the assembled system once, deep inside a
+        ! struggling nonlinear solve, so the operator can be analysed properly
+        ! (eigenvalues, singular values, block Schur complement) instead of
+        ! inferred from row magnitudes. Written BEFORE equilibration so the
+        ! matrix is the one the physics produced; the equilibration scale is
+        ! written alongside it.
+        if (JACOBIAN_DUMP .and. .not. jacobian_dump_done) then
+            block
+                integer(int32) :: dump_iter
+                call self%control%get_nonlinear_iter(dump_iter)
+                if (dump_iter >= JACOBIAN_DUMP_ITER) then
+                    jacobian_dump_done = .true.
+                    call dump_linear_system(K_ptr, F_ptr, dump_iter)
+                end if
+            end block
+        end if
+
         call jacobi_equilibrate_bsr(K_ptr, F_ptr, equil_scale)
         matrix_ierr = MATRIX_STATUS%SUCCESS%ID
         call K_ptr%commit_to_mkl(matrix_ierr)
@@ -590,27 +614,56 @@ contains
         type(type_coordinate_dp), intent(inout) :: water_flux
         type(type_constant_id), pointer :: computation_type => null()
         real(real64) :: K_wT, K_wP_raw, K_wP, rho_w, gravity_term
+        type(type_coordinate_dp) :: grad_Pgen
         call self%domain%get_computation_type(computation_type)
         call self%hydraulic%calc_K_wT(material_id, state, K_wT)
         call self%hydraulic%calc_K_wP(material_id, state, K_wP_raw)
         call self%thermal%calc_density_water(state, rho_w)
         K_wP = merge(K_wP_raw / (rho_w * g), 0.0d0, rho_w > tiny(1.0d0))
         gravity_term = K_wP_raw
+        call driver_gradient(state, grad_T, grad_P, grad_Pgen)
         select case (computation_type%ID)
         case (COMP_TYPES%XY_2D%ID)
-            water_flux%x = -K_wT * grad_T%x - K_wP * grad_P%x
-            water_flux%y = -K_wT * grad_T%y - K_wP * grad_P%y
+            water_flux%x = -K_wT * grad_T%x - K_wP * grad_Pgen%x
+            water_flux%y = -K_wT * grad_T%y - K_wP * grad_Pgen%y
             water_flux%z = 0.0d0
         case (COMP_TYPES%XZ_2D%ID)
-            water_flux%x = -K_wT * grad_T%x - K_wP * grad_P%x
+            water_flux%x = -K_wT * grad_T%x - K_wP * grad_Pgen%x
             water_flux%y = 0.0d0
-            water_flux%z = -K_wT * grad_T%z - K_wP * grad_P%z - gravity_term
+            water_flux%z = -K_wT * grad_T%z - K_wP * grad_Pgen%z - gravity_term
         case (COMP_TYPES%XYZ_3D%ID)
-            water_flux%x = -K_wT * grad_T%x - K_wP * grad_P%x
-            water_flux%y = -K_wT * grad_T%y - K_wP * grad_P%y
-            water_flux%z = -K_wT * grad_T%z - K_wP * grad_P%z - gravity_term
+            water_flux%x = -K_wT * grad_T%x - K_wP * grad_Pgen%x
+            water_flux%y = -K_wT * grad_T%y - K_wP * grad_Pgen%y
+            water_flux%z = -K_wT * grad_T%z - K_wP * grad_Pgen%z - gravity_term
         end select
     end subroutine calc_water_flux_ftcms
+
+    !> Gradient of the Darcy driver: grad(I_h p_l), the same discrete object
+    !> the hydraulic residual applies the FE operator to.
+    !>
+    !> Reconstructing it by the chain rule instead would put d(s_eff)/dX into
+    !> the residual VALUE, and s_eff is only C^1, so the thermal advection this
+    !> flux feeds would stop being differentiable in the unknowns. grad_Pl is
+    !> unset on nodal states, where this flux is output only; grad_P is the
+    !> fallback there and the exact answer for the pore-pressure driver.
+    subroutine driver_gradient(state, grad_T, grad_P, grad_Pgen)
+        implicit none
+        ! target: get_field_coord returns a pointer into state.
+        type(type_state), intent(in), target :: state
+        type(type_coordinate_dp), intent(in) :: grad_T, grad_P
+        type(type_coordinate_dp), intent(inout) :: grad_Pgen
+
+        type(type_coordinate_dp), pointer :: grad_Pl
+        logical :: is_set
+
+        nullify (grad_Pl)
+        grad_Pgen = grad_P
+        if (.not. HYDRAULIC_DRIVER_TOTAL_POTENTIAL) return
+
+        is_set = .false.
+        call state%grad_Pl%get(grad_Pl, is_set)
+        if (is_set .and. associated(grad_Pl)) grad_Pgen = grad_Pl
+    end subroutine driver_gradient
 
     !> Calculate water vapor flux vector
     module subroutine calc_vapor_flux_ftcms(self, material_id, state, grad_T, grad_P, water_flux)
@@ -646,5 +699,58 @@ contains
             water_flux%z = -K_vT * grad_T%z - K_vP * grad_P%z
         end select
     end subroutine calc_vapor_flux_ftcms
+
+    !> Write the assembled coupled system to a plain-text triplet file.
+    !>
+    !> Row/column indices are global DOFs in the solver's own ordering, so the
+    !> file can be read back without knowing the FE numbering: what matters for
+    !> a spectral study is the operator, not which node a row belongs to. The
+    !> block size is in the header so the thermal and hydraulic sub-blocks can
+    !> be separated offline.
+    subroutine dump_linear_system(K, F, iteration)
+        implicit none
+        class(abst_matrix), intent(in) :: K
+        type(type_vector_dp), intent(in) :: F
+        integer(int32), intent(in) :: iteration
+
+        real(real64), pointer :: rhs(:)
+        integer(int32) :: br, i, gi, gj, nb, ncb, ios, unit_dump, j
+        character(len=256) :: filename
+
+        select type (K)
+        type is (type_matrix_bsr)
+            write (filename, '(A,I0,A)') 'jacobian_dump_iter', iteration, '.txt'
+            open (newunit=unit_dump, file=trim(filename), status='replace', &
+                  action='write', iostat=ios)
+            if (ios /= 0) return
+            nb = K%num_block_rows
+            ncb = K%num_block_cols
+            nullify (rhs)
+            rhs => F%get_data()
+            write (unit_dump, '(A,3(1X,I0))') '# nrows nnz_blocks block_size', &
+                K%num_rows, K%nnz, nb
+            do br = 1, K%num_ptrs - 1
+                do i = K%ptr(br), K%ptr(br + 1) - 1
+                    do gi = 1, nb
+                        do gj = 1, ncb
+                            if (K%val(gi, gj, i) == 0.0d0) cycle
+                            write (unit_dump, '(2(1X,I0),1X,ES23.16)') &
+                                (br - 1) * nb + gi, (K%ind(i) - 1) * ncb + gj, &
+                                K%val(gi, gj, i)
+                        end do
+                    end do
+                end do
+            end do
+            write (unit_dump, '(A)') '# rhs'
+            if (associated(rhs)) then
+                do j = 1, size(rhs)
+                    write (unit_dump, '(1X,I0,1X,ES23.16)') j, rhs(j)
+                end do
+            end if
+            close (unit_dump)
+            write (*, '(A,A)') '   [DUMP] linear system written to ', trim(filename)
+            nullify (rhs)
+        end select
+    end subroutine dump_linear_system
 
 end submodule ftcms_compute

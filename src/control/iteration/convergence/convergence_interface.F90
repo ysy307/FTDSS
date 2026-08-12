@@ -149,8 +149,49 @@ module control_iteration_convergence
         !> The floor is derived, not tuned: an imbalance R may not move the nodal
         !> conserved quantity by more than its own atol over the step, so
         !> |R_i| <= atol * V_i / dt, hence ||R||_2 <= atol * V_total / (dt*sqrt(N)).
+        !>
+        !> Retained only for the mean-volume-floor fallback path (no nodal
+        !> volumes supplied) of the local gate below and for the line-search
+        !> merit scaling in ftcms_solve.F90; it is not part of the acceptance
+        !> decision on the exact per-node path.
         real(real64), private :: residual_volume_total = -1.0d0
         real(real64), private :: residual_dt = -1.0d0
+        !> Nodal control volumes V_i = sum_e int psi_i dOmega [m3], one entry
+        !> per domain node, in the same node ordering as enthalpy/density and
+        !> the per-block residual vectors. Built once (mesh is static) from the
+        !> FE row-sum-lumped mass matrix (see set_residual_scale). Size 0 means
+        !> "not supplied": the local gate then falls back to the mean-volume
+        !> floor (residual_volume_total / N) for backward compatibility.
+        real(real64), allocatable, private :: nodal_volume(:)
+        !> Nodal storage sensitivity of the thermal conserved quantity to its
+        !> primary variable, \( s_i = (\partial H/\partial T)_i \) [J/(m3 K)].
+        !> State-dependent, unlike nodal_volume: refreshed every time the
+        !> nodal conserved quantities themselves are recomputed (see
+        !> set_residual_scale and its call site in
+        !> solve_time_step_check_convergence_conserved). Size 0 means "not
+        !> supplied": local_error_block then returns its not-available
+        !> sentinel and the caller falls back to the mean-volume floor gate.
+        real(real64), allocatable, private :: dH_dT(:)
+        !> Nodal storage sensitivity of the hydraulic conserved quantity
+        !> (water-equivalent mass density) to pressure,
+        !> \( s_i = (\partial \rho_{eq}/\partial p)_i \) [kg/(m3 Pa)].
+        real(real64), allocatable, private :: drho_dp(:)
+        !> Nodal snapshot of the primary variable itself (temperature [C] or
+        !> pressure [Pa]) used only to evaluate the atol+rtol|u_i| tolerance
+        !> weight in local_error_block. Refreshed together with dH_dT/drho_dp.
+        real(real64), allocatable, private :: u_thermal(:)
+        real(real64), allocatable, private :: u_hydraulic(:)
+        !> ATS error-control tolerances (adaptive_stepping/error_control in
+        !> Conditions.json: error_absolute_tolerance_temperature,
+        !> error_absolute_tolerance_pressure, error_relative_tolerance). Read
+        !> once via a getter on the time/ATS controller (see
+        !> ftcms_solve.F90:solve_time_step_initial_setup) and reused as the
+        !> primary-variable tolerance scale in local_error_block, so the
+        !> nonlinear solve is held to the same accuracy standard the time
+        !> integrator itself already accepts.
+        real(real64), private :: atol_temperature_u = 1.0d-3
+        real(real64), private :: atol_pressure_u = 1.0d1
+        real(real64), private :: rtol_u = 1.0d-2
         !> Nodal conserved quantities at the previous nonlinear iterate
         real(real64), allocatable, private :: enthalpy_prev(:)
         real(real64), allocatable, private :: density_prev(:)
@@ -172,6 +213,22 @@ module control_iteration_convergence
         !> (kappa >= 1), relaxed back toward 1 when it contracts. Replaces ad-hoc
         !> per-variable step clamps with a principled, condition-agnostic globalization.
         real(real64), private :: relaxation_omega = 1.0d0
+        ! --- Global conserved-quantity drift budget (criterion 2) ---
+        !> Realized drift (sum_i R_i)*dt of the last iterate evaluated by
+        !> check_conserved, per block. Not yet folded into the cumulative
+        !> total below: that happens only when the caller confirms the step
+        !> was actually accepted (commit_conserved_drift), since a converged
+        !> nonlinear iterate can still be rejected afterward (LTE, outer phase
+        !> loop) without ever becoming part of the accepted-history budget.
+        real(real64), private :: pending_drift_thermal = 0.0d0
+        real(real64), private :: pending_drift_hydraulic = 0.0d0
+        logical, private :: pending_drift_thermal_valid = .false.
+        logical, private :: pending_drift_hydraulic_valid = .false.
+        !> Cumulative realized drift D_block = sum over accepted steps of
+        !> (sum_i R_i)*dt, signed [J for thermal, kg for hydraulic]. A V&V
+        !> observable, not an acceptance gate (see check_conserved).
+        real(real64), private :: cumulative_drift_thermal = 0.0d0
+        real(real64), private :: cumulative_drift_hydraulic = 0.0d0
     contains
         ! ---- Lifecycle ----
         procedure, public, pass(self) :: initialize => initialize_convergence_control
@@ -199,6 +256,8 @@ module control_iteration_convergence
         procedure, public, pass(self) :: compute_error_norm => compute_error_norm_convergence_control
         procedure, public, pass(self) :: get_conserved_relaxation => get_conserved_relaxation_convergence_control
         procedure, public, pass(self) :: get_conserved_dq_norm => get_conserved_dq_norm_convergence_control
+        procedure, public, pass(self) :: commit_conserved_drift => commit_conserved_drift_convergence_control
+        procedure, public, pass(self) :: local_error_block => local_error_block_convergence_control
         ! ---- Meta / Utility ----
     end type type_convergence_control
 
@@ -313,11 +372,32 @@ module control_iteration_convergence
             real(real64), intent(inout) :: floor_hydraulic
         end subroutine get_residual_floors_convergence_control
 
-        module subroutine set_residual_scale_convergence_control(self, volume_total, dt)
+        !> Supply the discretization scales the residual gates are built from.
+        !> nodal_volume, when present and non-empty, is copied into the stored
+        !> per-node control-volume array used by the exact local gate; when
+        !> absent the previously stored array (if any) is left unchanged, so
+        !> callers that only refresh dt every attempt (the mesh is static) do
+        !> not need to resupply it. dH_dT/drho_dp/u_thermal/u_hydraulic follow
+        !> the same "absent keeps previous value" convention, but are state-
+        !> dependent and so are resupplied every time the nodal conserved
+        !> quantities are recomputed (see local_error_block). The ATS
+        !> tolerance scalars are static run configuration and are supplied
+        !> once, at the same call that first builds nodal_volume.
+        module subroutine set_residual_scale_convergence_control(self, volume_total, dt, nodal_volume, &
+                                                                  dH_dT, drho_dp, u_thermal, u_hydraulic, &
+                                                                  atol_temperature_u, atol_pressure_u, rtol_u)
             implicit none
             class(type_convergence_control), intent(inout) :: self
             real(real64), intent(in) :: volume_total
             real(real64), intent(in) :: dt
+            real(real64), intent(in), optional :: nodal_volume(:)
+            real(real64), intent(in), optional :: dH_dT(:)
+            real(real64), intent(in), optional :: drho_dp(:)
+            real(real64), intent(in), optional :: u_thermal(:)
+            real(real64), intent(in), optional :: u_hydraulic(:)
+            real(real64), intent(in), optional :: atol_temperature_u
+            real(real64), intent(in), optional :: atol_pressure_u
+            real(real64), intent(in), optional :: rtol_u
 
         end subroutine set_residual_scale_convergence_control
 
@@ -391,6 +471,51 @@ module control_iteration_convergence
             class(type_convergence_control), intent(in) :: self
             real(real64) :: dq_norm
         end function get_conserved_dq_norm_convergence_control
+
+        !> Fold the pending realized drift of the last check_conserved
+        !> evaluation into the cumulative per-block budget, once the caller
+        !> has confirmed the step is genuinely accepted (i.e. not later
+        !> rejected by LTE or the outer phase loop). See check_conserved for
+        !> the per-step drift bound this cumulative total is tracked against.
+        module subroutine commit_conserved_drift_convergence_control(self)
+            implicit none
+            class(type_convergence_control), intent(inout) :: self
+        end subroutine commit_conserved_drift_convergence_control
+
+        !> Local nonlinear-error measure for one conserved block, expressed in
+        !> the units of that block's own primary variable (K for thermal, Pa
+        !> for hydraulic) rather than the conserved quantity's own units.
+        !>
+        !> Mathematical definition:
+        !> \[ E_b = \sqrt{\frac{1}{N}\sum_{i=1}^N \left[\frac{R_i\,\Delta t /
+        !>    V_i}{s_i\,\tau_i}\right]^2}, \qquad
+        !>    \tau_i = f_{NL}\,(atol_u + rtol_u\,|u_i|) \]
+        !> with \(R_i\) the assembled block residual, \(V_i\) the nodal
+        !> control volume, \(s_i\) the nodal storage sensitivity (dH/dT or
+        !> d rho_eq/dp, floored away from zero) and \(u_i\) the primary
+        !> variable snapshot, all supplied by set_residual_scale.
+        !> \(R_i\Delta t/V_i\) is the conserved-quantity error the residual
+        !> would cause if sustained over the step [J/m3 or kg/m3]; dividing
+        !> by \(s_i\) converts it into the primary variable's own error
+        !> [K or Pa], measured against the same atol/rtol the time integrator
+        !> already accepts (scaled by \(f_{NL}\) = NONLINEAR_TO_LTE_FACTOR).
+        !> Assumptions: nodal_volume and the block's sensitivity/primary-
+        !> variable snapshot were supplied and match residual in size;
+        !> otherwise returns the sentinel -1 so the caller can fall back to
+        !> the mean-volume floor gate (get_residual_floors).
+        !> Numerical guarantees: none beyond IEEE arithmetic.
+        !> Computational complexity: O(N) time, O(1) additional memory.
+        !> Failure behavior: returns -1 on any missing or mismatched input;
+        !> never aborts.
+        module function local_error_block_convergence_control(self, physics_type, residual) result(e_local)
+            implicit none
+            class(type_convergence_control), intent(in) :: self
+            !> Block identifier (PHYSICS_TYPES%THERMAL or PHYSICS_TYPES%HYDRAULIC)
+            type(type_constant_id), intent(in) :: physics_type
+            !> Assembled block residual at the current (trial) iterate
+            real(real64), intent(in) :: residual(:)
+            real(real64) :: e_local
+        end function local_error_block_convergence_control
 
     end interface
 

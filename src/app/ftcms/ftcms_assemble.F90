@@ -14,6 +14,11 @@ submodule(app_ftcms) ftcms_assemble
     !> pressure increment is over-predicted by the same factor, which is what
     !> drove the hydraulic residual to 1e3 times its step-initial value and left
     !> the line search with no admissible step.
+    !>
+    !> Superseded, for elements where both physics are active, by
+    !> FULL_FD_TANGENT (declared in the parent module, ftcms_interface.F90):
+    !> when that switch is .true. this parameter is not consulted for such
+    !> elements. It remains the active path when FULL_FD_TANGENT is .false.
     logical, parameter :: COUPLING_TH_FINITE_DIFFERENCE = .true.
 
     !> Solve the hydraulic block in the total potential rather than in the pore
@@ -35,13 +40,9 @@ submodule(app_ftcms) ftcms_assemble
     !> reference formulation solves for the total head.
     logical, parameter :: TOTAL_POTENTIAL_UNKNOWN = .false.
 
-    !> Overwrite the Gauss-point dQi/dT with the node-interpolated value.
-    !>
-    !> update_water_phases computes dQi/dT consistently at the Gauss point from
-    !> that point's own (T, p); replacing it by an interpolation of the nodal
-    !> values makes the apparent heat capacity in K_TT a different number from
-    !> the derivative of the enthalpy the residual integrates at that point.
-    logical, parameter :: LERP_NODAL_DQI_DT = .true.
+    ! LERP_NODAL_DQI_DT and FULL_FD_TANGENT are declared in the parent module
+    ! (app_ftcms, ftcms_interface.F90) so this submodule and
+    ! ftcms_fd_jacobian.F90 gate the same switches; see the doc comments there.
 
 contains
 
@@ -66,6 +67,13 @@ contains
 
         logical :: use_scatter, do_thermal, do_hydraulic
         logical :: do_thermal_elem, do_hydraulic_elem
+        !> Per-element success flag of assemble_tangent_fd (see FULL_FD_TANGENT
+        !> below); .false. triggers the analytic-block fallback for that element.
+        logical :: fd_tangent_ok
+        !> Count of elements where assemble_tangent_fd fell back to the
+        !> analytic blocks in this assembly sweep, summed across colors and
+        !> threads; reported once after the parallel region, only if nonzero.
+        integer(int32) :: fd_tangent_fallback_count
 
         call self%control%profiler_start(PROFILER_TYPES%ASSEMBLE)
 
@@ -101,14 +109,16 @@ contains
         end if
 
         use_scatter = .true.
+        fd_tangent_fallback_count = 0
 
         !$OMP PARALLEL IF(do_hydraulic .or. do_thermal) DEFAULT(NONE) &
         !$OMP SHARED(self, num_colors, elements_list, num_elements_in_color, &
-        !$OMP        thermal_dof, hydraulic_dof, use_scatter, do_thermal, do_hydraulic) &
+        !$OMP        thermal_dof, hydraulic_dof, use_scatter, do_thermal, do_hydraulic, &
+        !$OMP        fd_tangent_fallback_count) &
         !$OMP PRIVATE(i_color, i_elem, elem_id, p_connectivity, workspace, &
         !$OMP         local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
         !$OMP         local_F_T, local_F_H, elem_coords, raw_elem_coords, num_nodes_local, &
-        !$OMP         do_thermal_elem, do_hydraulic_elem)
+        !$OMP         do_thermal_elem, do_hydraulic_elem, fd_tangent_ok)
 
         do i_color = 1, num_colors
 
@@ -135,8 +145,44 @@ contains
                     call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
                                              local_F_T, local_F_H)
 
-                    if (COUPLING_TH_FINITE_DIFFERENCE .and. do_thermal_elem .and. do_hydraulic_elem) then
-                        call self%assemble_coupling_fd(workspace, local_F_T, local_K_TH)
+                    ! An element where only one physics is active has no
+                    ! coupling residual to difference against (the other
+                    ! block's assemble_local was never called, see
+                    ! assemble_local_ftcms), so it always keeps the analytic
+                    ! path; the choice below is only between the two coupled
+                    ! FD variants for elements where both physics are active.
+                    if (do_thermal_elem .and. do_hydraulic_elem) then
+                        if (FULL_FD_TANGENT) then
+                            ! Overwrites all four blocks with the true element
+                            ! tangent, then restores the capacity_regularization
+                            ! contribution onto K_HH (see restore_capacity_
+                            ! regularization below): it is NOT a Picard-only
+                            ! artifact safe to drop - measured, removing it made
+                            ! K_HH's Frobenius norm collapse by ~1e6 as soon as
+                            ! the state moved off the initial condition even in
+                            ! a fully unfrozen, mild element, which is exactly
+                            ! the near-singular pressure row the regularization
+                            ! exists to bound, independent of whether the rest
+                            ! of the block is Picard-lagged or an exact tangent.
+                            call self%assemble_tangent_fd(workspace, local_F_T, local_F_H, &
+                                                          local_K_TT, local_K_TH, local_K_HT, local_K_HH, &
+                                                          fd_tangent_ok)
+                            if (fd_tangent_ok) then
+                                ! Skipped while the regularization is off
+                                ! (CAPACITY_REGULARIZATION_ENABLED): re-adding
+                                ! it here would put back on the FD block the
+                                ! very matrix-only term that makes K differ
+                                ! from dR/du.
+                                if (CAPACITY_REGULARIZATION_ENABLED) then
+                                    call restore_capacity_regularization(self, workspace, local_K_HH)
+                                end if
+                            else
+                                !$OMP ATOMIC UPDATE
+                                fd_tangent_fallback_count = fd_tangent_fallback_count + 1
+                            end if
+                        else if (COUPLING_TH_FINITE_DIFFERENCE) then
+                            call self%assemble_coupling_fd(workspace, local_F_T, local_K_TH)
+                        end if
                     end if
 
                     if (TOTAL_POTENTIAL_UNKNOWN .and. do_thermal_elem .and. do_hydraulic_elem) then
@@ -179,6 +225,16 @@ contains
         if (allocated(raw_elem_coords)) deallocate (raw_elem_coords)
 
         !$OMP END PARALLEL
+
+        ! TEMPORARY Step-0 verification diagnostic (see hydraulic_matrix.F90,
+        ! report_subcell_debug_counts_hydraulic); no-op unless that submodule's
+        ! DEBUG_SUBCELL_COUNTER parameter is set to .true.
+        call self%hydraulic%report_subcell_debug_counts()
+
+        if (fd_tangent_fallback_count > 0) then
+            write (*, '(A,I0,A)') '   [FULL-FD-TANGENT] fell back to the analytic block on ', &
+                fd_tangent_fallback_count, ' element(s) (non-finite finite-difference column)'
+        end if
 
         call self%control%profiler_stop(PROFILER_TYPES%ASSEMBLE)
 
@@ -312,6 +368,64 @@ contains
         end if
 
     end subroutine assemble_local_ftcms
+
+    !> Re-add the pseudo-transient capacity regularization (hydraulic_matrix.F90,
+    !> assemble_local_picard_hydraulic) onto a K_HH block that was overwritten
+    !> by the finite-difference tangent.
+    !>
+    !> The FD tangent (assemble_tangent_fd_ftcms) never contains this term:
+    !> assemble_local_picard_hydraulic adds it to the K_HH MATRIX only, never
+    !> to F_H, and assemble_tangent_fd only ever calls assemble_local with F_H
+    !> requested, never K_HH - so the difference-quotient tangent is exactly
+    !> the term this regularization was designed to augment, with the
+    !> regularization itself absent.
+    !>
+    !> That is not safe to leave out: measured on a fully unfrozen, mild
+    !> element at the very first assembly of a run, dropping it collapsed
+    !> K_HH's Frobenius norm by about six orders of magnitude the moment the
+    !> state moved off the initial condition, which is the same near-singular
+    !> pressure row hydraulic_matrix.F90's own comment describes at the
+    !> freezing front - the regularization guards the pressure row's
+    !> conditioning in general, not specifically a Picard-lag artifact, so a
+    !> true Newton tangent needs it too.
+    !>
+    !> Uses type_hydraulic%get_capacity_regularization, a pure function of the
+    !> per-material bound array set once at initialize, instead of toggling
+    !> the shared disable_capacity_regularization flag and re-assembling K_HH
+    !> (which would race across the parallel element loop's threads): this
+    !> keeps the fix confined to workspace-local data.
+    subroutine restore_capacity_regularization(self, workspace, K_HH)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        type(type_assemble_workspace), intent(inout) :: workspace
+        !> K_HH as overwritten by assemble_tangent_fd; the regularization
+        !> contribution is added on top
+        type(type_matrix_dense), intent(inout) :: K_HH
+
+        real(real64) :: capacity_regularization, bdf0
+        real(real64) :: capacity_gp(workspace%num_fe_gauss)
+        real(real64) :: mass_matrix(workspace%num_fe_nodes, workspace%num_fe_nodes)
+        real(real64), pointer :: values(:, :)
+        integer(int32) :: nonlinear_iteration, i, j, n
+
+        call self%control%get_nonlinear_iter(nonlinear_iteration)
+        capacity_regularization = self%hydraulic%get_capacity_regularization(workspace%material_id, nonlinear_iteration)
+        if (capacity_regularization <= 0.0d0) return
+
+        n = workspace%num_fe_nodes
+        bdf0 = workspace%bdf_coeffs(1)
+        capacity_gp(:) = capacity_regularization
+        call workspace%compute_K1(capacity_gp, mass_matrix)
+
+        nullify (values)
+        values => K_HH%get_val()
+        do j = 1, n
+            do i = 1, n
+                values(i, j) = values(i, j) + bdf0 * mass_matrix(i, j)
+            end do
+        end do
+        nullify (values)
+    end subroutine restore_capacity_regularization
 
     !> Apply the column substitution du_p = du_g + c du_T to one element.
     subroutine transform_to_total_potential(self, workspace, K_TT, K_TH, K_HH, K_HT)

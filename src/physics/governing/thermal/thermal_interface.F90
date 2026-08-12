@@ -5,7 +5,7 @@ module physics_governing_thermal
     use :: module_input, only:type_input, input_translator
     use :: module_linalg
     use :: module_constitutive, only:type_constitutive_manager
-    use :: physics_governing_base, only:type_assemble_workspace
+    use :: physics_governing_base, only:type_assemble_workspace, HYDRAULIC_DRIVER_TOTAL_POTENTIAL
     implicit none
     private
 
@@ -20,6 +20,12 @@ module physics_governing_thermal
         integer(int32) :: computation_type
         integer(int32) :: computation_dimension
         logical :: enable_vapor_transport = .true.
+        !> Gate for the interface-split subcell quadrature (see
+        !> thermal_matrix.F90 cut branch and domain_fe_subcell). Same source
+        !> as type_hydraulic%enable_fringe_subcell_quadrature
+        !> (input%basic%analysis_controls%enable_fringe_subcell_quadrature),
+        !> so the two governing blocks are never gated differently.
+        logical :: enable_fringe_subcell_quadrature = .true.
         type(type_constitutive_manager) :: physics
 
         ! Enthalpy cache for BDF history terms

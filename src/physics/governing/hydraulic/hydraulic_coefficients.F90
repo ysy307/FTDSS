@@ -22,9 +22,9 @@ contains
         call self%physics%calc_Kflh(material_id, state, K_flh)
         call self%calc_K_vP(material_id, state, K_vP)
         call self%physics%calc_density_water(state, rho_w)
-        ! Pressure is the actual pore-water pressure used by retention,
-        ! relative permeability, and the Darcy potential. Ice impedance is a
-        ! separate multiplicative conductivity factor.
+        ! One coefficient for both phases presumes a shared driver; the
+        ! liquid-pressure driver breaks that, hence the guard in
+        ! initialize_type_hydraulic.
         coeff_D = (K_flh + K_vP) / (rho_w * g)
 
         D_HH(:, :) = 0.0d0
@@ -73,7 +73,7 @@ contains
     ! Coupling Coefficients
     ! ==========================================================================
 
-    !> @brief Calculate Coupling Mass Term C_HT = dTheta/dT
+    !> @brief Calculate Coupling Mass Term C_HT = dTheta/dT + vapor storage tangent.
     module subroutine compute_coupling_mass_term_hydraulic(self, material_id, state, C_HT)
         implicit none
         class(type_hydraulic), intent(in) :: self
@@ -81,34 +81,23 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: C_HT
 
-        real(real64) :: rho_w, rho_i, Qi
-        real(real64) :: drho_w_dT, drho_i_dT, dratio_dT
-        real(real64) :: dQw_dT, dQi_dT, dQv_dT
-        drho_w_dT = 0.0d0
-        drho_i_dT = 0.0d0
-        dratio_dT = 0.0d0
-        dQw_dT = 0.0d0
-        dQi_dT = 0.0d0
-        dQv_dT = 0.0d0
+        real(real64) :: dTheta_dT, dQv_dT_term
 
-        call state%ice_content%get(Qi)
-        call state%dQw_dT%get(dQw_dT)
-        call state%dQi_dT%get(dQi_dT)
+        dTheta_dT = 0.0d0
+        dQv_dT_term = 0.0d0
+
+        call state%dTheta_dT%get(dTheta_dT)
         if (self%enable_vapor_transport) then
-            call state%dQv_dT%get(dQv_dT)
-        end if
-
-        call self%physics%calc_density_water(state, rho_w)
-        call self%physics%calc_density_ice(state, rho_i)
-        call self%physics%calc_density_water_derivatives(material_id, state, dden_dT=drho_w_dT)
-        call self%physics%calc_density_ice_derivatives(material_id, state, dden_dT=drho_i_dT)
-        if (abs(rho_w) > tiny(1.0d0)) then
-            dratio_dT = drho_i_dT / rho_w - rho_i * drho_w_dT / (rho_w * rho_w)
+            call state%dQv_dT%get(dQv_dT_term)
         end if
 
         ! Modified Picard freezes this physical storage tangent at the current
         ! iterate while solving the coupled temperature-pressure increment.
-        C_HT = dQw_dT + (rho_i / rho_w) * dQi_dT + Qi * dratio_dT + dQv_dT
+        ! dTheta_dT is evaluated directly by calc_phase_split (see
+        ! phase_systems.F90), not recombined from dQw_dT + (rho_i/rho_w)*dQi_dT
+        ! + Qi*d(rho_i/rho_w)/dT: that recombination adds a ratio-derivative
+        ! term calc_phase_split's own derivatives do not carry.
+        C_HT = dTheta_dT + dQv_dT_term
 
     end subroutine compute_coupling_mass_term_hydraulic
 
@@ -299,7 +288,8 @@ contains
         rho_eff = rho_w * Qw + rho_i * Qi + rho_w * Qv + rho_std * compressive_storage
     end subroutine calc_effective_density_value_hydraulic
 
-    !> @brief Compute equivalent specific moisture capacity C_eq = dTheta/dP.
+    !> @brief Compute equivalent specific moisture capacity
+    !> C_eq = dTheta/dP + vapor storage tangent + compressible-storage capacity.
     module subroutine compute_C_eq_hydraulic(self, material_id, state, C_eq)
         implicit none
         class(type_hydraulic), intent(in) :: self
@@ -307,37 +297,27 @@ contains
         type(type_state), intent(in) :: state
         real(real64), intent(inout) :: C_eq
 
-        real(real64) :: rho_w, rho_i, Qi
-        real(real64) :: drho_w_dP, drho_i_dP, dratio_dP
-        real(real64) :: dQw_dP, dQi_dP, dQv_dP
+        real(real64) :: dTheta_dP, dQv_dP_term
         real(real64) :: compressive_capacity, compressive_storage
 
-        drho_w_dP = 0.0d0
-        drho_i_dP = 0.0d0
-        dratio_dP = 0.0d0
-        dQw_dP = 0.0d0
-        dQi_dP = 0.0d0
-        dQv_dP = 0.0d0
+        dTheta_dP = 0.0d0
+        dQv_dP_term = 0.0d0
 
-        call state%ice_content%get(Qi)
-        call state%dQw_dP%get(dQw_dP)
-        call state%dQi_dP%get(dQi_dP)
-        call state%dQv_dP%get(dQv_dP)
-
-        call self%physics%calc_density_water(state, rho_w)
-        call self%physics%calc_density_ice(state, rho_i)
-        call self%physics%calc_density_water_derivatives(material_id, state, dden_dP=drho_w_dP)
-        call self%physics%calc_density_ice_derivatives(material_id, state, dden_dP=drho_i_dP)
-        if (abs(rho_w) > tiny(1.0d0)) then
-            dratio_dP = drho_i_dP / rho_w - rho_i * drho_w_dP / (rho_w * rho_w)
+        call state%dTheta_dP%get(dTheta_dP)
+        if (self%enable_vapor_transport) then
+            call state%dQv_dP%get(dQv_dP_term)
         end if
 
-        ! C_eq = dTheta/dP, including the derivative of rho_i/rho_w.
-        ! (rho_v ~ rho_w approximation consistent with calc_effective_density)
-        ! Clamp to non-negative roundoff.
+        ! C_eq = dTheta/dP, evaluated directly by calc_phase_split (see
+        ! phase_systems.F90) rather than recombined from
+        ! dQw_dP + (rho_i/rho_w)*dQi_dP + Qi*d(rho_i/rho_w)/dP: calc_phase_split
+        ! treats the density ratio as frozen in its own derivatives, so the
+        ! ratio-derivative term is spurious surplus, not part of dTheta/dP.
+        ! No post-hoc max(0,.) clamp: dTheta/dP is the analytic tangent of the
+        ! (unclamped) values the residual integrates, and clamping it would
+        ! break FD-consistency of the assembled Jacobian.
         call self%compute_compressive_storage(material_id, state, compressive_storage, compressive_capacity)
-        C_eq = max(0.0d0, dQw_dP + (rho_i / rho_w) * dQi_dP + Qi * dratio_dP + dQv_dP) + &
-               compressive_capacity
+        C_eq = dTheta_dP + dQv_dP_term + compressive_capacity
     end subroutine compute_C_eq_hydraulic
 
     !> Compute the nonlinear-iteration capacity of the pressure block.

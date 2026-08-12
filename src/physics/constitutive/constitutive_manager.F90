@@ -56,6 +56,7 @@ module physics_constitutive_manager
         procedure, public :: calc_Kflh
         procedure, public :: calc_KlT
         procedure, public :: calc_cryo_head_dT
+        procedure, public :: calc_freezing_level_set
         procedure, public :: calc_Kvh
         procedure, public :: calc_KvT
         procedure, public :: calc_cryo_suction_deriv_T
@@ -489,6 +490,18 @@ contains
 
         call self%models(self%materials_id_map(material_id))%calc_cryo_head_dT(state, dh_dT)
     end subroutine calc_cryo_head_dT
+
+    !> Freezing-interface level set consistent with calc_phase_split's own
+    !> switch; see type_fusion%calc_freezing_level_set for the definition.
+    subroutine calc_freezing_level_set(self, material_id, state, phi)
+        implicit none
+        class(type_constitutive_manager), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: phi
+
+        call self%models(self%materials_id_map(material_id))%calc_freezing_level_set(state, phi)
+    end subroutine calc_freezing_level_set
 
     subroutine calc_Kvh(self, material_id, state, Kvh)
         implicit none

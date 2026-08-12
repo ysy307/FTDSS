@@ -71,6 +71,8 @@ module control_time
         procedure, public, pass(self) :: is_end_time
         procedure, public, pass(self) :: is_min_dt => is_min_dt_reached
         procedure, public, pass(self) :: is_max_dt => is_max_dt_reached
+        !> Get the ATS error-control tolerances (see control_time_ats).
+        procedure, public, pass(self) :: get_error_control_tolerances
         !> Synchronize time step with output interval.
         procedure, public, pass(self) :: sync_with_output
         procedure, public, pass(self) :: update => update_type_time
@@ -273,6 +275,27 @@ contains
         dt = self%dt * coeff
     end subroutine get_dt
 
+    !> Absolute/relative tolerances of the ATS error controller
+    !> (control_time_ats:type_ats), read once by the caller and reused as the
+    !> primary-variable tolerance scale of the nonlinear local error measure
+    !> (control_iteration_convergence:local_error_block), so the nonlinear
+    !> solve is held to a fraction of the accuracy the time integrator itself
+    !> already accepts.
+    pure subroutine get_error_control_tolerances(self, atol_temperature, atol_pressure, rtol)
+        implicit none
+        class(type_time), intent(in) :: self
+        !> Absolute tolerance on temperature [K]
+        real(real64), intent(inout) :: atol_temperature
+        !> Absolute tolerance on pressure [Pa]
+        real(real64), intent(inout) :: atol_pressure
+        !> Relative tolerance [-]
+        real(real64), intent(inout) :: rtol
+
+        atol_temperature = self%ats%error_atol_temperature
+        atol_pressure = self%ats%error_atol_pressure
+        rtol = self%ats%error_rtol
+    end subroutine get_error_control_tolerances
+
     pure subroutine get_end_time(self, end_time)
         implicit none
         class(type_time), intent(in) :: self
@@ -399,13 +422,15 @@ contains
     end subroutine display_status
 
     !> Perform all time-related updates after a nonlinear solve attempt
-    subroutine update_type_time(self, success, iter_count, next_output_time, error_estimate)
+    subroutine update_type_time(self, success, iter_count, next_output_time, error_estimate, error_order)
         implicit none
         class(type_time), intent(inout) :: self
         logical, intent(in) :: success
         integer(int32), intent(in) :: iter_count
         real(real64), intent(in) :: next_output_time
         real(real64), intent(in), optional :: error_estimate
+        !> BDF order error_estimate was measured at (see lte_retry_dt)
+        integer(int32), intent(in), optional :: error_order
         real(real64) :: next_dt, dt_iter, dt_err, dt_tol
         logical :: output_limited_step
 
@@ -448,11 +473,11 @@ contains
             ! Sync with output time (modifies only the active dt if necessary).
             call self%sync_with_output(next_output_time)
         else
-            ! A converged step rejected by LTE uses the BDF1 defect estimate;
-            ! nonlinear failures retain the configured robustness retry factor.
+            ! LTE rejections are resized at the order the estimate was
+            ! measured at; nonlinear failures use the robustness retry factor.
             if (self%ats%active .and. self%ats%use_error_control .and. present(error_estimate)) then
                 if (error_estimate > 1.0d0) then
-                    call self%ats%lte_retry_dt(self%dt, error_estimate, next_dt)
+                    call self%ats%lte_retry_dt(self%dt, error_estimate, next_dt, error_order=error_order)
                 else
                     call self%ats%calc_retry_dt(self%dt, next_dt)
                 end if

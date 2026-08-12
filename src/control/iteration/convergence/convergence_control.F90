@@ -33,6 +33,41 @@ submodule(control_iteration_convergence) convergence_control
     real(real64), parameter :: CONSERVED_OMEGA_WARM_RELEASE = 1.25d0
     real(real64), parameter :: CONSERVED_OMEGA_WARM_FLOOR = 2.5d-1
     logical, parameter :: CONSERVED_VERBOSE = .true.
+
+    !> Global-balance gate (redesign criterion 2): one accepted step may not
+    !> move the block's domain-summed conserved quantity by more than its own
+    !> absolute tolerance integrated over the domain,
+    !>   |sum_i R_i| * dt <= atol * V_total.
+    !> The bound never references the step's own initial residual R0, which is
+    !> what made the previous form unpassable exactly when the predictor
+    !> started near the solution.
+    !>
+    !> The signed running total is accumulated as a V&V observable only, never
+    !> as a gate: a cumulative budget would couple step acceptance to run
+    !> history, so once the account was spent every subsequent step would fail
+    !> regardless of its own quality (measured: balT pinned at 1.014 with the
+    !> account form, killing the run at dt_min).
+    !>
+    !> Report threshold for the cumulative drift diagnostic: print only once
+    !> the running total reaches this fraction of the block's own per-step
+    !> budget (atol*V_total), so a well-behaved run stays quiet.
+    real(real64), parameter :: CONSERVED_DRIFT_REPORT_FRACTION = 1.0d-1
+
+    !> Nonlinear-iteration error budget as a fraction of the time-
+    !> discretization (LTE) error the ATS integrator already accepts at E<=1.
+    !> The accepted step carries LTE + nonlinear error, so holding the
+    !> nonlinear part at a third of the LTE tolerance bounds the total at
+    !> 1.33x the error the step-size controller is already regulating - inside
+    !> its own safety factor. Demanding more margin than that spends
+    !> iterations buying an accuracy the accepted step cannot use, because the
+    !> time-discretization error it is measured against is three times larger.
+    real(real64), parameter :: NONLINEAR_TO_LTE_FACTOR = 1.0d0 / 3.0d0
+    !> Floors for the nodal storage sensitivity s_i in local_error_block, so a
+    !> vanishing apparent capacity (e.g. exactly at a phase-change plateau
+    !> edge where the latent-heat curvature briefly cancels the sensible
+    !> term) cannot divide the local error measure by (near) zero.
+    real(real64), parameter :: DH_DT_FLOOR = 1.0d3 ! J/(m3 K)
+    real(real64), parameter :: DRHO_DP_FLOOR = 1.0d-12 ! kg/(m3 Pa)
 contains
 
     module subroutine initialize_convergence_control(self, config, max_iterations, reference_values)
@@ -53,6 +88,10 @@ contains
         self%atol_density = config%atol_density
         self%rtol_conserved = config%rtol_conserved
         self%residual_eps = config%residual_eps
+        ! Cumulative drift is a whole-run V&V counter (criterion 2), not
+        ! per-step state: zeroed here at construction, never by reset() below.
+        self%cumulative_drift_thermal = 0.0d0
+        self%cumulative_drift_hydraulic = 0.0d0
         call reset_conserved_state(self)
 
         check_res = self%should_check_residual()
@@ -323,6 +362,15 @@ contains
 
         real(real64) :: dq_norm, dq_effective, kappa, residual_norm, residual_ratio
         real(real64) :: rT, rH, ratioT, ratioH, balanceT, balanceH
+        real(real64) :: floorT, floorH
+        real(real64) :: budgetT, budgetH
+        !> Local gate (criterion 1): V_i-weighted WRMS of the residual-induced
+        !> nodal drift; <= 1 passes. Sentinel -1 means the exact per-node path
+        !> was not available and the mean-volume-floor fallback ran instead.
+        real(real64) :: e_localT, e_localH
+        !> Global gate (criterion 2): signed (sum_i R_i)*dt, the realized
+        !> drift of the block's total conserved quantity over the step [J or kg].
+        real(real64) :: driftT, driftH
         logical :: dq_ok, residual_ok, balance_ok
         logical :: has_residual_norm
         integer(int32) :: n_cons
@@ -338,6 +386,10 @@ contains
         ratioH = 0.0d0
         balanceT = 0.0d0
         balanceH = 0.0d0
+        e_localT = -1.0d0
+        e_localH = -1.0d0
+        driftT = 0.0d0
+        driftH = 0.0d0
         residual_norm = 0.0d0
         has_residual_norm = .false.
 
@@ -360,21 +412,61 @@ contains
         ! Residuals are hard convergence gates. The transient hydraulic block has
         ! storage and therefore no additive-constant nullspace; retaining its mean
         ! component is required to retain the global water-balance equation.
+        !
+        ! Both gates below are now measured in conserved-quantity units against
+        ! absolute physical tolerances, never against the step's own initial
+        ! residual R0 (self%residual0_* is still tracked, but only to drive the
+        ! omega/kappa globalization further down, a control decision, not this
+        ! acceptance decision - see the design note at the top of this file's
+        ! history for the rationale: an R0-normalized gate is unpassable exactly
+        ! when the predictor starts near the solution, since R0 -> 0 there).
+        !
+        ! Criterion 1 (local): the primary-variable local error measure
+        ! local_error_block, e_i = (R_i*dt/V_i)/(s_i*tau_i) in K or Pa - see
+        ! its own doc comment for the full derivation. Exact node by node when
+        ! nodal control volumes and the storage-sensitivity snapshot are both
+        ! available (sentinel -1 otherwise); falls back to the mean-volume
+        ! floor gate on the raw block residual when they are not.
+        !
+        ! Criterion 2 (global): signed drift account against the run budget
+        ! atol*V_total (see the module-header doc). This needs only V_total
+        ! (already available whenever the residual floor is), not V_i, so it
+        ! does not participate in the criterion-1 fallback.
         residual_ok = .true.
         balance_ok = .true.
         if (check_thermal .and. present(residual_thermal)) then
             rT = block_residual_norm(residual_thermal)
             if (self%residual0_thermal < 0.0d0) self%residual0_thermal = max(rT, tiny(1.0d0))
             ratioT = rT / self%residual0_thermal
-            if (size(residual_thermal) > 0) then
-                balanceT = abs(sum(residual_thermal)) / &
-                           (sqrt(real(size(residual_thermal), real64)) * self%residual0_thermal)
+
+            e_localT = self%local_error_block(PHYSICS_TYPES%THERMAL, residual_thermal)
+            if (e_localT >= 0.0d0) then
+                residual_ok = residual_ok .and. (e_localT <= 1.0d0)
+            else
+                floorT = residual_floor(self%atol_enthalpy, self%residual_volume_total, &
+                                        self%residual_dt, size(residual_thermal))
+                residual_ok = residual_ok .and. &
+                              (rT <= floorT + self%residual_eps * self%residual0_thermal)
             end if
-            residual_ok = residual_ok .and. &
-                          (rT <= residual_floor(self%atol_enthalpy, self%residual_volume_total, &
-                                                self%residual_dt, size(residual_thermal)) + &
-                           self%residual_eps * self%residual0_thermal)
-            balance_ok = balance_ok .and. (balanceT <= self%residual_eps)
+
+            driftT = sum(residual_thermal) * self%residual_dt
+            self%pending_drift_thermal = driftT
+            self%pending_drift_thermal_valid = .true.
+            ! Budget in the same primary-variable currency as the local gate
+            ! (integrated_tolerance); falls back to the fixed conserved-unit
+            ! form when the sensitivity snapshot is unavailable.
+            budgetT = -1.0d0
+            ! e_localT >= 0 is the signal that the nodal volume/sensitivity
+            ! snapshot was available, i.e. the same data this budget needs.
+            if (e_localT >= 0.0d0) then
+                budgetT = integrated_tolerance(self%nodal_volume, self%dH_dT, self%u_thermal, &
+                                               self%atol_temperature_u, self%rtol_u, DH_DT_FLOOR)
+            end if
+            if (budgetT <= 0.0d0) budgetT = self%atol_enthalpy * self%residual_volume_total
+            if (budgetT > 0.0d0) then
+                balanceT = abs(driftT) / budgetT
+                balance_ok = balance_ok .and. (balanceT <= 1.0d0)
+            end if
         else if (check_thermal) then
             residual_ok = .false.
         end if
@@ -382,16 +474,31 @@ contains
             rH = block_residual_norm(residual_hydraulic)
             if (self%residual0_hydraulic < 0.0d0) self%residual0_hydraulic = max(rH, tiny(1.0d0))
             ratioH = rH / self%residual0_hydraulic
-            if (size(residual_hydraulic) > 0) then
-                balanceH = abs(sum(residual_hydraulic)) / &
-                           (sqrt(real(size(residual_hydraulic), real64)) * self%residual0_hydraulic)
+
+            e_localH = self%local_error_block(PHYSICS_TYPES%HYDRAULIC, residual_hydraulic)
+            if (e_localH >= 0.0d0) then
+                residual_ok = residual_ok .and. (e_localH <= 1.0d0)
+            else
+                floorH = residual_floor(self%atol_density, self%residual_volume_total, &
+                                        self%residual_dt, size(residual_hydraulic))
+                residual_ok = residual_ok .and. &
+                              (rH <= floorH + self%residual_eps * self%residual0_hydraulic)
             end if
-            residual_ok = residual_ok .and. &
-                          (rH <= residual_floor(self%atol_density, self%residual_volume_total, &
-                                                self%residual_dt, size(residual_hydraulic)) + &
-                           self%residual_eps * self%residual0_hydraulic) .and. &
-                          (balanceH <= self%residual_eps)
-            balance_ok = balance_ok .and. (balanceH <= self%residual_eps)
+
+            driftH = sum(residual_hydraulic) * self%residual_dt
+            self%pending_drift_hydraulic = driftH
+            self%pending_drift_hydraulic_valid = .true.
+            ! Same integrated-tolerance budget as the thermal block above.
+            budgetH = -1.0d0
+            if (e_localH >= 0.0d0) then
+                budgetH = integrated_tolerance(self%nodal_volume, self%drho_dp, self%u_hydraulic, &
+                                               self%atol_pressure_u, self%rtol_u, DRHO_DP_FLOOR)
+            end if
+            if (budgetH <= 0.0d0) budgetH = self%atol_density * self%residual_volume_total
+            if (budgetH > 0.0d0) then
+                balanceH = abs(driftH) / budgetH
+                balance_ok = balance_ok .and. (balanceH <= 1.0d0)
+            end if
         else if (check_hydraulic) then
             residual_ok = .false.
         end if
@@ -485,11 +592,15 @@ contains
         end if
 
         if (CONSERVED_VERBOSE) then
-            write (*, '(A,I4,A,ES10.3,A,F6.4,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3,A,L1,1X,L1,1X,L1)') &
+            ! resT/0, resH/0 are the R0-normalized ratios: control diagnostics
+            ! only (they drive omega above), not part of is_ok. locT/locH is
+            ! the criterion-1 local gate (<=1 passes, -1 = fallback path).
+            ! balT/balH is the criterion-2 global drift ratio (<=1 passes).
+            write (*, '(A,I4,A,ES10.3,A,F6.4,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3,A,L1,1X,L1,1X,L1)') &
                 '    [Conserved] it:', nonlinear_iter, ' dQeff:', dq_effective, &
                 ' om:', self%relaxation_omega, &
-                ' resT/0:', ratioT, ' balT:', balanceT, &
-                ' resH/0:', ratioH, ' balH:', balanceH, &
+                ' resT/0:', ratioT, ' locT:', e_localT, ' balT:', balanceT, &
+                ' resH/0:', ratioH, ' locH:', e_localH, ' balH:', balanceH, &
                 ' dq/res/is_ok:', dq_ok, residual_ok, is_ok
         end if
 
@@ -518,6 +629,43 @@ contains
             self%has_prev_conserved_increment = .true.
         end if
     end subroutine check_conserved_convergence_control
+
+    !> Fold the pending per-block drift into the cumulative budget (PDF 6.2.4
+    !> redesign, criterion 2). See interface for when the caller must invoke
+    !> this. Not a gate: the cumulative total is only ever reported, never
+    !> compared against a threshold to reject a step, since nothing requires
+    !> the sign of the per-step drift to average to zero across steps and no
+    !> V&V evidence yet exists for a sound cumulative bound.
+    module subroutine commit_conserved_drift_convergence_control(self)
+        implicit none
+        class(type_convergence_control), intent(inout) :: self
+
+        real(real64) :: budget_thermal, budget_hydraulic
+
+        if (self%pending_drift_thermal_valid) then
+            self%cumulative_drift_thermal = self%cumulative_drift_thermal + self%pending_drift_thermal
+            self%pending_drift_thermal_valid = .false.
+        end if
+        if (self%pending_drift_hydraulic_valid) then
+            self%cumulative_drift_hydraulic = self%cumulative_drift_hydraulic + self%pending_drift_hydraulic
+            self%pending_drift_hydraulic_valid = .false.
+        end if
+
+        budget_thermal = self%atol_enthalpy * self%residual_volume_total
+        budget_hydraulic = self%atol_density * self%residual_volume_total
+        if (budget_thermal > 0.0d0 .and. &
+            abs(self%cumulative_drift_thermal) > CONSERVED_DRIFT_REPORT_FRACTION * budget_thermal) then
+            write (*, '(A,ES11.3,A,ES11.3,A)') &
+                '   [Conserved] cumulative drift D_thermal=', self%cumulative_drift_thermal, &
+                ' J (', 100.0d0 * self%cumulative_drift_thermal / budget_thermal, '% of one-step budget)'
+        end if
+        if (budget_hydraulic > 0.0d0 .and. &
+            abs(self%cumulative_drift_hydraulic) > CONSERVED_DRIFT_REPORT_FRACTION * budget_hydraulic) then
+            write (*, '(A,ES11.3,A,ES11.3,A)') &
+                '   [Conserved] cumulative drift D_hydraulic=', self%cumulative_drift_hydraulic, &
+                ' kg (', 100.0d0 * self%cumulative_drift_hydraulic / budget_hydraulic, '% of one-step budget)'
+        end if
+    end subroutine commit_conserved_drift_convergence_control
 
     !> Weighted-RMS norm of (Q_b - Q_a) for the Richardson local-error estimate.
     module subroutine compute_error_norm_convergence_control(self, enthalpy_a, density_a, &
@@ -555,6 +703,11 @@ contains
         self%residual_norm_prev = -1.0d0
         self%dq_norm_prev = -1.0d0
         self%diverge_count = 0
+        ! A fresh step attempt has no confirmed iterate yet; the previous
+        ! attempt's pending drift (if any) must not be committed by a later,
+        ! unrelated call to commit_conserved_drift.
+        self%pending_drift_thermal_valid = .false.
+        self%pending_drift_hydraulic_valid = .false.
         self%relaxation_omega = min(1.0d0, max(CONSERVED_OMEGA_WARM_FLOOR, &
                                                CONSERVED_OMEGA_WARM_RELEASE * self%relaxation_omega))
     end subroutine reset_conserved_state
@@ -572,14 +725,34 @@ contains
                                          self%residual_dt, num_nodes)
     end subroutine get_residual_floors_convergence_control
 
-    module subroutine set_residual_scale_convergence_control(self, volume_total, dt)
+    module subroutine set_residual_scale_convergence_control(self, volume_total, dt, nodal_volume, &
+                                                              dH_dT, drho_dp, u_thermal, u_hydraulic, &
+                                                              atol_temperature_u, atol_pressure_u, rtol_u)
         implicit none
         class(type_convergence_control), intent(inout) :: self
         real(real64), intent(in) :: volume_total
         real(real64), intent(in) :: dt
+        real(real64), intent(in), optional :: nodal_volume(:)
+        real(real64), intent(in), optional :: dH_dT(:)
+        real(real64), intent(in), optional :: drho_dp(:)
+        real(real64), intent(in), optional :: u_thermal(:)
+        real(real64), intent(in), optional :: u_hydraulic(:)
+        real(real64), intent(in), optional :: atol_temperature_u
+        real(real64), intent(in), optional :: atol_pressure_u
+        real(real64), intent(in), optional :: rtol_u
 
         self%residual_volume_total = volume_total
         self%residual_dt = dt
+        if (present(nodal_volume)) then
+            if (size(nodal_volume) > 0) call allocate_array(self%nodal_volume, nodal_volume)
+        end if
+        if (present(dH_dT)) call allocate_array(self%dH_dT, dH_dT)
+        if (present(drho_dp)) call allocate_array(self%drho_dp, drho_dp)
+        if (present(u_thermal)) call allocate_array(self%u_thermal, u_thermal)
+        if (present(u_hydraulic)) call allocate_array(self%u_hydraulic, u_hydraulic)
+        if (present(atol_temperature_u)) self%atol_temperature_u = atol_temperature_u
+        if (present(atol_pressure_u)) self%atol_pressure_u = atol_pressure_u
+        if (present(rtol_u)) self%rtol_u = rtol_u
     end subroutine set_residual_scale_convergence_control
 
     !> Absolute residual floor for a block, from its conserved-quantity atol.
@@ -640,5 +813,98 @@ contains
             norm = 0.0d0
         end if
     end function weighted_rms_conserved
+
+    !> See the interface for the mathematical definition. Dispatches on the
+    !> requested block to the matching cached sensitivity/primary-variable
+    !> snapshot, then delegates the shared per-node accumulation to
+    !> local_error_wrms. Returns the not-available sentinel -1 when
+    !> nodal_volume, the block's sensitivity array or its primary-variable
+    !> snapshot is unallocated or does not match residual in size.
+    module function local_error_block_convergence_control(self, physics_type, residual) result(e_local)
+        implicit none
+        class(type_convergence_control), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        real(real64), intent(in) :: residual(:)
+        real(real64) :: e_local
+
+        integer(int32) :: n
+
+        e_local = -1.0d0
+        if (self%residual_dt <= 0.0d0) return
+        if (.not. allocated(self%nodal_volume)) return
+        n = size(residual)
+        if (size(self%nodal_volume) /= n) return
+
+        if (physics_type%ID == PHYSICS_TYPES%THERMAL%ID) then
+            if (.not. allocated(self%dH_dT) .or. .not. allocated(self%u_thermal)) return
+            if (size(self%dH_dT) /= n .or. size(self%u_thermal) /= n) return
+            e_local = local_error_wrms(residual, self%nodal_volume, self%dH_dT, self%u_thermal, &
+                                       self%atol_temperature_u, self%rtol_u, DH_DT_FLOOR, self%residual_dt)
+        else if (physics_type%ID == PHYSICS_TYPES%HYDRAULIC%ID) then
+            if (.not. allocated(self%drho_dp) .or. .not. allocated(self%u_hydraulic)) return
+            if (size(self%drho_dp) /= n .or. size(self%u_hydraulic) /= n) return
+            e_local = local_error_wrms(residual, self%nodal_volume, self%drho_dp, self%u_hydraulic, &
+                                       self%atol_pressure_u, self%rtol_u, DRHO_DP_FLOOR, self%residual_dt)
+        end if
+    end function local_error_block_convergence_control
+
+    !> Domain-integrated tolerance of a block, in the block's conserved units:
+    !> sum_i V_i * s_i * tau_i with the SAME per-node tolerance tau_i the local
+    !> measure uses.
+    !>
+    !> This is the budget the global-balance gate belongs against. The local
+    !> gate converts the residual to primary-variable units through s_i =
+    !> dH/dT (or d rho/dp); leaving the balance gate on a fixed conserved-unit
+    !> tolerance instead makes the two gates disagree about what "at tolerance"
+    !> means, and at a freezing front they disagree by the ratio of latent to
+    !> sensible capacity - two orders of magnitude. Measured: an iterate whose
+    !> local error was 0.117 (eight times inside tolerance) was rejected by a
+    !> balance gate reading 2.16.
+    pure function integrated_tolerance(volume, sensitivity, u, atol_u, rtol_u, s_floor) result(budget)
+        implicit none
+        real(real64), intent(in) :: volume(:), sensitivity(:), u(:)
+        real(real64), intent(in) :: atol_u, rtol_u, s_floor
+        real(real64) :: budget
+
+        integer(int32) :: i, n
+        real(real64) :: s_i, tol_i
+
+        n = min(size(volume), size(sensitivity), size(u))
+        budget = 0.0d0
+        do i = 1, n
+            s_i = max(abs(sensitivity(i)), s_floor)
+            tol_i = NONLINEAR_TO_LTE_FACTOR * (atol_u + rtol_u * abs(u(i)))
+            budget = budget + volume(i) * s_i * tol_i
+        end do
+    end function integrated_tolerance
+
+    !> Primary-variable-unit local error measure shared by the thermal and
+    !> hydraulic blocks: e_i = (R_i*dt/V_i) / (s_i*tau_i), tau_i =
+    !> NONLINEAR_TO_LTE_FACTOR*(atol_u+rtol_u*|u_i|). See local_error_block
+    !> for the full derivation; s_i is floored at s_floor away from zero.
+    pure function local_error_wrms(residual, volume, sensitivity, u, atol_u, rtol_u, s_floor, dt) result(e_local)
+        implicit none
+        real(real64), intent(in) :: residual(:), volume(:), sensitivity(:), u(:)
+        real(real64), intent(in) :: atol_u, rtol_u, s_floor, dt
+        real(real64) :: e_local
+
+        integer(int32) :: i, n
+        real(real64) :: s_i, tol_i, denom, acc
+
+        n = min(size(residual), size(volume), size(sensitivity), size(u))
+        acc = 0.0d0
+        do i = 1, n
+            s_i = max(abs(sensitivity(i)), s_floor)
+            tol_i = NONLINEAR_TO_LTE_FACTOR * (atol_u + rtol_u * abs(u(i)))
+            denom = volume(i) * s_i * tol_i
+            if (denom > 0.0d0) acc = acc + (residual(i) * dt / denom)**2
+        end do
+
+        if (n > 0) then
+            e_local = sqrt(acc / real(n, real64))
+        else
+            e_local = 0.0d0
+        end if
+    end function local_error_wrms
 
 end submodule convergence_control

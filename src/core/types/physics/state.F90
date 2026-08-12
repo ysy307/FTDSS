@@ -59,10 +59,10 @@ module core_types_physics_state
         type(type_field_dp) :: vapor_content ! Vapor content [-]
         type(type_field_dp) :: air_content ! Air content [-]
         type(type_field_dp) :: porosity ! Porosity [-]
-        ! Generalized suction psi_cap + psi_cryo [Pa]. Retention, relative
-        ! permeability and the Darcy total potential are all evaluated at this
-        ! value, so storage, mobility and driving force stay consistent.
+        ! s_eff = smoothmax(s_m, psi_cryo) under the pore-volume limit [Pa].
         type(type_field_dp) :: effective_suction ! [Pa]
+        type(type_field_dp) :: dSeff_dP ! d(s_eff)/dP [-]
+        type(type_field_dp) :: dSeff_dT ! d(s_eff)/dT [Pa/K]
 
         type(type_field_array_dp) :: temperature_history ! Temperature history [C]
         type(type_field_array_dp) :: pressure_history ! Pressure history [Pa]
@@ -84,11 +84,17 @@ module core_types_physics_state
         type(type_field_dp) :: dQv_dP ! d(theta_vapor)/dP
         type(type_field_dp) :: dQa_dP ! d(theta_air)/dP
         type(type_field_dp) :: dQi_dP ! d(theta_ice)/dP
+        ! Storage tangent of the total (retention-curve) water content
+        ! Theta = theta_SWRC(s_m), evaluated directly by calc_phase_split.
+        type(type_field_dp) :: dTheta_dP ! d(Theta)/dP
+        type(type_field_dp) :: dTheta_dT ! d(Theta)/dT
 
         ! type(type_field_dp) :: dot_T ! Temperature change rate [K/s]
         ! type(type_field_dp) :: dot_P ! Pressure change rate [Pa/s]
         type(type_field_coord) :: grad_T ! Temperature gradient [K/m]
         type(type_field_coord) :: grad_P ! Pressure gradient [Pa/m]
+        ! grad of the interpolated nodal liquid pressure p_l = -s_eff [Pa/m].
+        type(type_field_coord) :: grad_Pl
 
         ! --- Other ---
         type(type_field_dp) :: relative_humidity ! [-]
@@ -250,6 +256,7 @@ contains
                              temperature_history, pressure_history, porosity_history, &
                              latent_heat_fusion, latent_heat_vaporization, &
                              dQw_dT, dQv_dT, dQa_dT, dQi_dT, dQw_dP, dQv_dP, dQa_dP, dQi_dP, &
+                             dTheta_dP, dTheta_dT, &
                              !  dot_T, dot_P, &
                              grad_T, grad_P, &
                              relative_humidity, mass_fraction_clay, &
@@ -267,6 +274,7 @@ contains
         real(real64), intent(in), optional :: latent_heat_fusion, latent_heat_vaporization
         real(real64), intent(in), optional :: dQw_dT, dQv_dT, dQa_dT, dQi_dT
         real(real64), intent(in), optional :: dQw_dP, dQv_dP, dQa_dP, dQi_dP
+        real(real64), intent(in), optional :: dTheta_dP, dTheta_dT
         type(type_coordinate_dp), intent(in), optional :: grad_T, grad_P
         real(real64), intent(in), optional :: relative_humidity, mass_fraction_clay
         type(type_coordinate_dp), intent(in), optional :: water_flux, vapor_flux
@@ -336,6 +344,12 @@ contains
         if (present(dQi_dP)) then
             call self%dQi_dP%set(dQi_dP)
         end if
+        if (present(dTheta_dP)) then
+            call self%dTheta_dP%set(dTheta_dP)
+        end if
+        if (present(dTheta_dT)) then
+            call self%dTheta_dT%set(dTheta_dT)
+        end if
 
         if (present(grad_T)) then
             call self%grad_T%set(grad_T)
@@ -364,6 +378,7 @@ contains
                              temperature_history, pressure_history, porosity_history, &
                              latent_heat_fusion, latent_heat_vaporization, &
                              dQw_dT, dQv_dT, dQa_dT, dQi_dT, dQw_dP, dQv_dP, dQa_dP, dQi_dP, &
+                             dTheta_dP, dTheta_dT, &
                              ! dot_T, dot_P, &
                              grad_T, grad_P, &
                              relative_humidity, mass_fraction_clay, &
@@ -380,6 +395,7 @@ contains
         real(real64), intent(inout), optional :: latent_heat_fusion, latent_heat_vaporization
         real(real64), intent(inout), optional :: dQw_dT, dQv_dT, dQa_dT, dQi_dT
         real(real64), intent(inout), optional :: dQw_dP, dQv_dP, dQa_dP, dQi_dP
+        real(real64), intent(inout), optional :: dTheta_dP, dTheta_dT
         type(type_coordinate_dp), intent(inout), pointer, optional :: grad_T, grad_P
         real(real64), intent(inout), optional :: relative_humidity, mass_fraction_clay
         type(type_coordinate_dp), intent(inout), pointer, optional :: water_flux, vapor_flux
@@ -445,6 +461,12 @@ contains
         if (present(dQi_dP)) then
             call self%dQi_dP%get(dQi_dP)
         end if
+        if (present(dTheta_dP)) then
+            call self%dTheta_dP%get(dTheta_dP)
+        end if
+        if (present(dTheta_dT)) then
+            call self%dTheta_dT%get(dTheta_dT)
+        end if
         if (present(grad_T)) then
             call self%grad_T%get(grad_T)
         end if
@@ -477,6 +499,8 @@ contains
         call self%air_content%reset()
         call self%porosity%reset()
         call self%effective_suction%reset()
+        call self%dSeff_dP%reset()
+        call self%dSeff_dT%reset()
         call self%temperature_history%reset()
         call self%pressure_history%reset()
         call self%porosity_history%reset()
@@ -491,8 +515,11 @@ contains
         call self%dQv_dP%reset()
         call self%dQa_dP%reset()
         call self%dQi_dP%reset()
+        call self%dTheta_dP%reset()
+        call self%dTheta_dT%reset()
         call self%grad_T%reset()
         call self%grad_P%reset()
+        call self%grad_Pl%reset()
         call self%relative_humidity%reset()
         call self%mass_fraction_clay%reset()
         call self%water_flux%reset()
@@ -512,6 +539,8 @@ contains
         call copy_field(self%air_content, source%air_content)
         call copy_field(self%porosity, source%porosity)
         call copy_field(self%effective_suction, source%effective_suction)
+        call copy_field(self%dSeff_dP, source%dSeff_dP)
+        call copy_field(self%dSeff_dT, source%dSeff_dT)
         call copy_array_field(self%temperature_history, source%temperature_history)
         call copy_array_field(self%pressure_history, source%pressure_history)
         call copy_array_field(self%porosity_history, source%porosity_history)
@@ -526,8 +555,11 @@ contains
         call copy_field(self%dQv_dP, source%dQv_dP)
         call copy_field(self%dQa_dP, source%dQa_dP)
         call copy_field(self%dQi_dP, source%dQi_dP)
+        call copy_field(self%dTheta_dP, source%dTheta_dP)
+        call copy_field(self%dTheta_dT, source%dTheta_dT)
         call copy_coord_field(self%grad_T, source%grad_T)
         call copy_coord_field(self%grad_P, source%grad_P)
+        call copy_coord_field(self%grad_Pl, source%grad_Pl)
         call copy_field(self%relative_humidity, source%relative_humidity)
         call copy_field(self%mass_fraction_clay, source%mass_fraction_clay)
         call copy_coord_field(self%water_flux, source%water_flux)

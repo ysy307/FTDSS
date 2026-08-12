@@ -19,7 +19,20 @@ submodule(app_ftcms) ftcms_base
     !> failures 1 -> 3, line-search failures 10 -> 41, mean inner iterations
     !> 6.88 -> 8.61, with the same simulated time reached. The kink is a symptom
     !> of the freezing-onset stall, not its cause.
-    logical, parameter :: PHASE_ONSET_TEMPERATURE_RESET = .true.
+    !> RE-TESTED 2026-08-01 with a true element-FD tangent and the joint step
+    !> bound in place. The measurement above was taken when the tangent was
+    !> Picard-lagged, where this reset acted as a stabiliser. It cannot serve
+    !> that role for a Newton method: overwriting T after the update means the
+    !> state the line search evaluates is not u + alpha*du, so the descent
+    !> identity d/dalpha ||W R||^2 = -2||W R||^2 < 0 - which needs only an
+    !> exact tangent and an exact linear solve, both verified here - no longer
+    !> applies. That is exactly the observed failure: every alpha rejected with
+    !> the merit approaching 1 from above.
+    logical, parameter :: PHASE_ONSET_TEMPERATURE_RESET = .false.
+
+    !> Report the per-block local time-truncation error alongside the max the
+    !> controller acts on (compute_lte_error). Cheap: two reals per step.
+    logical, parameter :: LTE_BLOCK_REPORT = .true.
 
     ! Bridge experiment (see plan spicy-sauteeing-scroll.md, WP3 refinement):
     ! where freezing impedance has collapsed hydraulic conductivity, a node no
@@ -1040,6 +1053,7 @@ contains
         real(real64), parameter :: AA_PHASE_RESTART_CONTENT = 1.0d-4
 
         real(real64) :: max_du, alpha
+        real(real64) :: step_bound_lambda
         real(real64), parameter :: PICARD_MAX_DT_STEP = 2.0d1
         real(real64), parameter :: PICARD_MAX_DT_STEP_PHASE = 0.5d0   ! K near T_melt
         real(real64), parameter :: PICARD_PHASE_ZONE = 2.0d0           ! °C half-width
@@ -1091,6 +1105,74 @@ contains
             end if
         end if
 
+        ! --- Joint variable-wise trust region -------------------------------
+        ! One factor for both blocks, computed before either is updated, so the
+        ! applied update stays parallel to the direction the line search was
+        ! handed (see STEP_BOUND_ENABLED). The validity-wall factors are folded
+        ! in here for the same reason. The increment is bounded, never the
+        ! resulting value: clamping a value would break the correspondence
+        ! between the state and the direction the merit was evaluated along.
+        step_bound_lambda = 1.0d0
+        if (STEP_BOUND_ENABLED .and. is_conserved_mode) then
+            block
+                real(real64), allocatable :: du_probe(:)
+                real(real64), pointer, contiguous, dimension(:) :: probe_current
+                real(real64) :: relax_probe, largest
+
+                ! step_scale is deliberately NOT applied here. The bound must
+                ! fix the DIRECTION once, and the line search must then scale
+                ! that bounded direction: u_trial = u + alpha*(lambda*du).
+                ! Folding step_scale into the probe instead makes
+                ! lambda = dp_max/|omega*alpha*du| and the applied update
+                ! omega*alpha*lambda*du = dp_max*du/|du| - independent of
+                ! alpha, so every trial above the binding threshold evaluates
+                ! the SAME state. Measured at the stalled iterate: lambda_bound
+                ! = 5e4/4.151e6 = 1.2e-2, so the first seven halvings were
+                ! duplicates and the search could never reach the descent
+                ! region near an effective 1.2e-5.
+                relax_probe = self%control%get_conserved_relaxation()
+
+                nullify (probe_current)
+                if (self%is_active_thermal()) then
+                    call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du_probe)
+                    call self%temperature%get_current(probe_current)
+                    if (allocated(du_probe) .and. associated(probe_current)) then
+                        if (size(du_probe) > 0) then
+                            du_probe(:) = relax_probe * du_probe(:)
+                            largest = maxval(abs(du_probe))
+                            if (largest > STEP_BOUND_DT) then
+                                step_bound_lambda = min(step_bound_lambda, STEP_BOUND_DT / largest)
+                            end if
+                            step_bound_lambda = min(step_bound_lambda, &
+                                                    bounded_step_factor(probe_current, du_probe, &
+                                                                        TEMP_MIN_C, TEMP_MAX_C))
+                        end if
+                    end if
+                    nullify (probe_current)
+                    if (allocated(du_probe)) deallocate (du_probe)
+                end if
+
+                if (self%is_active_hydraulic()) then
+                    call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, du_probe)
+                    call self%pressure%get_current(probe_current)
+                    if (allocated(du_probe) .and. associated(probe_current)) then
+                        if (size(du_probe) > 0) then
+                            du_probe(:) = relax_probe * du_probe(:)
+                            largest = maxval(abs(du_probe))
+                            if (largest > STEP_BOUND_DP) then
+                                step_bound_lambda = min(step_bound_lambda, STEP_BOUND_DP / largest)
+                            end if
+                            step_bound_lambda = min(step_bound_lambda, &
+                                                    bounded_step_factor(probe_current, du_probe, &
+                                                                        PRESS_MIN_PA, PRESS_MAX_PA))
+                        end if
+                    end if
+                    nullify (probe_current)
+                    if (allocated(du_probe)) deallocate (du_probe)
+                end if
+            end block
+        end if
+
         if (self%is_active_thermal()) then
             call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du)
             call self%temperature%get_current(current)
@@ -1113,7 +1195,11 @@ contains
                             alpha = aa_alpha_joint
                         else
                             du_eff(:) = relaxation_factor * du(:)
-                            alpha = min(1.0d0, bounded_step_factor(current, du_eff, TEMP_MIN_C, TEMP_MAX_C))
+                            if (STEP_BOUND_ENABLED) then
+                                alpha = step_bound_lambda
+                            else
+                                alpha = min(1.0d0, bounded_step_factor(current, du_eff, TEMP_MIN_C, TEMP_MAX_C))
+                            end if
                         end if
                         current(:) = current(:) + alpha * du_eff(:)
                     else
@@ -1205,7 +1291,11 @@ contains
                             alpha = aa_alpha_joint
                         else
                             du_eff(:) = relaxation_factor * du(:)
-                            alpha = min(1.0d0, bounded_step_factor(current, du_eff, PRESS_MIN_PA, PRESS_MAX_PA))
+                            if (STEP_BOUND_ENABLED) then
+                                alpha = step_bound_lambda
+                            else
+                                alpha = min(1.0d0, bounded_step_factor(current, du_eff, PRESS_MIN_PA, PRESS_MAX_PA))
+                            end if
                         end if
                         current(:) = current(:) + alpha * du_eff(:)
                     else
@@ -2007,19 +2097,29 @@ contains
     !> scratch states; each iteration writes only its own node_id entries,
     !> so the result is schedule-independent. Cost: O(sum of distinct
     !> materials per node) constitutive evaluations.
-    module subroutine compute_nodal_conserved_ftcms(self, enthalpy, density)
+    module subroutine compute_nodal_conserved_ftcms(self, enthalpy, density, dH_dT, drho_dp)
         implicit none
         class(type_ftcms), intent(inout) :: self
         real(real64), allocatable, intent(inout) :: enthalpy(:)
         real(real64), allocatable, intent(inout) :: density(:)
+        real(real64), allocatable, intent(inout), optional :: dH_dT(:)
+        real(real64), allocatable, intent(inout), optional :: drho_dp(:)
 
         integer(int32) :: node_id, material_id, n_nodes
         integer(int32) :: row_start, row_end, m, k, repr_elem
         type(type_state), allocatable :: states(:)
         logical :: active_thermal, active_hydraulic
+        logical :: want_dH_dT, want_drho_dp
         real(real64) :: H_j, rho_j, measure
-        real(real64) :: sum_H, sum_rho, wsum
+        real(real64) :: dHdT_j, drhodp_j, rho_w_j
+        real(real64) :: sum_H, sum_rho, sum_dHdT, sum_drhodp, wsum
         integer(int32) :: num_threads, tid
+        ! Always-allocated scratch for the OpenMP region: OPTIONAL dummy
+        ! arguments must not be referenced when absent, including implicitly
+        ! through an OMP data-sharing clause, so the sensitivities are
+        ! accumulated here and only copied into the caller's (optional)
+        ! arrays afterward.
+        real(real64), allocatable :: dH_dT_local(:), drho_dp_local(:)
 
         call self%domain%get_num_nodes(n_nodes)
 
@@ -2029,7 +2129,17 @@ contains
         allocate (density(max(n_nodes, 1)))
         enthalpy = 0.0d0
         density = 0.0d0
-        if (n_nodes <= 0) return
+
+        want_dH_dT = present(dH_dT)
+        want_drho_dp = present(drho_dp)
+        allocate (dH_dT_local(max(n_nodes, 1)), source=0.0d0)
+        allocate (drho_dp_local(max(n_nodes, 1)), source=0.0d0)
+
+        if (n_nodes <= 0) then
+            if (want_dH_dT) call allocate_array(dH_dT, dH_dT_local)
+            if (want_drho_dp) call allocate_array(drho_dp, drho_dp_local)
+            return
+        end if
 
         active_thermal = self%is_active_thermal()
         active_hydraulic = self%is_active_hydraulic()
@@ -2038,9 +2148,11 @@ contains
         allocate (states(num_threads))
 
         !$OMP PARALLEL DEFAULT(NONE) &
-        !$OMP SHARED(self, n_nodes, states, enthalpy, density, active_thermal, active_hydraulic) &
+        !$OMP SHARED(self, n_nodes, states, enthalpy, density, dH_dT_local, drho_dp_local, &
+        !$OMP        active_thermal, active_hydraulic, want_dH_dT, want_drho_dp) &
         !$OMP PRIVATE(node_id, material_id, row_start, row_end, m, k, repr_elem, &
-        !$OMP         H_j, rho_j, measure, sum_H, sum_rho, wsum, tid)
+        !$OMP         H_j, rho_j, dHdT_j, drhodp_j, rho_w_j, &
+        !$OMP         measure, sum_H, sum_rho, sum_dHdT, sum_drhodp, wsum, tid)
         tid = omp_get_thread_num() + 1
         !$OMP DO
         do node_id = 1, n_nodes
@@ -2061,9 +2173,31 @@ contains
                 end if
                 enthalpy(node_id) = H_j
                 density(node_id) = rho_j
+                if (want_dH_dT .and. active_thermal) then
+                    dHdT_j = 0.0d0
+                    call self%thermal%compute_mass_term(material_id, states(tid), dHdT_j)
+                    dH_dT_local(node_id) = dHdT_j
+                end if
+                if (want_drho_dp .and. active_hydraulic) then
+                    ! d(rho_eq)/dp = rho_w * C_eq, where rho_eq = rho_w*Theta +
+                    ! (rho_std-rho_w)*compressive_storage (exact identity, see
+                    ! calc_effective_density_value_hydraulic and Theta_j in
+                    ! compute_transient_term_mixed_hydraulic) and C_eq =
+                    ! d(Theta)/dp. The dropped (rho_std-rho_w)*d(compressive_
+                    ! storage)/dp term is at most O(1 kg/m3)*O(1e-7 1/Pa),
+                    ! five to six orders below rho_w*C_eq for the retention
+                    ! curves this code targets, and is therefore not evaluated.
+                    drhodp_j = 0.0d0
+                    rho_w_j = 0.0d0
+                    call self%hydraulic%compute_C_eq(material_id, states(tid), drhodp_j)
+                    call self%thermal%calc_density_water(states(tid), rho_w_j)
+                    drho_dp_local(node_id) = rho_w_j * drhodp_j
+                end if
             else
                 sum_H = 0.0d0
                 sum_rho = 0.0d0
+                sum_dHdT = 0.0d0
+                sum_drhodp = 0.0d0
                 wsum = 0.0d0
                 do k = row_start, row_end
                     repr_elem = self%node_material_table%repr_element(k)
@@ -2078,12 +2212,26 @@ contains
                     end if
                     sum_H = sum_H + H_j * measure
                     sum_rho = sum_rho + rho_j * measure
+                    if (want_dH_dT .and. active_thermal) then
+                        dHdT_j = 0.0d0
+                        call self%thermal%compute_mass_term(material_id, states(tid), dHdT_j)
+                        sum_dHdT = sum_dHdT + dHdT_j * measure
+                    end if
+                    if (want_drho_dp .and. active_hydraulic) then
+                        drhodp_j = 0.0d0
+                        rho_w_j = 0.0d0
+                        call self%hydraulic%compute_C_eq(material_id, states(tid), drhodp_j)
+                        call self%thermal%calc_density_water(states(tid), rho_w_j)
+                        sum_drhodp = sum_drhodp + (rho_w_j * drhodp_j) * measure
+                    end if
                     wsum = wsum + measure
                 end do
                 ! Degenerate zero-measure rows leave the pre-zeroed values.
                 if (wsum > epsilon(1.0d0)) then
                     enthalpy(node_id) = sum_H / wsum
                     density(node_id) = sum_rho / wsum
+                    if (want_dH_dT .and. active_thermal) dH_dT_local(node_id) = sum_dHdT / wsum
+                    if (want_drho_dp .and. active_hydraulic) drho_dp_local(node_id) = sum_drhodp / wsum
                 end if
             end if
         end do
@@ -2091,12 +2239,16 @@ contains
         !$OMP END PARALLEL
 
         if (allocated(states)) deallocate (states)
+
+        if (want_dH_dT) call allocate_array(dH_dT, dH_dT_local)
+        if (want_drho_dp) call allocate_array(drho_dp, drho_dp_local)
     end subroutine compute_nodal_conserved_ftcms
 
     !> See the interface for the mathematical definition. Cost: O(N_dof) per step.
-    module function compute_lte_error_ftcms(self) result(error_rel)
+    module function compute_lte_error_ftcms(self, order_used) result(error_rel)
         implicit none
         class(type_ftcms), intent(inout) :: self
+        integer(int32), intent(inout), optional :: order_used
         real(real64) :: error_rel
 
         real(real64) :: dt_n, e_thermal, e_hydraulic
@@ -2106,6 +2258,7 @@ contains
         real(real64), allocatable :: enthalpy(:), density(:)
 
         error_rel = -1.0d0
+        if (present(order_used)) order_used = 1
         call self%control%get_dt(dt_n)
         if (dt_n <= 0.0d0) return
         if (.not. self%lte_has_state .or. .not. self%lte_has_derivative) return
@@ -2126,6 +2279,7 @@ contains
         ! bound because the run is still first order there anyway.
         if (bdf_order >= 2 .and. .not. self%lte_has_second_difference) bdf_order = 1
         if (bdf_order >= 2 .and. dt_n + self%lte_prev_span <= 0.0d0) bdf_order = 1
+        if (present(order_used)) order_used = bdf_order
 
         e_thermal = -1.0d0
         e_hydraulic = -1.0d0
@@ -2163,6 +2317,11 @@ contains
         end if
 
         error_rel = max(e_thermal, e_hydraulic)
+
+        if (LTE_BLOCK_REPORT) then
+            write (*, '(A,ES11.3,A,ES11.3,A,ES11.3)') '   [LTE] blocks: enthalpy=', e_thermal, &
+                ' water_mass=', e_hydraulic, ' dt[s]=', dt_n
+        end if
 
     contains
 
@@ -2232,8 +2391,21 @@ contains
 
             ! One weighted RMS over the whole distributed problem: a per-rank
             ! norm would hand each rank a different dt and desynchronize them.
-            accum_local(1) = sum((defect(:) / max(weight(:), tiny(1.0d0)))**2)
-            accum_local(2) = real(size(y), real64)
+            ! Weighted by nodal volume, not node count, so the estimate does not
+            ! grow simply because the surface mesh is graded finer.
+            if (allocated(self%nodal_volume)) then
+                if (size(self%nodal_volume) == size(y)) then
+                    accum_local(1) = sum(self%nodal_volume(:) * &
+                                         (defect(:) / max(weight(:), tiny(1.0d0)))**2)
+                    accum_local(2) = sum(self%nodal_volume(:))
+                else
+                    accum_local(1) = sum((defect(:) / max(weight(:), tiny(1.0d0)))**2)
+                    accum_local(2) = real(size(y), real64)
+                end if
+            else
+                accum_local(1) = sum((defect(:) / max(weight(:), tiny(1.0d0)))**2)
+                accum_local(2) = real(size(y), real64)
+            end if
 #ifdef _MPI
             call MPI_Allreduce(accum_local, accum_global, 2, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, ierr)
 #else

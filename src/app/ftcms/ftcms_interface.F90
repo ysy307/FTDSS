@@ -36,6 +36,66 @@ module app_ftcms
     real(real64), parameter :: WALL_PRESS_MIN_PA = -1.0d7
     real(real64), parameter :: WALL_PRESS_MAX_PA = 1.0d7
 
+    !> Overwrite the Gauss-point dQi/dT with the node-interpolated value.
+    !>
+    !> update_water_phases computes dQi/dT consistently at the Gauss point from
+    !> that point's own (T, p); replacing it by an interpolation of the nodal
+    !> values makes the apparent heat capacity in K_TT a different number from
+    !> the derivative of the enthalpy the residual integrates at that point.
+    !> Default is direct Gauss-point evaluation (.false.); the lerp path is
+    !> kept only as a regression-comparison switch. Declared here (rather than
+    !> in ftcms_assemble.F90, where the production path consumes it) because
+    !> the FD-Jacobian audit in ftcms_fd_jacobian.F90 must gate the same
+    !> switch, and a parameter private to one submodule is invisible to a
+    !> sibling submodule.
+    logical, parameter :: LERP_NODAL_DQI_DT = .false.
+
+    !> Replace all four coupled element blocks (K_TT, K_TH, K_HT, K_HH) with
+    !> their element finite-difference tangent, instead of only K_TH.
+    !>
+    !> The residual is now C^1 (smooth pore-limited cryosuction), so the true
+    !> element tangent is well-defined everywhere a Newton step is taken. The
+    !> remaining hand-written blocks are not that tangent: K_TT, K_HT and K_HH
+    !> are Modified-Picard blocks built from transport coefficients (impedance,
+    !> thermal conductivity, geometric-mean permeability) and a chord heat
+    !> capacity that are lagged at the current iterate rather than
+    !> differentiated, so the assembled operator is not dR/du at a developed
+    !> freezing front. Measured on such a step, the resulting update was an
+    !> ascent direction for the line-search merit (ratio 5194 at alpha=1,
+    !> still 8.95 at alpha=0.0078), and the nonlinear solve stalled at dt_min.
+    !> Declared here for the same reason as LERP_NODAL_DQI_DT: both
+    !> ftcms_assemble.F90 (production wiring) and ftcms_fd_jacobian.F90 (the
+    !> new routine) must see the same switch.
+    !>
+    !> When .true., an element where both physics are active gets all four
+    !> blocks from assemble_tangent_fd_ftcms; COUPLING_TH_FINITE_DIFFERENCE is
+    !> then moot for such elements (see ftcms_assemble.F90). When .false., the
+    !> previous TH-only finite-difference path remains selectable through
+    !> COUPLING_TH_FINITE_DIFFERENCE.
+    logical, parameter :: FULL_FD_TANGENT = .true.
+
+    !> Bound the coupled Newton update by a variable-wise trust region.
+    !>
+    !> Measured without it: single updates of 23 K and 13 MPa, and nodal water
+    !> contents moving by 0.32 (62 percent of the porosity) in one iteration -
+    !> far outside the range where the local linearisation the step came from
+    !> is meaningful, even when the direction itself is sound.
+    !>
+    !> The bound also repairs a structural defect in the unbounded path. The
+    !> temperature and pressure blocks each computed their OWN validity-wall
+    !> factor, so whenever one block's wall bound bound and the other's did
+    !> not, T and p were scaled differently: that does not shorten the Newton
+    !> step, it ROTATES it, and the line search is then no longer searching
+    !> along the direction it was handed. With the bound enabled a single
+    !> factor scales both blocks.
+    logical, parameter :: STEP_BOUND_ENABLED = .true.
+    !> Largest temperature change admitted in one nonlinear update [K].
+    real(real64), parameter :: STEP_BOUND_DT = 5.0d-1
+    !> Largest pore-pressure change admitted in one nonlinear update [Pa].
+    !> 50 kPa is about 0.04 K of Clapeyron freezing-point shift, so the two
+    !> bounds constrain the phase state by comparable amounts.
+    real(real64), parameter :: STEP_BOUND_DP = 5.0d4
+
     !>
     !> Static per-node table of the distinct materials among a node's
     !> adjacent elements, built once after the domain is initialized (the
@@ -205,6 +265,12 @@ module app_ftcms
         real(real64), allocatable :: lte_d2_prev_hydraulic(:)
         !> Total mesh measure, summed once and reused by the residual floor.
         real(real64) :: domain_measure_total = -1.0d0
+        !> Nodal control volumes V_i = sum_e int psi_i dOmega [m3], one entry
+        !> per domain node (row-sum-lumped mass matrix with unit coefficient),
+        !> built once (the mesh is static) and handed to the convergence
+        !> control's exact per-node local conservation gate. See
+        !> solve_time_step_initial_setup_ftcms.
+        real(real64), allocatable :: nodal_volume(:)
         real(real64) :: lte_prev_dt = 0.0d0
         !> t_{n-1} - t_{n-3} spanned by lte_d2_prev.
         real(real64) :: lte_prev_span = 0.0d0
@@ -314,6 +380,7 @@ module app_ftcms
         procedure, public, pass(self) :: assemble => assemble_ftcms
         procedure, public, pass(self) :: report_fd_jacobian => report_fd_jacobian_ftcms
         procedure, private, pass(self) :: assemble_coupling_fd => assemble_coupling_fd_ftcms
+        procedure, private, pass(self) :: assemble_tangent_fd => assemble_tangent_fd_ftcms
         procedure, private, pass(self) :: assemble_initialize => assemble_initialize_ftcms
         procedure, private, pass(self) :: assemble_destroy => assemble_destroy_ftcms
 
@@ -543,12 +610,18 @@ module app_ftcms
 
         !> Evaluate the per-node conserved quantities (volumetric enthalpy density
         !> and pore-water effective density) at the current iterate, for the
-        !> conserved-quantity nonlinear convergence norm.
-        module subroutine compute_nodal_conserved_ftcms(self, enthalpy, density)
+        !> conserved-quantity nonlinear convergence norm. The optional dH_dT/
+        !> drho_dp outputs are the matching nodal storage sensitivities (dH/dT,
+        !> d rho_eq/dp), used by the primary-variable local error measure (see
+        !> control_iteration_convergence:local_error_block); computed only when
+        !> the corresponding actual argument is present.
+        module subroutine compute_nodal_conserved_ftcms(self, enthalpy, density, dH_dT, drho_dp)
             implicit none
             class(type_ftcms), intent(inout) :: self
             real(real64), allocatable, intent(inout) :: enthalpy(:)
             real(real64), allocatable, intent(inout) :: density(:)
+            real(real64), allocatable, intent(inout), optional :: dH_dT(:)
+            real(real64), allocatable, intent(inout), optional :: drho_dp(:)
         end subroutine compute_nodal_conserved_ftcms
 
         !> Normalized local-truncation-error estimate of the tentative BDF1 step.
@@ -559,9 +632,14 @@ module app_ftcms
         !> component-wise atol/rtol weighted RMS norm.
         !> Returns -1 on the first step (no previous derivative yet) so the caller
         !> skips error control. This function does not mutate accepted history.
-        module function compute_lte_error_ftcms(self) result(error_rel)
+        module function compute_lte_error_ftcms(self, order_used) result(error_rel)
             implicit none
             class(type_ftcms), intent(inout) :: self
+            !> BDF order the estimate was actually measured at, which is not
+            !> always the controller's configured order: the estimator falls
+            !> back to 1 until the second difference exists. The step-size
+            !> retry must be resized at this order, not the configured one.
+            integer(int32), intent(inout), optional :: order_used
             real(real64) :: error_rel
         end function compute_lte_error_ftcms
 
@@ -674,6 +752,47 @@ module app_ftcms
             type(type_matrix_dense), intent(inout) :: K_TH
 
         end subroutine assemble_coupling_fd_ftcms
+
+        !> Overwrite all four coupled element blocks (K_TT, K_TH, K_HT, K_HH)
+        !> with the element finite-difference tangent of the same two
+        !> residuals \( \partial R_T/\partial(T,p), \partial R_H/\partial(T,p) \).
+        !>
+        !> Assumes `local_F_T` and `local_F_H` hold the element thermal and
+        !> hydraulic residuals at the unperturbed state; both are restored on
+        !> exit and the workspace is left on the unperturbed state regardless
+        !> of `ok`. Cost: \(2 n_{node}\) perturbations, each reading both
+        !> residuals (one thermal and one hydraulic evaluation), against
+        !> \(n_{node}\) perturbations of one residual for
+        !> assemble_coupling_fd_ftcms. Unlike that routine, each perturbation
+        !> here also needs a full nodal constitutive refresh (not only the
+        !> Gauss-point one), because the hydraulic residual reads nodal
+        !> derived state (effective_suction, transport coefficients) directly;
+        !> see the submodule doc comment for why. Failure behavior: if any
+        !> perturbed residual evaluation is non-finite, `ok` is returned
+        !> .false. and K_TT/K_TH/K_HT/K_HH are left untouched, so the
+        !> caller's previously assembled (analytic) blocks survive.
+        module subroutine assemble_tangent_fd_ftcms(self, workspace, local_F_T, local_F_H, &
+                                                    K_TT, K_TH, K_HT, K_HH, ok)
+            implicit none
+            class(type_ftcms), intent(inout) :: self
+            type(type_assemble_workspace), intent(inout) :: workspace
+            !> Element thermal residual; restored unchanged on exit
+            type(type_vector_dp), intent(inout) :: local_F_T
+            !> Element hydraulic residual; restored unchanged on exit
+            type(type_vector_dp), intent(inout) :: local_F_H
+            !> Overwritten with the finite-difference d R_T/d T block if ok
+            type(type_matrix_dense), intent(inout) :: K_TT
+            !> Overwritten with the finite-difference d R_T/d p block if ok
+            type(type_matrix_dense), intent(inout) :: K_TH
+            !> Overwritten with the finite-difference d R_H/d T block if ok
+            type(type_matrix_dense), intent(inout) :: K_HT
+            !> Overwritten with the finite-difference d R_H/d p block if ok
+            type(type_matrix_dense), intent(inout) :: K_HH
+            !> .true. if every perturbation produced a finite residual and the
+            !> four blocks were overwritten; .false. if left untouched
+            logical, intent(inout) :: ok
+
+        end subroutine assemble_tangent_fd_ftcms
 
         module subroutine assemble_initialize_ftcms(self, element_id, workspace, local_K_TT, local_K_TH, &
                                                     local_K_HH, local_K_HT, local_F_T, local_F_H, &

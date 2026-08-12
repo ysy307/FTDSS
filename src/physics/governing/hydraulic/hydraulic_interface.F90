@@ -5,11 +5,43 @@ module physics_governing_hydraulic
     use :: module_input, only:type_input, input_translator
     use :: module_linalg
     use :: module_constitutive, g => gravity_acceleration, rho_std => reference_water_density
-    use :: physics_governing_base, only:type_assemble_workspace
+    use :: physics_governing_base, only:type_assemble_workspace, HYDRAULIC_DRIVER_TOTAL_POTENTIAL
     implicit none
     private
 
     public :: type_hydraulic
+    public :: CAPACITY_REGULARIZATION_ENABLED
+
+    !> Add the iteration-decaying L-scheme capacity to K_HH.
+    !>
+    !> This term is added to the MATRIX only and never to the residual, so
+    !> while it is on, K is not the derivative of R by construction. That is
+    !> tolerable for a Picard iteration - it is the classical L-scheme bound -
+    !> but it invalidates the one identity a line search relies on:
+    !> d/dalpha ||W R||^2 = -2||W R||^2 < 0 holds only for K = dR/du. With the
+    !> element tangent now assembled by finite differences of the residual and
+    !> the linear solve verified to 1e-8, this term is the last remaining
+    !> inconsistency between the operator solved and the function measured.
+    !>
+    !> Removing it has now been measured TWICE and is worse both times, so the
+    !> term is load bearing rather than optional. Without it the pressure row
+    !> is degenerate where the medium saturates - dtheta_SWRC/ds_m -> 0 leaves
+    !> only the compressible storage, ~2e-10 1/Pa - and the Newton direction
+    !> for that row is meaningless. The first attempt (before any step bound)
+    !> exploded with |du_p| ~ 1e13. The second, with the joint step bound in
+    !> place, did not explode: the bound simply shrank the whole update to
+    !> lambda ~ 1e-9, the iterate stopped moving (resT/0 pinned at 1.000,
+    !> dQeff = 0), and the run died at t = 2.3 s having accepted one step. A
+    !> trust region converts the explosion into paralysis; it does not supply
+    !> the missing storage.
+    !>
+    !> The principled replacement is pseudo-transient continuation: the same
+    !> matrix-only diagonal, but M/tau with tau driven by the measured residual
+    !> reduction, so the added term vanishes as the iteration converges and K
+    !> returns to dR/du in the limit. Until that is in place this stays on and
+    !> the inconsistency it introduces is a known, bounded one (it decays as
+    !> 1/k within a step).
+    logical, parameter :: CAPACITY_REGULARIZATION_ENABLED = .true.
 
     type :: type_hydraulic
         private
@@ -17,6 +49,13 @@ module physics_governing_hydraulic
         integer(int32) :: computation_dimension
         logical :: enable_vapor_transport = .true.
         logical :: enable_fringe_subcell_quadrature = .true.
+        !> Diagnostic-only switch: skip the pseudo-transient capacity
+        !> regularization (see hydraulic_matrix.F90) when assembling K_HH.
+        !> Set by the FD-Jacobian audit (report_fd_jacobian_ftcms) so its
+        !> analytic comparison target is regularization-free, since that term
+        !> is added to the matrix only and the FD residual cannot see it.
+        !> Production assembly always runs with this .false.
+        logical :: disable_capacity_regularization = .false.
         real(real64), allocatable :: iteration_capacity_bound(:)
         real(real64), allocatable :: specific_storage(:)
         type(type_constitutive_manager) :: physics
@@ -43,6 +82,10 @@ module physics_governing_hydraulic
         procedure, pass(self), public :: calc_K_vT => calc_K_vT_hydraulic
         procedure, pass(self), public :: calc_K_vP => calc_K_vP_hydraulic
         procedure, pass(self), public :: is_vapor_transport_enabled => is_vapor_transport_enabled_hydraulic
+        procedure, pass(self), public :: set_disable_capacity_regularization => &
+            set_disable_capacity_regularization_hydraulic
+        procedure, pass(self), public :: get_capacity_regularization => &
+            get_capacity_regularization_hydraulic
 
         procedure, pass(self), public :: update_water_phases => update_water_phases_hydraulic
         procedure, pass(self), public :: calc_effective_density => calc_effective_density_hydraulic
@@ -53,6 +96,10 @@ module physics_governing_hydraulic
         procedure, pass(self), private :: compute_transient_term_mixed => compute_transient_term_mixed_hydraulic
         procedure, pass(self), private :: compute_compressive_storage => compute_compressive_storage_hydraulic
         procedure, pass(self), public :: calc_segregation_sink => calc_segregation_sink_hydraulic
+        ! ---- Meta / Utility ----
+        !> TEMPORARY Step-0 verification diagnostic (see hydraulic_matrix.F90);
+        !> to be removed once the subcell-quadrature firing rate is confirmed.
+        procedure, pass(self), public :: report_subcell_debug_counts => report_subcell_debug_counts_hydraulic
     end type type_hydraulic
 
     interface
@@ -171,6 +218,36 @@ module physics_governing_hydraulic
             logical :: enabled
         end function is_vapor_transport_enabled_hydraulic
 
+        !> Enable/disable the pseudo-transient capacity regularization added to
+        !> K_HH by assemble_local_picard_hydraulic. Diagnostic use only (see
+        !> the disable_capacity_regularization member doc).
+        module subroutine set_disable_capacity_regularization_hydraulic(self, disable)
+            implicit none
+            class(type_hydraulic), intent(inout) :: self
+            logical, intent(in) :: disable
+        end subroutine set_disable_capacity_regularization_hydraulic
+
+        !> Value of the pseudo-transient capacity regularization
+        !> assemble_local_picard_hydraulic adds to K_HH (hydraulic_matrix.F90),
+        !> without needing to assemble K_HH itself.
+        !>
+        !> \[ C_{reg} = C_{bound}(m) / \max(1, k) \]
+        !> where \(k\) is the nonlinear iteration. Returns 0 if the bound array
+        !> is not allocated or material_id is out of range, matching
+        !> assemble_local_picard_hydraulic's own guard. Reads only the
+        !> per-material bound array set once at initialize, so this is safe to
+        !> call concurrently from every thread of the parallel element loop.
+        module pure function get_capacity_regularization_hydraulic(self, material_id, nonlinear_iteration) &
+            result(value)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+            !> Element material id
+            integer(int32), intent(in) :: material_id
+            !> Current nonlinear (Newton) iteration, >= 1
+            integer(int32), intent(in) :: nonlinear_iteration
+            real(real64) :: value
+        end function get_capacity_regularization_hydraulic
+
         module subroutine update_water_phases_hydraulic(self, material_id, state)
             implicit none
             class(type_hydraulic), intent(in) :: self
@@ -200,9 +277,13 @@ module physics_governing_hydraulic
         end subroutine calc_effective_density_value_hydraulic
 
         !> Compute equivalent specific moisture capacity C_eq = dTheta/dP [1/Pa].
-        !> \[ C_{eq} = \frac{\partial\theta_l}{\partial P}
-        !>           + \frac{\rho_i}{\rho_l}\frac{\partial\theta_i}{\partial P}
-        !>           + \frac{\partial\theta_v}{\partial P} \]
+        !> \[ C_{eq} = \frac{\partial\Theta}{\partial P} + \frac{\partial\theta_v}{\partial P}
+        !>           + C_{compressive} \]
+        !> \(\Theta=\theta_{SWRC}(s_m)\) is the retention-curve total water content;
+        !> its pressure tangent is read directly from the state (set by
+        !> calc_phase_split), not recombined from per-phase derivatives. The vapor
+        !> term applies only when vapor transport is enabled, and \(C_{compressive}\)
+        !> is the saturated compressible-storage capacity.
         module subroutine compute_C_eq_hydraulic(self, material_id, state, C_eq)
             implicit none
             class(type_hydraulic), intent(in) :: self
@@ -248,6 +329,17 @@ module physics_governing_hydraulic
             real(real64), intent(in) :: dt
             real(real64), intent(inout) :: S_seg
         end subroutine calc_segregation_sink_hydraulic
+
+        !> TEMPORARY Step-0 verification diagnostic. Prints and resets the
+        !> module-scope "elements considered / elements cut" counters
+        !> accumulated by assemble_local_picard_hydraulic (hydraulic_matrix.F90)
+        !> since the last call. No-op unless DEBUG_SUBCELL_COUNTER is .true.
+        !> there. Remove together with the counters once the subcell-quadrature
+        !> firing rate is confirmed for the case under investigation.
+        module subroutine report_subcell_debug_counts_hydraulic(self)
+            implicit none
+            class(type_hydraulic), intent(in) :: self
+        end subroutine report_subcell_debug_counts_hydraulic
 
     end interface
 

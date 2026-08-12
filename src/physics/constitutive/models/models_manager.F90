@@ -31,6 +31,7 @@ module constitutive_models_manager
         procedure, public :: calc_Kflh
         procedure, public :: calc_KlT
         procedure, public :: calc_cryo_head_dT
+        procedure, public :: calc_freezing_level_set
         procedure, public :: calc_Kvh
         procedure, public :: calc_KvT
         procedure, public :: calc_latent_heat_fusion
@@ -157,6 +158,17 @@ contains
 
         call self%phase_manager%calc_cryo_head_dT(state, dh_dT)
     end subroutine calc_cryo_head_dT
+
+    !> Freezing-interface level set consistent with calc_phase_split's own
+    !> switch; see type_fusion%calc_freezing_level_set for the definition.
+    subroutine calc_freezing_level_set(self, state, phi)
+        implicit none
+        class(type_models_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: phi
+
+        call self%phase_manager%calc_freezing_level_set(state, phi)
+    end subroutine calc_freezing_level_set
 
     subroutine calc_Kvh(self, state, Kvh)
         implicit none

@@ -3,10 +3,20 @@ module physics_governing_base
     use :: module_core
     use :: module_control
     use :: module_domain
+    use :: module_constitutive, only:type_constitutive_manager
+    use :: domain_fe_subcell, only:type_subcell_quadrature_point, SUBCELL_QUADRATURE_CAPACITY, &
+                                   build_interface_quadrature_points
     implicit none
     private
 
     public :: type_assemble_workspace
+    public :: HYDRAULIC_DRIVER_TOTAL_POTENTIAL
+
+    !> Drive the liquid Darcy flux with p_l = -s_eff (Dall'Amico) instead of
+    !> the primary unknown p_w. Every consumer of the driver must scale by
+    !> d(p_l)/dX, which is not unity. Lives here because the thermal block
+    !> consumes the same flux and must not reference type_hydraulic.
+    logical, parameter :: HYDRAULIC_DRIVER_TOTAL_POTENTIAL = .true.
 
     type :: type_assemble_workspace
         logical, private :: is_initialized = .false.
@@ -28,6 +38,10 @@ module physics_governing_base
         real(real64), allocatable :: T_gp(:)
         real(real64), allocatable :: P_node(:)
         real(real64), allocatable :: P_gp(:)
+        !> Nodal liquid pressure p_l = -s_eff [Pa]. Element local, so its
+        !> gradient enters the residual as grad(I_h p_l), the same discrete
+        !> object the hydraulic flux applies the FE operator to.
+        real(real64), allocatable :: Pl_node(:)
         real(real64), allocatable :: phi_node(:)
         real(real64), allocatable :: phi_gp(:)
         real(real64), allocatable :: Qi_node(:)
@@ -51,6 +65,23 @@ module physics_governing_base
         real(real64), allocatable :: work_d_dt(:)
         real(real64), allocatable :: work_matrix(:, :)
 
+        ! --- Interface subcell quadrature (shared level set for THERMAL/HYDRAULIC) ---
+        !> .true. once compute_interface_subcell has populated is_cut and the
+        !> subcell rule for the CURRENT element; reset to .false. at the top of
+        !> initialize() so every new element recomputes. Lets whichever
+        !> governing block (THERMAL or HYDRAULIC) assembles second on this
+        !> workspace reuse the first block's result instead of recomputing the
+        !> level set, so the two blocks can never disagree on the interface.
+        logical, private :: is_interface_subcell_ready = .false.
+        !> .true. iff the current element is cut by the freezing interface
+        !> phi = 0 and the interface-split subcell rule applies to it.
+        logical :: is_cut = .false.
+        !> Number of valid entries in subcell_quadrature_points (0 when uncut or unsupported).
+        integer(int32) :: num_subcell_quadrature_points = 0
+        !> Interface-split subcell quadrature points of the current element
+        !> (see build_interface_quadrature_points); valid only when is_cut.
+        type(type_subcell_quadrature_point) :: subcell_quadrature_points(SUBCELL_QUADRATURE_CAPACITY)
+
         integer(int32) :: material_id
         integer(int32) :: element_id
         integer(int32) :: computation_type
@@ -68,6 +99,9 @@ module physics_governing_base
 
         procedure, public, pass(self) :: lerp => lerp_states
         procedure, public, pass(self) :: lerp_dqi_dt => lerp_dqi_dt_from_nodes
+
+        procedure, public, pass(self) :: compute_interface_subcell => compute_interface_subcell_assemble_workspace
+        procedure, public, pass(self) :: invalidate_interface_subcell => invalidate_interface_subcell_assemble_workspace
 
         procedure, public, pass(self) :: compute_K1 => compute_K1_assemble_workspace
         procedure, public, pass(self) :: compute_K1_lumped => compute_K1_lumped_assemble_workspace
@@ -93,6 +127,13 @@ contains
         type(type_control), intent(in) :: control
 
         integer(int32) :: fe_type
+
+        ! Every call corresponds to exactly one new element: the interface
+        ! subcell cache (compute_interface_subcell) must never leak from the
+        ! previous element into this one.
+        self%is_interface_subcell_ready = .false.
+        self%is_cut = .false.
+        self%num_subcell_quadrature_points = 0
 
         if (.not. self%associated_bdf) then
             call self%set_bdf_info(control)
@@ -184,6 +225,7 @@ contains
         ! Allocate workspace arrays
         call allocate_and_init(self%T_node, self%num_fe_nodes)
         call allocate_and_init(self%P_node, self%num_fe_nodes)
+        call allocate_and_init(self%Pl_node, self%num_fe_nodes)
         call allocate_and_init(self%phi_node, self%num_fe_nodes)
         call allocate_and_init(self%Qi_node, self%num_fe_nodes)
         call allocate_and_init(self%Qw_node, self%num_fe_nodes)
@@ -288,6 +330,7 @@ contains
         ! Initialize all variables to safe defaults
         self%T_node(:) = 273.15d0
         self%P_node(:) = 0.0d0
+        self%Pl_node(:) = 0.0d0
         self%phi_node(:) = 0.0d0
         self%Qi_node(:) = 0.0d0
         self%Qw_node(:) = 0.0d0
@@ -347,12 +390,25 @@ contains
             end if
         end do
 
+        do i = 1, self%num_fe_nodes
+            is_set = .false.
+            call self%state(i)%effective_suction%get(work_value, is_set=is_set)
+            if (is_set) then
+                self%Pl_node(i) = -work_value
+            else
+                self%Pl_node(i) = self%P_node(i)
+            end if
+        end do
+
         do i = 1, self%num_fe_gauss
             call self%fe%lerp(gp(i), self%P_node(1:self%num_fe_nodes), self%P_gp(i))
             call self%state_gp(i)%pressure%set(self%P_gp(i))
 
             call self%fe%dlerp(gp(i), self%P_node(1:self%num_fe_nodes), self%coordinates, self%computation_type, dlerped_value)
             call self%state_gp(i)%grad_P%set(dlerped_value)
+
+            call self%fe%dlerp(gp(i), self%Pl_node(1:self%num_fe_nodes), self%coordinates, self%computation_type, dlerped_value)
+            call self%state_gp(i)%grad_Pl%set(dlerped_value)
         end do
 
         do j = 1, self%num_fe_gauss
@@ -470,6 +526,78 @@ contains
         nullify (gp)
 
     end subroutine lerp_dqi_dt_from_nodes
+
+    !> Compute the freezing-interface level set and interface-split subcell
+    !> quadrature for the CURRENT element, once, so THERMAL and HYDRAULIC -
+    !> the only two callers - always agree on where the interface is.
+    !>
+    !> phi = (s_f - s_m) + eps_s, the same switch
+    !> type_constitutive_manager%calc_freezing_level_set uses to decide ice
+    !> existence (see models_manager.F90 / fusion.F90 for the derivation).
+    !> Guarded by is_interface_subcell_ready: the first governing block that
+    !> assembles on this workspace populates is_cut and the subcell rule; the
+    !> second reuses them unchanged instead of recomputing. Falls back to
+    !> is_cut = .false. (caller uses the standard Gauss rule) when subcell
+    !> quadrature is disabled, the material has no cryo transport, the
+    !> element is not 2D, or build_interface_quadrature_points reports an
+    !> unsupported element family (num_subcell_quadrature_points = 0).
+    subroutine compute_interface_subcell_assemble_workspace(self, physics, material_id, enabled)
+        implicit none
+        class(type_assemble_workspace), intent(inout) :: self
+        !> Per-material constitutive manager (each governing type owns its
+        !> own private instance; both provide the identical level set for a
+        !> given material_id and state, so either may be passed here).
+        class(type_constitutive_manager), intent(in) :: physics
+        integer(int32), intent(in) :: material_id
+        !> Analysis-control gate (input%basic%analysis_controls%
+        !> enable_fringe_subcell_quadrature); the caller's own copy of the flag.
+        logical, intent(in) :: enabled
+
+        real(real64) :: phi_nodes(self%num_fe_nodes)
+        integer(int32) :: i
+        logical :: use_subcell
+
+        if (self%is_interface_subcell_ready) return
+        self%is_interface_subcell_ready = .true.
+        self%is_cut = .false.
+        self%num_subcell_quadrature_points = 0
+
+        use_subcell = enabled .and. physics%has_cryo_transport(material_id) .and. self%num_fe_dimension == 2
+        if (.not. use_subcell) return
+
+        do i = 1, self%num_fe_nodes
+            call physics%calc_freezing_level_set(material_id, self%state(i), phi_nodes(i))
+        end do
+
+        ! Built for every element, not only sign-mixed ones: gating on mixed
+        ! signs switches between two rules that do not agree in the limit.
+        call build_interface_quadrature_points(self%fe, phi_nodes(1:self%num_fe_nodes), &
+                                              self%subcell_quadrature_points, self%num_subcell_quadrature_points)
+        self%is_cut = (self%num_subcell_quadrature_points > 0)
+
+    end subroutine compute_interface_subcell_assemble_workspace
+
+    !> Drop the cached interface split so the next compute_interface_subcell
+    !> rebuilds it from the current nodal state.
+    !>
+    !> The cache exists so THERMAL and HYDRAULIC share one level set per
+    !> element. A finite-difference tangent, however, perturbs a nodal unknown
+    !> and re-evaluates the element residual WITHOUT going through the element
+    !> setup that clears the cache, so without this the differentiated residual
+    !> keeps the unperturbed element's interface while the residual the line
+    !> search later evaluates recomputes it. The integrand jumps across that
+    !> interface - the latent heat lives on one side only - so the frozen
+    !> geometry omits a first-order term of the true derivative rather than a
+    !> small one. Measured with the thermal block on the cut rule: the coupled
+    !> solve diverged to the temperature validity walls.
+    subroutine invalidate_interface_subcell_assemble_workspace(self)
+        implicit none
+        class(type_assemble_workspace), intent(inout) :: self
+
+        self%is_interface_subcell_ready = .false.
+        self%is_cut = .false.
+        self%num_subcell_quadrature_points = 0
+    end subroutine invalidate_interface_subcell_assemble_workspace
 
     subroutine compute_K1_assemble_workspace(self, A_gp, local_matrix)
         implicit none
@@ -601,6 +729,10 @@ contains
             if (allocated(self%work_L)) deallocate (self%work_L)
             if (allocated(self%work_d_dt)) deallocate (self%work_d_dt)
             if (allocated(self%work_matrix)) deallocate (self%work_matrix)
+
+            self%is_interface_subcell_ready = .false.
+            self%is_cut = .false.
+            self%num_subcell_quadrature_points = 0
 
             nullify (self%fe)
             self%is_initialized = .false.

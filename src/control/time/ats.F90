@@ -190,20 +190,32 @@ contains
     end subroutine pi_controller_dt
 
     !> Retry step after a converged solve violates the LTE tolerance.
-    pure subroutine lte_retry_dt(self, current_dt, error_norm, retry_dt)
+    !>
+    !> \[ \Delta t_{retry} = \Delta t\, \mathrm{clip}\!\left(
+    !>    f_{safe} E^{-1/(k+1)},\, 0.1,\, 0.8 \right) \]
+    !>
+    !> for a defect of order \(k+1\): the exponent must match the order the
+    !> estimate was measured at. An absent order keeps BDF1 behaviour.
+    pure subroutine lte_retry_dt(self, current_dt, error_norm, retry_dt, error_order)
         implicit none
         class(type_ats), intent(in) :: self
         real(real64), intent(in) :: current_dt
         real(real64), intent(in) :: error_norm
         real(real64), intent(inout) :: retry_dt
+        !> BDF order the estimate was measured at; defect order is order + 1
+        integer(int32), intent(in), optional :: error_order
 
-        real(real64) :: ratio
+        real(real64) :: ratio, exponent
+        integer(int32) :: order
 
         retry_dt = current_dt
         if (.not. self%active .or. error_norm <= 1.0d0) return
 
-        ! BDF1 has a second-order local defect, hence exponent -1/2.
-        ratio = self%safety_factor * error_norm**(-0.5d0)
+        order = 1
+        if (present(error_order)) order = max(1, error_order)
+        exponent = -1.0d0 / real(order + 1, real64)
+
+        ratio = self%safety_factor * error_norm**exponent
         ratio = min(0.8d0, max(0.1d0, ratio))
         retry_dt = max(self%dt_min, min(current_dt * ratio, self%dt_max))
     end subroutine lte_retry_dt

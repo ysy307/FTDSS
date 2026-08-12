@@ -30,6 +30,7 @@ module models_phase_change_manager
         procedure, public :: update_water_phases
         procedure, public :: project_ice_content
         procedure, public :: calc_cryo_head_dT
+        procedure, public :: calc_freezing_level_set
         procedure, public :: calc_conserved_target
         procedure, public :: solve_local_conserved_equilibrium
         procedure, public :: calc_latent_heat_fusion
@@ -72,15 +73,8 @@ contains
         real(real64) :: dQi_dP, dQi_dT
         real(real64) :: dQa_dP, dQa_dT
         real(real64) :: dQv_dP, dQv_dT
-        real(real64) :: psi_eff
-
-        ! 0. Generalized suction psi_cap + psi_cryo driving the liquid retention,
-        !    the relative permeability AND the Darcy total potential. Published
-        !    on the state so the HCF models and the hydraulic residual all see
-        !    the same potential the retention curve was evaluated at.
-        psi_eff = 0.0d0
-        call self%fusion%calc_effective_suction(state, psi_eff)
-        call state%effective_suction%set(psi_eff)
+        real(real64) :: dTheta_dP, dTheta_dT
+        real(real64) :: psi_eff, dSeff_dP, dSeff_dT
 
         ! 1. Get porosity
         call state%porosity%get(porosity)
@@ -102,35 +96,38 @@ contains
         ! it can stay liquid, and the rest is ice. p_w is never assigned here -
         ! it remains the unknown of the mass balance, and the Clapeyron relation
         ! enters only through the freezing-equivalent suction.
+        !
+        ! calc_phase_split also returns the effective suction s_eff it used for
+        ! theta_l - the SAME (possibly pore-volume-limited) suction that must
+        ! drive the relative permeability and the Darcy total potential.
+        ! Publishing that value (instead of a second, independent
+        ! calc_effective_suction call) guarantees the storage split and the
+        ! transport potential can never disagree about which suction is
+        ! limited.
+        psi_eff = 0.0d0
+        dSeff_dP = 0.0d0
+        dSeff_dT = 0.0d0
         block
             real(real64) :: theta_total
             theta_total = 0.0d0
             call self%fusion%calc_phase_split(state, theta_total, water_content, ice_content, &
-                                              dQw_dP, dQw_dT, dQi_dP, dQi_dT)
+                                              dQw_dP, dQw_dT, dQi_dP, dQi_dT, &
+                                              dtotal_dP=dTheta_dP, dtotal_dT=dTheta_dT, &
+                                              suction_effective_out=psi_eff, &
+                                              dsuction_eff_dP_out=dSeff_dP, &
+                                              dsuction_eff_dT_out=dSeff_dT)
         end block
-        water_content = max(0.0d0, water_content)
+        call state%effective_suction%set(psi_eff)
+        call state%dSeff_dP%set(dSeff_dP)
+        call state%dSeff_dT%set(dSeff_dT)
 
-        ! Phase-volume bounds. Keep the one-sided thermodynamic derivatives
-        ! while a phase is active; tapering dQi/dT, dQi/dP to zero right at
-        ! theta_i = 0 would remove the apparent heat capacity exactly at the
-        ! freezing front and make the Picard map jump across it.
-        if (ice_content < 0.0d0) then
-            ice_content = 0.0d0
-            dQi_dP = 0.0d0
-            dQi_dT = 0.0d0
-        end if
-        if (ice_content > porosity) then
-            ice_content = porosity
-            dQi_dP = 0.0d0
-            dQi_dT = 0.0d0
-        end if
-
-        if (water_content + ice_content > porosity) then
-            water_content = max(0.0d0, porosity - ice_content)
-            dQw_dP = -dQi_dP
-            dQw_dT = -dQi_dT
-        end if
-
+        ! No post-hoc clamp on water_content/ice_content here: the identity
+        ! theta_w + (rho_i/rho_w) theta_i = Theta holds pointwise by
+        ! construction of calc_phase_split (theta_i is the complement of
+        ! theta_w against Theta), so overwriting either phase after the split
+        ! would break that identity and make the assembled storage tangent
+        ! (dTheta_dP/dT, set below) inconsistent with the values it is the
+        ! derivative of.
         air_content = max(0.0d0, porosity - water_content - ice_content)
         dQa_dP = -(dQw_dP + dQi_dP)
         dQa_dT = -(dQw_dT + dQi_dT)
@@ -143,6 +140,14 @@ contains
         call state%water_content%set(water_content)
         call state%dQw_dP%set(dQw_dP)
         call state%dQw_dT%set(dQw_dT)
+
+        ! Storage tangent d(Theta)/dP, d(Theta)/dT, evaluated directly by
+        ! calc_phase_split rather than recombined from dQw_dP + (rho_i/rho_w)
+        ! dQi_dP + Qi*d(rho_i/rho_w)/dP: calc_phase_split treats the density
+        ! ratio as frozen in its own derivatives, so adding a ratio-derivative
+        ! term here would double count physics the split does not carry.
+        call state%dTheta_dP%set(dTheta_dP)
+        call state%dTheta_dT%set(dTheta_dT)
 
         call state%air_content%set(air_content)
         call state%dQa_dP%set(dQa_dP)
@@ -219,6 +224,17 @@ contains
 
         call self%fusion%calc_cryo_head_dT(state, dh_dT)
     end subroutine calc_cryo_head_dT
+
+    !> Freezing-interface level set consistent with calc_phase_split's own
+    !> switch; see type_fusion%calc_freezing_level_set for the definition.
+    subroutine calc_freezing_level_set(self, state, phi)
+        implicit none
+        class(type_phase_manager), intent(in) :: self
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: phi
+
+        call self%fusion%calc_freezing_level_set(state, phi)
+    end subroutine calc_freezing_level_set
 
     subroutine project_ice_content(self, state, projected_ice, ice_increment, equilibrium_error, active_bound, &
                                     dice_dT, dice_dP)

@@ -73,6 +73,8 @@ module control_iteration_manager
         procedure, public, pass(self) :: update_reference_values => update_reference_values_iteration
         procedure, public, pass(self) :: set_residual_scale => set_residual_scale_iteration
         procedure, public, pass(self) :: get_residual_floors => get_residual_floors_iteration
+        procedure, public, pass(self) :: local_error_block => local_error_block_iteration
+        procedure, public, pass(self) :: commit_conserved_drift => commit_conserved_drift_iteration
         ! ---- Meta / Utility ----
     end type type_iteration
 
@@ -455,13 +457,46 @@ contains
         call self%settings%get_residual_floors(num_nodes, floor_thermal, floor_hydraulic)
     end subroutine get_residual_floors_iteration
 
-    subroutine set_residual_scale_iteration(self, volume_total, dt)
+    subroutine set_residual_scale_iteration(self, volume_total, dt, nodal_volume, &
+                                            dH_dT, drho_dp, u_thermal, u_hydraulic, &
+                                            atol_temperature_u, atol_pressure_u, rtol_u)
         implicit none
         class(type_iteration), intent(inout) :: self
         real(real64), intent(in) :: volume_total
         real(real64), intent(in) :: dt
+        real(real64), intent(in), optional :: nodal_volume(:)
+        real(real64), intent(in), optional :: dH_dT(:)
+        real(real64), intent(in), optional :: drho_dp(:)
+        real(real64), intent(in), optional :: u_thermal(:)
+        real(real64), intent(in), optional :: u_hydraulic(:)
+        real(real64), intent(in), optional :: atol_temperature_u
+        real(real64), intent(in), optional :: atol_pressure_u
+        real(real64), intent(in), optional :: rtol_u
 
-        call self%settings%set_residual_scale(volume_total, dt)
+        call self%settings%set_residual_scale(volume_total, dt, nodal_volume, &
+                                              dH_dT, drho_dp, u_thermal, u_hydraulic, &
+                                              atol_temperature_u, atol_pressure_u, rtol_u)
     end subroutine set_residual_scale_iteration
+
+    !> See control_iteration_convergence:local_error_block_convergence_control
+    !> for the mathematical definition.
+    function local_error_block_iteration(self, physics_type, residual) result(e_local)
+        implicit none
+        class(type_iteration), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        real(real64), intent(in) :: residual(:)
+        real(real64) :: e_local
+
+        e_local = self%settings%local_error_block(physics_type, residual)
+    end function local_error_block_iteration
+
+    !> Fold the pending conserved-quantity drift into the cumulative budget;
+    !> see control_iteration_convergence for the acceptance-time contract.
+    subroutine commit_conserved_drift_iteration(self)
+        implicit none
+        class(type_iteration), intent(inout) :: self
+
+        call self%settings%commit_conserved_drift()
+    end subroutine commit_conserved_drift_iteration
 
 end module control_iteration_manager

@@ -88,6 +88,13 @@ contains
         self%enable_vapor_transport = input%basic%analysis_controls%enable_vapor_transport
         self%enable_fringe_subcell_quadrature = input%basic%analysis_controls%enable_fringe_subcell_quadrature
 
+        ! D_HH sums the liquid and vapour conductivities, so the two cannot
+        ! be driven by different pressures until that sum is split.
+        if (HYDRAULIC_DRIVER_TOTAL_POTENTIAL .and. self%enable_vapor_transport) then
+            error stop 'type_hydraulic: HYDRAULIC_DRIVER_TOTAL_POTENTIAL requires enable_vapor_transport=false '// &
+                'until D_HH separates the liquid and vapour conductivities.'
+        end if
+
     end subroutine initialize_type_hydraulic
 
     module pure function is_vapor_transport_enabled_hydraulic(self) result(enabled)
@@ -97,5 +104,29 @@ contains
 
         enabled = self%enable_vapor_transport
     end function is_vapor_transport_enabled_hydraulic
+
+    module subroutine set_disable_capacity_regularization_hydraulic(self, disable)
+        implicit none
+        class(type_hydraulic), intent(inout) :: self
+        logical, intent(in) :: disable
+
+        self%disable_capacity_regularization = disable
+    end subroutine set_disable_capacity_regularization_hydraulic
+
+    module pure function get_capacity_regularization_hydraulic(self, material_id, nonlinear_iteration) &
+        result(value)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        integer(int32), intent(in) :: nonlinear_iteration
+        real(real64) :: value
+
+        value = 0.0d0
+        if (allocated(self%iteration_capacity_bound)) then
+            if (material_id >= 1 .and. material_id <= size(self%iteration_capacity_bound)) then
+                value = self%iteration_capacity_bound(material_id) / real(max(1, nonlinear_iteration), real64)
+            end if
+        end if
+    end function get_capacity_regularization_hydraulic
 
 end submodule hydraulic_base

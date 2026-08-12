@@ -56,6 +56,8 @@ module control_control_manager
         procedure, public, pass(self) :: check_convergence_conserved => check_convergence_conserved_control
         procedure, public, pass(self) :: set_residual_scale => set_residual_scale_control
         procedure, public, pass(self) :: get_residual_floors => get_residual_floors_control
+        procedure, public, pass(self) :: local_error_block => local_error_block_control
+        procedure, public, pass(self) :: commit_conserved_drift => commit_conserved_drift_control
         procedure, public, pass(self) :: compute_error_norm => compute_error_norm_control
         ! - acceleration
         procedure, public, pass(self) :: compute_relaxation => compute_relaxation_control
@@ -102,6 +104,7 @@ module control_control_manager
         procedure, public, pass(self) :: get_time => get_time_control
         procedure, public, pass(self) :: get_dt => get_dt_control
         procedure, public, pass(self) :: is_min_dt => is_min_dt_control
+        procedure, public, pass(self) :: get_error_control_tolerances => get_error_control_tolerances_control
         ! - acceleration
         procedure, public, pass(self) :: get_current_relaxation => get_current_relaxation_control
         procedure, public, pass(self) :: get_previous_relaxation => get_previous_relaxation_control
@@ -398,12 +401,14 @@ contains
         is_end_time = self%time%is_end_time()
     end function is_end_time_control
 
-    subroutine update_controls(self, success, error_estimate, iteration_count)
+    subroutine update_controls(self, success, error_estimate, iteration_count, error_order)
         implicit none
         class(type_control), intent(inout) :: self
         logical, intent(in) :: success
         real(real64), intent(in), optional :: error_estimate
         integer(int32), intent(in), optional :: iteration_count
+        !> BDF order error_estimate was measured at (see lte_retry_dt)
+        integer(int32), intent(in), optional :: error_order
         integer(int32) :: iter_count
         real(real64) :: t_target
         real(real64) :: t_arrival ! Time that will be reached after this step
@@ -434,7 +439,7 @@ contains
         end if
 
         ! 4. Execute update (dt is limited to not exceed t_target)
-        call self%time%update(success, iter_count, t_target, error_estimate)
+        call self%time%update(success, iter_count, t_target, error_estimate, error_order)
 
     end subroutine update_controls
 
@@ -563,6 +568,22 @@ contains
         is_min_dt = self%time%is_min_dt()
     end function is_min_dt_control
 
+    !> ATS error-control tolerances (adaptive_stepping/error_control in
+    !> Conditions.json), read once from the time/ATS controller and reused as
+    !> the primary-variable tolerance scale for the nonlinear local error
+    !> measure (see control_iteration_convergence:local_error_block). Static
+    !> run configuration: the caller supplies these to set_residual_scale
+    !> once, not every attempt.
+    subroutine get_error_control_tolerances_control(self, atol_temperature, atol_pressure, rtol)
+        implicit none
+        class(type_control), intent(in) :: self
+        real(real64), intent(inout) :: atol_temperature
+        real(real64), intent(inout) :: atol_pressure
+        real(real64), intent(inout) :: rtol
+
+        call self%time%get_error_control_tolerances(atol_temperature, atol_pressure, rtol)
+    end subroutine get_error_control_tolerances_control
+
     subroutine display_profiler_control(self, unit_in)
         implicit none
         class(type_control), intent(in) :: self
@@ -636,14 +657,58 @@ contains
         call self%iteration%get_residual_floors(num_nodes, floor_thermal, floor_hydraulic)
     end subroutine get_residual_floors_control
 
-    subroutine set_residual_scale_control(self, volume_total, dt)
+    subroutine set_residual_scale_control(self, volume_total, dt, nodal_volume, &
+                                          dH_dT, drho_dp, u_thermal, u_hydraulic, &
+                                          atol_temperature_u, atol_pressure_u, rtol_u)
         implicit none
         class(type_control), intent(inout) :: self
         real(real64), intent(in) :: volume_total
         real(real64), intent(in) :: dt
+        real(real64), intent(in), optional :: nodal_volume(:)
+        !> Nodal storage sensitivity dH/dT [J/(m3 K)], state-dependent
+        real(real64), intent(in), optional :: dH_dT(:)
+        !> Nodal storage sensitivity d rho_eq/dp [kg/(m3 Pa)], state-dependent
+        real(real64), intent(in), optional :: drho_dp(:)
+        !> Nodal temperature snapshot [C], for the local error tolerance weight
+        real(real64), intent(in), optional :: u_thermal(:)
+        !> Nodal pressure snapshot [Pa], for the local error tolerance weight
+        real(real64), intent(in), optional :: u_hydraulic(:)
+        !> ATS absolute temperature tolerance [K]
+        real(real64), intent(in), optional :: atol_temperature_u
+        !> ATS absolute pressure tolerance [Pa]
+        real(real64), intent(in), optional :: atol_pressure_u
+        !> ATS relative tolerance [-]
+        real(real64), intent(in), optional :: rtol_u
 
-        call self%iteration%set_residual_scale(volume_total, dt)
+        call self%iteration%set_residual_scale(volume_total, dt, nodal_volume, &
+                                               dH_dT, drho_dp, u_thermal, u_hydraulic, &
+                                               atol_temperature_u, atol_pressure_u, rtol_u)
     end subroutine set_residual_scale_control
+
+    !> Local nonlinear-error measure for one conserved block, in primary-
+    !> variable units. See control_iteration_convergence:
+    !> local_error_block_convergence_control for the mathematical definition.
+    function local_error_block_control(self, physics_type, residual) result(e_local)
+        implicit none
+        class(type_control), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        real(real64), intent(in) :: residual(:)
+        real(real64) :: e_local
+
+        e_local = self%iteration%local_error_block(physics_type, residual)
+    end function local_error_block_control
+
+    !> Fold the pending conserved-quantity drift into the cumulative budget
+    !> once the caller has confirmed the step is genuinely accepted (i.e. not
+    !> later rejected by LTE or the outer phase loop). See
+    !> control_iteration_convergence:check_conserved for the per-step drift
+    !> bound this cumulative total is tracked against.
+    subroutine commit_conserved_drift_control(self)
+        implicit none
+        class(type_control), intent(inout) :: self
+
+        call self%iteration%commit_conserved_drift()
+    end subroutine commit_conserved_drift_control
 
     subroutine check_convergence_conserved_control(self, enthalpy, density, &
                                                    residual_thermal, residual_hydraulic, &
