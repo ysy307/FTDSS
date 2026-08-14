@@ -324,15 +324,6 @@ contains
         end if
     end subroutine prime_conserved_residual_convergence_control
 
-    !> Current adaptive under-relaxation factor for the globalized modified Picard.
-    module pure function get_conserved_dq_norm_convergence_control(self) result(dq_norm)
-        implicit none
-        class(type_convergence_control), intent(in) :: self
-        real(real64) :: dq_norm
-
-        dq_norm = self%dq_norm_prev
-    end function get_conserved_dq_norm_convergence_control
-
     module pure function get_conserved_relaxation_convergence_control(self) result(omega)
         implicit none
         class(type_convergence_control), intent(in) :: self
@@ -365,7 +356,7 @@ contains
     !> mathematical definition. Mutates the stored previous iterate and counters.
     module subroutine check_conserved_convergence_control(self, enthalpy, density, &
                                                           residual_thermal, residual_hydraulic, &
-                                                          nonlinear_iter, check_thermal, check_hydraulic, &
+                                                          check_thermal, check_hydraulic, &
                                                           is_ok, is_diverged)
         implicit none
         class(type_convergence_control), intent(inout) :: self
@@ -373,7 +364,6 @@ contains
         real(real64), intent(in) :: density(:)
         real(real64), intent(in), optional :: residual_thermal(:)
         real(real64), intent(in), optional :: residual_hydraulic(:)
-        integer(int32), intent(in) :: nonlinear_iter
         logical, intent(in) :: check_thermal
         logical, intent(in) :: check_hydraulic
         logical, intent(inout) :: is_ok
@@ -734,6 +724,17 @@ contains
         ! unrelated call to commit_conserved_drift.
         self%pending_drift_thermal_valid = .false.
         self%pending_drift_hydraulic_valid = .false.
+        ! Same reason for the reported gates: an attempt that ends before any
+        ! conserved check runs (linear failure, NaN guard) would otherwise be
+        ! logged with the previous attempt's values.
+        self%gate_local_thermal = -1.0d0
+        self%gate_local_hydraulic = -1.0d0
+        self%gate_balance_thermal = -1.0d0
+        self%gate_balance_hydraulic = -1.0d0
+        self%gate_dq_effective = -1.0d0
+        self%gate_local_ok = .false.
+        self%gate_balance_ok = .false.
+        self%gate_dq_ok = .false.
         self%relaxation_omega = min(1.0d0, max(CONSERVED_OMEGA_WARM_FLOOR, &
                                                CONSERVED_OMEGA_WARM_RELEASE * self%relaxation_omega))
     end subroutine reset_conserved_state

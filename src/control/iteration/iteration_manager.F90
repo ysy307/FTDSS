@@ -59,7 +59,6 @@ module control_iteration_manager
         procedure, public, pass(self) :: is_none => is_none_iteration
         procedure, public, pass(self) :: is_conserved => is_conserved_iteration
         procedure, public, pass(self) :: get_conserved_relaxation => get_conserved_relaxation_iteration
-        procedure, public, pass(self) :: get_conserved_dq_norm => get_conserved_dq_norm_iteration
         procedure, public, pass(self) :: get_conserved_gates => get_conserved_gates_iteration
         procedure, public, pass(self) :: should_continue => should_continue_iteration
 
@@ -67,7 +66,6 @@ module control_iteration_manager
         procedure, public, pass(self) :: get_nonlinear_solver => get_nonlinear_solver_iteration
         procedure, public, pass(self) :: get_nonlinear_iter => get_nonlinear_iter_iteration
         procedure, public, pass(self) :: get_total_iter => get_total_iter_iteration
-        procedure, public, pass(self) :: get_max_iterations => get_max_iterations_iteration
         procedure, public, pass(self) :: get_update_frequency => get_update_frequency_iteration
         procedure, public, pass(self) :: get_current_norm => get_current_norm_iteration
         procedure, public, pass(self) :: get_tolerances => get_tolerances_iteration
@@ -235,7 +233,7 @@ contains
         is_ok = .false.
         is_diverged = .false.
         call self%settings%check_conserved(enthalpy, density, residual_thermal, residual_hydraulic, &
-                                           self%nonlinear_iter, check_thermal, check_hydraulic, is_ok, is_diverged)
+                                           check_thermal, check_hydraulic, is_ok, is_diverged)
 
         if (check_thermal) then
             call self%set_converged(PHYSICS_TYPES%THERMAL, is_ok)
@@ -264,15 +262,6 @@ contains
 
         omega = self%settings%get_conserved_relaxation()
     end function get_conserved_relaxation_iteration
-
-    !> Last weighted-RMS conserved-quantity change ||dQ||_W (diagnostics).
-    pure function get_conserved_dq_norm_iteration(self) result(dq_norm)
-        implicit none
-        class(type_iteration), intent(in) :: self
-        real(real64) :: dq_norm
-
-        dq_norm = self%settings%get_conserved_dq_norm()
-    end function get_conserved_dq_norm_iteration
 
     !> Gate values and verdicts of the last conserved check (all pass at <= 1).
     pure subroutine get_conserved_gates_iteration(self, local_thermal, local_hydraulic, &
@@ -418,14 +407,6 @@ contains
 
         total_iter = self%total_iter
     end subroutine get_total_iter_iteration
-
-    subroutine get_max_iterations_iteration(self, max_iterations)
-        implicit none
-        class(type_iteration), intent(in) :: self
-        integer(int32), intent(inout) :: max_iterations
-
-        call self%settings%get_max_iterations(max_iterations)
-    end subroutine get_max_iterations_iteration
 
     subroutine get_update_frequency_iteration(self, update_frequency)
         implicit none

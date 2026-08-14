@@ -31,7 +31,6 @@ module control_iteration_setting
         procedure, public, pass(self) :: is_conserved => is_conserved_setting
         ! ---- Getter ----
         procedure, public, pass(self) :: get_conserved_relaxation => get_conserved_relaxation_setting
-        procedure, public, pass(self) :: get_conserved_dq_norm => get_conserved_dq_norm_setting
         procedure, public, pass(self) :: get_conserved_gates => get_conserved_gates_setting
         procedure, public, pass(self) :: get_max_iterations => get_max_iterations_iteration_setting
         procedure, public, pass(self) :: get_update_frequency => get_update_frequency_iteration_setting
@@ -162,15 +161,6 @@ contains
         call self%convergence_control%commit_conserved_drift()
     end subroutine commit_conserved_drift_iteration_setting
 
-    !> Last weighted-RMS conserved-quantity change ||dQ||_W (diagnostics).
-    pure function get_conserved_dq_norm_setting(self) result(dq_norm)
-        implicit none
-        class(type_iteration_setting), intent(in) :: self
-        real(real64) :: dq_norm
-
-        dq_norm = self%convergence_control%get_conserved_dq_norm()
-    end function get_conserved_dq_norm_setting
-
     !> Gate values and verdicts of the last conserved check (all pass at <= 1).
     pure subroutine get_conserved_gates_setting(self, local_thermal, local_hydraulic, &
                                                 balance_thermal, balance_hydraulic, &
@@ -188,21 +178,20 @@ contains
     end subroutine get_conserved_gates_setting
 
     subroutine check_conserved_setting(self, enthalpy, density, residual_thermal, residual_hydraulic, &
-                                       nonlinear_iter, check_thermal, check_hydraulic, is_ok, is_diverged)
+                                       check_thermal, check_hydraulic, is_ok, is_diverged)
         implicit none
         class(type_iteration_setting), intent(inout) :: self
         real(real64), intent(in) :: enthalpy(:)
         real(real64), intent(in) :: density(:)
         real(real64), intent(in), optional :: residual_thermal(:)
         real(real64), intent(in), optional :: residual_hydraulic(:)
-        integer(int32), intent(in) :: nonlinear_iter
         logical, intent(in) :: check_thermal
         logical, intent(in) :: check_hydraulic
         logical, intent(inout) :: is_ok
         logical, intent(inout) :: is_diverged
 
         call self%convergence_control%check_conserved(enthalpy, density, residual_thermal, residual_hydraulic, &
-                                                      nonlinear_iter, check_thermal, check_hydraulic, is_ok, is_diverged)
+                                                      check_thermal, check_hydraulic, is_ok, is_diverged)
     end subroutine check_conserved_setting
 
     subroutine compute_error_norm_setting(self, enthalpy_a, density_a, enthalpy_b, density_b, eps)

@@ -80,7 +80,6 @@ module control_control_manager
         procedure, public, pass(self) :: is_none => is_none_control
         procedure, public, pass(self) :: is_conserved => is_conserved_control
         procedure, public, pass(self) :: get_conserved_relaxation => get_conserved_relaxation_control
-        procedure, public, pass(self) :: get_conserved_dq_norm => get_conserved_dq_norm_control
         procedure, public, pass(self) :: get_conserved_gates => get_conserved_gates_control
         procedure, public, pass(self) :: should_continue => should_continue_control
         ! - acceleration
@@ -97,7 +96,6 @@ module control_control_manager
         procedure, public, pass(self) :: get_nonlinear_solver => get_nonlinear_solver_control
         procedure, public, pass(self) :: get_nonlinear_iter => get_nonlinear_iter_control
         procedure, public, pass(self) :: get_total_iter => get_total_iter_control
-        procedure, public, pass(self) :: get_max_iterations => get_max_iterations_control
         procedure, public, pass(self) :: get_update_frequency => get_update_frequency_control
         procedure, public, pass(self) :: get_current_norm => get_current_norm_control
         procedure, public, pass(self) :: get_tolerances => get_tolerances_control
@@ -745,15 +743,6 @@ contains
         omega = self%iteration%get_conserved_relaxation()
     end function get_conserved_relaxation_control
 
-    !> Last weighted-RMS conserved-quantity change ||dQ||_W (diagnostics).
-    pure function get_conserved_dq_norm_control(self) result(dq_norm)
-        implicit none
-        class(type_control), intent(in) :: self
-        real(real64) :: dq_norm
-
-        dq_norm = self%iteration%get_conserved_dq_norm()
-    end function get_conserved_dq_norm_control
-
     !> Gate values and verdicts of the last conserved check (all pass at <= 1).
     pure subroutine get_conserved_gates_control(self, local_thermal, local_hydraulic, &
                                                 balance_thermal, balance_hydraulic, &
@@ -807,14 +796,6 @@ contains
 
         call self%iteration%get_total_iter(total_iter)
     end subroutine get_total_iter_control
-
-    subroutine get_max_iterations_control(self, max_iterations)
-        implicit none
-        class(type_control), intent(in) :: self
-        integer(int32), intent(inout) :: max_iterations
-
-        call self%iteration%get_max_iterations(max_iterations)
-    end subroutine get_max_iterations_control
 
     subroutine get_update_frequency_control(self, update_frequency)
         implicit none

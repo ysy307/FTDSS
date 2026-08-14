@@ -333,8 +333,6 @@ def _solver_metrics(path):
         for record in accepted
         if float(record["lte_rel"]) >= 0.0
     ]
-    aa_uses = [int(record.get("aa_uses", 0)) for record in records]
-    aa_gamma = [float(record.get("aa_gamma_max", 0.0)) for record in records]
     return {
         "attempts": len(records),
         "accepted_steps": len(accepted),
@@ -344,9 +342,6 @@ def _solver_metrics(path):
         "nonlinear_rejection_fraction": len(nonlinear_rejected) / len(records),
         "final_accepted_time_s": max(float(record["time_accepted_s"]) for record in accepted),
         "max_accepted_lte": max(accepted_lte, default=-1.0),
-        "aa_uses": sum(aa_uses),
-        "attempts_using_aa": sum(count > 0 for count in aa_uses),
-        "max_abs_aa_gamma": max(aa_gamma, default=0.0),
     }
 
 
@@ -486,8 +481,6 @@ def _gate_failures(result, time_hours, solver, args):
                 f"{solver['nonlinear_rejection_fraction']:.3f} exceeds "
                 f"{args.max_nonlinear_rejection_fraction:.3f}"
             )
-        if args.require_aa and solver["aa_uses"] <= 0:
-            failures.append(f"{label}: Anderson acceleration was never used")
     return failures
 
 
@@ -515,7 +508,6 @@ def main():
     )
     parser.add_argument("--max_sampling_difference", type=float)
     parser.add_argument("--max_nonlinear_rejection_fraction", type=float, default=0.2)
-    parser.add_argument("--require_aa", action="store_true")
     parser.add_argument("--json_output", type=Path)
     parser.add_argument("--csv_output", type=Path, help="Per-bin profiles for every evaluated time")
     parser.add_argument(
@@ -554,8 +546,7 @@ def main():
             f"nonlinear rejects={solver['nonlinear_rejections']}, "
             f"LTE rejects={solver['lte_rejections']}, "
             f"nonlinear reject fraction={solver['nonlinear_rejection_fraction']:.3f}, "
-            f"final accepted time={solver['final_accepted_time_s'] / 3600.0:.3f} h, "
-            f"AA uses={solver['aa_uses']}, max|AA gamma|={solver['max_abs_aa_gamma']:.3f}"
+            f"final accepted time={solver['final_accepted_time_s'] / 3600.0:.3f} h"
         )
         print()
 

@@ -17,7 +17,7 @@ module physics_governing_base
     !> consumes the same flux and must not reference type_hydraulic.
     logical, parameter :: HYDRAULIC_DRIVER_TOTAL_POTENTIAL = .true.
 
-    integer(int32), parameter :: SUBCELL_MAX_REFINEMENT_DEPTH = 0
+    integer(int32), parameter :: SUBCELL_MAX_REFINEMENT_DEPTH = 5
 
     type :: type_assemble_workspace
         logical, private :: is_initialized = .false.

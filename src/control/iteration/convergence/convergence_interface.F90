@@ -266,7 +266,6 @@ module control_iteration_convergence
         procedure, public, pass(self) :: check_conserved => check_conserved_convergence_control
         procedure, public, pass(self) :: compute_error_norm => compute_error_norm_convergence_control
         procedure, public, pass(self) :: get_conserved_relaxation => get_conserved_relaxation_convergence_control
-        procedure, public, pass(self) :: get_conserved_dq_norm => get_conserved_dq_norm_convergence_control
         procedure, public, pass(self) :: get_conserved_gates => get_conserved_gates_convergence_control
         procedure, public, pass(self) :: commit_conserved_drift => commit_conserved_drift_convergence_control
         procedure, public, pass(self) :: local_error_block => local_error_block_convergence_control
@@ -476,7 +475,7 @@ module control_iteration_convergence
         !> Sets is_ok when both hold; sets is_diverged on NaN or kappa>=1 repeated.
         module subroutine check_conserved_convergence_control(self, enthalpy, density, &
                                                               residual_thermal, residual_hydraulic, &
-                                                              nonlinear_iter, check_thermal, check_hydraulic, &
+                                                              check_thermal, check_hydraulic, &
                                                               is_ok, is_diverged)
             implicit none
             class(type_convergence_control), intent(inout) :: self
@@ -484,7 +483,6 @@ module control_iteration_convergence
             real(real64), intent(in) :: density(:)
             real(real64), intent(in), optional :: residual_thermal(:)
             real(real64), intent(in), optional :: residual_hydraulic(:)
-            integer(int32), intent(in) :: nonlinear_iter
             logical, intent(in) :: check_thermal
             logical, intent(in) :: check_hydraulic
             logical, intent(inout) :: is_ok
@@ -511,13 +509,6 @@ module control_iteration_convergence
             class(type_convergence_control), intent(in) :: self
             real(real64) :: omega
         end function get_conserved_relaxation_convergence_control
-
-        !> Last weighted-RMS conserved-quantity change ||dQ||_W (diagnostics).
-        module pure function get_conserved_dq_norm_convergence_control(self) result(dq_norm)
-            implicit none
-            class(type_convergence_control), intent(in) :: self
-            real(real64) :: dq_norm
-        end function get_conserved_dq_norm_convergence_control
 
         !> Fold the pending realized drift of the last check_conserved
         !> evaluation into the cumulative per-block budget, once the caller

@@ -59,11 +59,9 @@ contains
         ! Anderson(1) history is only meaningful within one nonlinear loop.
         self%aa_has_prev = .false.
         self%aa_gnorm_prev = -1.0d0
-        self%aa_use_count = 0
         self%last_line_search_failures = 0
         self%last_line_search_trials = 0
         self%last_line_search_scale = 1.0d0
-        self%aa_gamma_max_abs = 0.0d0
         if (allocated(self%phase_onset_reset)) self%phase_onset_reset = .false.
 
         ! [Important] Compute solver must always be PICARD or NEWTON if not NONE.
@@ -795,16 +793,15 @@ contains
 
         self%last_phase_iterations = 1
         self%last_inner_iterations = 0
-        self%last_max_inner_iterations = 0
         self%last_nonlinear_work = 0
         self%last_solve_status = SOLVE_STATUS_NOT_RUN
         self%last_phase_metrics_available = .false.
-        self%last_phase_converged = .false.
-        self%last_phase_active_nodes = -1
         self%last_phase_increment_max = -1.0d0
-        self%last_phase_increment_norm = -1.0d0
-        self%last_phase_equilibrium_error = -1.0d0
-        self%last_phase_merit = -1.0d0
+        ! Attempt-scoped: a linear failure or an early divergence return can end
+        ! the attempt before any iterate is reported, and the history record
+        ! would otherwise carry the previous attempt's increments.
+        self%last_du_thermal_max = -1.0d0
+        self%last_du_hydraulic_max = -1.0d0
 
         ! Dispatch to true staggered solver (H then T sequential nonlinear loops)
         if (self%control%is_staggered() .and. &
@@ -1037,8 +1034,8 @@ contains
                         do ls_diag = 1, LINE_SEARCH_MAX_TRIALS
                             if (ls_trial_alpha(ls_diag) < 0.0d0) cycle
                             ! E_T/E_H are the same local_error_block measure the
-                            ! [Conserved] line's locT/locH prints (<=1 passes),
-                            ! so the two logs are directly comparable.
+                            ! [NL] line's locT/locH prints (<=1 passes), so the
+                            ! two logs are directly comparable.
                             ! ES, not F: a rejected trial can raise the merit by
                             ! many orders of magnitude, and an F field that
                             ! overflows aborts the run on a Fortran output
@@ -1135,7 +1132,6 @@ contains
             is_step_converged = self%control%is_converged()
             call self%control%get_nonlinear_iter(iter_nl)
             self%last_inner_iterations = iter_nl
-            self%last_max_inner_iterations = max(self%last_max_inner_iterations, iter_nl)
             self%last_nonlinear_work = self%last_nonlinear_work + max(1_int32, iter_nl)
 
             if (.not. is_step_converged) then
@@ -1261,12 +1257,7 @@ contains
                               phase_increment_norm / PHASE_CONTENT_TOL, &
                               phase_increment_max / PHASE_CONTENT_MAX_TOL)
             self%last_phase_metrics_available = .true.
-            self%last_phase_converged = phase_is_converged
-            self%last_phase_active_nodes = num_active_nodes
             self%last_phase_increment_max = phase_increment_max
-            self%last_phase_increment_norm = phase_increment_norm
-            self%last_phase_equilibrium_error = phase_equilibrium_error
-            self%last_phase_merit = phase_merit
             if (phase_merit < 0.9d0 * phase_best_merit) then
                 phase_best_merit = phase_merit
                 phase_stagnation_count = 0
@@ -1322,7 +1313,7 @@ contains
     !> Delegates to convergence_control:local_error_block, the SAME formula
     !> and SAME cached per-node scales (nodal_volume, dH/dT or d rho_eq/dp,
     !> the primary-variable snapshot, the ATS tolerances) the conserved
-    !> acceptance gate's local criterion (locT/locH in the [Conserved] line)
+    !> acceptance gate's local criterion (locT/locH in the [NL] line)
     !> evaluates, so the line search and the gate cannot disagree about what
     !> progress means. They must stay separate rather than combined into one
     !> raw residual norm: the thermal residual is an energy rate [W] and the
@@ -2040,16 +2031,15 @@ contains
         call self%solve_time_step_initial_setup()
         self%last_phase_iterations = 1
         self%last_inner_iterations = 0
-        self%last_max_inner_iterations = 0
         self%last_nonlinear_work = 0
         self%last_solve_status = SOLVE_STATUS_NOT_RUN
         self%last_phase_metrics_available = .false.
-        self%last_phase_converged = .false.
-        self%last_phase_active_nodes = -1
         self%last_phase_increment_max = -1.0d0
-        self%last_phase_increment_norm = -1.0d0
-        self%last_phase_equilibrium_error = -1.0d0
-        self%last_phase_merit = -1.0d0
+        ! Attempt-scoped: a linear failure or an early divergence return can end
+        ! the attempt before any iterate is reported, and the history record
+        ! would otherwise carry the previous attempt's increments.
+        self%last_du_thermal_max = -1.0d0
+        self%last_du_hydraulic_max = -1.0d0
 
         coupling_loop: do coupling_iter = 1, MAX_COUPLING_ITER
             self%last_phase_iterations = coupling_iter
@@ -2162,7 +2152,6 @@ contains
 
                 call self%control%get_nonlinear_iter(iter_nl)
                 self%last_inner_iterations = iter_nl
-                self%last_max_inner_iterations = max(self%last_max_inner_iterations, iter_nl)
                 self%last_nonlinear_work = self%last_nonlinear_work + max(1_int32, iter_nl)
 
                 if (.not. self%control%is_converged()) then
@@ -2276,7 +2265,6 @@ contains
 
                 call self%control%get_nonlinear_iter(iter_nl)
                 self%last_inner_iterations = iter_nl
-                self%last_max_inner_iterations = max(self%last_max_inner_iterations, iter_nl)
                 self%last_nonlinear_work = self%last_nonlinear_work + max(1_int32, iter_nl)
 
                 is_step_converged = self%control%is_converged()
@@ -2440,14 +2428,12 @@ contains
         integer(int32) :: phase_iter
         integer(int32) :: nonlinear_work
         integer(int32) :: effective_iter
-        logical :: phase_iteration_spike
         logical :: failed_at_min_dt
         real(real64) :: time_s, time_start_s, time_trial_s, dt_s, dt_used
         real(real64) :: lte_error
         !> BDF order lte_error was measured at; the retry is resized at it
         integer(int32) :: lte_order
         integer(int32), parameter :: MAX_CONSECUTIVE_FAILURES = 50
-        integer(int32), parameter :: PHASE_SPIKE_MIN_ITER = 16
 
         consecutive_failures = 0
         step_counter = 0
@@ -2467,8 +2453,6 @@ contains
             ! accuracy and the final monolithic inner count supplies the existing
             ! nonlinear robustness brake; reducing dt did not reduce outer work.
             effective_iter = nl_iter
-            phase_iteration_spike = phase_iter >= PHASE_SPIKE_MIN_ITER .and. &
-                                    2 * phase_iter > 3 * self%last_accepted_phase_iterations
 
             ! Local-truncation-error estimate for error-controlled ATS, evaluated
             ! before the time/variable history is shifted (needs ydot_n and dt_n).
@@ -2486,7 +2470,6 @@ contains
 
             if (is_step_converged) then
                 self%last_accepted_dt = dt_used
-                self%last_accepted_phase_iterations = phase_iter
                 ! Genuine step acceptance: is_step_converged has already
                 ! survived the LTE rejection check above, so the conserved-
                 ! quantity drift measured at the nonlinear loop's last

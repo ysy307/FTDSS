@@ -224,23 +224,14 @@ module app_ftcms
         integer(int32) :: current_physics_id = 0
         ! Number of outer phase-equilibrium iterations in the latest solve.
         integer(int32) :: last_phase_iterations = 1
-        ! Iterations in the final and most expensive inner nonlinear solves.
+        ! Iterations in the final inner nonlinear solve.
         integer(int32) :: last_inner_iterations = 0
-        integer(int32) :: last_max_inner_iterations = 0
         ! Sum of inner nonlinear iterations over all outer phase iterations.
         integer(int32) :: last_nonlinear_work = 0
-        ! Termination status and the latest evaluated phase-equilibrium metrics.
         integer(int32) :: last_solve_status = 0
+        ! Phase-equilibrium metrics feeding the Anderson secant restart test.
         logical :: last_phase_metrics_available = .false.
-        logical :: last_phase_converged = .false.
-        integer(int32) :: last_phase_active_nodes = -1
         real(real64) :: last_phase_increment_max = -1.0d0
-        real(real64) :: last_phase_increment_norm = -1.0d0
-        real(real64) :: last_phase_equilibrium_error = -1.0d0
-        real(real64) :: last_phase_merit = -1.0d0
-        ! Outer count of the latest accepted step, used to detect a sudden
-        ! increase in phase-coupling work without throttling a steady regime.
-        integer(int32) :: last_accepted_phase_iterations = 1
         ! Time increment of the latest accepted step. Used only to extrapolate
         ! the initial ice-state guess; it does not enter the governing equations.
         real(real64) :: last_accepted_dt = 0.0d0
@@ -305,8 +296,6 @@ module app_ftcms
         ! Weighted norm of the previous fixed-point increment ||g_{k-1}||_W.
         ! Retained for nonlinear diagnostics; growth alone does not disable AA(1).
         real(real64) :: aa_gnorm_prev = -1.0d0
-        integer(int32) :: aa_use_count = 0
-        real(real64) :: aa_gamma_max_abs = 0.0d0
         ! Per-attempt active-set marker for Hansson's one-time freezing-onset
         ! temperature reset. It is not a primary unknown or accepted history.
         logical, allocatable :: phase_onset_reset(:)
@@ -322,10 +311,10 @@ module app_ftcms
         real(real64) :: last_du_thermal_max = -1.0d0
         real(real64) :: last_du_hydraulic_max = -1.0d0
 
-        ! Unit of Output/solver_history.log: one record per time-step attempt.
-        ! The log distinguishes attempted/accepted time and dt, termination
-        ! status, inner/outer work, phase metrics, nonlinear norms, and ATS
-        ! diagnostics. -1 when the log is not open.
+        ! Unit of Output/solver_history.log: one record per time-step attempt,
+        ! carrying attempted/accepted time and dt, termination status, inner
+        ! work, the acceptance gates, the increments and the LTE ratio.
+        ! -1 when the log is not open.
         integer(int32) :: solver_history_unit = -1
 
         type(type_control) :: control

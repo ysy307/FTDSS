@@ -118,17 +118,10 @@ contains
 
         self%last_phase_iterations = 1
         self%last_inner_iterations = 0
-        self%last_max_inner_iterations = 0
         self%last_nonlinear_work = 0
         self%last_solve_status = 0
         self%last_phase_metrics_available = .false.
-        self%last_phase_converged = .false.
-        self%last_phase_active_nodes = -1
         self%last_phase_increment_max = -1.0d0
-        self%last_phase_increment_norm = -1.0d0
-        self%last_phase_equilibrium_error = -1.0d0
-        self%last_phase_merit = -1.0d0
-        self%last_accepted_phase_iterations = 1
         self%last_accepted_dt = 0.0d0
 
         call self%control%initialize()
@@ -390,8 +383,8 @@ contains
     end subroutine initialize_type_ftcms
 
     !> Open Output/solver_history.log (rank 0 only): one record per time-step
-    !> attempt with the nonlinear-convergence diagnostics that are otherwise
-    !> invisible from outside (iterations, acceptance, omega, ||dQ||_W, LTE).
+    !> attempt with the diagnostics that are otherwise invisible from outside
+    !> (iterations, acceptance, the gates that decided it, increments, LTE).
     subroutine open_solver_history_log(self)
         implicit none
         class(type_ftcms), intent(inout) :: self
@@ -422,7 +415,7 @@ contains
             " omega lte_rel"
         write (self%solver_history_unit, '(A)') &
             "# loc_*/bal_*/dq_eff are the acceptance gates of the last iterate: each passes at <= 1," // &
-            " -1 means not evaluated. status names which one refused the attempt"
+            " -1 means not evaluated. status is how the attempt ended, not which gate refused it"
         write (self%solver_history_unit, '(A)') &
             "# du_*_max are the last increment magnitudes [K] and [Pa]; lte_rel is -1 when the step" // &
             " never reached the time-error test"
@@ -1104,10 +1097,6 @@ contains
             if (present(step_scale)) relaxation_factor = relaxation_factor * step_scale
             call prepare_coupled_aa_step(self, relaxation_factor, aa_gamma, aa_step_T, aa_step_P, &
                                          aa_alpha_joint, aa_active)
-            if (aa_alpha_joint > 0.0d0 .and. abs(aa_gamma) > sqrt(epsilon(1.0d0))) then
-                self%aa_use_count = self%aa_use_count + 1
-                self%aa_gamma_max_abs = max(self%aa_gamma_max_abs, abs(aa_gamma))
-            end if
         end if
 
         ! --- Joint variable-wise trust region -------------------------------
