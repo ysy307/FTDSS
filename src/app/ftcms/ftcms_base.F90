@@ -81,6 +81,7 @@ contains
         integer(int32) :: max_bdf_order
         integer(int32), allocatable :: active_region_ids(:)
         integer(int32) :: num_nodes
+        integer(int32) :: num_elements
         integer(int32) :: i
         integer(int32) :: computation_dimension
         integer(int32) :: num_total_dofs
@@ -200,6 +201,10 @@ contains
         ! Likewise build the static Gauss-point geometry cache used by the
         ! nodal gradient projection (calc_gradient).
         call self%gradient_cache%initialize(self%domain)
+
+        call self%domain%get_num_fe(num_elements)
+        allocate (self%subcell_active_depth(num_elements), source=0_int32)
+        allocate (self%subcell_depth_unresolved(num_elements), source=.false.)
 
         call self%domain%get_start_dof_index(PHYSICS_TYPES%THERMAL, self%thermal_start_dof)
         call self%domain%get_start_dof_index(PHYSICS_TYPES%HYDRAULIC, self%hydraulic_start_dof)
@@ -410,17 +415,17 @@ contains
             return
         end if
         write (self%solver_history_unit, '(A)') &
-            "# FTCMS solver history schema=3: one record per time-step attempt"
+            "# FTCMS solver history schema=4: one record per time-step attempt"
         write (self%solver_history_unit, '(A)') &
             "# attempt accepted_step time_start_s time_trial_s time_accepted_s dt_used_s dt_next_s" // &
-            " accepted status inner_last inner_max outer_iter nl_work ats_iter aa_uses phase_spike phase_eval" // &
-            " phase_converged active_nodes phase_dqi_max phase_dqi_rms phase_eq_Pa phase_merit aa_gamma_max" // &
-            " T_res_Linf T_update_Linf H_res_Linf H_update_Linf omega dq_norm_W lte_rel"
+            " accepted status inner_iter ats_iter loc_T loc_H bal_T bal_H dq_eff du_T_max du_p_max" // &
+            " omega lte_rel"
         write (self%solver_history_unit, '(A)') &
-            "# phase fields are the latest evaluated projection; -1 means unavailable;" // &
-            " inner_last is the final inner solve and nl_work is the sum over all inner solves"
+            "# loc_*/bal_*/dq_eff are the acceptance gates of the last iterate: each passes at <= 1," // &
+            " -1 means not evaluated. status names which one refused the attempt"
         write (self%solver_history_unit, '(A)') &
-            "# T/H norm fields are -1 in conserved mode; dq_norm_W is its active nonlinear change criterion"
+            "# du_*_max are the last increment magnitudes [K] and [Pa]; lte_rel is -1 when the step" // &
+            " never reached the time-error test"
         flush (self%solver_history_unit)
     end subroutine open_solver_history_log
 
@@ -2621,6 +2626,9 @@ contains
             close (self%solver_history_unit)
             self%solver_history_unit = -1
         end if
+
+        if (allocated(self%subcell_active_depth)) deallocate (self%subcell_active_depth)
+        if (allocated(self%subcell_depth_unresolved)) deallocate (self%subcell_depth_unresolved)
 
     end subroutine destroy_type_ftcms
 end submodule ftcms_base

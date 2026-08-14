@@ -60,6 +60,7 @@ module control_iteration_manager
         procedure, public, pass(self) :: is_conserved => is_conserved_iteration
         procedure, public, pass(self) :: get_conserved_relaxation => get_conserved_relaxation_iteration
         procedure, public, pass(self) :: get_conserved_dq_norm => get_conserved_dq_norm_iteration
+        procedure, public, pass(self) :: get_conserved_gates => get_conserved_gates_iteration
         procedure, public, pass(self) :: should_continue => should_continue_iteration
 
         ! ---- Getter ----
@@ -272,6 +273,22 @@ contains
 
         dq_norm = self%settings%get_conserved_dq_norm()
     end function get_conserved_dq_norm_iteration
+
+    !> Gate values and verdicts of the last conserved check (all pass at <= 1).
+    pure subroutine get_conserved_gates_iteration(self, local_thermal, local_hydraulic, &
+                                                  balance_thermal, balance_hydraulic, &
+                                                  dq_effective, local_ok, balance_ok, dq_ok)
+        implicit none
+        class(type_iteration), intent(in) :: self
+        real(real64), intent(inout) :: local_thermal, local_hydraulic
+        real(real64), intent(inout) :: balance_thermal, balance_hydraulic
+        real(real64), intent(inout) :: dq_effective
+        logical, intent(inout) :: local_ok, balance_ok, dq_ok
+
+        call self%settings%get_conserved_gates(local_thermal, local_hydraulic, &
+                                               balance_thermal, balance_hydraulic, &
+                                               dq_effective, local_ok, balance_ok, dq_ok)
+    end subroutine get_conserved_gates_iteration
 
     !> Weighted-RMS conserved-quantity error norm for the Richardson estimate.
     subroutine compute_error_norm_iteration(self, enthalpy_a, density_a, enthalpy_b, density_b, eps)

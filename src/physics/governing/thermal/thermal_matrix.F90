@@ -79,6 +79,8 @@ contains
         ! --- Interface-split subcell variables (see the cut branch below) ---
         logical :: is_cut
         integer(int32) :: num_subcell_quadrature_points, q_s, k, n_hist, hlen, d1, d2
+        real(real64) :: xi_sub, eta_sub, weight_sub
+        logical :: is_plus_side_sub
         real(real64) :: T_q_sub, P_q_sub, porosity_q_sub, Qi_q_sub
         real(real64) :: eff_weight_sub, det_J_sub
         real(real64) :: psi_sub(workspace%num_fe_nodes)
@@ -154,7 +156,7 @@ contains
         ! The shared level set is still computed above (HYDRAULIC consumes it);
         ! only this block's use of it is gated here.
         is_cut = workspace%is_cut .and. THERMAL_SUBCELL
-        num_subcell_quadrature_points = workspace%num_subcell_quadrature_points
+        call workspace%subcell_quadrature%get_num_points(num_subcell_quadrature_points)
 
         if (.not. is_cut) then
 
@@ -347,8 +349,9 @@ contains
             end do
 
             do q_s = 1, num_subcell_quadrature_points
-                r_sub%x = workspace%subcell_quadrature_points(q_s)%xi
-                r_sub%y = workspace%subcell_quadrature_points(q_s)%eta
+                call workspace%subcell_quadrature%get_point(q_s, xi_sub, eta_sub, weight_sub, is_plus_side_sub)
+                r_sub%x = xi_sub
+                r_sub%y = eta_sub
                 r_sub%z = 0.0d0
 
                 call workspace%fe%lerp(r_sub, workspace%T_node(1:n_nodes), T_q_sub)
@@ -401,7 +404,7 @@ contains
                 dpsi_dx_sub(:, :) = 0.0d0
                 call workspace%fe%calc_shape_function(r_sub, workspace%coordinates, psi=psi_sub, &
                                                       dpsi_dx=dpsi_dx_sub, determinant_jacobian=det_J_sub)
-                eff_weight_sub = workspace%subcell_quadrature_points(q_s)%weight * abs(det_J_sub)
+                eff_weight_sub = weight_sub * abs(det_J_sub)
 
                 call self%compute_mass_term(workspace%material_id, state_sub, C_TT_sub, scheme_opt=SCHEME_SECANT)
 

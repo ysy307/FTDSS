@@ -181,12 +181,13 @@ contains
             call self%gauss(4)%set(0.2d0, 0.2d0, 0.0d0)
 
         case (4)
-            ! Dunavant 6-point rule (degree 4)
+            ! Dunavant 6-point rule (degree 4). The tabulated weights sum to 1,
+            ! so they carry the reference-triangle area 1/2 like orders 1-3.
             self%num_gauss = 6
             call self%initial_setup(self%num_gauss)
 
-            self%weight(1:3) = 0.109951743655322d0
-            self%weight(4:6) = 0.223381589678011d0
+            self%weight(1:3) = 0.5d0 * 0.109951743655322d0
+            self%weight(4:6) = 0.5d0 * 0.223381589678011d0
 
             call self%gauss(1)%set(0.816847572980459d0, 0.091576213509771d0, 0.0d0)
             call self%gauss(2)%set(0.091576213509771d0, 0.816847572980459d0, 0.0d0)
@@ -196,13 +197,13 @@ contains
             call self%gauss(6)%set(0.445948490915965d0, 0.445948490915965d0, 0.0d0)
 
         case (5)
-            ! Dunavant 7-point rule (degree 5)
+            ! Dunavant 7-point rule (degree 5). Same normalisation as order 4.
             self%num_gauss = 7
             call self%initial_setup(self%num_gauss)
 
-            self%weight(1) = 0.225d0
-            self%weight(2:4) = 0.132394152788506d0
-            self%weight(5:7) = 0.125939180544827d0
+            self%weight(1) = 0.5d0 * 0.225d0
+            self%weight(2:4) = 0.5d0 * 0.132394152788506d0
+            self%weight(5:7) = 0.5d0 * 0.125939180544827d0
 
             call self%gauss(1)%set(1.0d0 / 3.0d0, 1.0d0 / 3.0d0, 0.0d0)
 

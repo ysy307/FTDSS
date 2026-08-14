@@ -32,7 +32,6 @@ submodule(control_iteration_convergence) convergence_control
     ! vacuously, and steps are accepted while the physics stalls.
     real(real64), parameter :: CONSERVED_OMEGA_WARM_RELEASE = 1.25d0
     real(real64), parameter :: CONSERVED_OMEGA_WARM_FLOOR = 2.5d-1
-    logical, parameter :: CONSERVED_VERBOSE = .true.
 
     !> Global-balance gate (redesign criterion 2): one accepted step may not
     !> move the block's domain-summed conserved quantity by more than its own
@@ -342,6 +341,26 @@ contains
         omega = self%relaxation_omega
     end function get_conserved_relaxation_convergence_control
 
+    module pure subroutine get_conserved_gates_convergence_control(self, local_thermal, local_hydraulic, &
+                                                                   balance_thermal, balance_hydraulic, &
+                                                                   dq_effective, local_ok, balance_ok, dq_ok)
+        implicit none
+        class(type_convergence_control), intent(in) :: self
+        real(real64), intent(inout) :: local_thermal, local_hydraulic
+        real(real64), intent(inout) :: balance_thermal, balance_hydraulic
+        real(real64), intent(inout) :: dq_effective
+        logical, intent(inout) :: local_ok, balance_ok, dq_ok
+
+        local_thermal = self%gate_local_thermal
+        local_hydraulic = self%gate_local_hydraulic
+        balance_thermal = self%gate_balance_thermal
+        balance_hydraulic = self%gate_balance_hydraulic
+        dq_effective = self%gate_dq_effective
+        local_ok = self%gate_local_ok
+        balance_ok = self%gate_balance_ok
+        dq_ok = self%gate_dq_ok
+    end subroutine get_conserved_gates_convergence_control
+
     !> Conserved-quantity convergence check (PDF 6.2.4). See interface for the
     !> mathematical definition. Mutates the stored previous iterate and counters.
     module subroutine check_conserved_convergence_control(self, enthalpy, density, &
@@ -591,18 +610,21 @@ contains
             end if
         end if
 
-        if (CONSERVED_VERBOSE) then
-            ! resT/0, resH/0 are the R0-normalized ratios: control diagnostics
-            ! only (they drive omega above), not part of is_ok. locT/locH is
-            ! the criterion-1 local gate (<=1 passes, -1 = fallback path).
-            ! balT/balH is the criterion-2 global drift ratio (<=1 passes).
-            write (*, '(A,I4,A,ES10.3,A,F6.4,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3,A,ES10.3,A,L1,1X,L1,1X,L1)') &
-                '    [Conserved] it:', nonlinear_iter, ' dQeff:', dq_effective, &
-                ' om:', self%relaxation_omega, &
-                ' resT/0:', ratioT, ' locT:', e_localT, ' balT:', balanceT, &
-                ' resH/0:', ratioH, ' locH:', e_localH, ' balH:', balanceH, &
-                ' dq/res/is_ok:', dq_ok, residual_ok, is_ok
-        end if
+        ! Publish the gates the decision above used. ratioT/ratioH are not
+        ! among them: they are R0-normalized control diagnostics that drive
+        ! omega only, and reporting them next to the gates has already caused
+        ! them to be misread as the acceptance criterion.
+        self%gate_local_thermal = e_localT
+        self%gate_local_hydraulic = e_localH
+        self%gate_balance_thermal = balanceT
+        self%gate_balance_hydraulic = balanceH
+        ! Report the first iterate's unevaluated dq as -1, the same marker the
+        ! other gates use, instead of the huge sentinel the comparison needs.
+        self%gate_dq_effective = -1.0d0
+        if (self%has_prev_conserved) self%gate_dq_effective = dq_effective
+        self%gate_local_ok = residual_ok
+        self%gate_balance_ok = balance_ok
+        self%gate_dq_ok = dq_ok
 
         ! Store current iterate as previous for the next check
         if (allocated(self%enthalpy_prev)) deallocate (self%enthalpy_prev)
@@ -696,6 +718,10 @@ contains
         if (allocated(self%density_prev)) deallocate (self%density_prev)
         if (allocated(self%dH_prev)) deallocate (self%dH_prev)
         if (allocated(self%drho_prev)) deallocate (self%drho_prev)
+        if (allocated(self%dH_dT)) deallocate (self%dH_dT)
+        if (allocated(self%drho_dp)) deallocate (self%drho_dp)
+        if (allocated(self%u_thermal)) deallocate (self%u_thermal)
+        if (allocated(self%u_hydraulic)) deallocate (self%u_hydraulic)
         self%has_prev_conserved = .false.
         self%has_prev_conserved_increment = .false.
         self%residual0_thermal = -1.0d0

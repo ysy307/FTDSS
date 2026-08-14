@@ -88,6 +88,9 @@ module app_ftcms
     !> step, it ROTATES it, and the line search is then no longer searching
     !> along the direction it was handed. With the bound enabled a single
     !> factor scales both blocks.
+    !> Print one line per nonlinear iterate with the acceptance gates and the
+    !> increment magnitudes.
+    logical, parameter :: NONLINEAR_VERBOSE = .true.
     logical, parameter :: STEP_BOUND_ENABLED = .true.
     !> Largest temperature change admitted in one nonlinear update [K].
     real(real64), parameter :: STEP_BOUND_DT = 5.0d-1
@@ -184,6 +187,14 @@ module app_ftcms
         !> projection (see type_gradient_geometry_cache). Consumed by
         !> calc_gradient.
         type(type_gradient_geometry_cache) :: gradient_cache
+
+        !> Quadrature depth selected for each element by the latest complete
+        !> matrix assembly.  Residual-only and finite-difference assemblies
+        !> reuse it so their discrete residual has one fixed integration rule.
+        integer(int32), allocatable :: subcell_active_depth(:)
+        !> True when the depth-d/depth-(d+1) comparison still exceeded the
+        !> tolerance at the maximum supported depth.
+        logical, allocatable :: subcell_depth_unresolved(:)
 
         type(type_variable) :: porosity
         type(type_variable) :: temperature
@@ -304,6 +315,12 @@ module app_ftcms
         real(real64) :: last_line_search_scale = 1.0d0
         integer(int32) :: last_line_search_trials = 0
         integer(int32) :: last_line_search_failures = 0
+        !> Largest per-block increment of the last nonlinear iterate, in primary
+        !> variable units [K] and [Pa]. With the tangent and the linear solve
+        !> both verified, the size of du is the remaining observable that says
+        !> whether the step is bounded. -1 before the first iterate.
+        real(real64) :: last_du_thermal_max = -1.0d0
+        real(real64) :: last_du_hydraulic_max = -1.0d0
 
         ! Unit of Output/solver_history.log: one record per time-step attempt.
         ! The log distinguishes attempted/accepted time and dt, termination
@@ -841,9 +858,11 @@ module app_ftcms
 
         end subroutine reset_ftcms
 
-        module subroutine assemble_ftcms(self)
+        module subroutine assemble_ftcms(self, residual_only)
             implicit none
             class(type_ftcms), intent(inout) :: self
+            !> Assemble only the residual vector when true.
+            logical, intent(in), optional :: residual_only
 
         end subroutine assemble_ftcms
 

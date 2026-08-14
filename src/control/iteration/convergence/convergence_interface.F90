@@ -213,6 +213,17 @@ module control_iteration_convergence
         !> (kappa >= 1), relaxed back toward 1 when it contracts. Replaces ad-hoc
         !> per-variable step clamps with a principled, condition-agnostic globalization.
         real(real64), private :: relaxation_omega = 1.0d0
+        !> Gate values of the last conserved check, kept so the caller can
+        !> report and log the same numbers the acceptance decision used.
+        !> All four error measures pass at <= 1; -1 means not evaluated.
+        real(real64), private :: gate_local_thermal = -1.0d0
+        real(real64), private :: gate_local_hydraulic = -1.0d0
+        real(real64), private :: gate_balance_thermal = -1.0d0
+        real(real64), private :: gate_balance_hydraulic = -1.0d0
+        real(real64), private :: gate_dq_effective = -1.0d0
+        logical, private :: gate_local_ok = .false.
+        logical, private :: gate_balance_ok = .false.
+        logical, private :: gate_dq_ok = .false.
         ! --- Global conserved-quantity drift budget (criterion 2) ---
         !> Realized drift (sum_i R_i)*dt of the last iterate evaluated by
         !> check_conserved, per block. Not yet folded into the cumulative
@@ -256,6 +267,7 @@ module control_iteration_convergence
         procedure, public, pass(self) :: compute_error_norm => compute_error_norm_convergence_control
         procedure, public, pass(self) :: get_conserved_relaxation => get_conserved_relaxation_convergence_control
         procedure, public, pass(self) :: get_conserved_dq_norm => get_conserved_dq_norm_convergence_control
+        procedure, public, pass(self) :: get_conserved_gates => get_conserved_gates_convergence_control
         procedure, public, pass(self) :: commit_conserved_drift => commit_conserved_drift_convergence_control
         procedure, public, pass(self) :: local_error_block => local_error_block_convergence_control
         ! ---- Meta / Utility ----
@@ -287,6 +299,41 @@ module control_iteration_convergence
             logical :: is_ok
 
         end function check_convergence_control
+
+        !> Gate values and verdicts of the last conserved check.
+        !>
+        !> Mathematical definition:
+        !> - \(e_{\mathrm{loc}}, e_{\mathrm{bal}}, \Delta Q_{\mathrm{eff}}\), each
+        !>   passing at \(\le 1\)
+        !>
+        !> Assumptions:
+        !> - check_conserved has run at least once; otherwise every value is -1
+        !>   and every verdict is .false.
+        !>
+        !> Numerical guarantee:
+        !> - Returns exactly the quantities the acceptance decision used
+        !>
+        !> Computational complexity:
+        !> - Time: \(O(1)\)
+        !> - Memory: \(O(1)\)
+        !>
+        !> Failure behavior:
+        !> - Returns without error
+        module pure subroutine get_conserved_gates_convergence_control(self, local_thermal, local_hydraulic, &
+                                                                      balance_thermal, balance_hydraulic, &
+                                                                      dq_effective, local_ok, balance_ok, dq_ok)
+            implicit none
+            class(type_convergence_control), intent(in) :: self
+            !> Criterion-1 local error of each block
+            real(real64), intent(inout) :: local_thermal, local_hydraulic
+            !> Criterion-2 global drift ratio of each block
+            real(real64), intent(inout) :: balance_thermal, balance_hydraulic
+            !> Conserved-quantity change measure
+            real(real64), intent(inout) :: dq_effective
+            !> Verdict of each gate
+            logical, intent(inout) :: local_ok, balance_ok, dq_ok
+
+        end subroutine get_conserved_gates_convergence_control
 
         module pure function is_initialized_convergence_control(self) result(is_initialized)
             implicit none

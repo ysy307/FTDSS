@@ -59,8 +59,6 @@ contains
         real(real64) :: caller_residual(workspace%num_fe_nodes)
         real(real64) :: base_residual(workspace%num_fe_nodes)
         real(real64), pointer :: values(:, :), residual(:)
-        real(real64), pointer, contiguous :: saved_bdf_coeffs(:)
-        real(real64), target :: current_level_coeff(1)
         integer(int32) :: b, i, n_nodes
         real(real64) :: base_pressure, delta
 
@@ -72,24 +70,7 @@ contains
         caller_residual(1:n_nodes) = residual(1:n_nodes)
         nullify (residual)
 
-        ! Drop the BDF history from the differenced residual. Levels j >= 2 are
-        ! functions of the stored history alone, so they are constant in the
-        ! primary variables and cancel exactly in the difference quotient - but
-        ! they cost an update_water_phases call per Gauss point per level, which
-        ! is most of the evaluation. Truncating the coefficient array to its
-        ! current level makes compute_transient_term stop at j = 1; the only
-        ! other consumers of bdf_coeffs(1) here are the matrix blocks, which are
-        ! not requested. Base and perturbed residuals must use the same variant,
-        ! so the base is re-evaluated below rather than reusing the caller's.
-        saved_bdf_coeffs => workspace%bdf_coeffs
-        current_level_coeff(1) = saved_bdf_coeffs(1)
-        workspace%bdf_coeffs => current_level_coeff
-
-        call local_F_T%zero()
-        call self%thermal%assemble_local(control=self%control, workspace=workspace, F_T=local_F_T)
-        residual => local_F_T%get_data()
-        base_residual(1:n_nodes) = residual(1:n_nodes)
-        nullify (residual)
+        base_residual(1:n_nodes) = caller_residual(1:n_nodes)
 
         nullify (values)
         values => K_TH%get_val()
@@ -98,8 +79,7 @@ contains
             call workspace%state(b)%pressure%get(base_pressure)
             delta = FD_RELATIVE * max(abs(base_pressure), FD_FLOOR_PRESSURE)
 
-            call workspace%state(b)%pressure%set(base_pressure + delta)
-            call refresh_gauss_states(self, workspace)
+            call set_and_refresh(self, workspace, b, PHYSICS_TYPES%HYDRAULIC%ID, base_pressure + delta)
 
             call local_F_T%zero()
             call self%thermal%assemble_local(control=self%control, workspace=workspace, F_T=local_F_T)
@@ -115,10 +95,9 @@ contains
         end do
         nullify (values)
 
-        ! Put the workspace back on the unperturbed state and full BDF order,
-        ! and hand the caller back the residual it is about to scatter.
-        workspace%bdf_coeffs => saved_bdf_coeffs
-        nullify (saved_bdf_coeffs)
+        ! Put the workspace back on the unperturbed state and hand the caller
+        ! back the residual it is about to scatter.
+        call self%update_physical_properties_bulk(workspace%material_id, workspace%state)
         call refresh_gauss_states(self, workspace)
         residual => local_F_T%get_data()
         residual(1:n_nodes) = caller_residual(1:n_nodes)
@@ -139,19 +118,15 @@ contains
     !> K_TT(:,b) and K_HT(:,b) together, and n_nodes pressure perturbations
     !> give K_TH(:,b) and K_HH(:,b) together.
     !>
-    !> Unlike assemble_coupling_fd_ftcms, the perturbation here must go through
-    !> set_and_refresh (full nodal update_physical_properties_bulk, then lerp,
-    !> then the Gauss-point update), not the cheaper refresh_gauss_states:
+    !> Each perturbation goes through set_and_refresh (full nodal update, then
+    !> Gauss-point update and subcell invalidation):
     !> hydraulic_matrix.F90's assemble_local_picard_hydraulic reads
     !> workspace%state(i) directly for the diffusion, coupling-diffusion and
     !> advective coefficients and for effective_suction and its tangents, so F_H,
     !> unlike F_T, depends on the perturbed node's own NODAL derived state, not
     !> only on the Gauss-point interpolation of it. Restoring a node's value in
-    !> the loop uses a raw %set() (no refresh), exactly like
-    !> assemble_coupling_fd_ftcms: the next set_and_refresh call - on the next
-    !> node, or the closing one below - refreshes every node's derived state
-    !> from its current (already-correct) raw value, so no residual is ever
-    !> read against a stale node.
+    !> the loop uses a raw %set(); the next perturbation refreshes all nodal
+    !> derived state before another residual is evaluated.
     module subroutine assemble_tangent_fd_ftcms(self, workspace, local_F_T, local_F_H, &
                                                 K_TT, K_TH, K_HT, K_HH, ok)
         implicit none
@@ -186,8 +161,6 @@ contains
         real(real64) :: plus_T(workspace%num_fe_nodes), plus_H(workspace%num_fe_nodes)
         real(real64) :: minus_T(workspace%num_fe_nodes), minus_H(workspace%num_fe_nodes)
         real(real64), pointer :: residual_T(:), residual_H(:), values(:, :)
-        real(real64), pointer, contiguous :: saved_bdf_coeffs(:)
-        real(real64), target :: current_level_coeff(1)
         integer(int32) :: b, i, n_nodes
         real(real64) :: base_temperature, base_pressure, delta, denominator
 
@@ -201,23 +174,8 @@ contains
         caller_residual_H(1:n_nodes) = residual_H(1:n_nodes)
         nullify (residual_T, residual_H)
 
-        ! Drop the BDF history from the differenced residuals; see the
-        ! rationale comment in assemble_coupling_fd_ftcms above. Both residuals
-        ! must use the same truncated variant, so both bases are re-evaluated
-        ! below rather than reusing the caller's.
-        saved_bdf_coeffs => workspace%bdf_coeffs
-        current_level_coeff(1) = saved_bdf_coeffs(1)
-        workspace%bdf_coeffs => current_level_coeff
-
-        call local_F_T%zero()
-        call local_F_H%zero()
-        call self%thermal%assemble_local(control=self%control, workspace=workspace, F_T=local_F_T)
-        call self%hydraulic%assemble_local(control=self%control, workspace=workspace, F_H=local_F_H)
-        residual_T => local_F_T%get_data()
-        residual_H => local_F_H%get_data()
-        base_residual_T(1:n_nodes) = residual_T(1:n_nodes)
-        base_residual_H(1:n_nodes) = residual_H(1:n_nodes)
-        nullify (residual_T, residual_H)
+        base_residual_T(1:n_nodes) = caller_residual_T(1:n_nodes)
+        base_residual_H(1:n_nodes) = caller_residual_H(1:n_nodes)
 
         ok = .true.
 
@@ -316,8 +274,8 @@ contains
             call workspace%state(b)%pressure%set(base_pressure)
         end do
 
-        ! Put the workspace back on the unperturbed state and full BDF order,
-        ! and hand the caller back both residuals it is about to scatter, on
+        ! Put the workspace back on the unperturbed state and hand the caller
+        ! back both residuals it is about to scatter, on
         ! every exit path (whether or not the staged blocks are accepted).
         !
         ! Every restore above used a raw %set() with no refresh, deferring the
@@ -327,8 +285,6 @@ contains
         ! the Gauss-point one - consistent with the now fully-restored raw
         ! values, matching this routine's "workspace left on the unperturbed
         ! state" contract.
-        workspace%bdf_coeffs => saved_bdf_coeffs
-        nullify (saved_bdf_coeffs)
         call self%update_physical_properties_bulk(workspace%material_id, workspace%state)
         call refresh_gauss_states(self, workspace)
         residual_T => local_F_T%get_data()
@@ -451,6 +407,9 @@ contains
                                           local_F_T=local_F_T, local_F_H=local_F_H, &
                                           coordinates=elem_coords, raw_coordinates=raw_elem_coords, &
                                           connectivity=connectivity)
+            if (allocated(self%subcell_active_depth)) then
+                call workspace%set_subcell_depth(self%subcell_active_depth(elem_id))
+            end if
 
             if (.not. self%control%is_target(PHYSICS_TYPES%THERMAL, workspace%material_id)) cycle
             if (.not. self%control%is_target(PHYSICS_TYPES%HYDRAULIC, workspace%material_id)) cycle

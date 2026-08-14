@@ -4,8 +4,7 @@ module physics_governing_base
     use :: module_control
     use :: module_domain
     use :: module_constitutive, only:type_constitutive_manager
-    use :: domain_fe_subcell, only:type_subcell_quadrature_point, SUBCELL_QUADRATURE_CAPACITY, &
-                                   build_interface_quadrature_points
+    use :: domain_fe_subcell, only:type_subcell_quadrature
     implicit none
     private
 
@@ -17,6 +16,8 @@ module physics_governing_base
     !> d(p_l)/dX, which is not unity. Lives here because the thermal block
     !> consumes the same flux and must not reference type_hydraulic.
     logical, parameter :: HYDRAULIC_DRIVER_TOTAL_POTENTIAL = .true.
+
+    integer(int32), parameter :: SUBCELL_MAX_REFINEMENT_DEPTH = 0
 
     type :: type_assemble_workspace
         logical, private :: is_initialized = .false.
@@ -76,11 +77,14 @@ module physics_governing_base
         !> .true. iff the current element is cut by the freezing interface
         !> phi = 0 and the interface-split subcell rule applies to it.
         logical :: is_cut = .false.
-        !> Number of valid entries in subcell_quadrature_points (0 when uncut or unsupported).
-        integer(int32) :: num_subcell_quadrature_points = 0
-        !> Interface-split subcell quadrature points of the current element
-        !> (see build_interface_quadrature_points); valid only when is_cut.
-        type(type_subcell_quadrature_point) :: subcell_quadrature_points(SUBCELL_QUADRATURE_CAPACITY)
+        !> .true. iff the nodal level set phi changes sign across the current
+        !> element. Refining an element of one sign cannot resolve an interface
+        !> it does not contain, so only these elements are worth refining.
+        logical :: is_sign_mixed = .false.
+        !> Interface-split subcell quadrature of the current element; carries
+        !> its own points and is valid only when is_cut.
+        type(type_subcell_quadrature) :: subcell_quadrature
+        integer(int32), private :: subcell_refinement_depth = 0
 
         integer(int32) :: material_id
         integer(int32) :: element_id
@@ -102,6 +106,7 @@ module physics_governing_base
 
         procedure, public, pass(self) :: compute_interface_subcell => compute_interface_subcell_assemble_workspace
         procedure, public, pass(self) :: invalidate_interface_subcell => invalidate_interface_subcell_assemble_workspace
+        procedure, public, pass(self) :: set_subcell_depth => set_subcell_depth_assemble_workspace
 
         procedure, public, pass(self) :: compute_K1 => compute_K1_assemble_workspace
         procedure, public, pass(self) :: compute_K1_lumped => compute_K1_lumped_assemble_workspace
@@ -133,7 +138,9 @@ contains
         ! previous element into this one.
         self%is_interface_subcell_ready = .false.
         self%is_cut = .false.
-        self%num_subcell_quadrature_points = 0
+        self%is_sign_mixed = .false.
+        self%subcell_refinement_depth = 0
+        call self%subcell_quadrature%reset()
 
         if (.not. self%associated_bdf) then
             call self%set_bdf_info(control)
@@ -182,6 +189,8 @@ contains
         call self%fe%get_num_nodes(self%num_fe_nodes)
         call self%fe%get_num_gauss(self%num_fe_gauss)
         call self%fe%get_dimension(self%num_fe_dimension)
+
+        call self%subcell_quadrature%initialize(SUBCELL_MAX_REFINEMENT_DEPTH)
 
         ! Resize struct arrays only when element type changes
         if (allocated(self%state)) then
@@ -560,7 +569,8 @@ contains
         if (self%is_interface_subcell_ready) return
         self%is_interface_subcell_ready = .true.
         self%is_cut = .false.
-        self%num_subcell_quadrature_points = 0
+        self%is_sign_mixed = .false.
+        call self%subcell_quadrature%reset()
 
         use_subcell = enabled .and. physics%has_cryo_transport(material_id) .and. self%num_fe_dimension == 2
         if (.not. use_subcell) return
@@ -569,13 +579,25 @@ contains
             call physics%calc_freezing_level_set(material_id, self%state(i), phi_nodes(i))
         end do
 
+        self%is_sign_mixed = any(phi_nodes(1:self%num_fe_nodes) > 0.0d0) .and. &
+                             any(phi_nodes(1:self%num_fe_nodes) <= 0.0d0)
+
         ! Built for every element, not only sign-mixed ones: gating on mixed
         ! signs switches between two rules that do not agree in the limit.
-        call build_interface_quadrature_points(self%fe, phi_nodes(1:self%num_fe_nodes), &
-                                              self%subcell_quadrature_points, self%num_subcell_quadrature_points)
-        self%is_cut = (self%num_subcell_quadrature_points > 0)
+        call self%subcell_quadrature%compute( &
+            self%fe, phi_nodes(1:self%num_fe_nodes), refinement_depth=self%subcell_refinement_depth)
+        self%is_cut = self%subcell_quadrature%is_usable()
 
     end subroutine compute_interface_subcell_assemble_workspace
+
+    subroutine set_subcell_depth_assemble_workspace(self, refinement_depth)
+        implicit none
+        class(type_assemble_workspace), intent(inout) :: self
+        integer(int32), intent(in) :: refinement_depth
+
+        self%subcell_refinement_depth = min(max(0, refinement_depth), SUBCELL_MAX_REFINEMENT_DEPTH)
+        call self%invalidate_interface_subcell()
+    end subroutine set_subcell_depth_assemble_workspace
 
     !> Drop the cached interface split so the next compute_interface_subcell
     !> rebuilds it from the current nodal state.
@@ -596,7 +618,8 @@ contains
 
         self%is_interface_subcell_ready = .false.
         self%is_cut = .false.
-        self%num_subcell_quadrature_points = 0
+        self%is_sign_mixed = .false.
+        call self%subcell_quadrature%reset()
     end subroutine invalidate_interface_subcell_assemble_workspace
 
     subroutine compute_K1_assemble_workspace(self, A_gp, local_matrix)
@@ -732,7 +755,8 @@ contains
 
             self%is_interface_subcell_ready = .false.
             self%is_cut = .false.
-            self%num_subcell_quadrature_points = 0
+            self%is_sign_mixed = .false.
+            call self%subcell_quadrature%destroy()
 
             nullify (self%fe)
             self%is_initialized = .false.

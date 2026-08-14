@@ -1,5 +1,8 @@
 submodule(app_ftcms) ftcms_assemble
+    use, intrinsic :: ieee_arithmetic, only:ieee_is_finite
     implicit none
+
+    real(real64), parameter :: SUBCELL_ADAPTIVE_RELATIVE_TOLERANCE = 1.0d-3
 
     !> Build the thermal-pressure coupling block by differencing the element
     !> thermal residual instead of using the hand-written storage tangent.
@@ -46,17 +49,20 @@ submodule(app_ftcms) ftcms_assemble
 
 contains
 
-    module subroutine assemble_ftcms(self)
+    module subroutine assemble_ftcms(self, residual_only)
         implicit none
         class(type_ftcms), intent(inout) :: self
+        !> Assemble only the residual vector when true.
+        logical, intent(in), optional :: residual_only
 
         type(type_matrix_dense) :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
         type(type_vector_dp) :: local_F_T, local_F_H
+        type(type_matrix_dense) :: fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT
+        type(type_vector_dp) :: fine_F_T, fine_F_H
         type(type_assemble_workspace) :: workspace
 
         real(real64), allocatable :: elem_coords(:, :)
         real(real64), allocatable :: raw_elem_coords(:, :)
-
         integer(int32) :: i_color, i_elem, elem_id
         integer(int32), pointer, contiguous, dimension(:) :: p_connectivity
         integer(int32) :: thermal_dof, hydraulic_dof
@@ -65,7 +71,7 @@ contains
         integer(int32) :: num_colors, num_elements_in_color
         integer(int32), pointer, contiguous, dimension(:) :: elements_list
 
-        logical :: use_scatter, do_thermal, do_hydraulic
+        logical :: use_scatter, do_thermal, do_hydraulic, assemble_matrix
         logical :: do_thermal_elem, do_hydraulic_elem
         !> Per-element success flag of assemble_tangent_fd (see FULL_FD_TANGENT
         !> below); .false. triggers the analytic-block fallback for that element.
@@ -74,16 +80,20 @@ contains
         !> analytic blocks in this assembly sweep, summed across colors and
         !> threads; reported once after the parallel region, only if nonzero.
         integer(int32) :: fd_tangent_fallback_count
+        integer(int32) :: selected_subcell_depth
+        logical :: subcell_depth_unresolved
+        integer(int32) :: local_unresolved_count, global_unresolved_count
+        integer(int32) :: local_max_depth, global_max_depth, mpi_rank, ierr
 
         call self%control%profiler_start(PROFILER_TYPES%ASSEMBLE)
 
         nullify (p_connectivity)
         nullify (elements_list)
-
-        call self%K%zero()
+        assemble_matrix = .not. optval(residual_only, .false.)
+        if (assemble_matrix) call self%K%zero()
         call self%F%zero()
 
-        if (TOTAL_POTENTIAL_UNKNOWN) then
+        if (assemble_matrix .and. TOTAL_POTENTIAL_UNKNOWN) then
             block
                 integer(int32) :: num_nodes_total
                 call self%domain%get_num_nodes(num_nodes_total)
@@ -110,15 +120,20 @@ contains
 
         use_scatter = .true.
         fd_tangent_fallback_count = 0
+        if (assemble_matrix .and. allocated(self%subcell_depth_unresolved)) then
+            self%subcell_depth_unresolved = .false.
+        end if
 
         !$OMP PARALLEL IF(do_hydraulic .or. do_thermal) DEFAULT(NONE) &
         !$OMP SHARED(self, num_colors, elements_list, num_elements_in_color, &
         !$OMP        thermal_dof, hydraulic_dof, use_scatter, do_thermal, do_hydraulic, &
-        !$OMP        fd_tangent_fallback_count) &
+        !$OMP        fd_tangent_fallback_count, assemble_matrix) &
         !$OMP PRIVATE(i_color, i_elem, elem_id, p_connectivity, workspace, &
         !$OMP         local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
+        !$OMP         fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
         !$OMP         local_F_T, local_F_H, elem_coords, raw_elem_coords, num_nodes_local, &
-        !$OMP         do_thermal_elem, do_hydraulic_elem, fd_tangent_ok)
+        !$OMP         fine_F_T, fine_F_H, do_thermal_elem, do_hydraulic_elem, fd_tangent_ok, &
+        !$OMP         selected_subcell_depth, subcell_depth_unresolved)
 
         do i_color = 1, num_colors
 
@@ -132,18 +147,42 @@ contains
                 do i_elem = 1, num_elements_in_color
 
                     elem_id = elements_list(i_elem)
-                    call self%assemble_initialize(element_id=elem_id, workspace=workspace, &
-                                                  local_K_TT=local_K_TT, local_K_TH=local_K_TH, &
-                                                  local_K_HH=local_K_HH, local_K_HT=local_K_HT, &
-                                                  local_F_T=local_F_T, local_F_H=local_F_H, &
-                                                  coordinates=elem_coords, raw_coordinates=raw_elem_coords, &
-                                                  connectivity=p_connectivity)
+                    if (assemble_matrix) then
+                        call self%assemble_initialize(element_id=elem_id, workspace=workspace, &
+                                                      local_K_TT=local_K_TT, local_K_TH=local_K_TH, &
+                                                      local_K_HH=local_K_HH, local_K_HT=local_K_HT, &
+                                                      local_F_T=local_F_T, local_F_H=local_F_H, &
+                                                      coordinates=elem_coords, raw_coordinates=raw_elem_coords, &
+                                                      connectivity=p_connectivity)
+                    else
+                        call self%assemble_initialize(element_id=elem_id, workspace=workspace, &
+                                                      local_F_T=local_F_T, local_F_H=local_F_H, &
+                                                      coordinates=elem_coords, raw_coordinates=raw_elem_coords, &
+                                                      connectivity=p_connectivity)
+                    end if
 
                     do_thermal_elem = self%control%is_target(PHYSICS_TYPES%THERMAL, workspace%material_id)
                     do_hydraulic_elem = self%control%is_target(PHYSICS_TYPES%HYDRAULIC, workspace%material_id)
 
-                    call self%assemble_local(workspace, local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
-                                             local_F_T, local_F_H)
+                    if (assemble_matrix) then
+                        call select_subcell_depth(self, workspace, do_thermal_elem, do_hydraulic_elem, &
+                                                  local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
+                                                  local_F_T, local_F_H, &
+                                                  fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
+                                                  fine_F_T, fine_F_H, selected_subcell_depth, &
+                                                  subcell_depth_unresolved)
+                        if (allocated(self%subcell_active_depth)) then
+                            self%subcell_active_depth(elem_id) = selected_subcell_depth
+                            self%subcell_depth_unresolved(elem_id) = subcell_depth_unresolved
+                        end if
+                    else
+                        selected_subcell_depth = 0
+                        if (allocated(self%subcell_active_depth)) then
+                            selected_subcell_depth = self%subcell_active_depth(elem_id)
+                        end if
+                        call workspace%set_subcell_depth(selected_subcell_depth)
+                        call self%assemble_local(workspace, local_F_T=local_F_T, local_F_H=local_F_H)
+                    end if
 
                     ! An element where only one physics is active has no
                     ! coupling residual to difference against (the other
@@ -151,31 +190,15 @@ contains
                     ! assemble_local_ftcms), so it always keeps the analytic
                     ! path; the choice below is only between the two coupled
                     ! FD variants for elements where both physics are active.
-                    if (do_thermal_elem .and. do_hydraulic_elem) then
+                    if (assemble_matrix .and. do_thermal_elem .and. do_hydraulic_elem) then
                         if (FULL_FD_TANGENT) then
-                            ! Overwrites all four blocks with the true element
-                            ! tangent, then restores the capacity_regularization
-                            ! contribution onto K_HH (see restore_capacity_
-                            ! regularization below): it is NOT a Picard-only
-                            ! artifact safe to drop - measured, removing it made
-                            ! K_HH's Frobenius norm collapse by ~1e6 as soon as
-                            ! the state moved off the initial condition even in
-                            ! a fully unfrozen, mild element, which is exactly
-                            ! the near-singular pressure row the regularization
-                            ! exists to bound, independent of whether the rest
-                            ! of the block is Picard-lagged or an exact tangent.
+                            ! Differentiate the physical residual first, then
+                            ! add the pressure-block step regularization.
                             call self%assemble_tangent_fd(workspace, local_F_T, local_F_H, &
                                                           local_K_TT, local_K_TH, local_K_HT, local_K_HH, &
                                                           fd_tangent_ok)
                             if (fd_tangent_ok) then
-                                ! Skipped while the regularization is off
-                                ! (CAPACITY_REGULARIZATION_ENABLED): re-adding
-                                ! it here would put back on the FD block the
-                                ! very matrix-only term that makes K differ
-                                ! from dR/du.
-                                if (CAPACITY_REGULARIZATION_ENABLED) then
-                                    call restore_capacity_regularization(self, workspace, local_K_HH)
-                                end if
+                                call restore_capacity_regularization(self, workspace, local_K_HH)
                             else
                                 !$OMP ATOMIC UPDATE
                                 fd_tangent_fallback_count = fd_tangent_fallback_count + 1
@@ -185,7 +208,8 @@ contains
                         end if
                     end if
 
-                    if (TOTAL_POTENTIAL_UNKNOWN .and. do_thermal_elem .and. do_hydraulic_elem) then
+                    if (assemble_matrix .and. TOTAL_POTENTIAL_UNKNOWN .and. &
+                        do_thermal_elem .and. do_hydraulic_elem) then
                         call transform_to_total_potential(self, workspace, &
                                                           local_K_TT, local_K_TH, local_K_HH, local_K_HT)
                     end if
@@ -194,17 +218,22 @@ contains
 
                     ! $OMP CRITICAL(ftcms_global_assembly)
                     if (do_thermal_elem) then
-                        call self%K%add(PHYSICS_TYPES%THERMAL%ID, PHYSICS_TYPES%THERMAL%ID, elem_id, num_nodes_local, local_K_TT)
+                        if (assemble_matrix) then
+                            call self%K%add(PHYSICS_TYPES%THERMAL%ID, PHYSICS_TYPES%THERMAL%ID, &
+                                            elem_id, num_nodes_local, local_K_TT)
+                        end if
                         call self%F%add(PHYSICS_TYPES%THERMAL%ID, p_connectivity, local_F_T)
                     end if
 
                     if (do_hydraulic_elem) then
-                        call self%K%add(PHYSICS_TYPES%HYDRAULIC%ID, PHYSICS_TYPES%HYDRAULIC%ID, &
-                                        elem_id, num_nodes_local, local_K_HH)
+                        if (assemble_matrix) then
+                            call self%K%add(PHYSICS_TYPES%HYDRAULIC%ID, PHYSICS_TYPES%HYDRAULIC%ID, &
+                                            elem_id, num_nodes_local, local_K_HH)
+                        end if
                         call self%F%add(PHYSICS_TYPES%HYDRAULIC%ID, p_connectivity, local_F_H)
                     end if
 
-                    if (do_thermal_elem .and. do_hydraulic_elem) then
+                    if (assemble_matrix .and. do_thermal_elem .and. do_hydraulic_elem) then
                         call self%K%add(PHYSICS_TYPES%THERMAL%ID, PHYSICS_TYPES%HYDRAULIC%ID, elem_id, num_nodes_local, local_K_TH)
                         call self%K%add(PHYSICS_TYPES%HYDRAULIC%ID, PHYSICS_TYPES%THERMAL%ID, elem_id, num_nodes_local, local_K_HT)
                     end if
@@ -219,8 +248,14 @@ contains
 
         end do
 
-        call self%assemble_destroy(workspace, local_K_TT, local_K_TH, &
-                                   local_K_HH, local_K_HT, local_F_T, local_F_H)
+        if (assemble_matrix) then
+            call self%assemble_destroy(workspace, local_K_TT, local_K_TH, &
+                                       local_K_HH, local_K_HT, local_F_T, local_F_H)
+            call destroy_local_system(fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
+                                      fine_F_T, fine_F_H)
+        else
+            call self%assemble_destroy(workspace, local_F_T=local_F_T, local_F_H=local_F_H)
+        end if
         if (allocated(elem_coords)) deallocate (elem_coords)
         if (allocated(raw_elem_coords)) deallocate (raw_elem_coords)
 
@@ -231,6 +266,25 @@ contains
         ! DEBUG_SUBCELL_COUNTER parameter is set to .true.
         call self%hydraulic%report_subcell_debug_counts()
 
+        if (assemble_matrix .and. allocated(self%subcell_depth_unresolved)) then
+            local_unresolved_count = count(self%subcell_depth_unresolved)
+            local_max_depth = 0
+            if (size(self%subcell_active_depth) > 0) then
+                local_max_depth = maxval(self%subcell_active_depth)
+            end if
+            call MPI_Allreduce(local_unresolved_count, global_unresolved_count, 1, MPI_INTEGER4, &
+                               MPI_SUM, MPI_COMM_WORLD, ierr)
+            call MPI_Allreduce(local_max_depth, global_max_depth, 1, MPI_INTEGER4, &
+                               MPI_MAX, MPI_COMM_WORLD, ierr)
+            call MPI_Comm_rank(MPI_COMM_WORLD, mpi_rank, ierr)
+            if (mpi_rank == 0 .and. global_unresolved_count > 0) then
+                write (*, '(A,I0,A,I0,A,ES9.2,A)') &
+                    '   [SUBCELL-ADAPTIVE] ', global_unresolved_count, &
+                    ' element(s) unresolved at depth ', global_max_depth, &
+                    ' (relative tolerance ', SUBCELL_ADAPTIVE_RELATIVE_TOLERANCE, ')'
+            end if
+        end if
+
         if (fd_tangent_fallback_count > 0) then
             write (*, '(A,I0,A)') '   [FULL-FD-TANGENT] fell back to the analytic block on ', &
                 fd_tangent_fallback_count, ' element(s) (non-finite finite-difference column)'
@@ -239,6 +293,185 @@ contains
         call self%control%profiler_stop(PROFILER_TYPES%ASSEMBLE)
 
     end subroutine assemble_ftcms
+
+    subroutine select_subcell_depth(self, workspace, do_thermal, do_hydraulic, &
+                                    K_TT, K_TH, K_HH, K_HT, F_T, F_H, &
+                                    fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
+                                    fine_F_T, fine_F_H, selected_depth, unresolved)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        type(type_assemble_workspace), intent(inout) :: workspace
+        logical, intent(in) :: do_thermal, do_hydraulic
+        type(type_matrix_dense), intent(inout) :: K_TT, K_TH, K_HH, K_HT
+        type(type_vector_dp), intent(inout) :: F_T, F_H
+        type(type_matrix_dense), intent(inout) :: fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT
+        type(type_vector_dp), intent(inout) :: fine_F_T, fine_F_H
+        integer(int32), intent(inout) :: selected_depth
+        logical, intent(inout) :: unresolved
+
+        integer(int32) :: fine_depth, max_depth
+
+        selected_depth = 0
+        unresolved = .false.
+        call workspace%subcell_quadrature%get_max_depth(max_depth)
+        call workspace%set_subcell_depth(selected_depth)
+        call self%assemble_local(workspace, K_TT, K_TH, K_HH, K_HT, F_T, F_H)
+
+        if (.not. workspace%is_cut .or. .not. workspace%is_sign_mixed .or. max_depth == 0) return
+
+        do fine_depth = 1, max_depth
+            call initialize_local_system(workspace%num_fe_nodes, fine_K_TT, fine_K_TH, &
+                                         fine_K_HH, fine_K_HT, fine_F_T, fine_F_H)
+            call workspace%set_subcell_depth(fine_depth)
+            call self%assemble_local(workspace, fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
+                                     fine_F_T, fine_F_H)
+
+            if (local_systems_agree(do_thermal, do_hydraulic, &
+                                    K_TT, K_TH, K_HH, K_HT, F_T, F_H, &
+                                    fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
+                                    fine_F_T, fine_F_H)) then
+                call workspace%set_subcell_depth(selected_depth)
+                return
+            end if
+
+            selected_depth = fine_depth
+            call copy_local_system(fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
+                                   fine_F_T, fine_F_H, K_TT, K_TH, K_HH, K_HT, F_T, F_H)
+        end do
+
+        unresolved = .true.
+        call workspace%set_subcell_depth(selected_depth)
+    end subroutine select_subcell_depth
+
+    subroutine initialize_local_system(num_nodes, K_TT, K_TH, K_HH, K_HT, F_T, F_H)
+        implicit none
+        integer(int32), intent(in) :: num_nodes
+        type(type_matrix_dense), intent(inout) :: K_TT, K_TH, K_HH, K_HT
+        type(type_vector_dp), intent(inout) :: F_T, F_H
+
+        call check_initialize_matrix(K_TT, num_nodes)
+        call check_initialize_matrix(K_TH, num_nodes)
+        call check_initialize_matrix(K_HH, num_nodes)
+        call check_initialize_matrix(K_HT, num_nodes)
+        call check_initialize_vector(F_T, num_nodes)
+        call check_initialize_vector(F_H, num_nodes)
+    end subroutine initialize_local_system
+
+    logical function local_systems_agree(do_thermal, do_hydraulic, &
+                                         K_TT, K_TH, K_HH, K_HT, F_T, F_H, &
+                                         fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
+                                         fine_F_T, fine_F_H) result(agree)
+        implicit none
+        logical, intent(in) :: do_thermal, do_hydraulic
+        type(type_matrix_dense), intent(in) :: K_TT, K_TH, K_HH, K_HT
+        type(type_vector_dp), intent(in) :: F_T, F_H
+        type(type_matrix_dense), intent(in) :: fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT
+        type(type_vector_dp), intent(in) :: fine_F_T, fine_F_H
+
+        agree = .true.
+        if (do_thermal) then
+            agree = agree .and. matrices_agree(K_TT, fine_K_TT)
+            agree = agree .and. vectors_agree(F_T, fine_F_T)
+            if (do_hydraulic) agree = agree .and. matrices_agree(K_TH, fine_K_TH)
+        end if
+        if (do_hydraulic) then
+            agree = agree .and. matrices_agree(K_HH, fine_K_HH)
+            agree = agree .and. vectors_agree(F_H, fine_F_H)
+            if (do_thermal) agree = agree .and. matrices_agree(K_HT, fine_K_HT)
+        end if
+    end function local_systems_agree
+
+    logical function matrices_agree(coarse, fine) result(agree)
+        implicit none
+        type(type_matrix_dense), intent(in), target :: coarse, fine
+
+        real(real64), pointer, contiguous :: coarse_values(:, :), fine_values(:, :)
+
+        coarse_values => coarse%get_val()
+        fine_values => fine%get_val()
+        agree = arrays_agree(reshape(coarse_values, [size(coarse_values)]), &
+                             reshape(fine_values, [size(fine_values)]))
+    end function matrices_agree
+
+    logical function vectors_agree(coarse, fine) result(agree)
+        implicit none
+        type(type_vector_dp), intent(in), target :: coarse, fine
+
+        real(real64), pointer, contiguous :: coarse_values(:), fine_values(:)
+
+        coarse_values => coarse%get_data()
+        fine_values => fine%get_data()
+        agree = arrays_agree(coarse_values, fine_values)
+    end function vectors_agree
+
+    logical function arrays_agree(coarse, fine) result(agree)
+        implicit none
+        real(real64), intent(in) :: coarse(:), fine(:)
+
+        real(real64) :: difference_norm, value_norm
+
+        agree = .false.
+        if (size(coarse) /= size(fine)) return
+        if (.not. all(ieee_is_finite(coarse)) .or. .not. all(ieee_is_finite(fine))) return
+
+        difference_norm = maxval(abs(fine - coarse))
+        value_norm = max(maxval(abs(coarse)), maxval(abs(fine)))
+        agree = difference_norm <= SUBCELL_ADAPTIVE_RELATIVE_TOLERANCE * value_norm
+    end function arrays_agree
+
+    subroutine copy_local_system(source_K_TT, source_K_TH, source_K_HH, source_K_HT, &
+                                 source_F_T, source_F_H, target_K_TT, target_K_TH, &
+                                 target_K_HH, target_K_HT, target_F_T, target_F_H)
+        implicit none
+        type(type_matrix_dense), intent(in), target :: source_K_TT, source_K_TH, source_K_HH, source_K_HT
+        type(type_vector_dp), intent(in), target :: source_F_T, source_F_H
+        type(type_matrix_dense), intent(inout), target :: target_K_TT, target_K_TH, target_K_HH, target_K_HT
+        type(type_vector_dp), intent(inout), target :: target_F_T, target_F_H
+
+        call copy_matrix(source_K_TT, target_K_TT)
+        call copy_matrix(source_K_TH, target_K_TH)
+        call copy_matrix(source_K_HH, target_K_HH)
+        call copy_matrix(source_K_HT, target_K_HT)
+        call copy_vector(source_F_T, target_F_T)
+        call copy_vector(source_F_H, target_F_H)
+    end subroutine copy_local_system
+
+    subroutine copy_matrix(source, target)
+        implicit none
+        type(type_matrix_dense), intent(in), target :: source
+        type(type_matrix_dense), intent(inout), target :: target
+
+        real(real64), pointer, contiguous :: source_values(:, :), target_values(:, :)
+
+        source_values => source%get_val()
+        target_values => target%get_val()
+        target_values = source_values
+    end subroutine copy_matrix
+
+    subroutine copy_vector(source, target)
+        implicit none
+        type(type_vector_dp), intent(in), target :: source
+        type(type_vector_dp), intent(inout), target :: target
+
+        real(real64), pointer, contiguous :: source_values(:), target_values(:)
+
+        source_values => source%get_data()
+        target_values => target%get_data()
+        target_values = source_values
+    end subroutine copy_vector
+
+    subroutine destroy_local_system(K_TT, K_TH, K_HH, K_HT, F_T, F_H)
+        implicit none
+        type(type_matrix_dense), intent(inout) :: K_TT, K_TH, K_HH, K_HT
+        type(type_vector_dp), intent(inout) :: F_T, F_H
+
+        if (K_TT%is_initialized()) call K_TT%destroy()
+        if (K_TH%is_initialized()) call K_TH%destroy()
+        if (K_HH%is_initialized()) call K_HH%destroy()
+        if (K_HT%is_initialized()) call K_HT%destroy()
+        if (F_T%is_initialized()) call F_T%destroy()
+        if (F_H%is_initialized()) call F_H%destroy()
+    end subroutine destroy_local_system
 
     module subroutine assemble_initialize_ftcms(self, element_id, workspace, local_K_TT, local_K_TH, &
                                                 local_K_HH, local_K_HT, local_F_T, local_F_H, &
@@ -369,37 +602,10 @@ contains
 
     end subroutine assemble_local_ftcms
 
-    !> Re-add the pseudo-transient capacity regularization (hydraulic_matrix.F90,
-    !> assemble_local_picard_hydraulic) onto a K_HH block that was overwritten
-    !> by the finite-difference tangent.
-    !>
-    !> The FD tangent (assemble_tangent_fd_ftcms) never contains this term:
-    !> assemble_local_picard_hydraulic adds it to the K_HH MATRIX only, never
-    !> to F_H, and assemble_tangent_fd only ever calls assemble_local with F_H
-    !> requested, never K_HH - so the difference-quotient tangent is exactly
-    !> the term this regularization was designed to augment, with the
-    !> regularization itself absent.
-    !>
-    !> That is not safe to leave out: measured on a fully unfrozen, mild
-    !> element at the very first assembly of a run, dropping it collapsed
-    !> K_HH's Frobenius norm by about six orders of magnitude the moment the
-    !> state moved off the initial condition, which is the same near-singular
-    !> pressure row hydraulic_matrix.F90's own comment describes at the
-    !> freezing front - the regularization guards the pressure row's
-    !> conditioning in general, not specifically a Picard-lag artifact, so a
-    !> true Newton tangent needs it too.
-    !>
-    !> Uses type_hydraulic%get_capacity_regularization, a pure function of the
-    !> per-material bound array set once at initialize, instead of toggling
-    !> the shared disable_capacity_regularization flag and re-assembling K_HH
-    !> (which would race across the parallel element loop's threads): this
-    !> keeps the fix confined to workspace-local data.
     subroutine restore_capacity_regularization(self, workspace, K_HH)
         implicit none
         class(type_ftcms), intent(inout) :: self
         type(type_assemble_workspace), intent(inout) :: workspace
-        !> K_HH as overwritten by assemble_tangent_fd; the regularization
-        !> contribution is added on top
         type(type_matrix_dense), intent(inout) :: K_HH
 
         real(real64) :: capacity_regularization, bdf0
@@ -408,8 +614,10 @@ contains
         real(real64), pointer :: values(:, :)
         integer(int32) :: nonlinear_iteration, i, j, n
 
+        if (.not. CAPACITY_REGULARIZATION_ENABLED) return
         call self%control%get_nonlinear_iter(nonlinear_iteration)
-        capacity_regularization = self%hydraulic%get_capacity_regularization(workspace%material_id, nonlinear_iteration)
+        capacity_regularization = self%hydraulic%get_capacity_regularization( &
+            workspace%material_id, nonlinear_iteration)
         if (capacity_regularization <= 0.0d0) return
 
         n = workspace%num_fe_nodes

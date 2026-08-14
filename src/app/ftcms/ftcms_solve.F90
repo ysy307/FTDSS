@@ -787,11 +787,6 @@ contains
         integer(int32) :: phase_stagnation_count
         logical :: linear_failed, phase_is_converged, phase_aa_usable
         logical :: phase_final_correction_applied
-        logical :: min_dt_extension_announced
-        integer(int32) :: max_iter_config, min_dt_iter_limit
-        integer(int32), parameter :: MIN_DT_ITER_FACTOR = 5
-
-
         is_step_converged = .false.
         ls_ref0_thermal = 0.0d0
         ls_ref0_hydraulic = 0.0d0
@@ -851,32 +846,9 @@ contains
                 self%aa_gnorm_prev = -1.0d0
             end if
 
-            call self%control%get_max_iterations(max_iter_config)
-            min_dt_iter_limit = max_iter_config
-            if (do_phase_outer .and. self%control%is_conserved()) then
-                min_dt_iter_limit = max(max_iter_config, MIN_DT_ITER_FACTOR * max_iter_config)
-            end if
-            if (self%control%is_min_dt() .and. self%control%is_conserved()) then
-                min_dt_iter_limit = max(max_iter_config, MIN_DT_ITER_FACTOR * max_iter_config)
-            end if
-            min_dt_extension_announced = .false.
-
             ! Nonlinear iteration loop
             nonlinear: do
-                if (.not. self%control%should_continue()) then
-                    call self%control%get_nonlinear_iter(iter_nl)
-                    if (self%control%is_conserved() .and. &
-                        (.not. self%control%is_converged()) .and. (.not. self%control%is_diverged()) .and. &
-                        iter_nl < min_dt_iter_limit) then
-                        if (.not. min_dt_extension_announced) then
-                            write (*, '(A,I0,A,I0,A)') '   [NONLINEAR] conserved continuation: iter limit ', &
-                                max_iter_config, ' -> ', min_dt_iter_limit, ' while conserved iteration is still contracting.'
-                            min_dt_extension_announced = .true.
-                        end if
-                    else
-                        exit nonlinear
-                    end if
-                end if
+                if (.not. self%control%should_continue()) exit nonlinear
 
                 ! Setup (update iteration counter)
                 call self%solve_time_step_setup(prescribe_bc)
@@ -1009,7 +981,7 @@ contains
                                             ls_aa_has_prev, ls_aa_gnorm)
                         end if
                         call self%reflect_variables(step_scale=ls_scale)
-                        call self%assemble()
+                        call self%assemble(residual_only=.true.)
                         call self%apply_bc(prescribed=.false.)
                         call ls_block_norms(self, ls_E_T, ls_E_H, ls_ref0_thermal, ls_ref0_hydraulic)
                         ls_trial_norm = ls_merit(ls_E_T, ls_E_H)
@@ -1045,7 +1017,7 @@ contains
                                         ls_aa_T, ls_aa_P, ls_aa_duT, ls_aa_duP, &
                                         ls_aa_has_prev, ls_aa_gnorm)
                         call self%reflect_variables(step_scale=0.0d0)
-                        call self%assemble()
+                        call self%assemble(residual_only=.true.)
                         call self%apply_bc(prescribed=.false.)
                         if (.not. branch_report_done .and. iter_nl >= 10) then
                             branch_report_done = .true.
@@ -1078,26 +1050,28 @@ contains
                                 '  E_T=', ls_trial_E_T(ls_diag), &
                                 '  E_H=', ls_trial_E_H(ls_diag)
                         end do
+                        if (self%is_active_thermal()) then
+                            call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
+                            call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
+                        end if
+                        if (self%is_active_hydraulic()) then
+                            call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
+                            call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
+                        end if
+                        exit nonlinear
                     end if
 
-                    ! Increment magnitudes. With the tangent and the linear
-                    ! solve both verified, the size of du is the remaining
-                    ! observable that says whether the step is bounded.
-                    if (iter_nl >= 5) then
-                        block
-                            real(real64), allocatable :: du_report_T(:), du_report_P(:)
-                            real(real64) :: max_du_T, max_du_P
+                    ! Increment magnitudes, reported on the iteration line below.
+                    block
+                        real(real64), allocatable :: du_report_T(:), du_report_P(:)
 
-                            call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du_report_T)
-                            call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, du_report_P)
-                            max_du_T = 0.0d0
-                            max_du_P = 0.0d0
-                            if (allocated(du_report_T)) max_du_T = maxval(abs(du_report_T))
-                            if (allocated(du_report_P)) max_du_P = maxval(abs(du_report_P))
-                            write (*, '(A,I0,A,ES11.3,A,ES11.3)') '   [DU] iter ', iter_nl, &
-                                ' max|du_T|=', max_du_T, ' max|du_p|=', max_du_P
-                        end block
-                    end if
+                        call self%get_variable_increment(PHYSICS_TYPES%THERMAL, du_report_T)
+                        call self%get_variable_increment(PHYSICS_TYPES%HYDRAULIC, du_report_P)
+                        self%last_du_thermal_max = 0.0d0
+                        self%last_du_hydraulic_max = 0.0d0
+                        if (allocated(du_report_T)) self%last_du_thermal_max = maxval(abs(du_report_T))
+                        if (allocated(du_report_P)) self%last_du_hydraulic_max = maxval(abs(du_report_P))
+                    end block
 
                     if (iter_nl >= FREEZE_REPORT_ITER .and. freeze_report_count < FREEZE_REPORT_LIMIT) then
                         freeze_report_count = freeze_report_count + 1
@@ -1145,6 +1119,8 @@ contains
                     ! theta_i is a state function of (T,p) evaluated inside the
                     ! reassembly above, so there is no separate phase criterion.
                     call self%solve_time_step_check_convergence_conserved()
+
+                    if (NONLINEAR_VERBOSE) call report_nonlinear_iterate(self, iter_nl)
                 else
                     ! Update solution with relaxation (Aitken for legacy Picard,
                     ! damped for Newton).
@@ -1371,6 +1347,10 @@ contains
 
         real(real64), allocatable :: r_thermal(:), r_hydraulic(:)
         real(real64) :: norm_thermal, norm_hydraulic
+#ifdef _MPI
+        real(real64) :: local_errors(2), global_errors(2)
+        integer(int32) :: ierr
+#endif
 
         e_thermal = 0.0d0
         e_hydraulic = 0.0d0
@@ -1394,6 +1374,12 @@ contains
                 end if
             end if
         end if
+#ifdef _MPI
+        local_errors = [e_thermal, e_hydraulic]
+        call MPI_Allreduce(local_errors, global_errors, 2, MPI_REAL8, MPI_MAX, MPI_COMM_WORLD, ierr)
+        e_thermal = global_errors(1)
+        e_hydraulic = global_errors(2)
+#endif
         if (allocated(r_thermal)) deallocate (r_thermal)
         if (allocated(r_hydraulic)) deallocate (r_hydraulic)
     end subroutine ls_block_norms
@@ -1745,6 +1731,53 @@ contains
             if (abs(denominator) > tiny(1.0d0)) ratio = numerator / denominator
         end function safe_ratio
     end subroutine verify_local_tangent
+
+    !> One line per nonlinear iterate.
+    !>
+    !> Carries exactly the quantities the acceptance decision uses: the four
+    !> error measures (each passes at <= 1, -1 = not evaluated), the conserved
+    !> change measure, the increment magnitudes and the relaxation factor, then
+    !> the verdict naming the gates that failed. The R0-normalized residual
+    !> ratios are deliberately absent - they steer omega only, and printing
+    !> them beside the gates invites reading them as the criterion.
+    subroutine report_nonlinear_iterate(self, iter_nl)
+        implicit none
+        class(type_ftcms), intent(in) :: self
+        integer(int32), intent(in) :: iter_nl
+
+        real(real64) :: loc_thermal, loc_hydraulic, bal_thermal, bal_hydraulic, dq_effective
+        logical :: local_ok, balance_ok, dq_ok
+        character(len=24) :: verdict
+
+        loc_thermal = -1.0d0
+        loc_hydraulic = -1.0d0
+        bal_thermal = -1.0d0
+        bal_hydraulic = -1.0d0
+        dq_effective = -1.0d0
+        local_ok = .false.
+        balance_ok = .false.
+        dq_ok = .false.
+        call self%control%get_conserved_gates(loc_thermal, loc_hydraulic, &
+                                              bal_thermal, bal_hydraulic, dq_effective, &
+                                              local_ok, balance_ok, dq_ok)
+
+        if (local_ok .and. balance_ok .and. dq_ok) then
+            verdict = 'converged'
+        else
+            verdict = 'fail:'
+            if (.not. local_ok) verdict = trim(verdict)//' loc'
+            if (.not. balance_ok) verdict = trim(verdict)//' bal'
+            if (.not. dq_ok) verdict = trim(verdict)//' dq'
+        end if
+
+        write (*, '(A,I3,8(A,ES10.2),2A)') '   [NL] it', iter_nl, &
+            ' locT', loc_thermal, ' locH', loc_hydraulic, &
+            ' balT', bal_thermal, ' balH', bal_hydraulic, &
+            ' dQ', dq_effective, &
+            ' duT', self%last_du_thermal_max, ' dup', self%last_du_hydraulic_max, &
+            ' om', self%control%get_conserved_relaxation(), &
+            '  ', trim(verdict)
+    end subroutine report_nonlinear_iterate
 
     !> State and constitutive derivatives across the freezing band.
     !>
@@ -2353,58 +2386,45 @@ contains
     !> Write diagnostics after time-control update so dt_next and accepted time
     !> describe the actual state used by the following attempt.
     subroutine write_solver_history_attempt(self, attempt, accepted_step, time_start, time_trial, dt_used, &
-                                            accepted, ats_iter, phase_spike, lte_error)
+                                            accepted, ats_iter, lte_error)
         implicit none
         class(type_ftcms), intent(inout) :: self
         integer(int32), intent(in) :: attempt, accepted_step, ats_iter
         real(real64), intent(in) :: time_start, time_trial, dt_used, lte_error
-        logical, intent(in) :: accepted, phase_spike
+        logical, intent(in) :: accepted
 
         character(len=18) :: status
         real(real64) :: time_accepted, dt_next
-        real(real64) :: t_res, t_inc, h_res, h_inc
-        real(real64) :: omega_used, dq_norm_used
+        real(real64) :: omega_used
+        real(real64) :: loc_thermal, loc_hydraulic, bal_thermal, bal_hydraulic, dq_effective
+        logical :: local_ok, balance_ok, dq_ok
 
         if (self%solver_history_unit == -1) return
 
         call self%control%get_time(time_accepted)
         call self%control%get_dt(dt_next)
         omega_used = self%control%get_conserved_relaxation()
-        dq_norm_used = self%control%get_conserved_dq_norm()
         status = solve_status_label(self%last_solve_status)
 
-        t_res = -1.0d0
-        t_inc = -1.0d0
-        h_res = -1.0d0
-        h_inc = -1.0d0
-        if ((.not. self%control%is_conserved()) .and. &
-            self%last_solve_status /= SOLVE_STATUS_LINEAR_FAILURE .and. &
-            self%last_solve_status /= SOLVE_STATUS_NOT_RUN) then
-            if (self%is_active_thermal()) then
-                call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, NONLINEAR_NORM_CRITERIA%RESIDUAL, &
-                                                   NORM_TYPES%LINF, t_res)
-                call self%control%get_current_norm(PHYSICS_TYPES%THERMAL, NONLINEAR_NORM_CRITERIA%UPDATE, &
-                                                   NORM_TYPES%LINF, t_inc)
-            end if
-            if (self%is_active_hydraulic()) then
-                call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, NONLINEAR_NORM_CRITERIA%RESIDUAL, &
-                                                   NORM_TYPES%LINF, h_res)
-                call self%control%get_current_norm(PHYSICS_TYPES%HYDRAULIC, NONLINEAR_NORM_CRITERIA%UPDATE, &
-                                                   NORM_TYPES%LINF, h_inc)
-            end if
-        end if
+        loc_thermal = -1.0d0
+        loc_hydraulic = -1.0d0
+        bal_thermal = -1.0d0
+        bal_hydraulic = -1.0d0
+        dq_effective = -1.0d0
+        local_ok = .false.
+        balance_ok = .false.
+        dq_ok = .false.
+        call self%control%get_conserved_gates(loc_thermal, loc_hydraulic, &
+                                              bal_thermal, bal_hydraulic, dq_effective, &
+                                              local_ok, balance_ok, dq_ok)
 
         write (self%solver_history_unit, &
-               '(2(I10,1X),5(ES15.7,1X),I1,1X,A18,1X,10(I10,1X),12(ES13.5,1X))') &
+               '(2(I10,1X),5(ES15.7,1X),I1,1X,A18,1X,2(I10,1X),9(ES13.5,1X))') &
             attempt, accepted_step, time_start, time_trial, time_accepted, dt_used, dt_next, &
             merge(1_int32, 0_int32, accepted), status, &
-            self%last_inner_iterations, self%last_max_inner_iterations, self%last_phase_iterations, &
-            self%last_nonlinear_work, ats_iter, self%aa_use_count, merge(1_int32, 0_int32, phase_spike), &
-            merge(1_int32, 0_int32, self%last_phase_metrics_available), &
-            merge(1_int32, 0_int32, self%last_phase_converged), self%last_phase_active_nodes, &
-            self%last_phase_increment_max, self%last_phase_increment_norm, &
-            self%last_phase_equilibrium_error, self%last_phase_merit, self%aa_gamma_max_abs, &
-            t_res, t_inc, h_res, h_inc, omega_used, dq_norm_used, lte_error
+            self%last_inner_iterations, ats_iter, &
+            loc_thermal, loc_hydraulic, bal_thermal, bal_hydraulic, dq_effective, &
+            self%last_du_thermal_max, self%last_du_hydraulic_max, omega_used, lte_error
         flush (self%solver_history_unit)
     end subroutine write_solver_history_attempt
 
@@ -2421,6 +2441,7 @@ contains
         integer(int32) :: nonlinear_work
         integer(int32) :: effective_iter
         logical :: phase_iteration_spike
+        logical :: failed_at_min_dt
         real(real64) :: time_s, time_start_s, time_trial_s, dt_s, dt_used
         real(real64) :: lte_error
         !> BDF order lte_error was measured at; the retry is resized at it
@@ -2485,7 +2506,7 @@ contains
                 step_counter = step_counter + 1
                 call write_solver_history_attempt(self, attempt_counter, step_counter, time_start_s, &
                                                   time_trial_s, dt_used, is_step_converged, effective_iter, &
-                                                  phase_iteration_spike, lte_error)
+                                                  lte_error)
                 call self%control%get_time(time_s)
                 if (step_counter == 1 .or. mod(step_counter, 20) == 0 .or. effective_iter > 8) then
                     write (*, '(A,I0,A,ES13.5,A,I0,A,I0,A,I0)') '   [STEP] converged: n=', step_counter, &
@@ -2500,6 +2521,7 @@ contains
                 call self%output_fields()
                 call self%output_history()
             else
+                failed_at_min_dt = self%control%is_min_dt()
                 ! Update time and adaptive time stepping
                 call self%control%update(is_step_converged, error_estimate=lte_error, &
                                          iteration_count=effective_iter, error_order=lte_order)
@@ -2508,9 +2530,9 @@ contains
                 consecutive_failures = consecutive_failures + 1
                 call write_solver_history_attempt(self, attempt_counter, step_counter, time_start_s, &
                                                   time_trial_s, dt_used, is_step_converged, effective_iter, &
-                                                  phase_iteration_spike, lte_error)
+                                                  lte_error)
 
-                if (self%control%is_min_dt()) then
+                if (failed_at_min_dt) then
                     call self%control%get_dt(dt_s)
                     write (*, '(A,ES13.5,A)') '   [ERROR] Step failed at minimum dt=', dt_s, '. Stopping retry loop.'
                     exit time_loop

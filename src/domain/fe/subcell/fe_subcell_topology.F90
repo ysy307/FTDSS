@@ -25,7 +25,7 @@ module domain_fe_subcell_topology
     !> Probe points of the largest cell: 4 vertices + 4 edge midpoints + centre.
     integer(int32), parameter :: MAX_PROBE_POINTS = 9
     !> Children produced by one refinement step.
-    integer(int32), parameter :: NUM_CHILDREN = 4
+    integer(int32), parameter :: CHILDREN_PER_CELL = 4
     !> Triangles a quadrilateral cell is decomposed into.
     integer(int32), parameter :: MAX_TRIANGLES = 2
     !> Vertex counts identifying the two supported cell shapes.
@@ -226,7 +226,7 @@ contains
         !> Number of children one refinement step produces; 0 if invalid.
         integer(int32), intent(inout) :: num_children
         num_children = 0
-        if (self%is_valid()) num_children = NUM_CHILDREN
+        if (self%is_valid()) num_children = CHILDREN_PER_CELL
     end subroutine get_num_children_subcell_cell
 
     pure subroutine get_num_triangles_subcell_cell(self, num_triangles)
@@ -285,11 +285,11 @@ contains
         !> The child cell, with its own probe points not yet computed.
         type(type_subcell_cell), intent(inout) :: child
 
-        integer(int32) :: probe_index(MAX_VERTICES, NUM_CHILDREN)
+        integer(int32) :: probe_index(MAX_VERTICES, CHILDREN_PER_CELL)
         integer(int32) :: vertex
 
         call child%reset()
-        if (index < 1 .or. index > NUM_CHILDREN) return
+        if (index < 1 .or. index > CHILDREN_PER_CELL) return
         if (self%num_probe_points == 0) return
 
         if (self%num_vertices == TRIANGLE_VERTICES) then

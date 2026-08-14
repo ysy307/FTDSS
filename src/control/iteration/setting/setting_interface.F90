@@ -32,6 +32,7 @@ module control_iteration_setting
         ! ---- Getter ----
         procedure, public, pass(self) :: get_conserved_relaxation => get_conserved_relaxation_setting
         procedure, public, pass(self) :: get_conserved_dq_norm => get_conserved_dq_norm_setting
+        procedure, public, pass(self) :: get_conserved_gates => get_conserved_gates_setting
         procedure, public, pass(self) :: get_max_iterations => get_max_iterations_iteration_setting
         procedure, public, pass(self) :: get_update_frequency => get_update_frequency_iteration_setting
         procedure, public, pass(self) :: get_current_norm => get_current_norm_iteration_setting
@@ -169,6 +170,22 @@ contains
 
         dq_norm = self%convergence_control%get_conserved_dq_norm()
     end function get_conserved_dq_norm_setting
+
+    !> Gate values and verdicts of the last conserved check (all pass at <= 1).
+    pure subroutine get_conserved_gates_setting(self, local_thermal, local_hydraulic, &
+                                                balance_thermal, balance_hydraulic, &
+                                                dq_effective, local_ok, balance_ok, dq_ok)
+        implicit none
+        class(type_iteration_setting), intent(in) :: self
+        real(real64), intent(inout) :: local_thermal, local_hydraulic
+        real(real64), intent(inout) :: balance_thermal, balance_hydraulic
+        real(real64), intent(inout) :: dq_effective
+        logical, intent(inout) :: local_ok, balance_ok, dq_ok
+
+        call self%convergence_control%get_conserved_gates(local_thermal, local_hydraulic, &
+                                                          balance_thermal, balance_hydraulic, &
+                                                          dq_effective, local_ok, balance_ok, dq_ok)
+    end subroutine get_conserved_gates_setting
 
     subroutine check_conserved_setting(self, enthalpy, density, residual_thermal, residual_hydraulic, &
                                        nonlinear_iter, check_thermal, check_hydraulic, is_ok, is_diverged)

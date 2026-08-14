@@ -1,5 +1,4 @@
 submodule(physics_governing_hydraulic) hydraulic_matrix
-    use :: domain_fe_subcell, only: type_subcell_quadrature_point, SUBCELL_QUADRATURE_CAPACITY
     implicit none
 
     !> TEMPORARY Step-0 verification diagnostic (see report_subcell_debug_counts_hydraulic).
@@ -66,8 +65,9 @@ contains
         real(real64) :: bdf0, dt_local
 
         ! --- Interface-split subcell variables ---
-        type(type_subcell_quadrature_point) :: subcell_quadrature_points(SUBCELL_QUADRATURE_CAPACITY)
         integer(int32) :: num_subcell_quadrature_points, q_s
+        real(real64) :: xi_sub, eta_sub, weight_sub
+        logical :: is_plus_side_sub
         logical :: use_subcell, is_cut
         real(real64) :: phi_nodes(workspace%num_fe_nodes)
         real(real64) :: porosity_nodes(workspace%num_fe_nodes)
@@ -166,11 +166,7 @@ contains
         call workspace%compute_interface_subcell(self%physics, workspace%material_id, &
                                                  self%enable_fringe_subcell_quadrature)
         is_cut = workspace%is_cut
-        num_subcell_quadrature_points = workspace%num_subcell_quadrature_points
-        if (num_subcell_quadrature_points > 0) then
-            subcell_quadrature_points(1:num_subcell_quadrature_points) = &
-                workspace%subcell_quadrature_points(1:num_subcell_quadrature_points)
-        end if
+        call workspace%subcell_quadrature%get_num_points(num_subcell_quadrature_points)
 
         if (DEBUG_SUBCELL_COUNTER .and. use_subcell) then
             ! Diagnostic-only: phi is recomputed locally here (cheap, O(n_nodes))
@@ -446,8 +442,9 @@ contains
             end do
 
             do q_s = 1, num_subcell_quadrature_points
-                r_sub%x = subcell_quadrature_points(q_s)%xi
-                r_sub%y = subcell_quadrature_points(q_s)%eta
+                call workspace%subcell_quadrature%get_point(q_s, xi_sub, eta_sub, weight_sub, is_plus_side_sub)
+                r_sub%x = xi_sub
+                r_sub%y = eta_sub
                 r_sub%z = 0.0d0
 
                 call workspace%fe%lerp(r_sub, workspace%T_node(1:n_nodes), T_q_sub)
@@ -476,7 +473,7 @@ contains
                 call workspace%fe%calc_shape_function(r_sub, workspace%coordinates, psi=psi_sub, &
                                                       dpsi_dx=dpsi_dx_sub, determinant_jacobian=det_J_sub)
 
-                eff_weight_sub = subcell_quadrature_points(q_s)%weight * abs(det_J_sub)
+                eff_weight_sub = weight_sub * abs(det_J_sub)
 
                 D_HH_sub = D_HH_elem
                 D_HT_sub = D_HT_elem
