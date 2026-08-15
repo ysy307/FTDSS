@@ -365,9 +365,7 @@ contains
         real(real64), pointer, dimension(:), contiguous :: pressure_history
         real(real64), pointer, dimension(:), contiguous :: ice_content_history
 
-        real(real64) :: Qw, Qi, Qv
-        real(real64) :: rho_w, rho_i
-        real(real64) :: Theta_j, compressive_storage
+        real(real64) :: Theta_j
         integer(int32) :: j, n
 
         nullify (temperature_history)
@@ -384,31 +382,59 @@ contains
         if (.not. associated(ice_content_history)) return
 
         n = min(size(bdf_coeffs), size(temperature_history), size(pressure_history), size(ice_content_history))
-        call local_state%copy(state)
+        if (n < 1) return
 
-        do j = 1, n
-            call local_state%temperature%set(temperature_history(j))
-            call local_state%pressure%set(pressure_history(j))
-            call local_state%ice_content%set(ice_content_history(j))
+        ! j = 1 is the current state, and must be read from state itself rather
+        ! than from history(1): the finite-difference tangent perturbs
+        ! state%temperature/%pressure without touching the history arrays, so
+        ! taking it from history(1) drops the current storage term from K_HH/K_HT.
+        call total_storage_hydraulic(self, material_id, state, Theta_j)
+        dTheta_dt = dTheta_dt + bdf_coeffs(1) * Theta_j
 
-            call self%update_water_phases(material_id, local_state)
+        ! j >= 2 are previous-step states: recompute phases at the historical T/P.
+        if (n >= 2) then
+            call local_state%copy(state)
+            do j = 2, n
+                call local_state%temperature%set(temperature_history(j))
+                call local_state%pressure%set(pressure_history(j))
+                call local_state%ice_content%set(ice_content_history(j))
 
-            call local_state%water_content%get(Qw)
-            call local_state%ice_content%get(Qi)
-            call local_state%vapor_content%get(Qv)
+                call self%update_water_phases(material_id, local_state)
+                call total_storage_hydraulic(self, material_id, local_state, Theta_j)
 
-            call self%physics%calc_density_water(local_state, rho_w)
-            call self%physics%calc_density_ice(local_state, rho_i)
-
-            ! Theta = Qw + (rho_i/rho_w)*Qi + Qv  (rho_v ~ rho_w)
-            Theta_j = Qw + (rho_i / rho_w) * Qi + Qv
-            call self%compute_compressive_storage(material_id, local_state, compressive_storage)
-            Theta_j = Theta_j + compressive_storage
-
-            dTheta_dt = dTheta_dt + bdf_coeffs(j) * Theta_j
-        end do
+                dTheta_dt = dTheta_dt + bdf_coeffs(j) * Theta_j
+            end do
+        end if
 
     end subroutine compute_transient_term_mixed_hydraulic
+
+    !> Total stored water per unit volume at one state,
+    !> \[ \Theta = \theta_w + \frac{\rho_i}{\rho_w}\theta_i + \theta_v + S_c \]
+    !> where \( S_c \) is the compressive storage. Shared by every BDF level of
+    !> compute_transient_term_mixed_hydraulic so all levels use one definition.
+    subroutine total_storage_hydraulic(self, material_id, state, Theta)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(in) :: state
+        real(real64), intent(inout) :: Theta
+
+        real(real64) :: Qw, Qi, Qv
+        real(real64) :: rho_w, rho_i
+        real(real64) :: compressive_storage
+
+        call state%water_content%get(Qw)
+        call state%ice_content%get(Qi)
+        call state%vapor_content%get(Qv)
+
+        call self%physics%calc_density_water(state, rho_w)
+        call self%physics%calc_density_ice(state, rho_i)
+
+        ! Theta = Qw + (rho_i/rho_w)*Qi + Qv  (rho_v ~ rho_w)
+        Theta = Qw + (rho_i / rho_w) * Qi + Qv
+        call self%compute_compressive_storage(material_id, state, compressive_storage)
+        Theta = Theta + compressive_storage
+    end subroutine total_storage_hydraulic
 
     module subroutine compute_compressive_storage_hydraulic(self, material_id, state, storage, capacity)
         implicit none
