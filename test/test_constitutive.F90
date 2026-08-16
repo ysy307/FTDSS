@@ -7,7 +7,7 @@ module test_constitutive_suite
     use :: models_hcf, only: holder_hcfs
     use :: models_phase_change_vaporization, only: type_evaporation
     use :: models_phase_change_gcc, only: holder_gccs
-    use :: models_phase_change_fusion, only: type_fusion
+    use :: models_phase_change_fusion, only: type_fusion, PORE_LIMIT_EXPELS_WATER
     use :: models_phase_change_manager, only: type_phase_manager
     use :: models_wrf, only: holder_wrfs
     use :: numerical_special_functions_mkl, only: type_mkl_regularized_incomplete_beta
@@ -612,15 +612,29 @@ contains
         ! precision cancellation (1e-12).
         call self%check_true("limited-branch volumetric derivatives cancel: d(Qw+Qi)/dP = 0", &
                              abs(dQw_dP + dQi_dP) <= 1.0d-8)
-        ! General water-conservation identity theta_w+(rho_i/rho_w)*theta_i=Theta
-        ! (calc_phase_split's theta_i is defined as the complement of theta_w
-        ! against Theta): holds by construction on both branches, checked here
-        ! against an independently evaluated Theta = theta_SWRC(s_m) at s_m=0.
+        ! The two closures make different promises here, so the assertion has to
+        ! follow whichever one was compiled.
         call fusion_probe%calc_rho_water(state, rho_w_probe)
         call fusion_probe%calc_rho_ice(state, rho_i_probe)
         call wrf%p%calc(0.0d0, theta_predicted)
-        call self%check_close("saturated frozen state closes the water-conservation identity", &
-                              Qw + (rho_i_probe / rho_w_probe) * Qi, theta_predicted, 1.0d-10)
+        if (PORE_LIMIT_EXPELS_WATER) then
+            ! Expelling closure: theta_i is defined as phi - theta_l, so the
+            ! pore volume is an exact equality, and the stored water
+            ! alpha*phi + (1-alpha)*theta_l falls BELOW what the retention curve
+            ! asks for. That deficit is the water the mass balance moves out of
+            ! the node - closing against theta_SWRC here would mean the
+            ! constraint was being met by suppressing the phase change again.
+            call self%check_close("saturated frozen state fills the pore exactly", &
+                                  Qw + Qi, porosity, 1.0d-12)
+            call self%check_true("saturated frozen state stores less than the retention curve demands", &
+                                 Qw + (rho_i_probe / rho_w_probe) * Qi < theta_predicted - 1.0d-6)
+        else
+            ! Suction-pinning closure: the split stays on the retention curve,
+            ! and the pore bound is only approached (see the smoothing note
+            ! above), never reached exactly.
+            call self%check_close("saturated frozen state closes the water-conservation identity", &
+                                  Qw + (rho_i_probe / rho_w_probe) * Qi, theta_predicted, 1.0d-10)
+        end if
 
         ! Dropping the pressure far enough takes theta(psi_cap) below the bound,
         ! which deactivates it and lets a gas phase appear. The offset has to be
@@ -776,22 +790,31 @@ contains
         call self%check_close("frozen branch carries no pressure sensitivity", dSeff_dP, 0.0d0, 1.0d-14)
         call self%check_true("frozen branch carries the Clapeyron slope", dSeff_dT < -1.0d5)
 
-        ! --- Pore-volume-limited branch: the active constraint reintroduces a
-        !     pressure sensitivity through dpsi_star/dp, which is what keeps the
-        !     pressure column from degenerating once the pore fills. ---
+        ! --- Pore-volume-limited state: the suction is NOT pinned any more.
+        !     The constraint is carried by the stored water instead, so the
+        !     Clapeyron slope must survive here - suppressing it is exactly the
+        !     apparent-capacity collapse the expelling closure removes. ---
         call state%temperature%set(-0.5d0)
         call state%pressure%set(-1.0d3)
         call split_here()
         call finite_difference_here()
-        call self%check_close("limited-branch d(s_eff)/dP matches finite difference", &
+        call self%check_close("pore-limited d(s_eff)/dP matches finite difference", &
                               dSeff_dP, dSeff_dP_fd, 1.0d-4)
-        call self%check_true("pore-volume limit revives the pressure sensitivity", abs(dSeff_dP) > 1.0d-6)
-        ! The analytic dT tangent is zero on this branch; the floor is what
-        ! dropping dpsi_star_dT costs (~10 Pa/K).
-        call self%check_true("limited-branch d(s_eff)/dT omits only the density-ratio term", &
-                             abs(dSeff_dT - dSeff_dT_fd) <= 5.0d1)
-        call self%check_true("pore-volume limit suppresses the Clapeyron coupling", &
-                             abs(dSeff_dT_fd) < 1.0d3)
+        if (PORE_LIMIT_EXPELS_WATER) then
+            ! Nothing pins the suction, so the Clapeyron slope survives - that
+            ! survival is the whole point of the expelling closure.
+            call self%check_close("pore-limited d(s_eff)/dT matches finite difference", &
+                                  dSeff_dT, dSeff_dT_fd, 1.0d-4)
+            call self%check_true("pore-volume limit keeps the Clapeyron coupling", dSeff_dT < -1.0d5)
+        else
+            ! The pinned branch drops dpsi_star_dT (~10 Pa/K) and suppresses the
+            ! Clapeyron coupling, which is what collapses the apparent capacity.
+            call self%check_true("limited-branch d(s_eff)/dT omits only the density-ratio term", &
+                                 abs(dSeff_dT - dSeff_dT_fd) <= 5.0d1)
+            call self%check_true("pore-volume limit suppresses the Clapeyron coupling", &
+                                 abs(dSeff_dT_fd) < 1.0d3)
+            call self%check_true("pore-volume limit revives the pressure sensitivity", abs(dSeff_dP) > 1.0d-6)
+        end if
 
         ! --- Closed material point, cooled from the melting point. ---
         call state%temperature%set(0.0d0)

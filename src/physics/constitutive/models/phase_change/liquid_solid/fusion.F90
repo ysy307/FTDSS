@@ -51,7 +51,97 @@ module models_phase_change_fusion
     !> differentiable for the Newton linearization.
     real(real64), private, parameter :: SUCTION_SMOOTHING = 1.0d-2 * rho_std * Lf0 / (Tf0 + TtoK)
 
+    !> Let a full pore keep freezing and return the displaced water to the mass
+    !> balance, instead of pinning the cryogenic suction at the pore-volume root.
+    !>
+    !> Pinning the suction is what makes d(theta_i)/dT vanish exactly where the
+    !> latent heat is largest: the apparent heat capacity collapses from the
+    !> latent-dominated ~1e8 to the sensible ~3e6, and the few nodes it happens
+    !> at then dominate the WRMS convergence gate. With the constraint carried
+    !> by the stored water instead, theta_l keeps falling with temperature,
+    !> theta_i = phi - theta_l keeps growing, and the ice's lower density means
+    !> the stored water
+    !>   Theta_store = theta_l + alpha*theta_i = alpha*phi + (1-alpha)*theta_l
+    !> decreases as freezing proceeds - which the transport equation reads as a
+    !> source that expels water from the saturated node.
+    logical, parameter, public :: PORE_LIMIT_EXPELS_WATER = .false.
+
 contains
+
+    !> Generalized-Clapeyron freezing suction under homotopy continuation.
+    !>
+    !> \[ s_f^{\lambda} = s_f^{ref} + \lambda\,(s_f(T,p) - s_f^{ref}),
+    !>    \qquad s_f^{ref} = s_f(T^n, p^n) \]
+    !>
+    !> Every consumer of the raw generalized-Clapeyron suction goes through
+    !> here, so the split, the transport potential, the level set and the
+    !> quadrature rule cannot end up at different values of \( \lambda \).
+    !>
+    !> Assumptions: the reference is the previous BDF level, so at that level
+    !> the blend is the identity and the known history terms stay independent
+    !> of \( \lambda \).
+    !> Numerical guarantees: at \( \lambda = 1 \), and whenever the state
+    !> carries no continuation parameter or no usable history, the raw model
+    !> values are returned unchanged.
+    !> Computational complexity: O(1) arithmetic; one state copy when
+    !> \( \lambda < 1 \), none otherwise.
+    !> Failure behavior: none; a missing reference degrades to \( \lambda = 1 \).
+    subroutine calc_freezing_suction(self, state, suction_freezing, dfreezing_dP, dfreezing_dT)
+        implicit none
+        !> Fusion model
+        class(type_fusion), intent(in) :: self
+        !> Thermodynamic state, carrying the continuation parameter and history
+        type(type_state), intent(in) :: state
+        !> Freezing suction [Pa]
+        !> Overwritten on exit
+        real(real64), intent(inout) :: suction_freezing
+        !> d(s_f)/dP [-]
+        real(real64), intent(inout), optional :: dfreezing_dP
+        !> d(s_f)/dT [Pa/K]
+        real(real64), intent(inout), optional :: dfreezing_dT
+
+        type(type_state) :: reference_state
+        real(real64), pointer, contiguous, dimension(:) :: temperature_history
+        real(real64), pointer, contiguous, dimension(:) :: pressure_history
+        real(real64) :: lambda, suction_reference
+        logical :: lambda_set, history_set
+
+        call self%gcc%calc(state, suction_freezing)
+        if (present(dfreezing_dP)) call self%gcc%deriv_pressure(state, dfreezing_dP)
+        if (present(dfreezing_dT)) call self%gcc%deriv_temperature(state, dfreezing_dT)
+
+        lambda = 1.0d0
+        lambda_set = .false.
+        call state%continuation_lambda%get(lambda, is_set=lambda_set)
+        if (.not. lambda_set) return
+        if (lambda >= 1.0d0) return
+
+        nullify (temperature_history)
+        nullify (pressure_history)
+        history_set = .false.
+        call state%temperature_history%get(temperature_history, is_set=history_set)
+        if (.not. history_set) return
+        if (.not. associated(temperature_history)) return
+        if (size(temperature_history) < 2) return
+        history_set = .false.
+        call state%pressure_history%get(pressure_history, is_set=history_set)
+
+        call reference_state%copy(state)
+        call reference_state%temperature%set(temperature_history(2))
+        if (history_set) then
+            if (associated(pressure_history)) then
+                if (size(pressure_history) >= 2) call reference_state%pressure%set(pressure_history(2))
+            end if
+        end if
+        call self%gcc%calc(reference_state, suction_reference)
+
+        suction_freezing = suction_reference + lambda * (suction_freezing - suction_reference)
+        if (present(dfreezing_dP)) dfreezing_dP = lambda * dfreezing_dP
+        if (present(dfreezing_dT)) dfreezing_dT = lambda * dfreezing_dT
+
+        nullify (temperature_history)
+        nullify (pressure_history)
+    end subroutine calc_freezing_suction
 
     !> C^1 compact-support ramp underlying the smooth max/min below.
     !>
@@ -351,6 +441,16 @@ contains
         real(real64) :: dtheta_dhead_star, theta_prime_star
         real(real64) :: dE_dpsi, dE_dp, dpsi_star_dp
 
+        ! With the pore constraint carried by the stored water, the suction is
+        ! never pinned: theta_l must keep responding to temperature for the
+        ! latent capacity to survive. calc_phase_split then caps the phases.
+        if (PORE_LIMIT_EXPELS_WATER) then
+            call compute_effective_suction(suction_matric, suction_freezing, suction_effective, sig_a, sig_b)
+            if (present(dsuction_eff_dP)) dsuction_eff_dP = -sig_a + sig_b * dfreezing_dP
+            if (present(dsuction_eff_dT)) dsuction_eff_dT = sig_b * dfreezing_dT
+            return
+        end if
+
         call calc_limited_cryo_suction(self, state, suction_matric, suction_freezing, &
                                        psi_cryo_limited_unused, is_limited_unused, &
                                        psi_star, needs_blend)
@@ -473,6 +573,8 @@ contains
         real(real64) :: dtheta_dhead_matric, dtheta_dhead_effective
         real(real64) :: dtotal_dpressure, dliquid_dpressure, dliquid_dtemperature
         real(real64) :: rho_w, rho_i, density_ratio
+        real(real64) :: sig_a, sig_b, porosity_limit
+        logical :: pore_expels
 
         call state%pressure%get(pressure)
         call self%calc_rho_water(state, rho_w)
@@ -485,9 +587,8 @@ contains
         ! and clamping would put a kink where the physics has none.
         suction_matric = -pressure
 
-        call self%gcc%calc(state, suction_freezing)
-        call self%gcc%deriv_pressure(state, dfreezing_dP)
-        call self%gcc%deriv_temperature(state, dfreezing_dT)
+        call calc_freezing_suction(self, state, suction_freezing, &
+                                   dfreezing_dP=dfreezing_dP, dfreezing_dT=dfreezing_dT)
 
         call self%wrf%calc(-suction_matric / (rho_std * g), total_water)
         call self%wrf%deriv(-suction_matric / (rho_std * g), dtheta_dhead_matric)
@@ -500,6 +601,8 @@ contains
         ! suction through the same smooth max used elsewhere. No is_limited
         ! branch: see that routine's docstring for the far-limit and
         ! deep-limit reductions.
+        ! One composition for every consumer (see compute_blended_effective_
+        ! suction); with PORE_LIMIT_EXPELS_WATER it returns the unpinned form.
         call compute_blended_effective_suction(self, state, suction_matric, suction_freezing, &
                                                dfreezing_dP, dfreezing_dT, &
                                                suction_effective, dsuction_eff_dP, dsuction_eff_dT)
@@ -507,13 +610,70 @@ contains
         call self%wrf%calc(-suction_effective / (rho_std * g), theta_liquid)
         call self%wrf%deriv(-suction_effective / (rho_std * g), dtheta_dhead_effective)
 
-        theta_ice = density_ratio * max(0.0d0, total_water - theta_liquid)
+        pore_expels = .false.
+        if (PORE_LIMIT_EXPELS_WATER) then
+            call state%porosity%get(porosity_limit)
+            if (porosity_limit > 0.0d0) then
+                pore_expels = (theta_liquid + density_ratio * max(0.0d0, total_water - theta_liquid)) &
+                              >= porosity_limit
+            end if
+        end if
+
+        if (.not. pore_expels) then
+            theta_ice = density_ratio * max(0.0d0, total_water - theta_liquid)
+        else
+            ! Pore full: ice takes whatever the liquid gives up, and the stored
+            ! water follows the ice's lower density. total_water becomes
+            ! Theta_store, so the identity theta_l + alpha*theta_i = total_water
+            ! that the transient term integrates still holds by construction.
+            theta_ice = porosity_limit - theta_liquid
+            total_water = theta_liquid + theta_ice / density_ratio
+            dtotal_dpressure = 0.0d0
+        end if
 
         ! Chain rule through the blended effective suction: dtheta_l/dX =
         ! (dtheta_l/dh)*(-d(s_eff)/dX)/(rho_std g), the same convention used
         ! throughout this module (e.g. calc_water_content_derivatives).
         dliquid_dpressure = dtheta_dhead_effective * (-dsuction_eff_dP) / (rho_std * g)
         dliquid_dtemperature = dtheta_dhead_effective * (-dsuction_eff_dT) / (rho_std * g)
+
+        if (pore_expels) then
+            ! theta_i = phi - theta_l and Theta_store = theta_l + alpha*theta_i,
+            ! alpha = 1/density_ratio. The alpha derivative is retained for the
+            ! same reason the unconstrained branch keeps its ratio term.
+            block
+                real(real64) :: alpha, dalpha_dP, dalpha_dT
+                real(real64) :: drho_w_dP, drho_w_dT, drho_i_dP, drho_i_dT
+                real(real64) :: dratio_dP, dratio_dT
+
+                alpha = 1.0d0 / density_ratio
+                dalpha_dP = 0.0d0
+                dalpha_dT = 0.0d0
+                if (rho_i > tiny(1.0d0)) then
+                    call self%calc_drho_water_dP(state, drho_w_dP)
+                    call self%calc_drho_water_dT(state, drho_w_dT)
+                    call self%calc_drho_ice_dP(state, drho_i_dP)
+                    call self%calc_drho_ice_dT(state, drho_i_dT)
+                    dratio_dP = drho_w_dP / rho_i - rho_w * drho_i_dP / rho_i**2
+                    dratio_dT = drho_w_dT / rho_i - rho_w * drho_i_dT / rho_i**2
+                    dalpha_dP = -dratio_dP / density_ratio**2
+                    dalpha_dT = -dratio_dT / density_ratio**2
+                end if
+
+                if (present(dtotal_dP)) dtotal_dP = (1.0d0 - alpha) * dliquid_dpressure + theta_ice * dalpha_dP
+                if (present(dtotal_dT)) dtotal_dT = (1.0d0 - alpha) * dliquid_dtemperature + theta_ice * dalpha_dT
+                if (present(dliquid_dP)) dliquid_dP = dliquid_dpressure
+                if (present(dliquid_dT)) dliquid_dT = dliquid_dtemperature
+                ! Freezing in a full pore converts liquid to ice one for one by
+                ! volume, so the latent capacity survives where it is largest.
+                if (present(dice_dP)) dice_dP = -dliquid_dpressure
+                if (present(dice_dT)) dice_dT = -dliquid_dtemperature
+            end block
+            if (present(suction_effective_out)) suction_effective_out = suction_effective
+            if (present(dsuction_eff_dP_out)) dsuction_eff_dP_out = dsuction_eff_dP
+            if (present(dsuction_eff_dT_out)) dsuction_eff_dT_out = dsuction_eff_dT
+            return
+        end if
 
         if (present(dtotal_dP)) dtotal_dP = dtotal_dpressure
         ! Theta = theta_SWRC(s_m(p_w)) has no explicit temperature dependence
@@ -627,7 +787,7 @@ contains
             psi_cap = max(0.0d0, -pressure)
             call self%wrf%calc(-psi_cap / (rho_std * g), theta_l_cap)
 
-            call self%gcc%calc(state, psi_cryo)
+            call calc_freezing_suction(self, state, psi_cryo)
             call compute_effective_suction(psi_cap, psi_cryo, psi_eff)
             call self%wrf%calc(-psi_eff / (rho_std * g), theta_l_new)
 
@@ -720,9 +880,8 @@ contains
             call self%wrf%deriv(-psi_cap / (rho_std * g), dtheta_dPin_cap)
             d_theta_cap_dP = dtheta_dPin_cap * (-d_psi_cap_dP) / (rho_std * g)
 
-            call self%gcc%calc(state, psi_cryo)
-            call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
-            call self%gcc%deriv_temperature(state, d_psi_cryo_dT)
+            call calc_freezing_suction(self, state, psi_cryo, &
+                                       dfreezing_dP=d_psi_cryo_dP, dfreezing_dT=d_psi_cryo_dT)
 
             call compute_effective_suction(psi_cap, psi_cryo, psi_eff, d_psi_eff_dpsi_cap, d_psi_eff_dpsi_cryo)
             d_psi_eff_dP = d_psi_eff_dpsi_cap * d_psi_cap_dP + d_psi_eff_dpsi_cryo * d_psi_cryo_dP
@@ -796,8 +955,8 @@ contains
         real(real64), intent(inout) :: water_content
 
         real(real64) :: pressure
-        real(real64) :: psi_cap, psi_cryo, psi_eff, psi_cryo_limited
-        logical :: is_limited
+        real(real64) :: psi_cap, psi_cryo, psi_eff
+        real(real64) :: dpsi_cryo_dP, dpsi_cryo_dT
 
         call state%pressure%get(pressure)
 
@@ -813,9 +972,15 @@ contains
         ! cryogenic suction psi_cryo(T) lowers the unfrozen content, which is
         ! what makes theta_l temperature-dependent and supplies the apparent
         ! heat capacity to the energy equation.
-        call self%gcc%calc(state, psi_cryo)
-        call calc_limited_cryo_suction(self, state, psi_cap, psi_cryo, psi_cryo_limited, is_limited)
-        call compute_effective_suction(psi_cap, psi_cryo_limited, psi_eff)
+        ! Through compute_blended_effective_suction, not the limiter directly:
+        ! it is the one routine that decides whether the pore-volume root pins
+        ! the suction, so calling the limiter here left the saturation test
+        ! (calc_saturation_pressure -> here) on the old closure while the split
+        ! had moved to the new one.
+        call calc_freezing_suction(self, state, psi_cryo, &
+                                   dfreezing_dP=dpsi_cryo_dP, dfreezing_dT=dpsi_cryo_dT)
+        call compute_blended_effective_suction(self, state, psi_cap, psi_cryo, &
+                                               dpsi_cryo_dP, dpsi_cryo_dT, psi_eff)
         call self%wrf%calc(-psi_eff / (rho_std * g), water_content)
 
     end subroutine calc_water_content
@@ -852,9 +1017,8 @@ contains
         ! dependence flows through psi_cryo, giving a nonzero dwater_dT: this
         ! is the freezing-curve slope that becomes the apparent heat capacity
         ! in the energy equation's C_TT (thermal_coefficients.F90).
-        call self%gcc%calc(state, psi_cryo)
-        call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
-        call self%gcc%deriv_temperature(state, d_psi_cryo_dT)
+        call calc_freezing_suction(self, state, psi_cryo, &
+                                   dfreezing_dP=d_psi_cryo_dP, dfreezing_dT=d_psi_cryo_dT)
 
         call compute_effective_suction(psi_cap, psi_cryo, psi_eff, d_psi_eff_dpsi_cap, d_psi_eff_dpsi_cryo)
         d_psi_eff_dP = d_psi_eff_dpsi_cap * d_psi_cap_dP + d_psi_eff_dpsi_cryo * d_psi_cryo_dP
@@ -894,9 +1058,8 @@ contains
         call state%pressure%get(pressure)
         psi_cap = max(0.0d0, -pressure)
 
-        call self%gcc%calc(state, psi_cryo)
-        call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
-        call self%gcc%deriv_temperature(state, d_psi_cryo_dT)
+        call calc_freezing_suction(self, state, psi_cryo, &
+                                   dfreezing_dP=d_psi_cryo_dP, dfreezing_dT=d_psi_cryo_dT)
 
         call compute_blended_effective_suction(self, state, psi_cap, psi_cryo, d_psi_cryo_dP, d_psi_cryo_dT, &
                                                suction_effective, dsuction_eff_dP, dsuction_eff_dT)
@@ -924,9 +1087,8 @@ contains
 
         call state%pressure%get(pressure)
         psi_cap = max(0.0d0, -pressure)
-        call self%gcc%calc(state, psi_cryo)
-        call self%gcc%deriv_pressure(state, d_psi_cryo_dP)
-        call self%gcc%deriv_temperature(state, d_psi_cryo_dT)
+        call calc_freezing_suction(self, state, psi_cryo, &
+                                   dfreezing_dP=d_psi_cryo_dP, dfreezing_dT=d_psi_cryo_dT)
         call compute_blended_effective_suction(self, state, psi_cap, psi_cryo, d_psi_cryo_dP, d_psi_cryo_dT, psi_eff)
     end subroutine calc_effective_suction
 
@@ -971,7 +1133,7 @@ contains
 
         call state%pressure%get(pressure)
         suction_matric = -pressure
-        call self%gcc%calc(state, suction_freezing)
+        call calc_freezing_suction(self, state, suction_freezing)
         phi = (suction_freezing - suction_matric) + SUCTION_SMOOTHING
     end subroutine calc_freezing_level_set
 
@@ -1027,7 +1189,7 @@ contains
         if (.not. ice_is_set) current_ice = 0.0d0
         call state%porosity%get(porosity)
         call self%calc_water_content(state, liquid_pressure)
-        call self%gcc%calc(state, psi_cryo)
+        call calc_freezing_suction(self, state, psi_cryo)
         call self%wrf%calc(-max(0.0d0, psi_cryo) / (rho_std * g), liquid_equilibrium)
         call self%calc_rho_water(state, rho_w)
         call self%calc_rho_ice(state, rho_i)
@@ -1075,8 +1237,10 @@ contains
             dliquid_eq_dP = 0.0d0
             if (psi_cryo > 0.0d0) then
                 call self%wrf%deriv(-psi_cryo / (rho_std * g), dtheta_eq_dh)
-                call self%gcc%deriv_temperature(state, dpsi_cryo_dT)
-                call self%gcc%deriv_pressure(state, dpsi_cryo_dP)
+                ! Re-entering the helper reproduces psi_cryo and returns the
+                ! tangents belonging to that same continuation value.
+                call calc_freezing_suction(self, state, psi_cryo, &
+                                           dfreezing_dP=dpsi_cryo_dP, dfreezing_dT=dpsi_cryo_dT)
                 dliquid_eq_dT = -dtheta_eq_dh * dpsi_cryo_dT / (rho_std * g)
                 dliquid_eq_dP = -dtheta_eq_dh * dpsi_cryo_dP / (rho_std * g)
             end if
@@ -1219,7 +1383,7 @@ contains
         do iter = 1, MAX_ITER
             call local_state%pressure%set(pressure)
             call self%calc_water_content(local_state, liquid_content)
-            call self%gcc%calc(local_state, psi_cryo)
+            call calc_freezing_suction(self, local_state, psi_cryo)
             call self%wrf%calc(-max(0.0d0, psi_cryo) / (rho_std * g), liquid_equilibrium)
 
             residual = liquid_content - liquid_equilibrium
@@ -1232,7 +1396,7 @@ contains
             dliquid_eq_dP = 0.0d0
             if (psi_cryo > 0.0d0) then
                 call self%wrf%deriv(-psi_cryo / (rho_std * g), dtheta_eq_dh)
-                call self%gcc%deriv_pressure(local_state, dpsi_cryo_dP)
+                call calc_freezing_suction(self, local_state, psi_cryo, dfreezing_dP=dpsi_cryo_dP)
                 dliquid_eq_dP = -dtheta_eq_dh * dpsi_cryo_dP / (rho_std * g)
             end if
             jacobian = dliquid_dP - dliquid_eq_dP
