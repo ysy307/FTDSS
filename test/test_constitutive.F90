@@ -830,7 +830,12 @@ contains
 
         call self%check_close("cooling a closed point leaves the total water invariant", &
                               theta_total, theta_total_warm, 1.0d-12)
-        call self%check_close("total water carries no temperature tangent", dtotal_dT, 0.0d0, 1.0d-14)
+        ! The pore cap is inactive at this state under either closure, so the
+        ! retention total's zero temperature tangent must survive the expelling
+        ! branch's longer cancellation too. Absolute, not relative: check_close
+        ! scales its tolerance by max(1e-14, |values|), which against an exact
+        ! zero demands 1e-28 and so cannot express "zero to round-off".
+        call self%check_true("total water carries no temperature tangent", abs(dtotal_dT) <= 1.0d-14)
         call self%check_true("cooling a closed point produces ice", theta_ice > 0.0d0)
         call fusion%calc_rho_water(state, rho_w)
         call fusion%calc_rho_ice(state, rho_i)

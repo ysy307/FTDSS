@@ -66,6 +66,11 @@ module models_phase_change_fusion
     !> source that expels water from the saturated node.
     logical, parameter, public :: PORE_LIMIT_EXPELS_WATER = .false.
 
+    !> Width of the C^1 band over which the pore overfill is removed, in water
+    !> content. Small against the porosity so the cap is exact on both sides
+    !> outside it, wide enough that the tangent transition is resolvable.
+    real(real64), private, parameter :: PORE_EXCESS_SMOOTHING = 1.0d-3
+
 contains
 
     !> Generalized-Clapeyron freezing suction under homotopy continuation.
@@ -142,6 +147,54 @@ contains
         nullify (temperature_history)
         nullify (pressure_history)
     end subroutine calc_freezing_suction
+
+    !> One-sided C^1 ramp: exactly zero up to the corner, exactly the identity
+    !> past the band, cubic in between.
+    !>
+    !> \[ h(d,\varepsilon) = \begin{cases} 0 & d \le 0 \\
+    !>    2d^2/\varepsilon - d^3/\varepsilon^2 & 0 < d < \varepsilon \\
+    !>    d & d \ge \varepsilon \end{cases} \]
+    !>
+    !> One-sided because the quantity it caps is already inactive below the
+    !> corner: a symmetric band would give the unconstrained state a spurious
+    !> tangent. Value and slope match at both breakpoints (h(0)=h'(0)=0,
+    !> h(eps)=eps, h'(eps)=1), and h is monotone on the band.
+    pure elemental function ramp_band(d, band) result(h)
+        implicit none
+        !> Argument of the ramp
+        real(real64), intent(in) :: d
+        !> Width of the regularized band, > 0
+        real(real64), intent(in) :: band
+        !> Regularized max(0, d)
+        real(real64) :: h
+
+        if (d <= 0.0d0) then
+            h = 0.0d0
+        else if (band <= 0.0d0 .or. d >= band) then
+            h = d
+        else
+            h = 2.0d0 * d**2 / band - d**3 / band**2
+        end if
+    end function ramp_band
+
+    !> Derivative of ramp_band with respect to its first argument.
+    pure elemental function ramp_band_deriv(d, band) result(hp)
+        implicit none
+        !> Argument of the ramp
+        real(real64), intent(in) :: d
+        !> Width of the regularized band, > 0
+        real(real64), intent(in) :: band
+        !> dh/dd
+        real(real64) :: hp
+
+        if (d <= 0.0d0) then
+            hp = 0.0d0
+        else if (band <= 0.0d0 .or. d >= band) then
+            hp = 1.0d0
+        else
+            hp = 4.0d0 * d / band - 3.0d0 * d**2 / band**2
+        end if
+    end function ramp_band_deriv
 
     !> C^1 compact-support ramp underlying the smooth max/min below.
     !>
@@ -574,6 +627,8 @@ contains
         real(real64) :: dtotal_dpressure, dliquid_dpressure, dliquid_dtemperature
         real(real64) :: rho_w, rho_i, density_ratio
         real(real64) :: sig_a, sig_b, porosity_limit
+        real(real64) :: theta_ice_unconstrained, pore_excess_value, pore_excess_slope
+        real(real64) :: total_water_retention
         logical :: pore_expels
 
         call state%pressure%get(pressure)
@@ -610,25 +665,38 @@ contains
         call self%wrf%calc(-suction_effective / (rho_std * g), theta_liquid)
         call self%wrf%deriv(-suction_effective / (rho_std * g), dtheta_dhead_effective)
 
+        total_water_retention = total_water
+        theta_ice_unconstrained = density_ratio * max(0.0d0, total_water - theta_liquid)
         pore_expels = .false.
+        pore_excess_value = 0.0d0
+        pore_excess_slope = 0.0d0
+
         if (PORE_LIMIT_EXPELS_WATER) then
             call state%porosity%get(porosity_limit)
-            if (porosity_limit > 0.0d0) then
-                pore_expels = (theta_liquid + density_ratio * max(0.0d0, total_water - theta_liquid)) &
-                              >= porosity_limit
-            end if
+            if (porosity_limit > 0.0d0) pore_expels = .true.
         end if
 
         if (.not. pore_expels) then
-            theta_ice = density_ratio * max(0.0d0, total_water - theta_liquid)
+            theta_ice = theta_ice_unconstrained
         else
-            ! Pore full: ice takes whatever the liquid gives up, and the stored
-            ! water follows the ice's lower density. total_water becomes
-            ! Theta_store, so the identity theta_l + alpha*theta_i = total_water
-            ! that the transient term integrates still holds by construction.
-            theta_ice = porosity_limit - theta_liquid
+            ! Remove the pore overfill smoothly rather than switching closures at
+            ! the crossing: a hard branch leaves theta_i continuous but its
+            ! tangent discontinuous, and the element finite-difference tangent
+            ! this residual feeds is documented to need a C^1 residual.
+            !
+            !   e      = theta_l + theta_i_unconstrained - phi
+            !   theta_i = theta_i_unconstrained - h(e)
+            !
+            ! h is the same compact-support C^1 ramp used for the suction
+            ! composition, so below the limit the split is EXACTLY the
+            ! unconstrained one and above it theta_i is EXACTLY phi - theta_l.
+            pore_excess_value = theta_liquid + theta_ice_unconstrained - porosity_limit
+            theta_ice = theta_ice_unconstrained - ramp_band(pore_excess_value, PORE_EXCESS_SMOOTHING)
+            pore_excess_slope = ramp_band_deriv(pore_excess_value, PORE_EXCESS_SMOOTHING)
+            ! Theta_store = theta_l + alpha*theta_i reproduces the retention
+            ! total exactly where the cap is inactive, so one expression covers
+            ! both regimes.
             total_water = theta_liquid + theta_ice / density_ratio
-            dtotal_dpressure = 0.0d0
         end if
 
         ! Chain rule through the blended effective suction: dtheta_l/dX =
@@ -638,17 +706,23 @@ contains
         dliquid_dtemperature = dtheta_dhead_effective * (-dsuction_eff_dT) / (rho_std * g)
 
         if (pore_expels) then
-            ! theta_i = phi - theta_l and Theta_store = theta_l + alpha*theta_i,
-            ! alpha = 1/density_ratio. The alpha derivative is retained for the
-            ! same reason the unconstrained branch keeps its ratio term.
+            ! One chain rule for both regimes. With
+            !   theta_i = theta_i_unc - h(e),  e = theta_l + theta_i_unc - phi
+            !   Theta   = theta_l + alpha*theta_i,   alpha = 1/density_ratio
+            ! h' = 0 below the limit reproduces the unconstrained split exactly,
+            ! including its density-ratio terms, and h' = 1 above it gives
+            ! theta_i = phi - theta_l.
             block
                 real(real64) :: alpha, dalpha_dP, dalpha_dT
                 real(real64) :: drho_w_dP, drho_w_dT, drho_i_dP, drho_i_dT
-                real(real64) :: dratio_dP, dratio_dT
+                real(real64) :: dratio_dP, dratio_dT, phase_gap
+                real(real64) :: dice_unc_dP, dice_unc_dT, de_dP, de_dT
+                real(real64) :: dice_blend_dP, dice_blend_dT
 
                 alpha = 1.0d0 / density_ratio
-                dalpha_dP = 0.0d0
-                dalpha_dT = 0.0d0
+                dratio_dP = 0.0d0
+                dratio_dT = 0.0d0
+                phase_gap = max(0.0d0, total_water_retention - theta_liquid)
                 if (rho_i > tiny(1.0d0)) then
                     call self%calc_drho_water_dP(state, drho_w_dP)
                     call self%calc_drho_water_dT(state, drho_w_dT)
@@ -656,18 +730,28 @@ contains
                     call self%calc_drho_ice_dT(state, drho_i_dT)
                     dratio_dP = drho_w_dP / rho_i - rho_w * drho_i_dP / rho_i**2
                     dratio_dT = drho_w_dT / rho_i - rho_w * drho_i_dT / rho_i**2
-                    dalpha_dP = -dratio_dP / density_ratio**2
-                    dalpha_dT = -dratio_dT / density_ratio**2
+                end if
+                dalpha_dP = -dratio_dP / density_ratio**2
+                dalpha_dT = -dratio_dT / density_ratio**2
+
+                dice_unc_dP = density_ratio * (dtotal_dpressure - dliquid_dpressure) + phase_gap * dratio_dP
+                dice_unc_dT = -density_ratio * dliquid_dtemperature + phase_gap * dratio_dT
+                if (total_water_retention <= theta_liquid) then
+                    dice_unc_dP = 0.0d0
+                    dice_unc_dT = 0.0d0
                 end if
 
-                if (present(dtotal_dP)) dtotal_dP = (1.0d0 - alpha) * dliquid_dpressure + theta_ice * dalpha_dP
-                if (present(dtotal_dT)) dtotal_dT = (1.0d0 - alpha) * dliquid_dtemperature + theta_ice * dalpha_dT
+                de_dP = dliquid_dpressure + dice_unc_dP
+                de_dT = dliquid_dtemperature + dice_unc_dT
+                dice_blend_dP = dice_unc_dP - pore_excess_slope * de_dP
+                dice_blend_dT = dice_unc_dT - pore_excess_slope * de_dT
+
                 if (present(dliquid_dP)) dliquid_dP = dliquid_dpressure
                 if (present(dliquid_dT)) dliquid_dT = dliquid_dtemperature
-                ! Freezing in a full pore converts liquid to ice one for one by
-                ! volume, so the latent capacity survives where it is largest.
-                if (present(dice_dP)) dice_dP = -dliquid_dpressure
-                if (present(dice_dT)) dice_dT = -dliquid_dtemperature
+                if (present(dice_dP)) dice_dP = dice_blend_dP
+                if (present(dice_dT)) dice_dT = dice_blend_dT
+                if (present(dtotal_dP)) dtotal_dP = dliquid_dpressure + alpha * dice_blend_dP + theta_ice * dalpha_dP
+                if (present(dtotal_dT)) dtotal_dT = dliquid_dtemperature + alpha * dice_blend_dT + theta_ice * dalpha_dT
             end block
             if (present(suction_effective_out)) suction_effective_out = suction_effective
             if (present(dsuction_eff_dP_out)) dsuction_eff_dP_out = dsuction_eff_dP
