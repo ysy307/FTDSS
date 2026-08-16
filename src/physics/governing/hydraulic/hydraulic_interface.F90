@@ -41,7 +41,7 @@ module physics_governing_hydraulic
     !> returns to dR/du in the limit. Until that is in place this stays on and
     !> the inconsistency it introduces is a known, bounded one (it decays as
     !> 1/k within a step).
-    logical, parameter :: CAPACITY_REGULARIZATION_ENABLED = .true.
+    logical, parameter :: CAPACITY_REGULARIZATION_ENABLED = .false.
 
     type :: type_hydraulic
         private
