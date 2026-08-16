@@ -269,6 +269,7 @@ module control_iteration_convergence
         procedure, public, pass(self) :: get_conserved_gates => get_conserved_gates_convergence_control
         procedure, public, pass(self) :: commit_conserved_drift => commit_conserved_drift_convergence_control
         procedure, public, pass(self) :: local_error_block => local_error_block_convergence_control
+        procedure, public, pass(self) :: report_local_error_nodes => report_local_error_nodes_convergence_control
         ! ---- Meta / Utility ----
     end type type_convergence_control
 
@@ -554,6 +555,30 @@ module control_iteration_convergence
             real(real64), intent(in) :: residual(:)
             real(real64) :: e_local
         end function local_error_block_convergence_control
+
+        !> Report which nodes dominate a block's local error.
+        !>
+        !> Prints the per-node \( e_i = R_i\,\Delta t/(V_i s_i \tau_i) \) that
+        !> local_error_block reduces to a WRMS, so a stalled iterate can be
+        !> classified as a few bad nodes or a uniformly slow field.
+        !>
+        !> Assumptions: the conserved-mode state has been refreshed.
+        !> Numerical guarantees: none; diagnostic output only.
+        !> Computational complexity: O(N*TOP_N) time, O(N) additional memory.
+        !> Failure behavior: returns silently on any missing input.
+        module subroutine report_local_error_nodes_convergence_control(self, physics_type, residual, label, &
+                                                                       theta_w, theta_i, porosity)
+            implicit none
+            class(type_convergence_control), intent(in) :: self
+            !> Block identifier (PHYSICS_TYPES%THERMAL or PHYSICS_TYPES%HYDRAULIC)
+            type(type_constant_id), intent(in) :: physics_type
+            !> Assembled block residual at the current iterate
+            real(real64), intent(in) :: residual(:)
+            !> Tag printed with the report
+            character(*), intent(in) :: label
+            !> Nodal phase state at the same iterate, reported alongside
+            real(real64), intent(in), optional :: theta_w(:), theta_i(:), porosity(:)
+        end subroutine report_local_error_nodes_convergence_control
 
     end interface
 

@@ -8,6 +8,7 @@ module control_control_manager
     use :: control_time, only:type_time
     use :: control_time_profiler, only:type_time_profiler
     use :: control_iteration, only:type_iteration
+    use :: control_homotopy_manager, only:type_homotopy, HOMOTOPY_STAGE_ITERATIONS
     use :: control_scheduler, only:type_scheduler_manager
     use :: control_parallel, only:initialize_openmp
     implicit none
@@ -23,6 +24,7 @@ module control_control_manager
         type(type_iteration), private :: iteration
         type(type_time), private :: time
         type(type_time_profiler), private :: profiler
+        type(type_homotopy), private :: homotopy
 
         type(type_scheduler_manager), private :: scheduler_field
         type(type_scheduler_manager), private :: scheduler_history
@@ -45,6 +47,11 @@ module control_control_manager
         procedure, public, pass(self) :: set_diverged => set_diverged_control
         ! - acceleration
         procedure, public, pass(self) :: reset_acceleration => reset_acceleration_control
+        ! - homotopy
+        procedure, public, pass(self) :: begin_homotopy => begin_homotopy_control
+        procedure, public, pass(self) :: accept_homotopy_stage => accept_homotopy_stage_control
+        procedure, public, pass(self) :: reject_homotopy_stage => reject_homotopy_stage_control
+        procedure, public, pass(self) :: finish_homotopy => finish_homotopy_control
         ! ---- Algorithm / Operation ----
         ! - profiler
         procedure, public, pass(self) :: profiler_start => profiler_start_control
@@ -57,6 +64,7 @@ module control_control_manager
         procedure, public, pass(self) :: set_residual_scale => set_residual_scale_control
         procedure, public, pass(self) :: get_residual_floors => get_residual_floors_control
         procedure, public, pass(self) :: local_error_block => local_error_block_control
+        procedure, public, pass(self) :: report_local_error_nodes => report_local_error_nodes_control
         procedure, public, pass(self) :: commit_conserved_drift => commit_conserved_drift_control
         procedure, public, pass(self) :: compute_error_norm => compute_error_norm_control
         ! - acceleration
@@ -103,6 +111,12 @@ module control_control_manager
         procedure, public, pass(self) :: get_time => get_time_control
         procedure, public, pass(self) :: get_dt => get_dt_control
         procedure, public, pass(self) :: is_min_dt => is_min_dt_control
+        ! - homotopy
+        procedure, public, pass(self) :: is_homotopy_active => is_homotopy_active_control
+        procedure, public, pass(self) :: is_homotopy_complete => is_homotopy_complete_control
+        procedure, public, pass(self) :: is_homotopy_exhausted => is_homotopy_exhausted_control
+        procedure, public, pass(self) :: get_homotopy_lambda => get_homotopy_lambda_control
+        procedure, public, pass(self) :: get_homotopy_stage => get_homotopy_stage_control
         procedure, public, pass(self) :: get_error_control_tolerances => get_error_control_tolerances_control
         ! - acceleration
         procedure, public, pass(self) :: get_current_relaxation => get_current_relaxation_control
@@ -183,6 +197,7 @@ contains
         end if
 
         call self%profiler%initialize()
+        call self%homotopy%initialize()
 
     end subroutine initialize_type_control
 
@@ -697,6 +712,17 @@ contains
         e_local = self%iteration%local_error_block(physics_type, residual)
     end function local_error_block_control
 
+    subroutine report_local_error_nodes_control(self, physics_type, residual, label, theta_w, theta_i, porosity)
+        implicit none
+        class(type_control), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        real(real64), intent(in) :: residual(:)
+        character(*), intent(in) :: label
+        real(real64), intent(in), optional :: theta_w(:), theta_i(:), porosity(:)
+
+        call self%iteration%report_local_error_nodes(physics_type, residual, label, theta_w, theta_i, porosity)
+    end subroutine report_local_error_nodes_control
+
     !> Fold the pending conserved-quantity drift into the cumulative budget
     !> once the caller has confirmed the step is genuinely accepted (i.e. not
     !> later rejected by LTE or the outer phase loop). See
@@ -885,6 +911,74 @@ contains
         end if
 
     end subroutine reset_acceleration_control
+
+    subroutine begin_homotopy_control(self)
+        implicit none
+        class(type_control), intent(inout) :: self
+
+        call self%homotopy%begin_step()
+    end subroutine begin_homotopy_control
+
+    subroutine accept_homotopy_stage_control(self)
+        implicit none
+        class(type_control), intent(inout) :: self
+
+        call self%homotopy%accept_stage()
+    end subroutine accept_homotopy_stage_control
+
+    subroutine reject_homotopy_stage_control(self)
+        implicit none
+        class(type_control), intent(inout) :: self
+
+        call self%homotopy%reject_stage()
+    end subroutine reject_homotopy_stage_control
+
+    subroutine finish_homotopy_control(self)
+        implicit none
+        class(type_control), intent(inout) :: self
+
+        call self%homotopy%finish()
+    end subroutine finish_homotopy_control
+
+    pure function is_homotopy_active_control(self) result(is_active)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: is_active
+
+        is_active = self%homotopy%is_active()
+    end function is_homotopy_active_control
+
+    pure function is_homotopy_complete_control(self) result(is_complete)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: is_complete
+
+        is_complete = self%homotopy%is_complete()
+    end function is_homotopy_complete_control
+
+    pure function is_homotopy_exhausted_control(self) result(is_exhausted)
+        implicit none
+        class(type_control), intent(in) :: self
+        logical :: is_exhausted
+
+        is_exhausted = self%homotopy%is_exhausted()
+    end function is_homotopy_exhausted_control
+
+    pure function get_homotopy_lambda_control(self) result(lambda)
+        implicit none
+        class(type_control), intent(in) :: self
+        real(real64) :: lambda
+
+        lambda = self%homotopy%get_lambda()
+    end function get_homotopy_lambda_control
+
+    pure function get_homotopy_stage_control(self) result(stage)
+        implicit none
+        class(type_control), intent(in) :: self
+        integer(int32) :: stage
+
+        stage = self%homotopy%get_stage()
+    end function get_homotopy_stage_control
 
     subroutine compute_relaxation_control(self, physics_type, iter, du, vec)
         implicit none

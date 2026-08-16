@@ -73,6 +73,7 @@ module control_iteration_manager
         procedure, public, pass(self) :: set_residual_scale => set_residual_scale_iteration
         procedure, public, pass(self) :: get_residual_floors => get_residual_floors_iteration
         procedure, public, pass(self) :: local_error_block => local_error_block_iteration
+        procedure, public, pass(self) :: report_local_error_nodes => report_local_error_nodes_iteration
         procedure, public, pass(self) :: commit_conserved_drift => commit_conserved_drift_iteration
         ! ---- Meta / Utility ----
     end type type_iteration
@@ -487,6 +488,17 @@ contains
 
         e_local = self%settings%local_error_block(physics_type, residual)
     end function local_error_block_iteration
+
+    subroutine report_local_error_nodes_iteration(self, physics_type, residual, label, theta_w, theta_i, porosity)
+        implicit none
+        class(type_iteration), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        real(real64), intent(in) :: residual(:)
+        character(*), intent(in) :: label
+        real(real64), intent(in), optional :: theta_w(:), theta_i(:), porosity(:)
+
+        call self%settings%report_local_error_nodes(physics_type, residual, label, theta_w, theta_i, porosity)
+    end subroutine report_local_error_nodes_iteration
 
     !> Fold the pending conserved-quantity drift into the cumulative budget;
     !> see control_iteration_convergence for the acceptance-time contract.

@@ -824,6 +824,11 @@ contains
         if (present(include_fluxes)) do_fluxes = include_fluxes
         call state%reset()
 
+        ! Set before any physics is evaluated, and regardless of calc_physics:
+        ! states built with calc_physics=.false. are updated in bulk later, and
+        ! that update reads the constitutive laws this parameter softens.
+        call state%continuation_lambda%set(self%control%get_homotopy_lambda())
+
         call self%control%get_bdf_coeffs(bdf_order=bdf_order)
 
         start_dof_thermal = self%thermal_start_dof

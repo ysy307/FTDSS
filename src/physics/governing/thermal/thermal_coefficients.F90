@@ -243,6 +243,10 @@ contains
         ! j >= 2 are previous-step states: recompute phases at the historical T/P.
         if (n_hist >= 2) then
             call local_state%copy(state)
+            ! Known levels carry no continuation. The blend is already the
+            ! identity at its own reference level, but level n-1 is not that
+            ! reference, so U at n-1 would otherwise move with lambda.
+            call local_state%continuation_lambda%set(1.0d0)
             do j = 2, n_hist
                 call local_state%temperature%set(temperature_history(j))
                 call local_state%pressure%set(pressure_history(j))
@@ -376,6 +380,10 @@ contains
                 call self%calc_enthalpy_density(material_id, state, C_TT_current)
                 call temp_state%copy(state)
                 call temp_state%temperature%set(temperature_history(2))
+                ! The chord's old end is the reference level, where the blend is
+                ! the identity for any lambda. Stated explicitly so a pressure-
+                ! dependent freezing model cannot make the two ends disagree.
+                call temp_state%continuation_lambda%set(1.0d0)
                 call self%update_water_phases(material_id, temp_state)
                 call self%calc_enthalpy_density(material_id, temp_state, C_TT_old)
                 C_TT_secant = (C_TT_current - C_TT_old) / dT

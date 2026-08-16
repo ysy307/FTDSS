@@ -905,6 +905,91 @@ contains
         end do
     end function integrated_tolerance
 
+    module subroutine report_local_error_nodes_convergence_control(self, physics_type, residual, label, &
+                                                                   theta_w, theta_i, porosity)
+        implicit none
+        class(type_convergence_control), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        real(real64), intent(in) :: residual(:)
+        character(*), intent(in) :: label
+        real(real64), intent(in), optional :: theta_w(:), theta_i(:), porosity(:)
+
+        integer(int32), parameter :: TOP_N = 10
+        real(real64), allocatable :: e_node(:), sens(:), u(:)
+        real(real64) :: atol_u, s_floor, s_i, tol_i, denom, total, part
+        integer(int32) :: i, n, k, worst
+        integer(int32) :: top_id(TOP_N)
+
+        if (self%residual_dt <= 0.0d0) return
+        if (.not. allocated(self%nodal_volume)) return
+        n = size(residual)
+        if (size(self%nodal_volume) /= n) return
+
+        if (physics_type%ID == PHYSICS_TYPES%THERMAL%ID) then
+            if (.not. allocated(self%dH_dT) .or. .not. allocated(self%u_thermal)) return
+            if (size(self%dH_dT) /= n .or. size(self%u_thermal) /= n) return
+            allocate (sens, source=self%dH_dT)
+            allocate (u, source=self%u_thermal)
+            atol_u = self%atol_temperature_u
+            s_floor = DH_DT_FLOOR
+        else
+            if (.not. allocated(self%drho_dp) .or. .not. allocated(self%u_hydraulic)) return
+            if (size(self%drho_dp) /= n .or. size(self%u_hydraulic) /= n) return
+            allocate (sens, source=self%drho_dp)
+            allocate (u, source=self%u_hydraulic)
+            atol_u = self%atol_pressure_u
+            s_floor = DRHO_DP_FLOOR
+        end if
+
+        allocate (e_node(n), source=0.0d0)
+        do i = 1, n
+            s_i = max(abs(sens(i)), s_floor)
+            tol_i = NONLINEAR_TO_LTE_FACTOR * (atol_u + self%rtol_u * abs(u(i)))
+            denom = self%nodal_volume(i) * s_i * tol_i
+            if (denom > 0.0d0) e_node(i) = abs(residual(i) * self%residual_dt / denom)
+        end do
+
+        total = sum(e_node**2)
+        if (total <= 0.0d0) return
+
+        ! Rank the largest contributors without sorting the whole field.
+        top_id(:) = 0
+        do k = 1, min(TOP_N, n)
+            worst = 0
+            do i = 1, n
+                if (any(top_id(1:k - 1) == i)) cycle
+                if (worst == 0) then
+                    worst = i
+                else if (e_node(i) > e_node(worst)) then
+                    worst = i
+                end if
+            end do
+            top_id(k) = worst
+        end do
+
+        part = sum(e_node(top_id(1:min(TOP_N, n)))**2)
+        write (*, '(A,A,A,ES11.3,A,I0)') '   [ERRNODES] ', trim(label), &
+            '  wrms=', sqrt(total / real(n, real64)), '  n=', n
+        write (*, '(A,ES11.3,A,I0,A,F6.2,A)') &
+            '      e_max=', maxval(e_node), '   nodes with e>1: ', count(e_node > 1.0d0), &
+            '   top10 share of sum e^2: ', 100.0d0 * part / total, ' %'
+        do k = 1, min(TOP_N, n)
+            i = top_id(k)
+            if (i < 1) cycle
+            write (*, '(A,I6,A,ES11.3,A,ES11.3,A,ES11.3,A,ES11.3,A,ES11.3)') &
+                '      node=', i, ' e=', e_node(i), ' R=', residual(i), &
+                ' V=', self%nodal_volume(i), ' s=', sens(i), ' u=', u(i)
+            if (present(theta_w) .and. present(theta_i) .and. present(porosity)) then
+                if (size(theta_w) >= i .and. size(theta_i) >= i .and. size(porosity) >= i) then
+                    write (*, '(A,ES11.3,A,ES11.3,A,ES11.3,A,F7.4)') &
+                        '            th_w=', theta_w(i), ' th_i=', theta_i(i), &
+                        ' phi=', porosity(i), ' Theta/phi=', &
+                        (theta_w(i) + theta_i(i) * 917.0d0 / 1000.0d0) / max(porosity(i), tiny(1.0d0))
+                end if
+            end if
+        end do
+    end subroutine report_local_error_nodes_convergence_control
+
     !> Primary-variable-unit local error measure shared by the thermal and
     !> hydraulic blocks: e_i = (R_i*dt/V_i) / (s_i*tau_i), tau_i =
     !> NONLINEAR_TO_LTE_FACTOR*(atol_u+rtol_u*|u_i|). See local_error_block

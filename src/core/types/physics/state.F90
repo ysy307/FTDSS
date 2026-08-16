@@ -63,6 +63,8 @@ module core_types_physics_state
         type(type_field_dp) :: effective_suction ! [Pa]
         type(type_field_dp) :: dSeff_dP ! d(s_eff)/dP [-]
         type(type_field_dp) :: dSeff_dT ! d(s_eff)/dT [Pa/K]
+        ! Homotopy parameter of the freezing suction, 1 = full physics.
+        type(type_field_dp) :: continuation_lambda ! [-]
 
         type(type_field_array_dp) :: temperature_history ! Temperature history [C]
         type(type_field_array_dp) :: pressure_history ! Pressure history [Pa]
@@ -501,6 +503,7 @@ contains
         call self%effective_suction%reset()
         call self%dSeff_dP%reset()
         call self%dSeff_dT%reset()
+        call self%continuation_lambda%reset()
         call self%temperature_history%reset()
         call self%pressure_history%reset()
         call self%porosity_history%reset()
@@ -541,6 +544,7 @@ contains
         call copy_field(self%effective_suction, source%effective_suction)
         call copy_field(self%dSeff_dP, source%dSeff_dP)
         call copy_field(self%dSeff_dT, source%dSeff_dT)
+        call copy_field(self%continuation_lambda, source%continuation_lambda)
         call copy_array_field(self%temperature_history, source%temperature_history)
         call copy_array_field(self%pressure_history, source%pressure_history)
         call copy_array_field(self%porosity_history, source%porosity_history)

@@ -394,6 +394,8 @@ contains
         ! j >= 2 are previous-step states: recompute phases at the historical T/P.
         if (n >= 2) then
             call local_state%copy(state)
+            ! Known levels carry no continuation; see compute_transient_term_thermal.
+            call local_state%continuation_lambda%set(1.0d0)
             do j = 2, n
                 call local_state%temperature%set(temperature_history(j))
                 call local_state%pressure%set(pressure_history(j))

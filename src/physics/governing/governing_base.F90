@@ -504,6 +504,16 @@ contains
             call self%state_gp(j)%ice_content_history%set(self%work_bdf_buffer)
         end do
 
+        ! The continuation parameter is a scalar of the solve, not a field, so
+        ! it is carried across rather than interpolated.
+        is_set = .false.
+        call self%state(1)%continuation_lambda%get(work_value, is_set=is_set)
+        if (is_set) then
+            do i = 1, self%num_fe_gauss
+                call self%state_gp(i)%continuation_lambda%set(work_value)
+            end do
+        end if
+
         nullify (gp)
         nullify (work_history_ptr)
 

@@ -1,6 +1,28 @@
 submodule(app_ftcms) ftcms_solve
     use :: models_phase_change_chemical_potential, only:calc_T_high_celsius
+    use :: control_homotopy_manager, only:HOMOTOPY_STAGE_ITERATIONS
     implicit none
+
+    !> Smallest accepted line-search scale that still counts as a healthy
+    !> homotopy stage. Below it the increment was too large to be a usable
+    !> initial guess for the next one.
+    real(real64), parameter :: HOMOTOPY_STAGE_MIN_SCALE = 2.5d-1
+    !> A stage that no longer reduces the merit by this factor has nothing left
+    !> to contribute to the initial guess, so its iteration budget is dropped.
+    real(real64), parameter :: HOMOTOPY_STAGE_PROGRESS = 9.0d-1
+    !> Coldest nodal temperature that still leaves the freezing suction inactive
+    !> everywhere [C]. Above it the blend is the identity for every lambda, so
+    !> the whole ladder is redundant work on one unchanging problem.
+    real(real64), parameter :: HOMOTOPY_ONSET_MARGIN = 1.0d-3
+    !> One line per time step reporting how far the ladder got.
+    logical, parameter :: HOMOTOPY_VERBOSE = .true.
+
+    !> Report which nodes dominate the local error at a failed nonlinear solve.
+    !> Diagnostic only: it says whether a stall is a few bad nodes or a
+    !> uniformly slow field, which the WRMS gate alone cannot distinguish.
+    logical, parameter :: ERROR_NODE_REPORT = .true.
+    integer(int32), parameter :: ERROR_NODE_REPORT_LIMIT = 6
+    integer(int32), save :: error_node_report_count = 0
 
     integer(int32), parameter :: SOLVE_STATUS_NOT_RUN = 0
     integer(int32), parameter :: SOLVE_STATUS_CONVERGED = 1
@@ -23,6 +45,16 @@ submodule(app_ftcms) ftcms_solve
     integer(int32), parameter :: RESIDUAL_SCAN_ITER = 12
     logical, save :: residual_scan_done = .false.
     logical, save :: branch_report_done = .false.
+
+    ! --- Backtracking line search ---
+    ! The measured descent region lies below alpha ~ 1e-5; backtracking by
+    ! 1/4 reaches 2.4e-7 within MAX_TRIALS. At module scope because both the
+    ! nonlinear loop and the homotopy stage loop run the same search.
+    integer(int32), parameter :: LINE_SEARCH_MAX_TRIALS = 12
+    real(real64), parameter :: LINE_SEARCH_BACKTRACK = 2.5d-1
+    real(real64), parameter :: LINE_SEARCH_MIN_SCALE = 1.0d-6
+    !> Armijo sufficient-decrease coefficient on the residual norm.
+    real(real64), parameter :: LINE_SEARCH_ARMIJO = 1.0d-4
 
     !> Freezing-band telemetry at the iterations that exhaust the budget.
     integer(int32), parameter :: FREEZE_REPORT_ITER = 10
@@ -750,30 +782,14 @@ contains
         real(real64) :: phase_aa_gamma
         real(real64) :: phase_merit, phase_best_merit
         ! --- Backtracking line-search state ---
-        ! The measured descent region lies below alpha ~ 1e-5; backtracking by
-        ! 1/4 reaches 2.4e-7 within MAX_TRIALS.
-        integer(int32), parameter :: LINE_SEARCH_MAX_TRIALS = 12
-        real(real64), parameter :: LINE_SEARCH_BACKTRACK = 2.5d-1
-        real(real64), parameter :: LINE_SEARCH_MIN_SCALE = 1.0d-6
-        !> Armijo sufficient-decrease coefficient on the residual norm.
-        real(real64), parameter :: LINE_SEARCH_ARMIJO = 1.0d-4
-        integer(int32) :: ls_trial, ls_diag
-        real(real64) :: ls_scale, ls_reference_norm, ls_trial_norm, ls_aa_gnorm
+        integer(int32) :: ls_trial
+        real(real64) :: ls_scale, ls_reference_norm
         !> Per-block local error measure at the trial iterate (E_T, E_H; see
         !> local_error_block) and the mean-volume-floor fallback scale used
         !> only when the exact per-node data is not yet available.
         real(real64) :: ls_E_T, ls_E_H
         real(real64) :: ls_ref0_thermal, ls_ref0_hydraulic
-        !> Per-trial backtracking record, kept only to separate a wrong direction
-        !> from a step length the search does not actually control.
-        real(real64) :: ls_trial_alpha(LINE_SEARCH_MAX_TRIALS)
-        real(real64) :: ls_trial_ratio(LINE_SEARCH_MAX_TRIALS)
-        real(real64) :: ls_trial_E_T(LINE_SEARCH_MAX_TRIALS)
-        real(real64) :: ls_trial_E_H(LINE_SEARCH_MAX_TRIALS)
-        logical :: ls_accepted, ls_aa_has_prev
-        real(real64), allocatable :: ls_T_saved(:), ls_P_saved(:)
-        real(real64), allocatable :: ls_aa_T(:), ls_aa_P(:), ls_aa_duT(:), ls_aa_duP(:)
-        logical, allocatable :: ls_onset_saved(:)
+        logical :: ls_accepted
         real(real64), allocatable :: initial_residual_thermal(:), initial_residual_hydraulic(:)
         !> Per-node frozen flags, used only by the active-set telemetry.
         logical, allocatable :: frozen_now(:), frozen_previous(:)
@@ -825,6 +841,25 @@ contains
         phase_mixing_current = PHASE_MIXING
         phase_best_merit = huge(1.0d0)
         phase_stagnation_count = 0
+
+        ! Homotopy: march lambda from 0 towards 1 to grow an initial guess for
+        ! the accepted solve. No convergence gate is evaluated here - the only
+        ! acceptance test is the nonlinear loop below, which runs at lambda = 1.
+        call self%control%begin_homotopy()
+        if (self%control%is_homotopy_active()) then
+            call run_homotopy_stages(self, num_phase_nodes)
+        end if
+        call self%control%finish_homotopy()
+        ! Re-arm the nonlinear controller. reset_iteration is mandatory: the
+        ! stages leave a nonzero iteration count and a converged(:) state that
+        ! would let the accepted solve exit at its first test, and the count
+        ! also reaches the adaptive time step through control%update's max().
+        call self%control%reset_iteration()
+        call self%control%set_nonlinear_solver(NONLINEAR_SOLVER%PICARD)
+        call self%control%reset_acceleration()
+        self%aa_has_prev = .false.
+        self%aa_gnorm_prev = -1.0d0
+
         ! Outer phase projection loop
         coupling_loop: do coupling_iter = 1, merge(MAX_PHASE_ITER, 1, do_phase_outer)
             self%last_phase_iterations = coupling_iter
@@ -962,91 +997,11 @@ contains
                         call scan_residual_along_direction(self, iter_nl, ls_ref0_thermal, ls_ref0_hydraulic)
                     end if
 
-                    call ls_snapshot(self, ls_T_saved, ls_P_saved, ls_onset_saved, &
-                                     ls_aa_T, ls_aa_P, ls_aa_duT, ls_aa_duP, &
-                                     ls_aa_has_prev, ls_aa_gnorm)
-                    ls_scale = 1.0d0
-                    ls_accepted = .false.
-                    ls_trial_ratio(:) = -1.0d0
-                    ls_trial_alpha(:) = -1.0d0
-                    ls_trial_E_T(:) = -1.0d0
-                    ls_trial_E_H(:) = -1.0d0
-                    do ls_trial = 1, LINE_SEARCH_MAX_TRIALS
-                        if (ls_trial > 1) then
-                            call ls_restore(self, ls_T_saved, ls_P_saved, ls_onset_saved, &
-                                            ls_aa_T, ls_aa_P, ls_aa_duT, ls_aa_duP, &
-                                            ls_aa_has_prev, ls_aa_gnorm)
-                        end if
-                        call self%reflect_variables(step_scale=ls_scale)
-                        call self%assemble(residual_only=.true.)
-                        call self%apply_bc(prescribed=.false.)
-                        call ls_block_norms(self, ls_E_T, ls_E_H, ls_ref0_thermal, ls_ref0_hydraulic)
-                        ls_trial_norm = ls_merit(ls_E_T, ls_E_H)
-                        if (ls_reference_norm <= 0.0d0) then
-                            ls_accepted = .true.
-                            exit
-                        end if
-                        ls_trial_alpha(ls_trial) = ls_scale
-                        ls_trial_ratio(ls_trial) = ls_trial_norm / ls_reference_norm
-                        ls_trial_E_T(ls_trial) = ls_E_T
-                        ls_trial_E_H(ls_trial) = ls_E_H
-                        if (ls_trial_norm <= (1.0d0 - LINE_SEARCH_ARMIJO * ls_scale) * ls_reference_norm) then
-                            ls_accepted = .true.
-                            exit
-                        end if
-                        if (ls_scale <= LINE_SEARCH_MIN_SCALE) exit
-                        ls_scale = max(LINE_SEARCH_MIN_SCALE, LINE_SEARCH_BACKTRACK * ls_scale)
-                    end do
-                    self%last_line_search_scale = ls_scale
-                    self%last_line_search_trials = ls_trial
+                    call apply_line_search(self, iter_nl, ls_reference_norm, &
+                                           ls_ref0_thermal, ls_ref0_hydraulic, &
+                                           ls_accepted, ls_scale, ls_trial, ls_E_T, ls_E_H, &
+                                           report_failure=.true.)
                     if (.not. ls_accepted) then
-                        self%last_line_search_failures = self%last_line_search_failures + 1
-                        ! Put the iterate back where the search started.
-                        !
-                        ! Leaving the last trial in place applies a step that was
-                        ! just measured to raise the merit, every iteration, so
-                        ! the sequence is not monotone and can and does diverge:
-                        ! with the iteration cap lifted to 300 the loop reached
-                        ! the divergence guard at 45 iterations rather than
-                        ! converging. A globalization that keeps a step it
-                        ! rejected is not a globalization.
-                        call ls_restore(self, ls_T_saved, ls_P_saved, ls_onset_saved, &
-                                        ls_aa_T, ls_aa_P, ls_aa_duT, ls_aa_duP, &
-                                        ls_aa_has_prev, ls_aa_gnorm)
-                        call self%reflect_variables(step_scale=0.0d0)
-                        call self%assemble(residual_only=.true.)
-                        call self%apply_bc(prescribed=.false.)
-                        if (.not. branch_report_done .and. iter_nl >= 10) then
-                            branch_report_done = .true.
-                            call report_active_branches(self)
-                        end if
-                        ! Report the whole backtracking sequence, not just its
-                        ! last entry. The two failure mechanisms are only
-                        ! distinguishable from the trend in alpha:
-                        !   ratio - 1 proportional to alpha  -> the direction is
-                        !     genuinely an ascent direction for ||R||, i.e. the
-                        !     linearization is wrong;
-                        !   ratio - 1 constant in alpha      -> part of the update
-                        !     does not scale with alpha, i.e. the search is not
-                        !     actually controlling the step length.
-                        write (*, '(A,I0,A,ES11.3)') &
-                            '   [LS] no descent at iter ', iter_nl, ': ||R_k||=', ls_reference_norm
-                        do ls_diag = 1, LINE_SEARCH_MAX_TRIALS
-                            if (ls_trial_alpha(ls_diag) < 0.0d0) cycle
-                            ! E_T/E_H are the same local_error_block measure the
-                            ! [NL] line's locT/locH prints (<=1 passes), so the
-                            ! two logs are directly comparable.
-                            ! ES, not F: a rejected trial can raise the merit by
-                            ! many orders of magnitude, and an F field that
-                            ! overflows aborts the run on a Fortran output
-                            ! conversion error - a diagnostic must never be able
-                            ! to kill the solve it is reporting on.
-                            write (*, '(A,ES9.2,A,ES12.4,A,ES11.3,A,ES11.3)') &
-                                '        alpha=', ls_trial_alpha(ls_diag), &
-                                '  merit/merit_k=', ls_trial_ratio(ls_diag), &
-                                '  E_T=', ls_trial_E_T(ls_diag), &
-                                '  E_H=', ls_trial_E_H(ls_diag)
-                        end do
                         if (self%is_active_thermal()) then
                             call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
                             call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
@@ -1141,6 +1096,37 @@ contains
                     self%last_solve_status = SOLVE_STATUS_NONLINEAR_DIVERGED
                 else
                     self%last_solve_status = SOLVE_STATUS_NONLINEAR_LIMIT
+                end if
+                if (ERROR_NODE_REPORT .and. error_node_report_count < ERROR_NODE_REPORT_LIMIT) then
+                    error_node_report_count = error_node_report_count + 1
+                    block
+                        real(real64), allocatable :: rep_residual(:)
+                        real(real64), pointer, contiguous :: rep_qw(:), rep_qi(:), rep_phi(:)
+                        nullify (rep_qw, rep_qi, rep_phi)
+                        call self%Qw%get_current(rep_qw)
+                        call self%Qi%get_current(rep_qi)
+                        call self%porosity%get_current(rep_phi)
+                        if (self%is_active_thermal()) then
+                            call self%get_variable_residual(PHYSICS_TYPES%THERMAL, rep_residual)
+                            if (allocated(rep_residual)) then
+                                if (associated(rep_qw) .and. associated(rep_qi) .and. associated(rep_phi)) then
+                                    call self%control%report_local_error_nodes(PHYSICS_TYPES%THERMAL, rep_residual, 'thermal', &
+                                                                              theta_w=rep_qw, theta_i=rep_qi, porosity=rep_phi)
+                                else
+                                    call self%control%report_local_error_nodes(PHYSICS_TYPES%THERMAL, rep_residual, 'thermal')
+                                end if
+                                deallocate (rep_residual)
+                            end if
+                        end if
+                        if (self%is_active_hydraulic()) then
+                            call self%get_variable_residual(PHYSICS_TYPES%HYDRAULIC, rep_residual)
+                            if (allocated(rep_residual)) then
+                                call self%control%report_local_error_nodes(PHYSICS_TYPES%HYDRAULIC, rep_residual, 'hydraulic')
+                                deallocate (rep_residual)
+                            end if
+                        end if
+                        nullify (rep_qw, rep_qi, rep_phi)
+                    end block
                 end if
                 ! One-shot tangent audit at the first attempt the nonlinear
                 ! solve gives up on. That state - not the first line-search
@@ -1395,6 +1381,274 @@ contains
 
         merit = sqrt(e_thermal**2 + e_hydraulic**2)
     end function ls_merit
+
+    !> True when at least one node is cold enough for the generalized-Clapeyron
+    !> suction to be nonzero, i.e. when lambda can change the physics at all.
+    !>
+    !> Assumptions: the freezing suction vanishes above the bulk freezing point,
+    !> which holds for the non-segregation model; a pressure-dependent model
+    !> would need its own test.
+    !> Computational complexity: O(n_node) arithmetic, no allocation.
+    !> Failure behavior: returns .true. when the field cannot be read, so an
+    !> unexpected state costs work rather than silently skipping continuation.
+    function homotopy_can_bite(self) result(can_bite)
+        implicit none
+        !> Solver object
+        class(type_ftcms), intent(inout) :: self
+        !> True when the ladder can change anything
+        logical :: can_bite
+
+        real(real64), pointer, contiguous :: field(:)
+
+        can_bite = .true.
+        if (.not. self%is_active_thermal()) return
+
+        nullify (field)
+        call self%temperature%get_current(field)
+        if (.not. associated(field)) return
+        can_bite = minval(field) <= HOMOTOPY_ONSET_MARGIN
+        nullify (field)
+    end function homotopy_can_bite
+
+    !> March the continuation parameter from 0 towards 1, spending a bounded
+    !> number of nonlinear iterations at each value.
+    !>
+    !> The stages are predictor work, not solves: no convergence gate is
+    !> evaluated, and a stage is judged only on whether the line search stayed
+    !> healthy and the merit did not grow. A stage that fails is rolled back to
+    !> the last banked lambda and retried with half the increment; when the
+    !> increment collapses the ladder gives up and leaves the iterate where it
+    !> got to, which is still a better starting point than the predictor.
+    !>
+    !> Rollback is transactional: restoring T and p is not enough, because the
+    !> quadrature depth and the assembled system belong to the rejected lambda,
+    !> so the state is re-derived and fully re-assembled at the banked value.
+    subroutine run_homotopy_stages(self, num_nodes)
+        implicit none
+        !> Solver object; its iterate and homotopy telemetry are updated
+        class(type_ftcms), intent(inout) :: self
+        !> Number of domain nodes, for the physical residual floors
+        integer(int32), intent(in) :: num_nodes
+
+        real(real64), allocatable :: hc_T(:), hc_P(:)
+        real(real64), allocatable :: hc_aa_T(:), hc_aa_P(:), hc_aa_duT(:), hc_aa_duP(:)
+        logical, allocatable :: hc_onset(:)
+        logical :: hc_has_prev, prescribe_bc, accepted, stage_ok
+        real(real64) :: hc_gnorm
+        real(real64) :: floor_thermal, floor_hydraulic
+        real(real64) :: e_thermal, e_hydraulic
+        real(real64) :: reference_norm, entry_merit, exit_merit
+        real(real64) :: scale, lambda
+        integer(int32) :: stage_iter, trials, stage_work
+
+        ! Nothing is cold enough for the freezing suction to be nonzero, so the
+        ! blend is the identity at every lambda and every stage would re-solve
+        ! one unchanging problem.
+        if (.not. homotopy_can_bite(self)) then
+            self%last_phase_iterations = 1
+            return
+        end if
+
+        floor_thermal = 0.0d0
+        floor_hydraulic = 0.0d0
+        call self%control%get_residual_floors(num_nodes, floor_thermal, floor_hydraulic)
+        stage_work = 0
+
+        stage_loop: do
+            if (self%control%is_homotopy_complete()) exit stage_loop
+            if (self%control%is_homotopy_exhausted()) exit stage_loop
+            lambda = self%control%get_homotopy_lambda()
+
+            call ls_snapshot(self, hc_T, hc_P, hc_onset, &
+                             hc_aa_T, hc_aa_P, hc_aa_duT, hc_aa_duP, hc_has_prev, hc_gnorm)
+
+            stage_ok = .true.
+            entry_merit = -1.0d0
+            exit_merit = -1.0d0
+            do stage_iter = 1, HOMOTOPY_STAGE_ITERATIONS
+                call self%solve_time_step_setup(prescribe_bc)
+                if (prescribe_bc) then
+                    call self%prescribe_dirichlet()
+                    call self%calc_gradient_temperature()
+                    call self%calc_gradient_pressure()
+                end if
+                call self%assemble()
+                call self%apply_bc(prescribed=.false.)
+
+                ! Reference merit before solve(): the linear solve equilibrates
+                ! K and F in place and only unscales du.
+                call ls_block_norms(self, e_thermal, e_hydraulic, floor_thermal, floor_hydraulic)
+                reference_norm = ls_merit(e_thermal, e_hydraulic)
+                if (entry_merit < 0.0d0) entry_merit = reference_norm
+
+                call self%solve()
+                if (.not. self%solver%is_success()) then
+                    stage_ok = .false.
+                    exit
+                end if
+
+                call apply_line_search(self, stage_iter, reference_norm, &
+                                       floor_thermal, floor_hydraulic, &
+                                       accepted, scale, trials, e_thermal, e_hydraulic, &
+                                       report_failure=.false.)
+                stage_work = stage_work + 1
+                if (.not. accepted .or. scale < HOMOTOPY_STAGE_MIN_SCALE) then
+                    stage_ok = .false.
+                    exit
+                end if
+                exit_merit = ls_merit(e_thermal, e_hydraulic)
+                ! Spending the rest of the budget on an iterate that has stopped
+                ! moving buys no better initial guess.
+                if (exit_merit > HOMOTOPY_STAGE_PROGRESS * reference_norm) exit
+            end do
+
+            if (stage_ok .and. entry_merit > 0.0d0 .and. exit_merit > entry_merit) stage_ok = .false.
+
+            if (stage_ok) then
+                call self%control%accept_homotopy_stage()
+            else
+                call ls_restore(self, hc_T, hc_P, hc_onset, &
+                                hc_aa_T, hc_aa_P, hc_aa_duT, hc_aa_duP, hc_has_prev, hc_gnorm)
+                call self%reflect_variables(step_scale=0.0d0)
+                call self%control%reject_homotopy_stage()
+                ! Re-assemble fully at the banked lambda: the cached subcell
+                ! depth and the matrix blocks still belong to the rejected one.
+                call self%assemble()
+                call self%apply_bc(prescribed=.false.)
+            end if
+        end do stage_loop
+
+        ! Stage work is predictor cost, not step difficulty. It must not reach
+        ! the adaptive time step through last_inner_iterations.
+        self%last_phase_iterations = max(1, self%control%get_homotopy_stage())
+        self%last_nonlinear_work = self%last_nonlinear_work + stage_work
+        if (HOMOTOPY_VERBOSE) then
+            write (*, '(A,I0,A,ES10.3,A,I0)') '   [HOM] stages=', self%control%get_homotopy_stage(), &
+                ', lambda=', self%control%get_homotopy_lambda(), ', iterations=', stage_work
+        end if
+    end subroutine run_homotopy_stages
+
+    !> Backtracking Armijo search on the assembled residual merit.
+    !>
+    !> The system was assembled at x_k, so its merit is the reference. Each
+    !> trial restores x_k, applies the scaled update and reassembles, so a
+    !> converging search costs nothing over the reassembly the iteration was
+    !> doing anyway and only hard iterates pay for retries.
+    !>
+    !> On failure the iterate is put back where the search started: leaving a
+    !> rejected trial in place applies a step measured to raise the merit, and
+    !> a globalization that keeps a step it rejected is not a globalization.
+    !> The caller decides what a failure means - the nonlinear loop marks the
+    !> physics diverged, the homotopy stage loop shrinks its increment instead.
+    subroutine apply_line_search(self, iter_nl, reference_norm, floor_thermal, floor_hydraulic, &
+                                 accepted, scale, trials, e_thermal, e_hydraulic, report_failure)
+        implicit none
+        !> Solver object; its iterate, residual and line-search telemetry are updated
+        class(type_ftcms), intent(inout) :: self
+        !> Current nonlinear iterate index, used only for reporting
+        integer(int32), intent(in) :: iter_nl
+        !> Merit at x_k, taken before the linear solve
+        real(real64), intent(in) :: reference_norm
+        !> Physical residual floors of the two blocks
+        real(real64), intent(in) :: floor_thermal, floor_hydraulic
+        !> True when an admissible step was found
+        logical, intent(inout) :: accepted
+        !> Step scale of the accepted (or last) trial
+        real(real64), intent(inout) :: scale
+        !> Number of trials used
+        integer(int32), intent(inout) :: trials
+        !> Per-block local error at the final iterate
+        real(real64), intent(inout) :: e_thermal, e_hydraulic
+        !> Print the backtracking table when no step is admissible
+        logical, intent(in), optional :: report_failure
+
+        real(real64), allocatable :: T_saved(:), P_saved(:)
+        real(real64), allocatable :: aa_T(:), aa_P(:), aa_duT(:), aa_duP(:)
+        logical, allocatable :: onset_saved(:)
+        logical :: aa_has_prev, do_report
+        real(real64) :: aa_gnorm, trial_norm
+        real(real64) :: trial_alpha(LINE_SEARCH_MAX_TRIALS)
+        real(real64) :: trial_ratio(LINE_SEARCH_MAX_TRIALS)
+        real(real64) :: trial_E_T(LINE_SEARCH_MAX_TRIALS)
+        real(real64) :: trial_E_H(LINE_SEARCH_MAX_TRIALS)
+        integer(int32) :: trial, diag
+
+        do_report = .true.
+        if (present(report_failure)) do_report = report_failure
+
+        call ls_snapshot(self, T_saved, P_saved, onset_saved, &
+                         aa_T, aa_P, aa_duT, aa_duP, aa_has_prev, aa_gnorm)
+        scale = 1.0d0
+        accepted = .false.
+        trial_alpha(:) = -1.0d0
+        trial_ratio(:) = -1.0d0
+        trial_E_T(:) = -1.0d0
+        trial_E_H(:) = -1.0d0
+
+        do trial = 1, LINE_SEARCH_MAX_TRIALS
+            if (trial > 1) then
+                call ls_restore(self, T_saved, P_saved, onset_saved, &
+                                aa_T, aa_P, aa_duT, aa_duP, aa_has_prev, aa_gnorm)
+            end if
+            call self%reflect_variables(step_scale=scale)
+            call self%assemble(residual_only=.true.)
+            call self%apply_bc(prescribed=.false.)
+            call ls_block_norms(self, e_thermal, e_hydraulic, floor_thermal, floor_hydraulic)
+            trial_norm = ls_merit(e_thermal, e_hydraulic)
+            if (reference_norm <= 0.0d0) then
+                accepted = .true.
+                exit
+            end if
+            trial_alpha(trial) = scale
+            trial_ratio(trial) = trial_norm / reference_norm
+            trial_E_T(trial) = e_thermal
+            trial_E_H(trial) = e_hydraulic
+            if (trial_norm <= (1.0d0 - LINE_SEARCH_ARMIJO * scale) * reference_norm) then
+                accepted = .true.
+                exit
+            end if
+            if (scale <= LINE_SEARCH_MIN_SCALE) exit
+            scale = max(LINE_SEARCH_MIN_SCALE, LINE_SEARCH_BACKTRACK * scale)
+        end do
+
+        trials = trial
+        self%last_line_search_scale = scale
+        self%last_line_search_trials = trial
+        if (accepted) return
+
+        self%last_line_search_failures = self%last_line_search_failures + 1
+        call ls_restore(self, T_saved, P_saved, onset_saved, &
+                        aa_T, aa_P, aa_duT, aa_duP, aa_has_prev, aa_gnorm)
+        call self%reflect_variables(step_scale=0.0d0)
+        call self%assemble(residual_only=.true.)
+        call self%apply_bc(prescribed=.false.)
+        if (.not. do_report) return
+
+        if (.not. branch_report_done .and. iter_nl >= 10) then
+            branch_report_done = .true.
+            call report_active_branches(self)
+        end if
+        ! Report the whole backtracking sequence, not just its last entry. The
+        ! two failure mechanisms are only distinguishable from the trend in
+        ! alpha:
+        !   ratio - 1 proportional to alpha  -> the direction is genuinely an
+        !     ascent direction for ||R||, i.e. the linearization is wrong;
+        !   ratio - 1 constant in alpha      -> part of the update does not
+        !     scale with alpha, i.e. the search is not controlling the step.
+        write (*, '(A,I0,A,ES11.3)') &
+            '   [LS] no descent at iter ', iter_nl, ': ||R_k||=', reference_norm
+        do diag = 1, LINE_SEARCH_MAX_TRIALS
+            if (trial_alpha(diag) < 0.0d0) cycle
+            ! ES, not F: a rejected trial can raise the merit by many orders of
+            ! magnitude, and an overflowing F field aborts the run on a Fortran
+            ! output conversion error.
+            write (*, '(A,ES9.2,A,ES12.4,A,ES11.3,A,ES11.3)') &
+                '        alpha=', trial_alpha(diag), &
+                '  merit/merit_k=', trial_ratio(diag), &
+                '  E_T=', trial_E_T(diag), &
+                '  E_H=', trial_E_H(diag)
+        end do
+    end subroutine apply_line_search
 
     !> Save everything a line-search trial mutates. The AA(1) secant pair is
     !> included because prepare_coupled_aa_step commits it unconditionally: a

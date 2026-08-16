@@ -26,6 +26,8 @@ target_sources(SOLVER_CONTROL PRIVATE
     iteration/iteration_manager.F90
     iteration/iteration.F90
 
+    homotopy/homotopy_manager.F90
+
     scheduler/scheduler_manager.F90
 
     parallel/openmp.F90
