@@ -66,6 +66,36 @@ module models_phase_change_fusion
     !> source that expels water from the saturated node.
     logical, parameter, public :: PORE_LIMIT_EXPELS_WATER = .false.
 
+    !> Painter-Karra three-phase equilibrium closure (Vadose Zone J. 13, 2014).
+    !>
+    !> The ice pressure is not fixed at atmospheric. Liquid-ice equilibrium makes
+    !> it the dependent quantity
+    !>   p_i = alpha*p_w - rho_i*L_f*ln(T/T_0),   alpha = rho_i/rho_w
+    !> so the ice-water pressure difference chi = p_i - p_w responds to BOTH
+    !> temperature and the pore pressure - the derivative d(chi)/dp_w = alpha-1
+    !> that the p_i = p_a assumption sets to zero, which is what drops the
+    !> pressure out of the phase split.
+    !>
+    !> The condensed phases then partition by volume, not by liquid-equivalent
+    !> mass:
+    !>   theta_c = theta_SWRC(s_m)                condensed volume (liquid+ice)
+    !>   theta_l = theta_SWRC(max(s_m, beta*chi)) most restrictive interface
+    !>   theta_i = theta_c - theta_l              volume complement
+    !>   theta_a = phi - theta_c                  >= 0 automatically
+    !> and the density ratio enters the CONSERVED MASS, theta_l + alpha*theta_i,
+    !> not the geometric complement. Putting it in the complement (as
+    !> theta_i = (rho_w/rho_i)(Theta - theta_l) does) is what lets the condensed
+    !> phases exceed the pore volume and forces a limiter, and the limiter is
+    !> what pins theta_l to a temperature-independent expression.
+    logical, parameter, public :: PHASE_CLOSURE_PAINTER_KARRA = .false.
+
+    !> Ratio of the air-water to the ice-water surface tension. The same pore
+    !> geometry drains at s = 2*sigma_aw/r against air and freezes at
+    !> chi = 2*sigma_iw/r against ice, so one retention curve serves both once
+    !> the ice-water pressure difference is rescaled by this factor.
+    !> sigma_aw = 0.0728 N/m, sigma_iw = 0.033 N/m at 0 C.
+    real(real64), private, parameter :: SURFACE_TENSION_RATIO = 0.0728d0 / 0.033d0
+
     !> Width of the C^1 band over which the pore overfill is removed, in water
     !> content. Small against the porosity so the cap is exact on both sides
     !> outside it, wide enough that the tangent transition is resolvable.
@@ -115,6 +145,35 @@ contains
         if (present(dfreezing_dP)) call self%gcc%deriv_pressure(state, dfreezing_dP)
         if (present(dfreezing_dT)) call self%gcc%deriv_temperature(state, dfreezing_dT)
 
+        if (PHASE_CLOSURE_PAINTER_KARRA) then
+            ! Map the p_i = p_a suction onto the ice-water pressure difference
+            ! rescaled to an equivalent air-water suction, here rather than in
+            ! the split: this is the one entry point every consumer of the
+            ! freezing suction goes through, so the composition, the level set
+            ! and the flux tangent cannot end up on different definitions.
+            block
+                real(real64) :: alpha_pk, rho_w_pk, rho_i_pk, pressure_pk
+                real(real64) :: ds_dP_pk, ds_dT_pk
+
+                call self%calc_rho_water(state, rho_w_pk)
+                call self%calc_rho_ice(state, rho_i_pk)
+                alpha_pk = 1.0d0
+                if (rho_w_pk > tiny(1.0d0)) alpha_pk = rho_i_pk / rho_w_pk
+                call state%pressure%get(pressure_pk)
+
+                ds_dP_pk = 0.0d0
+                ds_dT_pk = 0.0d0
+                if (present(dfreezing_dP)) ds_dP_pk = dfreezing_dP
+                if (present(dfreezing_dT)) ds_dT_pk = dfreezing_dT
+
+                suction_freezing = SURFACE_TENSION_RATIO * &
+                                   ((alpha_pk - 1.0d0) * pressure_pk + alpha_pk * suction_freezing)
+                if (present(dfreezing_dP)) dfreezing_dP = SURFACE_TENSION_RATIO * &
+                                                          ((alpha_pk - 1.0d0) + alpha_pk * ds_dP_pk)
+                if (present(dfreezing_dT)) dfreezing_dT = SURFACE_TENSION_RATIO * alpha_pk * ds_dT_pk
+            end block
+        end if
+
         lambda = 1.0d0
         lambda_set = .false.
         call state%continuation_lambda%get(lambda, is_set=lambda_set)
@@ -147,6 +206,112 @@ contains
         nullify (temperature_history)
         nullify (pressure_history)
     end subroutine calc_freezing_suction
+
+    !> Painter-Karra three-phase equilibrium split; see PHASE_CLOSURE_PAINTER_KARRA.
+    !>
+    !> \[ \chi = p_i - p_w = (\alpha-1)p_w + \alpha s_f, \qquad
+    !>    \theta_l = \theta_{SWRC}(\max(s_m,\beta\chi)), \qquad
+    !>    \theta_i = \theta_c - \theta_l \]
+    !>
+    !> Assumptions: local liquid-ice equilibrium wherever both are present, a
+    !> rigid skeleton, and one pore-size distribution shared by the air-water
+    !> and ice-water interfaces.
+    !> Numerical guarantees: theta_a = phi - theta_c >= 0 holds by construction
+    !> for a retention curve bounded by the porosity, so no pore-volume limiter
+    !> is needed and no branch pins theta_l.
+    !> Computational complexity: O(1) arithmetic, two retention evaluations.
+    !> Failure behavior: none; degenerates to the unfrozen split above T_f.
+    subroutine phase_split_painter_karra(self, state, suction_matric, suction_freezing, &
+                                         dfreezing_dP, dfreezing_dT, &
+                                         theta_condensed, dcondensed_dpressure, &
+                                         rho_w, rho_i, density_ratio, &
+                                         theta_liquid, theta_ice, &
+                                         dliquid_dP, dliquid_dT, dice_dP, dice_dT, &
+                                         dtotal_dP, dtotal_dT, &
+                                         suction_effective_out, dsuction_eff_dP_out, dsuction_eff_dT_out)
+        implicit none
+        !> Fusion model
+        class(type_fusion), intent(in) :: self
+        !> Thermodynamic state
+        type(type_state), intent(in) :: state
+        !> Matric suction s_m = -p_w [Pa]
+        real(real64), intent(in) :: suction_matric
+        !> Raw generalized-Clapeyron suction at p_i = p_a [Pa]
+        real(real64), intent(in) :: suction_freezing
+        !> Tangents of the raw freezing suction
+        real(real64), intent(in) :: dfreezing_dP, dfreezing_dT
+        !> Condensed-phase volume theta_c and its pressure tangent; on exit the
+        !> liquid-equivalent conserved mass replaces theta_c
+        real(real64), intent(inout) :: theta_condensed
+        real(real64), intent(in) :: dcondensed_dpressure
+        !> Phase densities and their ratio rho_w/rho_i
+        real(real64), intent(in) :: rho_w, rho_i, density_ratio
+        !> Liquid and ice volume fractions [-]
+        real(real64), intent(inout) :: theta_liquid, theta_ice
+        !> Optional tangents, same meaning as calc_phase_split's
+        real(real64), intent(inout), optional :: dliquid_dP, dliquid_dT, dice_dP, dice_dT
+        real(real64), intent(inout), optional :: dtotal_dP, dtotal_dT
+        real(real64), intent(inout), optional :: suction_effective_out
+        real(real64), intent(inout), optional :: dsuction_eff_dP_out, dsuction_eff_dT_out
+
+        real(real64) :: alpha
+        real(real64) :: suction_effective, sig_a, sig_b
+        real(real64) :: dsuction_eff_dP, dsuction_eff_dT
+        real(real64) :: dtheta_dhead_effective
+        real(real64) :: dliquid_dpressure, dliquid_dtemperature
+        real(real64) :: dice_dpressure, dice_dtemperature
+        real(real64) :: drho_w_dP, drho_w_dT, drho_i_dP, drho_i_dT
+        real(real64) :: dratio_dP, dratio_dT, dalpha_dP, dalpha_dT
+
+        alpha = 1.0d0 / density_ratio
+
+        ! suction_freezing already carries beta*chi: calc_freezing_suction does
+        ! the mapping so every consumer shares it.
+        call compute_effective_suction(suction_matric, suction_freezing, suction_effective, sig_a, sig_b)
+        dsuction_eff_dP = -sig_a + sig_b * dfreezing_dP
+        dsuction_eff_dT = sig_b * dfreezing_dT
+
+        call self%wrf%calc(-suction_effective / (rho_std * g), theta_liquid)
+        call self%wrf%deriv(-suction_effective / (rho_std * g), dtheta_dhead_effective)
+
+        dliquid_dpressure = dtheta_dhead_effective * (-dsuction_eff_dP) / (rho_std * g)
+        dliquid_dtemperature = dtheta_dhead_effective * (-dsuction_eff_dT) / (rho_std * g)
+
+        ! Volume complement: the ice occupies the space the liquid gave up.
+        theta_ice = max(0.0d0, theta_condensed - theta_liquid)
+        dice_dpressure = dcondensed_dpressure - dliquid_dpressure
+        dice_dtemperature = -dliquid_dtemperature
+        if (theta_condensed <= theta_liquid) then
+            dice_dpressure = 0.0d0
+            dice_dtemperature = 0.0d0
+        end if
+
+        dratio_dP = 0.0d0
+        dratio_dT = 0.0d0
+        if (rho_i > tiny(1.0d0)) then
+            call self%calc_drho_water_dP(state, drho_w_dP)
+            call self%calc_drho_water_dT(state, drho_w_dT)
+            call self%calc_drho_ice_dP(state, drho_i_dP)
+            call self%calc_drho_ice_dT(state, drho_i_dT)
+            dratio_dP = drho_w_dP / rho_i - rho_w * drho_i_dP / rho_i**2
+            dratio_dT = drho_w_dT / rho_i - rho_w * drho_i_dT / rho_i**2
+        end if
+        dalpha_dP = -dratio_dP / density_ratio**2
+        dalpha_dT = -dratio_dT / density_ratio**2
+
+        if (present(dliquid_dP)) dliquid_dP = dliquid_dpressure
+        if (present(dliquid_dT)) dliquid_dT = dliquid_dtemperature
+        if (present(dice_dP)) dice_dP = dice_dpressure
+        if (present(dice_dT)) dice_dT = dice_dtemperature
+        ! The density ratio belongs to the conserved mass, not the complement.
+        if (present(dtotal_dP)) dtotal_dP = dliquid_dpressure + alpha * dice_dpressure + theta_ice * dalpha_dP
+        if (present(dtotal_dT)) dtotal_dT = dliquid_dtemperature + alpha * dice_dtemperature + theta_ice * dalpha_dT
+        theta_condensed = theta_liquid + alpha * theta_ice
+
+        if (present(suction_effective_out)) suction_effective_out = suction_effective
+        if (present(dsuction_eff_dP_out)) dsuction_eff_dP_out = dsuction_eff_dP
+        if (present(dsuction_eff_dT_out)) dsuction_eff_dT_out = dsuction_eff_dT
+    end subroutine phase_split_painter_karra
 
     !> One-sided C^1 ramp: exactly zero up to the corner, exactly the identity
     !> past the band, cubic in between.
@@ -650,6 +815,18 @@ contains
         ! d s_m/d p_w = -1, so d h_m/d p_w = 1/(rho g) and the storage tangent is
         ! positive for a monotone retention curve.
         dtotal_dpressure = dtheta_dhead_matric / (rho_std * g)
+
+        if (PHASE_CLOSURE_PAINTER_KARRA) then
+            call phase_split_painter_karra(self, state, suction_matric, suction_freezing, &
+                                           dfreezing_dP, dfreezing_dT, &
+                                           total_water, dtotal_dpressure, &
+                                           rho_w, rho_i, density_ratio, &
+                                           theta_liquid, theta_ice, &
+                                           dliquid_dP, dliquid_dT, dice_dP, dice_dT, &
+                                           dtotal_dP, dtotal_dT, &
+                                           suction_effective_out, dsuction_eff_dP_out, dsuction_eff_dT_out)
+            return
+        end if
 
         ! Blend the raw cryogenic suction with the pore-volume-limit root
         ! (compute_blended_effective_suction), then compose with the matric
