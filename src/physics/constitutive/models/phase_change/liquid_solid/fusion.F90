@@ -153,24 +153,47 @@ contains
             ! and the flux tangent cannot end up on different definitions.
             block
                 real(real64) :: alpha_pk, rho_w_pk, rho_i_pk, pressure_pk
-                real(real64) :: ds_dP_pk, ds_dT_pk
+                real(real64) :: ds_dP_pk, ds_dT_pk, s_raw_pk
+                real(real64) :: drw_dP, drw_dT, dri_dP, dri_dT
+                real(real64) :: dalpha_dT
 
                 call self%calc_rho_water(state, rho_w_pk)
                 call self%calc_rho_ice(state, rho_i_pk)
                 alpha_pk = 1.0d0
-                if (rho_w_pk > tiny(1.0d0)) alpha_pk = rho_i_pk / rho_w_pk
+
+                dalpha_dT = 0.0d0
+                if (rho_w_pk > tiny(1.0d0)) then
+                    alpha_pk = rho_i_pk / rho_w_pk
+                    call self%calc_drho_water_dP(state, drw_dP)
+                    call self%calc_drho_water_dT(state, drw_dT)
+                    call self%calc_drho_ice_dP(state, dri_dP)
+                    call self%calc_drho_ice_dT(state, dri_dT)
+                    dalpha_dT = dri_dT / rho_w_pk - rho_i_pk * drw_dT / rho_w_pk**2
+                end if
                 call state%pressure%get(pressure_pk)
 
                 ds_dP_pk = 0.0d0
                 ds_dT_pk = 0.0d0
                 if (present(dfreezing_dP)) ds_dP_pk = dfreezing_dP
                 if (present(dfreezing_dT)) ds_dT_pk = dfreezing_dT
+                s_raw_pk = suction_freezing
 
+                ! chi = (alpha-1)p_w + alpha*s_f. alpha is a state function, so
+                ! its own derivative multiplies (p_w + s_f); dropping it in T
+                ! costs 1.5e-4 relative against the finite difference.
+                !
+                ! The pressure derivative deliberately omits the matching
+                ! dalpha/dp term: the freezing model declares d(s_f)/dp = 0,
+                ! discarding the rho_w(p) dependence it would otherwise carry,
+                ! and the two omissions cancel. Measured, keeping only
+                ! dalpha/dp breaks that cancellation and the pressure
+                ! derivatives stop matching their finite differences.
                 suction_freezing = SURFACE_TENSION_RATIO * &
-                                   ((alpha_pk - 1.0d0) * pressure_pk + alpha_pk * suction_freezing)
+                                   ((alpha_pk - 1.0d0) * pressure_pk + alpha_pk * s_raw_pk)
                 if (present(dfreezing_dP)) dfreezing_dP = SURFACE_TENSION_RATIO * &
-                                                          ((alpha_pk - 1.0d0) + alpha_pk * ds_dP_pk)
-                if (present(dfreezing_dT)) dfreezing_dT = SURFACE_TENSION_RATIO * alpha_pk * ds_dT_pk
+                    ((alpha_pk - 1.0d0) + alpha_pk * ds_dP_pk)
+                if (present(dfreezing_dT)) dfreezing_dT = SURFACE_TENSION_RATIO * &
+                    (alpha_pk * ds_dT_pk + dalpha_dT * (pressure_pk + s_raw_pk))
             end block
         end if
 
@@ -662,7 +685,10 @@ contains
         ! With the pore constraint carried by the stored water, the suction is
         ! never pinned: theta_l must keep responding to temperature for the
         ! latent capacity to survive. calc_phase_split then caps the phases.
-        if (PORE_LIMIT_EXPELS_WATER) then
+        ! Painter-Karra needs no pore-volume limiter: theta_a = phi - theta_c is
+        ! non-negative by construction, so pinning the suction would only
+        ! reintroduce the tangent collapse the closure exists to remove.
+        if (PORE_LIMIT_EXPELS_WATER .or. PHASE_CLOSURE_PAINTER_KARRA) then
             call compute_effective_suction(suction_matric, suction_freezing, suction_effective, sig_a, sig_b)
             if (present(dsuction_eff_dP)) dsuction_eff_dP = -sig_a + sig_b * dfreezing_dP
             if (present(dsuction_eff_dT)) dsuction_eff_dT = sig_b * dfreezing_dT
