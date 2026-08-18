@@ -122,6 +122,7 @@ contains
 
     subroutine set_residual_scale_iteration_setting(self, volume_total, dt, nodal_volume, &
                                                     dH_dT, drho_dp, u_thermal, u_hydraulic, &
+                                                    q_thermal, q_hydraulic, q_span_thermal, q_span_hydraulic, &
                                                     atol_temperature_u, atol_pressure_u, rtol_u)
         implicit none
         class(type_iteration_setting), intent(inout) :: self
@@ -132,12 +133,17 @@ contains
         real(real64), intent(in), optional :: drho_dp(:)
         real(real64), intent(in), optional :: u_thermal(:)
         real(real64), intent(in), optional :: u_hydraulic(:)
+        real(real64), intent(in), optional :: q_thermal(:)
+        real(real64), intent(in), optional :: q_hydraulic(:)
+        real(real64), intent(in), optional :: q_span_thermal
+        real(real64), intent(in), optional :: q_span_hydraulic
         real(real64), intent(in), optional :: atol_temperature_u
         real(real64), intent(in), optional :: atol_pressure_u
         real(real64), intent(in), optional :: rtol_u
 
         call self%convergence_control%set_residual_scale(volume_total, dt, nodal_volume, &
                                                           dH_dT, drho_dp, u_thermal, u_hydraulic, &
+                                                    q_thermal, q_hydraulic, q_span_thermal, q_span_hydraulic, &
                                                           atol_temperature_u, atol_pressure_u, rtol_u)
     end subroutine set_residual_scale_iteration_setting
 

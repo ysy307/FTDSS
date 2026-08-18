@@ -673,6 +673,7 @@ contains
 
     subroutine set_residual_scale_control(self, volume_total, dt, nodal_volume, &
                                           dH_dT, drho_dp, u_thermal, u_hydraulic, &
+                                          q_thermal, q_hydraulic, q_span_thermal, q_span_hydraulic, &
                                           atol_temperature_u, atol_pressure_u, rtol_u)
         implicit none
         class(type_control), intent(inout) :: self
@@ -687,6 +688,13 @@ contains
         real(real64), intent(in), optional :: u_thermal(:)
         !> Nodal pressure snapshot [Pa], for the local error tolerance weight
         real(real64), intent(in), optional :: u_hydraulic(:)
+        !> Nodal enthalpy [J/m3], the thermal block's conserved quantity
+        real(real64), intent(in), optional :: q_thermal(:)
+        !> Nodal water-equivalent mass density [kg/m3]
+        real(real64), intent(in), optional :: q_hydraulic(:)
+        !> Global span of each conserved field, flooring its relative tolerance
+        real(real64), intent(in), optional :: q_span_thermal
+        real(real64), intent(in), optional :: q_span_hydraulic
         !> ATS absolute temperature tolerance [K]
         real(real64), intent(in), optional :: atol_temperature_u
         !> ATS absolute pressure tolerance [Pa]
@@ -696,6 +704,7 @@ contains
 
         call self%iteration%set_residual_scale(volume_total, dt, nodal_volume, &
                                                dH_dT, drho_dp, u_thermal, u_hydraulic, &
+                                          q_thermal, q_hydraulic, q_span_thermal, q_span_hydraulic, &
                                                atol_temperature_u, atol_pressure_u, rtol_u)
     end subroutine set_residual_scale_control
 

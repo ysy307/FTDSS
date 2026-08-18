@@ -662,15 +662,22 @@ contains
         ! pointer (inactive physics) is treated as an absent optional argument.
         block
             real(real64), pointer, contiguous, dimension(:) :: T_current, p_current
-            real(real64) :: dt_now
+            real(real64) :: dt_now, span_thermal, span_hydraulic
 
             nullify (T_current, p_current)
             if (check_thermal) call self%temperature%get_current(T_current)
             if (check_hydraulic) call self%pressure%get_current(p_current)
             call self%control%get_dt(dt_now)
+            ! Reduced here, not inside the gate: the span is a cross-rank
+            ! quantity and convergence_control carries no MPI.
+            span_thermal = conserved_span(enthalpy)
+            span_hydraulic = conserved_span(density)
             call self%control%set_residual_scale(self%domain_measure_total, dt_now, &
                                                  dH_dT=dH_dT, drho_dp=drho_dp, &
-                                                 u_thermal=T_current, u_hydraulic=p_current)
+                                                 u_thermal=T_current, u_hydraulic=p_current, &
+                                                 q_thermal=enthalpy, q_hydraulic=density, &
+                                                 q_span_thermal=span_thermal, &
+                                                 q_span_hydraulic=span_hydraulic)
             nullify (T_current, p_current)
         end block
 
@@ -1296,6 +1303,42 @@ contains
     !> Local nonlinear-error measure (E_T, E_H) of the thermal and hydraulic
     !> blocks, separately, at the current (trial) iterate.
     !>
+    !> Global span max(q) - min(q) of a conserved field.
+    !>
+    !> Assumptions: q holds one value per local node.
+    !> Numerical guarantees: the result is identical on every rank, so the
+    !> acceptance gate weights the same way everywhere; a rank-local span
+    !> would hand each rank a different criterion and desynchronize them.
+    !> Computational complexity: O(n) locally plus one reduction.
+    !> Failure behavior: returns zero for an unallocated or empty field.
+    function conserved_span(q) result(span)
+        implicit none
+        !> Conserved quantity per node
+        real(real64), allocatable, intent(in) :: q(:)
+        !> Span in the quantity's own units
+        real(real64) :: span
+
+        real(real64) :: hi, lo
+#ifdef _MPI
+        real(real64) :: local_pair(2), global_pair(2)
+        integer(int32) :: ierr
+#endif
+
+        span = 0.0d0
+        if (.not. allocated(q)) return
+        if (size(q) == 0) return
+
+        hi = maxval(q)
+        lo = minval(q)
+#ifdef _MPI
+        local_pair = [hi, -lo]
+        call MPI_Allreduce(local_pair, global_pair, 2, MPI_REAL8, MPI_MAX, MPI_COMM_WORLD, ierr)
+        hi = global_pair(1)
+        lo = -global_pair(2)
+#endif
+        span = max(0.0d0, hi - lo)
+    end function conserved_span
+
     !> Delegates to convergence_control:local_error_block, the SAME formula
     !> and SAME cached per-node scales (nodal_volume, dH/dT or d rho_eq/dp,
     !> the primary-variable snapshot, the ATS tolerances) the conserved
@@ -2015,11 +2058,12 @@ contains
             if (.not. dq_ok) verdict = trim(verdict)//' dq'
         end if
 
-        write (*, '(A,I3,8(A,ES10.2),2A)') '   [NL] it', iter_nl, &
+        write (*, '(A,I3,9(A,ES10.2),2A)') '   [NL] it', iter_nl, &
             ' locT', loc_thermal, ' locH', loc_hydraulic, &
             ' balT', bal_thermal, ' balH', bal_hydraulic, &
             ' dQ', dq_effective, &
             ' duT', self%last_du_thermal_max, ' dup', self%last_du_hydraulic_max, &
+            ' ls', self%last_line_search_scale, &
             ' om', self%control%get_conserved_relaxation(), &
             '  ', trim(verdict)
     end subroutine report_nonlinear_iterate

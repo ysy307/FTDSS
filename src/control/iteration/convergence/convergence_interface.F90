@@ -181,6 +181,19 @@ module control_iteration_convergence
         !> weight in local_error_block. Refreshed together with dH_dT/drho_dp.
         real(real64), allocatable, private :: u_thermal(:)
         real(real64), allocatable, private :: u_hydraulic(:)
+        !> Nodal snapshot of the conserved quantities themselves, enthalpy
+        !> [J/m3] and water-equivalent mass density [kg/m3]. These, not the
+        !> primary variables, carry the tolerance weight of the local gate:
+        !> see conserved_tolerance for why the primary variables cannot.
+        !> Refreshed together with dH_dT/drho_dp.
+        real(real64), allocatable, private :: q_thermal(:)
+        real(real64), allocatable, private :: q_hydraulic(:)
+        !> Global span max(q)-min(q) of each conserved field. Supplied by the
+        !> caller because it is a cross-rank reduction and this module carries
+        !> no MPI; a rank-local span would weight each rank differently and
+        !> desynchronize the gate.
+        real(real64), private :: q_span_thermal = 0.0d0
+        real(real64), private :: q_span_hydraulic = 0.0d0
         !> ATS error-control tolerances (adaptive_stepping/error_control in
         !> Conditions.json: error_absolute_tolerance_temperature,
         !> error_absolute_tolerance_pressure, error_relative_tolerance). Read
@@ -432,6 +445,8 @@ module control_iteration_convergence
         !> once, at the same call that first builds nodal_volume.
         module subroutine set_residual_scale_convergence_control(self, volume_total, dt, nodal_volume, &
                                                                   dH_dT, drho_dp, u_thermal, u_hydraulic, &
+                                                                  q_thermal, q_hydraulic, &
+                                                                  q_span_thermal, q_span_hydraulic, &
                                                                   atol_temperature_u, atol_pressure_u, rtol_u)
             implicit none
             class(type_convergence_control), intent(inout) :: self
@@ -442,6 +457,10 @@ module control_iteration_convergence
             real(real64), intent(in), optional :: drho_dp(:)
             real(real64), intent(in), optional :: u_thermal(:)
             real(real64), intent(in), optional :: u_hydraulic(:)
+            real(real64), intent(in), optional :: q_thermal(:)
+            real(real64), intent(in), optional :: q_hydraulic(:)
+            real(real64), intent(in), optional :: q_span_thermal
+            real(real64), intent(in), optional :: q_span_hydraulic
             real(real64), intent(in), optional :: atol_temperature_u
             real(real64), intent(in), optional :: atol_pressure_u
             real(real64), intent(in), optional :: rtol_u

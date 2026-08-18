@@ -468,8 +468,8 @@ contains
             ! e_localT >= 0 is the signal that the nodal volume/sensitivity
             ! snapshot was available, i.e. the same data this budget needs.
             if (e_localT >= 0.0d0) then
-                budgetT = integrated_tolerance(self%nodal_volume, self%dH_dT, self%u_thermal, &
-                                               self%atol_temperature_u, self%rtol_u, DH_DT_FLOOR)
+                budgetT = integrated_tolerance(self%nodal_volume, self%q_thermal, &
+                                               self%q_span_thermal, self%atol_enthalpy, self%rtol_u)
             end if
             if (budgetT <= 0.0d0) budgetT = self%atol_enthalpy * self%residual_volume_total
             if (budgetT > 0.0d0) then
@@ -500,8 +500,8 @@ contains
             ! Same integrated-tolerance budget as the thermal block above.
             budgetH = -1.0d0
             if (e_localH >= 0.0d0) then
-                budgetH = integrated_tolerance(self%nodal_volume, self%drho_dp, self%u_hydraulic, &
-                                               self%atol_pressure_u, self%rtol_u, DRHO_DP_FLOOR)
+                budgetH = integrated_tolerance(self%nodal_volume, self%q_hydraulic, &
+                                               self%q_span_hydraulic, self%atol_density, self%rtol_u)
             end if
             if (budgetH <= 0.0d0) budgetH = self%atol_density * self%residual_volume_total
             if (budgetH > 0.0d0) then
@@ -754,6 +754,8 @@ contains
 
     module subroutine set_residual_scale_convergence_control(self, volume_total, dt, nodal_volume, &
                                                               dH_dT, drho_dp, u_thermal, u_hydraulic, &
+                                                              q_thermal, q_hydraulic, &
+                                                              q_span_thermal, q_span_hydraulic, &
                                                               atol_temperature_u, atol_pressure_u, rtol_u)
         implicit none
         class(type_convergence_control), intent(inout) :: self
@@ -764,6 +766,10 @@ contains
         real(real64), intent(in), optional :: drho_dp(:)
         real(real64), intent(in), optional :: u_thermal(:)
         real(real64), intent(in), optional :: u_hydraulic(:)
+        real(real64), intent(in), optional :: q_thermal(:)
+        real(real64), intent(in), optional :: q_hydraulic(:)
+        real(real64), intent(in), optional :: q_span_thermal
+        real(real64), intent(in), optional :: q_span_hydraulic
         real(real64), intent(in), optional :: atol_temperature_u
         real(real64), intent(in), optional :: atol_pressure_u
         real(real64), intent(in), optional :: rtol_u
@@ -777,6 +783,10 @@ contains
         if (present(drho_dp)) call allocate_array(self%drho_dp, drho_dp)
         if (present(u_thermal)) call allocate_array(self%u_thermal, u_thermal)
         if (present(u_hydraulic)) call allocate_array(self%u_hydraulic, u_hydraulic)
+        if (present(q_thermal)) call allocate_array(self%q_thermal, q_thermal)
+        if (present(q_hydraulic)) call allocate_array(self%q_hydraulic, q_hydraulic)
+        if (present(q_span_thermal)) self%q_span_thermal = max(0.0d0, q_span_thermal)
+        if (present(q_span_hydraulic)) self%q_span_hydraulic = max(0.0d0, q_span_hydraulic)
         if (present(atol_temperature_u)) self%atol_temperature_u = atol_temperature_u
         if (present(atol_pressure_u)) self%atol_pressure_u = atol_pressure_u
         if (present(rtol_u)) self%rtol_u = rtol_u
@@ -863,15 +873,17 @@ contains
         if (size(self%nodal_volume) /= n) return
 
         if (physics_type%ID == PHYSICS_TYPES%THERMAL%ID) then
-            if (.not. allocated(self%dH_dT) .or. .not. allocated(self%u_thermal)) return
-            if (size(self%dH_dT) /= n .or. size(self%u_thermal) /= n) return
-            e_local = local_error_wrms(residual, self%nodal_volume, self%dH_dT, self%u_thermal, &
-                                       self%atol_temperature_u, self%rtol_u, DH_DT_FLOOR, self%residual_dt)
+            if (.not. allocated(self%q_thermal)) return
+            if (size(self%q_thermal) /= n) return
+            e_local = local_error_wrms(residual, self%nodal_volume, self%q_thermal, &
+                                       self%q_span_thermal, self%atol_enthalpy, self%rtol_u, &
+                                       self%residual_dt)
         else if (physics_type%ID == PHYSICS_TYPES%HYDRAULIC%ID) then
-            if (.not. allocated(self%drho_dp) .or. .not. allocated(self%u_hydraulic)) return
-            if (size(self%drho_dp) /= n .or. size(self%u_hydraulic) /= n) return
-            e_local = local_error_wrms(residual, self%nodal_volume, self%drho_dp, self%u_hydraulic, &
-                                       self%atol_pressure_u, self%rtol_u, DRHO_DP_FLOOR, self%residual_dt)
+            if (.not. allocated(self%q_hydraulic)) return
+            if (size(self%q_hydraulic) /= n) return
+            e_local = local_error_wrms(residual, self%nodal_volume, self%q_hydraulic, &
+                                       self%q_span_hydraulic, self%atol_density, self%rtol_u, &
+                                       self%residual_dt)
         end if
     end function local_error_block_convergence_control
 
@@ -887,21 +899,18 @@ contains
     !> sensible capacity - two orders of magnitude. Measured: an iterate whose
     !> local error was 0.117 (eight times inside tolerance) was rejected by a
     !> balance gate reading 2.16.
-    pure function integrated_tolerance(volume, sensitivity, u, atol_u, rtol_u, s_floor) result(budget)
+    pure function integrated_tolerance(volume, q, q_span, atol_q, rtol) result(budget)
         implicit none
-        real(real64), intent(in) :: volume(:), sensitivity(:), u(:)
-        real(real64), intent(in) :: atol_u, rtol_u, s_floor
+        real(real64), intent(in) :: volume(:), q(:)
+        real(real64), intent(in) :: q_span, atol_q, rtol
         real(real64) :: budget
 
         integer(int32) :: i, n
-        real(real64) :: s_i, tol_i
 
-        n = min(size(volume), size(sensitivity), size(u))
+        n = min(size(volume), size(q))
         budget = 0.0d0
         do i = 1, n
-            s_i = max(abs(sensitivity(i)), s_floor)
-            tol_i = NONLINEAR_TO_LTE_FACTOR * (atol_u + rtol_u * abs(u(i)))
-            budget = budget + volume(i) * s_i * tol_i
+            budget = budget + volume(i) * conserved_weight(q(i), q_span, atol_q, rtol)
         end do
     end function integrated_tolerance
 
@@ -915,8 +924,8 @@ contains
         real(real64), intent(in), optional :: theta_w(:), theta_i(:), porosity(:)
 
         integer(int32), parameter :: TOP_N = 10
-        real(real64), allocatable :: e_node(:), sens(:), u(:)
-        real(real64) :: atol_u, s_floor, s_i, tol_i, denom, total, part
+        real(real64), allocatable :: e_node(:), sens(:), q(:)
+        real(real64) :: atol_q, q_span, denom, total, part
         integer(int32) :: i, n, k, worst
         integer(int32) :: top_id(TOP_N)
 
@@ -926,26 +935,24 @@ contains
         if (size(self%nodal_volume) /= n) return
 
         if (physics_type%ID == PHYSICS_TYPES%THERMAL%ID) then
-            if (.not. allocated(self%dH_dT) .or. .not. allocated(self%u_thermal)) return
-            if (size(self%dH_dT) /= n .or. size(self%u_thermal) /= n) return
+            if (.not. allocated(self%dH_dT) .or. .not. allocated(self%q_thermal)) return
+            if (size(self%dH_dT) /= n .or. size(self%q_thermal) /= n) return
             allocate (sens, source=self%dH_dT)
-            allocate (u, source=self%u_thermal)
-            atol_u = self%atol_temperature_u
-            s_floor = DH_DT_FLOOR
+            allocate (q, source=self%q_thermal)
+            atol_q = self%atol_enthalpy
+            q_span = self%q_span_thermal
         else
-            if (.not. allocated(self%drho_dp) .or. .not. allocated(self%u_hydraulic)) return
-            if (size(self%drho_dp) /= n .or. size(self%u_hydraulic) /= n) return
+            if (.not. allocated(self%drho_dp) .or. .not. allocated(self%q_hydraulic)) return
+            if (size(self%drho_dp) /= n .or. size(self%q_hydraulic) /= n) return
             allocate (sens, source=self%drho_dp)
-            allocate (u, source=self%u_hydraulic)
-            atol_u = self%atol_pressure_u
-            s_floor = DRHO_DP_FLOOR
+            allocate (q, source=self%q_hydraulic)
+            atol_q = self%atol_density
+            q_span = self%q_span_hydraulic
         end if
 
         allocate (e_node(n), source=0.0d0)
         do i = 1, n
-            s_i = max(abs(sens(i)), s_floor)
-            tol_i = NONLINEAR_TO_LTE_FACTOR * (atol_u + self%rtol_u * abs(u(i)))
-            denom = self%nodal_volume(i) * s_i * tol_i
+            denom = self%nodal_volume(i) * conserved_weight(q(i), q_span, atol_q, self%rtol_u)
             if (denom > 0.0d0) e_node(i) = abs(residual(i) * self%residual_dt / denom)
         end do
 
@@ -978,7 +985,7 @@ contains
             if (i < 1) cycle
             write (*, '(A,I6,A,ES11.3,A,ES11.3,A,ES11.3,A,ES11.3,A,ES11.3)') &
                 '      node=', i, ' e=', e_node(i), ' R=', residual(i), &
-                ' V=', self%nodal_volume(i), ' s=', sens(i), ' u=', u(i)
+                ' V=', self%nodal_volume(i), ' s=', sens(i), ' q=', q(i)
             if (present(theta_w) .and. present(theta_i) .and. present(porosity)) then
                 if (size(theta_w) >= i .and. size(theta_i) >= i .and. size(porosity) >= i) then
                     write (*, '(A,ES11.3,A,ES11.3,A,ES11.3,A,F7.4)') &
@@ -990,25 +997,51 @@ contains
         end do
     end subroutine report_local_error_nodes_convergence_control
 
-    !> Primary-variable-unit local error measure shared by the thermal and
-    !> hydraulic blocks: e_i = (R_i*dt/V_i) / (s_i*tau_i), tau_i =
-    !> NONLINEAR_TO_LTE_FACTOR*(atol_u+rtol_u*|u_i|). See local_error_block
-    !> for the full derivation; s_i is floored at s_floor away from zero.
-    pure function local_error_wrms(residual, volume, sensitivity, u, atol_u, rtol_u, s_floor, dt) result(e_local)
+    !> Per-node tolerance on a conserved quantity, in that quantity's own units.
+    !>
+    !> \[ w_i = f\,\bigl(atol_q + rtol\,\max(|q_i|,\ q_{span})\bigr) \]
+    !>
+    !> Flooring the relative part at the field's own span is what makes the
+    !> criterion uniform across the domain. A purely relative tolerance is
+    !> meaningless for a quantity whose zero is not a natural zero, and the
+    !> conserved quantities inherit that origin from their primary variables:
+    !> Celsius temperature has its zero AT the phase-change point, so rtol|q|
+    !> collapses exactly at the freezing front and a few front nodes then
+    !> dominate the norm. physics_lte (ftcms_base) floors identically, so the
+    !> nonlinear gate and the time-error estimator now weight the same way.
+    pure function conserved_weight(q, q_span, atol_q, rtol) result(w)
         implicit none
-        real(real64), intent(in) :: residual(:), volume(:), sensitivity(:), u(:)
-        real(real64), intent(in) :: atol_u, rtol_u, s_floor, dt
+        real(real64), intent(in) :: q, q_span, atol_q, rtol
+        real(real64) :: w
+
+        w = NONLINEAR_TO_LTE_FACTOR * (atol_q + rtol * max(abs(q), q_span))
+    end function conserved_weight
+
+    !> Conserved-unit local error measure shared by the thermal and hydraulic
+    !> blocks: e_i = (R_i*dt/V_i) / w_i, with w_i from conserved_weight.
+    !>
+    !> The residual is an imbalance in the conserved quantity, so it is scored
+    !> in that quantity. Converting it to primary-variable units by dividing by
+    !> the storage sensitivity (dH/dT, drho/dp) scores it in a currency the
+    !> node may not be able to pay in: at a pore-volume-limited node the split
+    !> is fixed by the constraint, dH/dT falls back to sensible, and the same
+    !> imbalance is then reported as a large temperature error even though the
+    !> node balances it through pressure instead. Measured at the wall: node
+    !> 150 needed 0.178 K (326x its temperature tolerance) or 198 Pa, and the
+    !> gate read only the first.
+    pure function local_error_wrms(residual, volume, q, q_span, atol_q, rtol, dt) result(e_local)
+        implicit none
+        real(real64), intent(in) :: residual(:), volume(:), q(:)
+        real(real64), intent(in) :: q_span, atol_q, rtol, dt
         real(real64) :: e_local
 
         integer(int32) :: i, n
-        real(real64) :: s_i, tol_i, denom, acc
+        real(real64) :: denom, acc
 
-        n = min(size(residual), size(volume), size(sensitivity), size(u))
+        n = min(size(residual), size(volume), size(q))
         acc = 0.0d0
         do i = 1, n
-            s_i = max(abs(sensitivity(i)), s_floor)
-            tol_i = NONLINEAR_TO_LTE_FACTOR * (atol_u + rtol_u * abs(u(i)))
-            denom = volume(i) * s_i * tol_i
+            denom = volume(i) * conserved_weight(q(i), q_span, atol_q, rtol)
             if (denom > 0.0d0) acc = acc + (residual(i) * dt / denom)**2
         end do
 
