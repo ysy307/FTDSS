@@ -73,6 +73,7 @@ contains
         integer(int32), parameter :: num_nodes = 3
         integer(int32), parameter :: num_fe = 2
         integer(int32) :: num_dofs_of_physics(PHYSICS_TYPES%NUM_ID)
+        integer(int32) :: start_dof_index(PHYSICS_TYPES%NUM_ID)
         integer(int32) :: adj_row(num_nodes + 1)
         integer(int32) :: adj_col(7)
         integer(int32) :: conn_ptr(num_fe + 1)
@@ -88,14 +89,19 @@ contains
         conn_idx = [1, 2, 2, 3]
 
         num_dofs_of_physics = 0
+        start_dof_index = 0
         num_dofs_of_physics(PHYSICS_TYPES%THERMAL%ID) = 1
-        if (num_active_physics >= 2) num_dofs_of_physics(PHYSICS_TYPES%HYDRAULIC%ID) = 1
+        start_dof_index(PHYSICS_TYPES%THERMAL%ID) = 1
+        if (num_active_physics >= 2) then
+            num_dofs_of_physics(PHYSICS_TYPES%HYDRAULIC%ID) = 1
+            start_dof_index(PHYSICS_TYPES%HYDRAULIC%ID) = 2
+        end if
 
         num_dof_per_node = sum(num_dofs_of_physics)
         total_dofs = num_nodes * num_dof_per_node
 
         call topology%initialize(num_nodes, total_dofs, num_dof_per_node, &
-                                 num_dofs_of_physics, adj_row, adj_col, &
+                                 num_dofs_of_physics, start_dof_index, adj_row, adj_col, &
                                  num_fe, conn_ptr, conn_idx)
     end subroutine build_fixture_topology
 

@@ -1,0 +1,109 @@
+{
+  "description": "Mizoguchi freezing-column reference. Regression baseline for the THV reformulation stages.",
+  "source_run": "project/Mizo-xz-Convex/Output_archive_20260818_qgate_theta0330",
+  "source_note": "50 h complete run at the initial condition the repository's Input/Conditions.json actually carries (uniform pressure -54065.7412 Pa, theta=0.330). The ic345 archive (theta=0.345) is a DIFFERENT initial condition and must not be used as the baseline unless Conditions.json is changed to match. Regenerate with: python3 scripts/validation/Mizo_theta.py --vtu_dir <dir>/Files --time <h> --json_output <file>",
+  "times": {
+    "12h": {
+      "time_hours": 12,
+      "profile_metrics": {
+        "rmse": 0.0231180160382513,
+        "mae": 0.018851500428551115,
+        "bias": -0.008593000215225721,
+        "max_abs_error": 0.06068873723316176
+      },
+      "skill_vs_no_redistribution": 0.7053382960469499,
+      "redistribution": {
+        "upper_0_005m_gain_m": 0.0023729600916866855,
+        "lower_005_012m_change_m": -0.0016548051691090704,
+        "column_0_020m_change_m": 0.0001366981803227102,
+        "experimental_upper_0_005m_gain_m": 0.0025000000000000014,
+        "experimental_lower_005_012m_change_m": -0.0030499999999999985,
+        "experimental_column_0_020m_change_m": -0.0014499999999999936,
+        "upper_gain_fraction_of_experiment": 0.9491840366746737
+      },
+      "zero_crossing": {
+        "simulated_m": 0.03976265603430143,
+        "experimental_m": 0.045000000000000005,
+        "difference_m": -0.005237343965698575
+      },
+      "solver": {
+        "attempts": 320,
+        "accepted_steps": 302,
+        "rejected_steps": 18,
+        "nonlinear_rejections": 13,
+        "lte_rejections": 5,
+        "nonlinear_rejection_fraction": 0.040625,
+        "final_accepted_time_s": 180000.0,
+        "max_accepted_lte": 0.98535
+      }
+    },
+    "24h": {
+      "time_hours": 24,
+      "profile_metrics": {
+        "rmse": 0.02468658894230391,
+        "mae": 0.01837674480905786,
+        "bias": -0.005233391002289534,
+        "max_abs_error": 0.07341477197172491
+      },
+      "skill_vs_no_redistribution": 0.6925963815352931,
+      "redistribution": {
+        "upper_0_005m_gain_m": 0.003240694581091167,
+        "lower_005_012m_change_m": -0.0012305816347210601,
+        "column_0_020m_change_m": 0.00015862002290994716,
+        "experimental_upper_0_005m_gain_m": 0.002450000000000002,
+        "experimental_lower_005_012m_change_m": -0.0022999999999999987,
+        "experimental_column_0_020m_change_m": -0.0020999999999999942,
+        "upper_gain_fraction_of_experiment": 1.3227324820780262
+      },
+      "zero_crossing": {
+        "simulated_m": 0.06998417716104985,
+        "experimental_m": 0.065,
+        "difference_m": 0.004984177161049846
+      },
+      "solver": {
+        "attempts": 320,
+        "accepted_steps": 302,
+        "rejected_steps": 18,
+        "nonlinear_rejections": 13,
+        "lte_rejections": 5,
+        "nonlinear_rejection_fraction": 0.040625,
+        "final_accepted_time_s": 180000.0,
+        "max_accepted_lte": 0.98535
+      }
+    },
+    "50h": {
+      "time_hours": 50,
+      "profile_metrics": {
+        "rmse": 0.02105625938382706,
+        "mae": 0.01697426381054565,
+        "bias": -0.009116071418150271,
+        "max_abs_error": 0.03836705369320803
+      },
+      "skill_vs_no_redistribution": 0.8758947349925807,
+      "redistribution": {
+        "upper_0_005m_gain_m": 0.00323821542954287,
+        "lower_005_012m_change_m": 0.0013028292999239023,
+        "column_0_020m_change_m": 0.0001820839397377999,
+        "experimental_upper_0_005m_gain_m": 0.0028500000000000014,
+        "experimental_lower_005_012m_change_m": 0.0018000000000000017,
+        "experimental_column_0_020m_change_m": -0.0012999999999999939,
+        "upper_gain_fraction_of_experiment": 1.1362159401904801
+      },
+      "zero_crossing": {
+        "simulated_m": 0.11421938296891809,
+        "experimental_m": 0.10625,
+        "difference_m": 0.007969382968918096
+      },
+      "solver": {
+        "attempts": 320,
+        "accepted_steps": 302,
+        "rejected_steps": 18,
+        "nonlinear_rejections": 13,
+        "lte_rejections": 5,
+        "nonlinear_rejection_fraction": 0.040625,
+        "final_accepted_time_s": 180000.0,
+        "max_accepted_lte": 0.98535
+      }
+    }
+  }
+}

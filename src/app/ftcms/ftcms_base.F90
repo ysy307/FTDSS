@@ -1838,7 +1838,7 @@ contains
         integer(int32) :: i_patch, num_patches, i_bc_node, bc_idx, comp_dim, i_coord, j_coord
         type(type_boundary_patch), pointer :: bc_patch
         real(real64) :: dt_local, C_eq_val, hydraulic_diffusivity, element_length, fourier_number, S_seg
-        real(real64), allocatable :: D_HH_matrix(:, :), element_coords(:, :)
+        real(real64), allocatable :: D_HH_matrix(:, :), D_HH_gas_matrix(:, :), element_coords(:, :)
         integer(int32) :: local_eq_candidates, local_eq_fires
         real(real64) :: local_eq_fo_min
 
@@ -1894,7 +1894,7 @@ contains
         !$OMP         weight_sum, current_ice, node_equilibrium_error, active_bound, node_active_bound, &
         !$OMP         target_total_water, local_pressure, local_ice, target_available, local_converged, use_local_eq, &
         !$OMP         C_eq_val, hydraulic_diffusivity, element_length, fourier_number, S_seg, &
-        !$OMP         D_HH_matrix, element_coords, i_coord, j_coord) &
+        !$OMP         D_HH_matrix, D_HH_gas_matrix, element_coords, i_coord, j_coord) &
         !$OMP REDUCTION(+:local_eq_candidates, local_eq_fires) REDUCTION(min:local_eq_fo_min)
         tid = omp_get_thread_num() + 1
         !$OMP DO
@@ -1942,12 +1942,18 @@ contains
                     ! deliberately anisotropic mesh.
                     if (.not. allocated(D_HH_matrix)) then
                         allocate (D_HH_matrix(comp_dim, comp_dim))
+                        allocate (D_HH_gas_matrix(comp_dim, comp_dim))
                     else if (size(D_HH_matrix, 1) /= comp_dim) then
-                        deallocate (D_HH_matrix)
+                        deallocate (D_HH_matrix, D_HH_gas_matrix)
                         allocate (D_HH_matrix(comp_dim, comp_dim))
+                        allocate (D_HH_gas_matrix(comp_dim, comp_dim))
                     end if
                     call self%hydraulic%compute_diffusion_term(self%node_material_table%material_id(k), &
                                                                 states(tid), D_HH_matrix)
+                    call self%hydraulic%compute_diffusion_term_gas(self%node_material_table%material_id(k), &
+                                                                   states(tid), D_HH_gas_matrix)
+                    ! The Fourier gate judges the total hydraulic relaxation.
+                    D_HH_matrix(:, :) = D_HH_matrix(:, :) + D_HH_gas_matrix(:, :)
                     call self%hydraulic%compute_C_eq(self%node_material_table%material_id(k), states(tid), C_eq_val)
                     call self%domain%get_fe_coordinate(repr_elem, element_coords)
                     element_length = huge(1.0d0)

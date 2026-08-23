@@ -153,16 +153,20 @@ contains
         ! Staged columns: not written into K_TT/K_TH/K_HT/K_HH until every
         ! column has proven finite, so a failed element keeps its analytic
         ! blocks (the sanity-guarded fallback selected in ftcms_assemble.F90).
-        real(real64) :: stage_TT(workspace%num_fe_nodes, workspace%num_fe_nodes)
-        real(real64) :: stage_TH(workspace%num_fe_nodes, workspace%num_fe_nodes)
-        real(real64) :: stage_HT(workspace%num_fe_nodes, workspace%num_fe_nodes)
-        real(real64) :: stage_HH(workspace%num_fe_nodes, workspace%num_fe_nodes)
+        ! stage(:, b, row_physics, col_physics): perturbing physics c fills
+        ! column c of every row's block.
+        real(real64) :: stage(workspace%num_fe_nodes, workspace%num_fe_nodes, &
+                              PHYSICS_TYPES%NUM_ID, PHYSICS_TYPES%NUM_ID)
         ! For a forward difference "minus" holds the base evaluation.
-        real(real64) :: plus_T(workspace%num_fe_nodes), plus_H(workspace%num_fe_nodes)
-        real(real64) :: minus_T(workspace%num_fe_nodes), minus_H(workspace%num_fe_nodes)
+        real(real64) :: plus(workspace%num_fe_nodes, PHYSICS_TYPES%NUM_ID)
+        real(real64) :: minus(workspace%num_fe_nodes, PHYSICS_TYPES%NUM_ID)
         real(real64), pointer :: residual_T(:), residual_H(:), values(:, :)
-        integer(int32) :: b, i, n_nodes
-        real(real64) :: base_temperature, base_pressure, delta, denominator
+        integer(int32) :: b, i, n_nodes, c_phys, r_phys
+        integer(int32), parameter :: ID_THERMAL = PHYSICS_TYPES%THERMAL%ID
+        integer(int32), parameter :: ID_HYDRAULIC = PHYSICS_TYPES%HYDRAULIC%ID
+        !> Physics perturbed by this routine, in column order
+        integer(int32), parameter :: FD_COLUMNS(2) = [ID_THERMAL, ID_HYDRAULIC]
+        real(real64) :: base_value, delta, denominator
 
         n_nodes = workspace%num_fe_nodes
 
@@ -179,99 +183,55 @@ contains
 
         ok = .true.
 
-        ! Temperature perturbations: K_TT(:,b) and K_HT(:,b) share one
-        ! evaluation of both residuals.
-        do b = 1, n_nodes
-            call workspace%state(b)%temperature%get(base_temperature)
-            delta = FD_RELATIVE * max(abs(base_temperature), FD_FLOOR_TEMPERATURE)
+        ! Perturbing physics c fills column c of every row block, so one pair of
+        ! residual evaluations serves every row.
+        do c_phys = 1, size(FD_COLUMNS)
+            do b = 1, n_nodes
+                call get_state_value(workspace%state(b), FD_COLUMNS(c_phys), base_value)
+                delta = FD_RELATIVE * max(abs(base_value), fd_floor(FD_COLUMNS(c_phys)))
 
-            call set_and_refresh(self, workspace, b, PHYSICS_TYPES%THERMAL%ID, base_temperature + delta)
+                call set_and_refresh(self, workspace, b, FD_COLUMNS(c_phys), base_value + delta)
 
-            call local_F_T%zero()
-            call local_F_H%zero()
-            call self%thermal%assemble_local(control=self%control, workspace=workspace, F_T=local_F_T)
-            call self%hydraulic%assemble_local(control=self%control, workspace=workspace, F_H=local_F_H)
-
-            residual_T => local_F_T%get_data()
-            residual_H => local_F_H%get_data()
-            plus_T(1:n_nodes) = residual_T(1:n_nodes)
-            plus_H(1:n_nodes) = residual_H(1:n_nodes)
-            nullify (residual_T, residual_H)
-
-            if (FD_CENTRAL_TANGENT) then
-                call set_and_refresh(self, workspace, b, PHYSICS_TYPES%THERMAL%ID, base_temperature - delta)
                 call local_F_T%zero()
                 call local_F_H%zero()
                 call self%thermal%assemble_local(control=self%control, workspace=workspace, F_T=local_F_T)
                 call self%hydraulic%assemble_local(control=self%control, workspace=workspace, F_H=local_F_H)
+
                 residual_T => local_F_T%get_data()
                 residual_H => local_F_H%get_data()
-                minus_T(1:n_nodes) = residual_T(1:n_nodes)
-                minus_H(1:n_nodes) = residual_H(1:n_nodes)
+                plus(1:n_nodes, ID_THERMAL) = residual_T(1:n_nodes)
+                plus(1:n_nodes, ID_HYDRAULIC) = residual_H(1:n_nodes)
                 nullify (residual_T, residual_H)
-                denominator = 2.0d0 * delta
-            else
-                minus_T(1:n_nodes) = base_residual_T(1:n_nodes)
-                minus_H(1:n_nodes) = base_residual_H(1:n_nodes)
-                denominator = delta
-            end if
 
-            ! The assembled vector is F = -R, so the residual tangent is -dF/dT.
-            do i = 1, n_nodes
-                stage_TT(i, b) = -(plus_T(i) - minus_T(i)) / denominator
-                stage_HT(i, b) = -(plus_H(i) - minus_H(i)) / denominator
+                if (FD_CENTRAL_TANGENT) then
+                    call set_and_refresh(self, workspace, b, FD_COLUMNS(c_phys), base_value - delta)
+                    call local_F_T%zero()
+                    call local_F_H%zero()
+                    call self%thermal%assemble_local(control=self%control, workspace=workspace, F_T=local_F_T)
+                    call self%hydraulic%assemble_local(control=self%control, workspace=workspace, F_H=local_F_H)
+                    residual_T => local_F_T%get_data()
+                    residual_H => local_F_H%get_data()
+                    minus(1:n_nodes, ID_THERMAL) = residual_T(1:n_nodes)
+                    minus(1:n_nodes, ID_HYDRAULIC) = residual_H(1:n_nodes)
+                    nullify (residual_T, residual_H)
+                    denominator = 2.0d0 * delta
+                else
+                    minus(1:n_nodes, ID_THERMAL) = base_residual_T(1:n_nodes)
+                    minus(1:n_nodes, ID_HYDRAULIC) = base_residual_H(1:n_nodes)
+                    denominator = delta
+                end if
+
+                ! The assembled vector is F = -R, so the residual tangent is -dF/du.
+                do r_phys = 1, size(FD_COLUMNS)
+                    do i = 1, n_nodes
+                        stage(i, b, FD_COLUMNS(r_phys), FD_COLUMNS(c_phys)) = &
+                            -(plus(i, FD_COLUMNS(r_phys)) - minus(i, FD_COLUMNS(r_phys))) / denominator
+                    end do
+                    if (any(.not. ieee_is_finite(stage(1:n_nodes, b, FD_COLUMNS(r_phys), FD_COLUMNS(c_phys))))) ok = .false.
+                end do
+
+                call set_state_value(workspace%state(b), FD_COLUMNS(c_phys), base_value)
             end do
-            if (any(.not. ieee_is_finite(stage_TT(1:n_nodes, b))) .or. &
-                any(.not. ieee_is_finite(stage_HT(1:n_nodes, b)))) ok = .false.
-
-            call workspace%state(b)%temperature%set(base_temperature)
-        end do
-
-        ! Pressure perturbations: K_TH(:,b) and K_HH(:,b) share the other
-        ! evaluation of both residuals.
-        do b = 1, n_nodes
-            call workspace%state(b)%pressure%get(base_pressure)
-            delta = FD_RELATIVE * max(abs(base_pressure), FD_FLOOR_PRESSURE)
-
-            call set_and_refresh(self, workspace, b, PHYSICS_TYPES%HYDRAULIC%ID, base_pressure + delta)
-
-            call local_F_T%zero()
-            call local_F_H%zero()
-            call self%thermal%assemble_local(control=self%control, workspace=workspace, F_T=local_F_T)
-            call self%hydraulic%assemble_local(control=self%control, workspace=workspace, F_H=local_F_H)
-
-            residual_T => local_F_T%get_data()
-            residual_H => local_F_H%get_data()
-            plus_T(1:n_nodes) = residual_T(1:n_nodes)
-            plus_H(1:n_nodes) = residual_H(1:n_nodes)
-            nullify (residual_T, residual_H)
-
-            if (FD_CENTRAL_TANGENT) then
-                call set_and_refresh(self, workspace, b, PHYSICS_TYPES%HYDRAULIC%ID, base_pressure - delta)
-                call local_F_T%zero()
-                call local_F_H%zero()
-                call self%thermal%assemble_local(control=self%control, workspace=workspace, F_T=local_F_T)
-                call self%hydraulic%assemble_local(control=self%control, workspace=workspace, F_H=local_F_H)
-                residual_T => local_F_T%get_data()
-                residual_H => local_F_H%get_data()
-                minus_T(1:n_nodes) = residual_T(1:n_nodes)
-                minus_H(1:n_nodes) = residual_H(1:n_nodes)
-                nullify (residual_T, residual_H)
-                denominator = 2.0d0 * delta
-            else
-                minus_T(1:n_nodes) = base_residual_T(1:n_nodes)
-                minus_H(1:n_nodes) = base_residual_H(1:n_nodes)
-                denominator = delta
-            end if
-
-            do i = 1, n_nodes
-                stage_TH(i, b) = -(plus_T(i) - minus_T(i)) / denominator
-                stage_HH(i, b) = -(plus_H(i) - minus_H(i)) / denominator
-            end do
-            if (any(.not. ieee_is_finite(stage_TH(1:n_nodes, b))) .or. &
-                any(.not. ieee_is_finite(stage_HH(1:n_nodes, b)))) ok = .false.
-
-            call workspace%state(b)%pressure%set(base_pressure)
         end do
 
         ! Put the workspace back on the unperturbed state and hand the caller
@@ -297,18 +257,66 @@ contains
 
         nullify (values)
         values => K_TT%get_val()
-        values(1:n_nodes, 1:n_nodes) = stage_TT(1:n_nodes, 1:n_nodes)
+        values(1:n_nodes, 1:n_nodes) = stage(1:n_nodes, 1:n_nodes, ID_THERMAL, ID_THERMAL)
         nullify (values)
         values => K_TH%get_val()
-        values(1:n_nodes, 1:n_nodes) = stage_TH(1:n_nodes, 1:n_nodes)
+        values(1:n_nodes, 1:n_nodes) = stage(1:n_nodes, 1:n_nodes, ID_THERMAL, ID_HYDRAULIC)
         nullify (values)
         values => K_HT%get_val()
-        values(1:n_nodes, 1:n_nodes) = stage_HT(1:n_nodes, 1:n_nodes)
+        values(1:n_nodes, 1:n_nodes) = stage(1:n_nodes, 1:n_nodes, ID_HYDRAULIC, ID_THERMAL)
         nullify (values)
         values => K_HH%get_val()
-        values(1:n_nodes, 1:n_nodes) = stage_HH(1:n_nodes, 1:n_nodes)
+        values(1:n_nodes, 1:n_nodes) = stage(1:n_nodes, 1:n_nodes, ID_HYDRAULIC, ID_HYDRAULIC)
         nullify (values)
     end subroutine assemble_tangent_fd_ftcms
+
+    !> Absolute perturbation floor for a primary variable passing through zero.
+    pure function fd_floor(physics_id) result(floor_value)
+        implicit none
+        integer(int32), intent(in) :: physics_id
+        real(real64) :: floor_value
+
+        select case (physics_id)
+        case (PHYSICS_TYPES%THERMAL%ID)
+            floor_value = FD_FLOOR_TEMPERATURE
+        case (PHYSICS_TYPES%HYDRAULIC%ID)
+            floor_value = FD_FLOOR_PRESSURE
+        case default
+            floor_value = 1.0d0
+        end select
+    end function fd_floor
+
+    subroutine get_state_value(state, physics_id, value)
+        implicit none
+        type(type_state), intent(in) :: state
+        integer(int32), intent(in) :: physics_id
+        real(real64), intent(inout) :: value
+
+        select case (physics_id)
+        case (PHYSICS_TYPES%THERMAL%ID)
+            call state%temperature%get(value)
+        case (PHYSICS_TYPES%HYDRAULIC%ID)
+            call state%pressure%get(value)
+        case default
+            error stop 'get_state_value: no primary variable for this physics id'
+        end select
+    end subroutine get_state_value
+
+    subroutine set_state_value(state, physics_id, value)
+        implicit none
+        type(type_state), intent(inout) :: state
+        integer(int32), intent(in) :: physics_id
+        real(real64), intent(in) :: value
+
+        select case (physics_id)
+        case (PHYSICS_TYPES%THERMAL%ID)
+            call state%temperature%set(value)
+        case (PHYSICS_TYPES%HYDRAULIC%ID)
+            call state%pressure%set(value)
+        case default
+            error stop 'set_state_value: no primary variable for this physics id'
+        end select
+    end subroutine set_state_value
 
     !> Re-derive what the element thermal residual reads after a nodal primary
     !> variable changed.
@@ -599,11 +607,7 @@ contains
         integer(int32), intent(in) :: b, physics_id
         real(real64), intent(in) :: value
 
-        if (physics_id == PHYSICS_TYPES%THERMAL%ID) then
-            call workspace%state(b)%temperature%set(value)
-        else
-            call workspace%state(b)%pressure%set(value)
-        end if
+        call set_state_value(workspace%state(b), physics_id, value)
 
         call self%update_physical_properties_bulk(workspace%material_id, workspace%state)
         call workspace%lerp()

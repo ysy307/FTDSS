@@ -88,13 +88,6 @@ contains
         self%enable_vapor_transport = input%basic%analysis_controls%enable_vapor_transport
         self%enable_fringe_subcell_quadrature = input%basic%analysis_controls%enable_fringe_subcell_quadrature
 
-        ! D_HH sums the liquid and vapour conductivities, so the two cannot
-        ! be driven by different pressures until that sum is split.
-        if (HYDRAULIC_DRIVER_TOTAL_POTENTIAL .and. self%enable_vapor_transport) then
-            error stop 'type_hydraulic: HYDRAULIC_DRIVER_TOTAL_POTENTIAL requires enable_vapor_transport=false '// &
-                'until D_HH separates the liquid and vapour conductivities.'
-        end if
-
     end subroutine initialize_type_hydraulic
 
     module pure function is_vapor_transport_enabled_hydraulic(self) result(enabled)

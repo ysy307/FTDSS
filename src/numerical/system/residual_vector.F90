@@ -27,6 +27,9 @@ module numerical_system_residual_vector
         !> physics i -> system index (0 if inactive)
         integer(int32) :: physics_to_system(PHYSICS_TYPES%NUM_ID) = 0
 
+        !> physics i -> block coordinate inside a monolithic node block (0 if inactive)
+        integer(int32) :: physics_to_block(PHYSICS_TYPES%NUM_ID) = 0
+
         !> per system total dofs
         integer(int32), allocatable :: system_size(:)
     contains
@@ -76,10 +79,15 @@ contains
 
         self%coupling_mode = coupling_mode
         self%physics_to_system(:) = 0
+        self%physics_to_block(:) = 0
         self%num_dofs_of_physics(:) = 0
 
         call topology%get_total_dofs(self%size)
         call topology%get_num_nodes(self%num_nodes)
+
+        do i = 1, PHYSICS_TYPES%NUM_ID
+            call topology%get_start_dof_index(PHYSICS_TYPES%to_object(i), self%physics_to_block(i))
+        end do
 
         select case (coupling_mode%ID)
         case (COUPLING_MODES%MONOLITHIC%ID)
@@ -200,7 +208,12 @@ contains
 
         select case (self%coupling_mode%ID)
         case (COUPLING_MODES%MONOLITHIC%ID)
-            row_block = physics_id
+            if (physics_id < 1 .or. physics_id > PHYSICS_TYPES%NUM_ID) then
+                nullify (vec)
+                return
+            end if
+            row_block = self%physics_to_block(physics_id)
+            if (row_block <= 0) nullify (vec)
         case (COUPLING_MODES%STAGGERED%ID)
             row_block = 1
         end select

@@ -585,6 +585,7 @@ contains
 
         integer(int32) :: total_dofs, num_nodes, num_dof_per_node, num_fe
         integer(int32) :: num_dofs_of_physics(PHYSICS_TYPES%NUM_ID)
+        integer(int32) :: start_dof_index(PHYSICS_TYPES%NUM_ID)
         integer(int32), allocatable :: row(:), col(:)
         integer(int32), allocatable :: conn_ptr(:), conn_idx(:)
         integer(int32), pointer, contiguous :: connectivity(:)
@@ -596,6 +597,7 @@ contains
 
         do i = 1, PHYSICS_TYPES%NUM_ID
             call self%get_target_dof(PHYSICS_TYPES%to_object(i), num_dofs_of_physics(i))
+            call self%get_start_dof_index(PHYSICS_TYPES%to_object(i), start_dof_index(i))
         end do
 
         call self%get_node_adjacency(MATRIX_TYPES%CSR, row, col)
@@ -621,7 +623,7 @@ contains
         end do
 
         call topology%initialize(num_nodes, total_dofs, num_dof_per_node, &
-                                 num_dofs_of_physics, row, col, num_fe, conn_ptr, conn_idx)
+                                 num_dofs_of_physics, start_dof_index, row, col, num_fe, conn_ptr, conn_idx)
 
         deallocate (row, col, conn_ptr, conn_idx)
     end subroutine export_topology_domain

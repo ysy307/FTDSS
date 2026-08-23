@@ -11,6 +11,30 @@ submodule(physics_governing_hydraulic) hydraulic_matrix
     real(real64), save :: dbg_phi_max = -huge(1.0d0)
     real(real64), save :: dbg_abs_phi_min = huge(1.0d0)
 
+    !> Report how far the element conductivity can exceed the series-flow value.
+    !>
+    !> The element takes the GEOMETRIC mean of its nodal conductivities (see
+    !> the comment above D_HH_elem). For flow in series through a nearly
+    !> impermeable frozen layer the physical weighting is the HARMONIC mean, so
+    !> geo/har bounds how much the discrete operator can over-conduct across
+    !> the freezing front. Measured from the implementation rather than from a
+    !> re-derivation, because k_r has two branches (closed form only when
+    !> m = 1 - 1/n, incomplete beta otherwise) and the wrong one is 26x off in
+    !> the frozen range.
+    logical, parameter :: KELEM_REPORT = .false.
+    !> Weight the element conductivity with the HARMONIC mean of its nodal
+    !> values instead of the geometric mean. Flow across a freezing front is in
+    !> series through a nearly impermeable layer, for which the harmonic mean
+    !> is the physical weighting; measured, the geometric mean the element uses
+    !> exceeds it by a factor 4 to 14 at the front. Kept behind a switch
+    !> because the geometric mean is the standard internodal weight for an
+    !> exponentially varying coefficient away from such an interface.
+    logical, parameter :: ELEMENT_CONDUCTIVITY_HARMONIC = .false.
+    !> Only elements whose nodal conductivities span at least this factor.
+    real(real64), parameter :: KELEM_REPORT_MIN_CONTRAST = 1.0d1
+    integer(int32), parameter :: KELEM_REPORT_LIMIT = 40
+    integer(int32), save :: kelem_report_count = 0
+
 contains
 
     !> @brief Assemble local matrix and vector (Picard only)
@@ -76,6 +100,7 @@ contains
         real(real64) :: V_sub(workspace%num_fe_dimension)
         real(real64) :: vec_V_sub(workspace%num_fe_nodes)
         real(real64) :: coeff_sub_mat(workspace%num_fe_dimension, workspace%num_fe_dimension)
+        real(real64) :: coeff_gas_mat(workspace%num_fe_dimension, workspace%num_fe_dimension)
         real(real64) :: mat_HH_sub(workspace%num_fe_nodes, workspace%num_fe_nodes)
         real(real64) :: mat_HT_sub(workspace%num_fe_nodes, workspace%num_fe_nodes)
         real(real64) :: dpsi_dx_sub(workspace%num_fe_dimension, workspace%num_fe_nodes)
@@ -107,8 +132,16 @@ contains
         real(real64) :: D_HT_tmp(workspace%num_fe_dimension, workspace%num_fe_dimension)
         ! Nodal transport coefficients and the element values formed from them.
         real(real64) :: D_HH_node(workspace%num_fe_nodes), D_HT_node(workspace%num_fe_nodes)
+        real(real64) :: D_HH_gas_node(workspace%num_fe_nodes)
         real(real64) :: V_node_mag(workspace%num_fe_nodes)
-        real(real64) :: D_HH_elem, D_HT_elem, V_elem_mag
+        real(real64) :: D_HH_elem, D_HT_elem, V_elem_mag, D_HH_gas_elem
+        ! Vapour flux operator: same K2 machinery as the liquid, but driven by
+        ! the gas pressure instead of the liquid potential.
+        real(real64) :: work_D_gas(workspace%num_fe_dimension, workspace%num_fe_dimension, workspace%num_fe_gauss)
+        real(real64) :: work_matrix_gas(workspace%num_fe_nodes, workspace%num_fe_nodes)
+        real(real64) :: mat_HH_gas_sub(workspace%num_fe_nodes, workspace%num_fe_nodes)
+        real(real64) :: D_HH_gas_sub
+        logical :: gas_flux_needed
         real(real64) :: V_dir(workspace%num_fe_dimension), V_node_tmp(workspace%num_fe_dimension)
         ! Nodal Darcy driver and its tangents in the two primary unknowns.
         real(real64) :: P_gen_node(workspace%num_fe_nodes), psi_eff_i
@@ -126,6 +159,7 @@ contains
         coupling_mass_needed = present(K_HT) .and. thermal_target
         coupling_flux_needed = (present(F_H) .or. present(K_HT)) .and. thermal_target
         coupling_block_needed = present(K_HT) .and. thermal_target
+        gas_flux_needed = self%enable_vapor_transport
 
         bdf0 = workspace%bdf_coeffs(1)
         dt_local = 0.0d0
@@ -272,6 +306,13 @@ contains
             call self%compute_diffusion_term(workspace%material_id, workspace%state(i), coeff_sub_mat)
             D_HH_node(i) = coeff_sub_mat(1, 1)
 
+            D_HH_gas_node(i) = 0.0d0
+            if (gas_flux_needed) then
+                coeff_gas_mat(:, :) = 0.0d0
+                call self%compute_diffusion_term_gas(workspace%material_id, workspace%state(i), coeff_gas_mat)
+                D_HH_gas_node(i) = coeff_gas_mat(1, 1)
+            end if
+
             D_HT_node(i) = 0.0d0
             if (coupling_flux_needed) then
                 coeff_sub_mat(:, :) = 0.0d0
@@ -289,9 +330,16 @@ contains
             end if
         end do
 
-        D_HH_elem = geometric_mean(D_HH_node(1:n_nodes))
+        if (ELEMENT_CONDUCTIVITY_HARMONIC) then
+            D_HH_elem = harmonic_mean(D_HH_node(1:n_nodes))
+        else
+            D_HH_elem = geometric_mean(D_HH_node(1:n_nodes))
+        end if
+        if (KELEM_REPORT) call report_element_conductivity(D_HH_node(1:n_nodes), D_HH_elem)
         D_HT_elem = signed_geometric_mean(D_HT_node(1:n_nodes))
         V_elem_mag = geometric_mean(V_node_mag(1:n_nodes))
+        D_HH_gas_elem = 0.0d0
+        if (gas_flux_needed) D_HH_gas_elem = geometric_mean(D_HH_gas_node(1:n_nodes))
 
         if (.not. is_cut) then
             do i = 1, n_gauss
@@ -395,12 +443,37 @@ contains
                     end do
                 end do
             end if
+
+            ! Vapour flux is driven by the gas pressure, so its column scale is
+            ! unity and it contributes nothing to K_HT.
+            if (gas_flux_needed) then
+                work_D_gas(:, :, :) = 0.0d0
+                do i = 1, n_gauss
+                    do d = 1, n_dim
+                        work_D_gas(d, d, i) = D_HH_gas_elem
+                    end do
+                end do
+                call workspace%compute_K2(work_D_gas, work_matrix_gas)
+                if (present(K_HH)) then
+                    do j = 1, n_nodes
+                        do i = 1, n_nodes
+                            call K_HH%set(MATRIX_OPS%ADD, i, j, work_matrix_gas(i, j))
+                        end do
+                    end do
+                end if
+                if (present(F_H)) then
+                    workspace%work_vec(:) = 0.0d0
+                    call matvec(work_matrix_gas, workspace%P_node, workspace%work_vec, ierr)
+                    local_vec_res(:) = local_vec_res(:) + workspace%work_vec(:)
+                end if
+            end if
         else
             do i = 1, n_nodes
                 call workspace%state(i)%porosity%get(porosity_nodes(i))
             end do
 
             mat_HH_sub(:, :) = 0.0d0
+            mat_HH_gas_sub(:, :) = 0.0d0
             mat_HT_sub(:, :) = 0.0d0
             vec_V_sub(:) = 0.0d0
             mat_C_sub(:, :) = 0.0d0
@@ -477,6 +550,7 @@ contains
 
                 D_HH_sub = D_HH_elem
                 D_HT_sub = D_HT_elem
+                D_HH_gas_sub = D_HH_gas_elem
                 V_sub(:) = V_elem_mag * V_dir(:)
 
                 ! Storage term (Step 3): C_eq = dTheta/dp at the subcell point,
@@ -495,6 +569,8 @@ contains
                     do i = 1, n_nodes
                         mat_HH_sub(i, j) = mat_HH_sub(i, j) + eff_weight_sub * D_HH_sub * &
                                            dot_product(dpsi_dx_sub(:, i), dpsi_dx_sub(:, j))
+                        mat_HH_gas_sub(i, j) = mat_HH_gas_sub(i, j) + eff_weight_sub * D_HH_gas_sub * &
+                                               dot_product(dpsi_dx_sub(:, i), dpsi_dx_sub(:, j))
                         mat_HT_sub(i, j) = mat_HT_sub(i, j) + eff_weight_sub * D_HT_sub * &
                                            dot_product(dpsi_dx_sub(:, i), dpsi_dx_sub(:, j))
                         mat_C_sub(i, j) = mat_C_sub(i, j) + eff_weight_sub * C_eq_sub * psi_sub(i) * psi_sub(j)
@@ -513,7 +589,8 @@ contains
                 do j = 1, n_nodes
                     do i = 1, n_nodes
                         call K_HH%set(MATRIX_OPS%ADD, i, j, &
-                                      mat_HH_sub(i, j) * dPgen_dP_node(j) + bdf0 * mat_C_sub(i, j))
+                                      mat_HH_sub(i, j) * dPgen_dP_node(j) + mat_HH_gas_sub(i, j) + &
+                                      bdf0 * mat_C_sub(i, j))
                     end do
                 end do
             end if
@@ -529,6 +606,14 @@ contains
             if (present(F_H)) then
                 workspace%work_vec(:) = 0.0d0
                 call matvec(mat_HH_sub, P_gen_node, workspace%work_vec, ierr)
+                do i = 1, n_nodes
+                    local_vec_res(i) = local_vec_res(i) + workspace%work_vec(i)
+                end do
+            end if
+
+            if (present(F_H) .and. gas_flux_needed) then
+                workspace%work_vec(:) = 0.0d0
+                call matvec(mat_HH_gas_sub, workspace%P_node, workspace%work_vec, ierr)
                 do i = 1, n_nodes
                     local_vec_res(i) = local_vec_res(i) + workspace%work_vec(i)
                 end do
@@ -578,6 +663,58 @@ contains
     !>
     !> Returns zero if any node is zero: a single impermeable node blocks the
     !> element, which is the physically correct series behaviour.
+    !> Compare the element's geometric mean against the harmonic mean.
+    !>
+    !> Assumptions: called from inside the assembly's OpenMP region, hence the
+    !> critical section; a no-op unless KELEM_REPORT.
+    !> Numerical guarantees: none; diagnostic only, the operator is unchanged.
+    !> Computational complexity: O(n_nodes).
+    !> Failure behavior: silently skipped for a non-positive nodal value.
+    subroutine report_element_conductivity(k_node, k_geometric)
+        implicit none
+        !> Nodal conductivities of one element
+        real(real64), intent(in) :: k_node(:)
+        !> Geometric mean the element actually uses
+        real(real64), intent(in) :: k_geometric
+
+        real(real64) :: k_lo, k_hi, k_harmonic
+
+        if (size(k_node) == 0) return
+        k_lo = minval(k_node)
+        k_hi = maxval(k_node)
+        if (k_lo <= 0.0d0) return
+        if (k_hi < KELEM_REPORT_MIN_CONTRAST * k_lo) return
+
+        k_harmonic = real(size(k_node), real64) / sum(1.0d0 / k_node)
+
+        !$OMP CRITICAL (kelem_report_section)
+        if (kelem_report_count < KELEM_REPORT_LIMIT) then
+            kelem_report_count = kelem_report_count + 1
+            write (*, '(A,ES11.3,A,ES11.3,A,ES11.3,A,ES11.3,A,ES11.3,A,ES11.3)') &
+                '   [KELEM] k_min=', k_lo, ' k_max=', k_hi, &
+                ' contrast=', k_hi / k_lo, &
+                ' geo=', k_geometric, ' har=', k_harmonic, &
+                ' geo/har=', k_geometric / k_harmonic
+        end if
+        !$OMP END CRITICAL (kelem_report_section)
+    end subroutine report_element_conductivity
+
+    !> Harmonic mean, the series-flow weight; zero if any value is non-positive.
+    pure function harmonic_mean(values) result(mean_value)
+        implicit none
+        real(real64), intent(in) :: values(:)
+        real(real64) :: mean_value
+
+        integer(int32) :: i
+
+        mean_value = 0.0d0
+        if (size(values) == 0) return
+        do i = 1, size(values)
+            if (values(i) <= 0.0d0) return
+        end do
+        mean_value = real(size(values), real64) / sum(1.0d0 / values)
+    end function harmonic_mean
+
     pure function geometric_mean(values) result(mean_value)
         implicit none
         real(real64), intent(in) :: values(:)

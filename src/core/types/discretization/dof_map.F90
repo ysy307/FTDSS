@@ -36,28 +36,29 @@ contains
         class(type_dof_map), intent(inout) :: self
         logical, intent(in) :: active_dofs(:)
 
-        integer(int32) :: current_dof_index
+        integer(int32) :: current_dof_index, slot, physics_id
 
+        ! Block layout order, deliberately not physics-id order: the coupled
+        ! THM unknowns stay contiguous even when mechanics is active.
+        integer(int32), parameter :: LAYOUT_ORDER(4) = [ &
+                                     PHYSICS_TYPES%THERMAL%ID, &
+                                     PHYSICS_TYPES%HYDRAULIC%ID, &
+                                     PHYSICS_TYPES%PNEUMATIC%ID, &
+                                     PHYSICS_TYPES%MECHANICAL%ID]
+        integer(int32), parameter :: LAYOUT_WIDTH(4) = [1, 1, 1, 3]
 
-        
         self%start_dof_index(:) = 0
-        
+        self%num_dofs_of_physics(:) = 0
+
         current_dof_index = 1
-        if (active_dofs(PHYSICS_TYPES%THERMAL%ID)) then
-            self%num_dofs_of_physics(PHYSICS_TYPES%THERMAL%ID) = 1
-            self%start_dof_index(PHYSICS_TYPES%THERMAL%ID) = current_dof_index
-            current_dof_index = current_dof_index + self%num_dofs_of_physics(PHYSICS_TYPES%THERMAL%ID)
-        end if
-        if (active_dofs(PHYSICS_TYPES%HYDRAULIC%ID)) then
-            self%num_dofs_of_physics(PHYSICS_TYPES%HYDRAULIC%ID) = 1
-            self%start_dof_index(PHYSICS_TYPES%HYDRAULIC%ID) = current_dof_index
-            current_dof_index = current_dof_index + self%num_dofs_of_physics(PHYSICS_TYPES%HYDRAULIC%ID)
-        end if
-        if (active_dofs(PHYSICS_TYPES%MECHANICAL%ID)) then
-            self%num_dofs_of_physics(PHYSICS_TYPES%MECHANICAL%ID) = 3
-            self%start_dof_index(PHYSICS_TYPES%MECHANICAL%ID) = current_dof_index
-            current_dof_index = current_dof_index + self%num_dofs_of_physics(PHYSICS_TYPES%MECHANICAL%ID)
-        end if
+        do slot = 1, size(LAYOUT_ORDER)
+            physics_id = LAYOUT_ORDER(slot)
+            if (physics_id > size(active_dofs)) cycle
+            if (.not. active_dofs(physics_id)) cycle
+            self%num_dofs_of_physics(physics_id) = LAYOUT_WIDTH(slot)
+            self%start_dof_index(physics_id) = current_dof_index
+            current_dof_index = current_dof_index + LAYOUT_WIDTH(slot)
+        end do
         self%num_dofs_per_node = current_dof_index - 1
     end subroutine initialize_type_dof_map
 

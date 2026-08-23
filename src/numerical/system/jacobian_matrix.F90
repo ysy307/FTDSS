@@ -25,6 +25,9 @@ module numerical_system_jacobian_matrix
         !> physics i -> system index (0 if inactive)
         integer(int32) :: physics_to_system(PHYSICS_TYPES%NUM_ID) = 0
 
+        !> physics i -> block coordinate inside a monolithic node block (0 if inactive)
+        integer(int32) :: physics_to_block(PHYSICS_TYPES%NUM_ID) = 0
+
         !> per system total dofs
         integer(int32), allocatable :: system_size(:)
     contains
@@ -64,11 +67,16 @@ contains
 
         self%coupling_mode = coupling_mode
         self%physics_to_system(:) = 0
+        self%physics_to_block(:) = 0
         self%num_dofs_of_physics(:) = 0
 
         call topology%get_total_dofs(self%size)
         call topology%get_num_nodes(self%num_nodes)
         call topology%get_node_adjacency(MATRIX_TYPES%CSR, row, col)
+
+        do i = 1, PHYSICS_TYPES%NUM_ID
+            call topology%get_start_dof_index(PHYSICS_TYPES%to_object(i), self%physics_to_block(i))
+        end do
 
         select case (coupling_mode%ID)
 
@@ -259,9 +267,12 @@ contains
 
         select case (self%coupling_mode%ID)
         case (COUPLING_MODES%MONOLITHIC%ID)
+            if (row_physics_id < 1 .or. row_physics_id > PHYSICS_TYPES%NUM_ID) return
+            if (col_physics_id < 1 .or. col_physics_id > PHYSICS_TYPES%NUM_ID) return
+            row_blk = self%physics_to_block(row_physics_id)
+            col_blk = self%physics_to_block(col_physics_id)
+            if (row_blk <= 0 .or. col_blk <= 0) return
             mat => self%matrix(1)
-            row_blk = row_physics_id
-            col_blk = col_physics_id
         case (COUPLING_MODES%STAGGERED%ID)
             if (row_physics_id /= col_physics_id) return
             if (row_physics_id < 1 .or. row_physics_id > PHYSICS_TYPES%NUM_ID) return
@@ -354,8 +365,8 @@ contains
         ! are always (1, 1) regardless of coupling mode; only the target matrix
         ! differs, which the helper resolves.
         call self%resolve_block_target(row_physics_id, col_physics_id, mat, row_blk, col_blk)
-        ! Scatter into the (row_blk, col_blk) sub-block of each 2x2 node block. In
-        ! monolithic coupling these are the physics offsets (e.g. hydraulic->(2,2)),
+        ! Scatter into the (row_blk, col_blk) sub-block of each node block. In
+        ! monolithic coupling these are the per-node DOF offsets (e.g. hydraulic->(2,2)),
         ! so the off-diagonal coupling and the pressure self-block are assembled
         ! correctly; in staggered coupling resolve returns (1,1) into a per-physics
         ! matrix. Passing the literal (1,1) here left the entire pressure block (and

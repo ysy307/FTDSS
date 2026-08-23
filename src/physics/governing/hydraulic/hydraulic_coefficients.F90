@@ -2,11 +2,13 @@ submodule(physics_governing_hydraulic) hydraulic_coefficients
     implicit none
 contains
 
-    !> @brief Calculate Diffusion Term D_HH (Hydraulic Conductivity Tensor)
+    !> @brief Calculate Diffusion Term D_HH (Liquid Hydraulic Conductivity Tensor)
     !> @details
     !>   Mixed water-content form uses volumetric Darcy flux:
     !>   q = -K/(rho_w g) * grad P ...
-    !>   D_HH = K_eff / (rho_w g)
+    !>   D_HH = K_flh / (rho_w g)
+    !>   The vapour conductivity is a separate tensor: it is driven by the gas
+    !>   pressure, not by the liquid potential. See compute_diffusion_term_gas.
     module subroutine compute_diffusion_term_hydraulic(self, material_id, state, D_HH)
         implicit none
         class(type_hydraulic), intent(in) :: self
@@ -14,18 +16,14 @@ contains
         type(type_state), intent(inout) :: state
         real(real64), intent(inout) :: D_HH(:, :)
 
-        real(real64) :: K_flh, K_vP, rho_w
+        real(real64) :: K_flh, rho_w
         real(real64) :: coeff_D
 
         integer(int32) :: i
 
         call self%physics%calc_Kflh(material_id, state, K_flh)
-        call self%calc_K_vP(material_id, state, K_vP)
         call self%physics%calc_density_water(state, rho_w)
-        ! One coefficient for both phases presumes a shared driver; the
-        ! liquid-pressure driver breaks that, hence the guard in
-        ! initialize_type_hydraulic.
-        coeff_D = (K_flh + K_vP) / (rho_w * g)
+        coeff_D = K_flh / (rho_w * g)
 
         D_HH(:, :) = 0.0d0
         do i = 1, self%computation_dimension
@@ -33,6 +31,32 @@ contains
         end do
 
     end subroutine compute_diffusion_term_hydraulic
+
+    !> @brief Calculate the vapour conductivity tensor D_HH_gas
+    !> @details
+    !>   D_HH_gas = K_vP / (rho_w g), zero when vapour transport is disabled.
+    module subroutine compute_diffusion_term_gas_hydraulic(self, material_id, state, D_HH_gas)
+        implicit none
+        class(type_hydraulic), intent(in) :: self
+        integer(int32), intent(in) :: material_id
+        type(type_state), intent(inout) :: state
+        real(real64), intent(inout) :: D_HH_gas(:, :)
+
+        real(real64) :: K_vP, rho_w
+        real(real64) :: coeff_D
+
+        integer(int32) :: i
+
+        call self%calc_K_vP(material_id, state, K_vP)
+        call self%physics%calc_density_water(state, rho_w)
+        coeff_D = K_vP / (rho_w * g)
+
+        D_HH_gas(:, :) = 0.0d0
+        do i = 1, self%computation_dimension
+            D_HH_gas(i, i) = coeff_D
+        end do
+
+    end subroutine compute_diffusion_term_gas_hydraulic
 
     !> @brief Calculate Advective (Gravity) Term V_H
     !> @details

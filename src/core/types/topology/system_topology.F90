@@ -31,6 +31,9 @@ module core_types_topology_system_topology
         integer(int32) :: num_fe = 0
         integer(int32) :: num_dofs_of_physics(PHYSICS_TYPES%NUM_ID) = 0
 
+        !> Start index of each physics within the per-node DOF block (0 if inactive).
+        integer(int32) :: start_dof_index(PHYSICS_TYPES%NUM_ID) = 0
+
         !> CSR node-adjacency sparsity pattern (node graph).
         integer(int32), allocatable :: adj_row(:)
         integer(int32), allocatable :: adj_col(:)
@@ -49,6 +52,7 @@ module core_types_topology_system_topology
         procedure, public, pass(self) :: get_num_nodes => get_num_nodes_topology
         procedure, public, pass(self) :: get_num_dof_per_node => get_num_dof_per_node_topology
         procedure, public, pass(self) :: get_target_dof => get_target_dof_topology
+        procedure, public, pass(self) :: get_start_dof_index => get_start_dof_index_topology
         procedure, public, pass(self) :: get_node_adjacency => get_node_adjacency_topology
         procedure, public, pass(self) :: get_num_fe => get_num_fe_topology
         procedure, public, pass(self) :: get_fe_connectivity => get_fe_connectivity_topology
@@ -59,7 +63,7 @@ contains
     !> Deep-copies all sizing/topology arrays into the carrier. Pre-existing
     !> contents are released first, so the call is idempotent.
     subroutine initialize_system_topology(self, num_nodes, total_dofs, num_dof_per_node, &
-                                          num_dofs_of_physics, adj_row, adj_col, &
+                                          num_dofs_of_physics, start_dof_index, adj_row, adj_col, &
                                           num_fe, conn_ptr, conn_idx)
         implicit none
         class(type_system_topology), intent(inout) :: self
@@ -67,6 +71,8 @@ contains
         integer(int32), intent(in) :: total_dofs
         integer(int32), intent(in) :: num_dof_per_node
         integer(int32), intent(in) :: num_dofs_of_physics(:)
+        !> Start index of each physics within the per-node DOF block (0 if inactive)
+        integer(int32), intent(in) :: start_dof_index(:)
         integer(int32), intent(in) :: adj_row(:)
         integer(int32), intent(in) :: adj_col(:)
         integer(int32), intent(in) :: num_fe
@@ -85,6 +91,9 @@ contains
         ncopy = min(size(self%num_dofs_of_physics), size(num_dofs_of_physics))
         self%num_dofs_of_physics(1:ncopy) = num_dofs_of_physics(1:ncopy)
 
+        ncopy = min(size(self%start_dof_index), size(start_dof_index))
+        self%start_dof_index(1:ncopy) = start_dof_index(1:ncopy)
+
         allocate (self%adj_row, source=adj_row)
         allocate (self%adj_col, source=adj_col)
         allocate (self%conn_ptr, source=conn_ptr)
@@ -100,6 +109,7 @@ contains
         self%num_dof_per_node = 0
         self%num_fe = 0
         self%num_dofs_of_physics(:) = 0
+        self%start_dof_index(:) = 0
 
         call deallocate_array(self%adj_row)
         call deallocate_array(self%adj_col)
@@ -144,6 +154,22 @@ contains
             target_dof = self%num_dofs_of_physics(physics_type%ID)
         end if
     end subroutine get_target_dof_topology
+
+    !> Returns the start index of \c physics_type within the per-node DOF block,
+    !> or 0 when the physics id is out of range or inactive. This is the block
+    !> coordinate of the physics in a monolithic per-node matrix block, which is
+    !> not in general the physics id.
+    subroutine get_start_dof_index_topology(self, physics_type, start_dof_index)
+        implicit none
+        class(type_system_topology), intent(in) :: self
+        type(type_constant_id), intent(in) :: physics_type
+        integer(int32), intent(inout) :: start_dof_index
+
+        start_dof_index = 0
+        if (physics_type%ID >= 1 .and. physics_type%ID <= size(self%start_dof_index)) then
+            start_dof_index = self%start_dof_index(physics_type%ID)
+        end if
+    end subroutine get_start_dof_index_topology
 
     !> Returns a fresh copy of the stored CSR node-adjacency pattern. Only the
     !> CSR layout is retained; an invalid \c matrix_type leaves the outputs

@@ -4,6 +4,13 @@ submodule(app_ftcms) ftcms_assemble
 
     real(real64), parameter :: SUBCELL_ADAPTIVE_RELATIVE_TOLERANCE = 1.0d-3
 
+    !> One element's local blocks, indexed by physics id on both axes so the
+    !> helpers below do not enumerate the physics pairs by name.
+    type :: type_assemble_blocks
+        type(type_matrix_dense) :: K(PHYSICS_TYPES%NUM_ID, PHYSICS_TYPES%NUM_ID)
+        type(type_vector_dp) :: F(PHYSICS_TYPES%NUM_ID)
+    end type type_assemble_blocks
+
     !> Build the thermal-pressure coupling block by differencing the element
     !> thermal residual instead of using the hand-written storage tangent.
     !>
@@ -55,15 +62,15 @@ contains
         !> Assemble only the residual vector when true.
         logical, intent(in), optional :: residual_only
 
-        type(type_matrix_dense) :: local_K_TT, local_K_TH, local_K_HH, local_K_HT
-        type(type_vector_dp) :: local_F_T, local_F_H
-        type(type_matrix_dense) :: fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT
-        type(type_vector_dp) :: fine_F_T, fine_F_H
+        integer(int32), parameter :: ID_THERMAL = PHYSICS_TYPES%THERMAL%ID
+        integer(int32), parameter :: ID_HYDRAULIC = PHYSICS_TYPES%HYDRAULIC%ID
+        type(type_assemble_blocks) :: local_blocks, fine_blocks
+        logical :: active_elem(PHYSICS_TYPES%NUM_ID)
         type(type_assemble_workspace) :: workspace
 
         real(real64), allocatable :: elem_coords(:, :)
         real(real64), allocatable :: raw_elem_coords(:, :)
-        integer(int32) :: i_color, i_elem, elem_id
+        integer(int32) :: i_color, i_elem, elem_id, row_physics, col_physics
         integer(int32), pointer, contiguous, dimension(:) :: p_connectivity
         integer(int32) :: thermal_dof, hydraulic_dof
         integer(int32) :: num_nodes_local
@@ -129,10 +136,10 @@ contains
         !$OMP        thermal_dof, hydraulic_dof, use_scatter, do_thermal, do_hydraulic, &
         !$OMP        fd_tangent_fallback_count, assemble_matrix) &
         !$OMP PRIVATE(i_color, i_elem, elem_id, p_connectivity, workspace, &
-        !$OMP         local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
-        !$OMP         fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
-        !$OMP         local_F_T, local_F_H, elem_coords, raw_elem_coords, num_nodes_local, &
-        !$OMP         fine_F_T, fine_F_H, do_thermal_elem, do_hydraulic_elem, fd_tangent_ok, &
+        !$OMP         row_physics, col_physics, &
+        !$OMP         local_blocks, fine_blocks, active_elem, &
+        !$OMP         elem_coords, raw_elem_coords, num_nodes_local, &
+        !$OMP         do_thermal_elem, do_hydraulic_elem, fd_tangent_ok, &
         !$OMP         selected_subcell_depth, subcell_depth_unresolved)
 
         do i_color = 1, num_colors
@@ -149,27 +156,31 @@ contains
                     elem_id = elements_list(i_elem)
                     if (assemble_matrix) then
                         call self%assemble_initialize(element_id=elem_id, workspace=workspace, &
-                                                      local_K_TT=local_K_TT, local_K_TH=local_K_TH, &
-                                                      local_K_HH=local_K_HH, local_K_HT=local_K_HT, &
-                                                      local_F_T=local_F_T, local_F_H=local_F_H, &
+                                                      local_K_TT=local_blocks%K(ID_THERMAL, ID_THERMAL), &
+                                                      local_K_TH=local_blocks%K(ID_THERMAL, ID_HYDRAULIC), &
+                                                      local_K_HH=local_blocks%K(ID_HYDRAULIC, ID_HYDRAULIC), &
+                                                      local_K_HT=local_blocks%K(ID_HYDRAULIC, ID_THERMAL), &
+                                                      local_F_T=local_blocks%F(ID_THERMAL), &
+                                                      local_F_H=local_blocks%F(ID_HYDRAULIC), &
                                                       coordinates=elem_coords, raw_coordinates=raw_elem_coords, &
                                                       connectivity=p_connectivity)
                     else
                         call self%assemble_initialize(element_id=elem_id, workspace=workspace, &
-                                                      local_F_T=local_F_T, local_F_H=local_F_H, &
+                                                      local_F_T=local_blocks%F(ID_THERMAL), &
+                                                      local_F_H=local_blocks%F(ID_HYDRAULIC), &
                                                       coordinates=elem_coords, raw_coordinates=raw_elem_coords, &
                                                       connectivity=p_connectivity)
                     end if
 
                     do_thermal_elem = self%control%is_target(PHYSICS_TYPES%THERMAL, workspace%material_id)
                     do_hydraulic_elem = self%control%is_target(PHYSICS_TYPES%HYDRAULIC, workspace%material_id)
+                    active_elem(:) = .false.
+                    active_elem(ID_THERMAL) = do_thermal_elem
+                    active_elem(ID_HYDRAULIC) = do_hydraulic_elem
 
                     if (assemble_matrix) then
-                        call select_subcell_depth(self, workspace, do_thermal_elem, do_hydraulic_elem, &
-                                                  local_K_TT, local_K_TH, local_K_HH, local_K_HT, &
-                                                  local_F_T, local_F_H, &
-                                                  fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
-                                                  fine_F_T, fine_F_H, selected_subcell_depth, &
+                        call select_subcell_depth(self, workspace, active_elem, &
+                                                  local_blocks, fine_blocks, selected_subcell_depth, &
                                                   subcell_depth_unresolved)
                         if (allocated(self%subcell_active_depth)) then
                             self%subcell_active_depth(elem_id) = selected_subcell_depth
@@ -181,7 +192,8 @@ contains
                             selected_subcell_depth = self%subcell_active_depth(elem_id)
                         end if
                         call workspace%set_subcell_depth(selected_subcell_depth)
-                        call self%assemble_local(workspace, local_F_T=local_F_T, local_F_H=local_F_H)
+                        call self%assemble_local(workspace, local_F_T=local_blocks%F(ID_THERMAL), &
+                                                 local_F_H=local_blocks%F(ID_HYDRAULIC))
                     end if
 
                     ! An element where only one physics is active has no
@@ -194,49 +206,46 @@ contains
                         if (FULL_FD_TANGENT) then
                             ! Differentiate the physical residual first, then
                             ! add the pressure-block step regularization.
-                            call self%assemble_tangent_fd(workspace, local_F_T, local_F_H, &
-                                                          local_K_TT, local_K_TH, local_K_HT, local_K_HH, &
+                            call self%assemble_tangent_fd(workspace, local_blocks%F(ID_THERMAL), local_blocks%F(ID_HYDRAULIC), &
+                                                          local_blocks%K(ID_THERMAL, ID_THERMAL), &
+                                                          local_blocks%K(ID_THERMAL, ID_HYDRAULIC), &
+                                                          local_blocks%K(ID_HYDRAULIC, ID_THERMAL), &
+                                                          local_blocks%K(ID_HYDRAULIC, ID_HYDRAULIC), &
                                                           fd_tangent_ok)
                             if (fd_tangent_ok) then
-                                call restore_capacity_regularization(self, workspace, local_K_HH)
+                                call restore_capacity_regularization(self, workspace, local_blocks%K(ID_HYDRAULIC, ID_HYDRAULIC))
                             else
                                 !$OMP ATOMIC UPDATE
                                 fd_tangent_fallback_count = fd_tangent_fallback_count + 1
                             end if
                         else if (COUPLING_TH_FINITE_DIFFERENCE) then
-                            call self%assemble_coupling_fd(workspace, local_F_T, local_K_TH)
+                            call self%assemble_coupling_fd(workspace, local_blocks%F(ID_THERMAL), &
+                                                           local_blocks%K(ID_THERMAL, ID_HYDRAULIC))
                         end if
                     end if
 
                     if (assemble_matrix .and. TOTAL_POTENTIAL_UNKNOWN .and. &
                         do_thermal_elem .and. do_hydraulic_elem) then
                         call transform_to_total_potential(self, workspace, &
-                                                          local_K_TT, local_K_TH, local_K_HH, local_K_HT)
+                                                          local_blocks%K(ID_THERMAL, ID_THERMAL), &
+                                                          local_blocks%K(ID_THERMAL, ID_HYDRAULIC), &
+                                                          local_blocks%K(ID_HYDRAULIC, ID_HYDRAULIC), &
+                                                          local_blocks%K(ID_HYDRAULIC, ID_THERMAL))
                     end if
 
                     num_nodes_local = workspace%num_fe_nodes
 
                     ! $OMP CRITICAL(ftcms_global_assembly)
-                    if (do_thermal_elem) then
-                        if (assemble_matrix) then
-                            call self%K%add(PHYSICS_TYPES%THERMAL%ID, PHYSICS_TYPES%THERMAL%ID, &
-                                            elem_id, num_nodes_local, local_K_TT)
-                        end if
-                        call self%F%add(PHYSICS_TYPES%THERMAL%ID, p_connectivity, local_F_T)
-                    end if
-
-                    if (do_hydraulic_elem) then
-                        if (assemble_matrix) then
-                            call self%K%add(PHYSICS_TYPES%HYDRAULIC%ID, PHYSICS_TYPES%HYDRAULIC%ID, &
-                                            elem_id, num_nodes_local, local_K_HH)
-                        end if
-                        call self%F%add(PHYSICS_TYPES%HYDRAULIC%ID, p_connectivity, local_F_H)
-                    end if
-
-                    if (assemble_matrix .and. do_thermal_elem .and. do_hydraulic_elem) then
-                        call self%K%add(PHYSICS_TYPES%THERMAL%ID, PHYSICS_TYPES%HYDRAULIC%ID, elem_id, num_nodes_local, local_K_TH)
-                        call self%K%add(PHYSICS_TYPES%HYDRAULIC%ID, PHYSICS_TYPES%THERMAL%ID, elem_id, num_nodes_local, local_K_HT)
-                    end if
+                    do row_physics = 1, PHYSICS_TYPES%NUM_ID
+                        if (.not. active_elem(row_physics)) cycle
+                        call self%F%add(row_physics, p_connectivity, local_blocks%F(row_physics))
+                        if (.not. assemble_matrix) cycle
+                        do col_physics = 1, PHYSICS_TYPES%NUM_ID
+                            if (.not. active_elem(col_physics)) cycle
+                            call self%K%add(row_physics, col_physics, elem_id, num_nodes_local, &
+                                            local_blocks%K(row_physics, col_physics))
+                        end do
+                    end do
 
                     ! $OMP END CRITICAL(ftcms_global_assembly)
 
@@ -249,12 +258,16 @@ contains
         end do
 
         if (assemble_matrix) then
-            call self%assemble_destroy(workspace, local_K_TT, local_K_TH, &
-                                       local_K_HH, local_K_HT, local_F_T, local_F_H)
-            call destroy_local_system(fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
-                                      fine_F_T, fine_F_H)
+            call self%assemble_destroy(workspace, &
+                                       local_blocks%K(ID_THERMAL, ID_THERMAL), &
+                                       local_blocks%K(ID_THERMAL, ID_HYDRAULIC), &
+                                       local_blocks%K(ID_HYDRAULIC, ID_HYDRAULIC), &
+                                       local_blocks%K(ID_HYDRAULIC, ID_THERMAL), &
+                                       local_blocks%F(ID_THERMAL), local_blocks%F(ID_HYDRAULIC))
+            call destroy_local_system(fine_blocks)
         else
-            call self%assemble_destroy(workspace, local_F_T=local_F_T, local_F_H=local_F_H)
+            call self%assemble_destroy(workspace, local_F_T=local_blocks%F(ID_THERMAL), &
+                                       local_F_H=local_blocks%F(ID_HYDRAULIC))
         end if
         if (allocated(elem_coords)) deallocate (elem_coords)
         if (allocated(raw_elem_coords)) deallocate (raw_elem_coords)
@@ -294,18 +307,14 @@ contains
 
     end subroutine assemble_ftcms
 
-    subroutine select_subcell_depth(self, workspace, do_thermal, do_hydraulic, &
-                                    K_TT, K_TH, K_HH, K_HT, F_T, F_H, &
-                                    fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
-                                    fine_F_T, fine_F_H, selected_depth, unresolved)
+    subroutine select_subcell_depth(self, workspace, active, blocks, fine, &
+                                    selected_depth, unresolved)
         implicit none
         class(type_ftcms), intent(inout) :: self
         type(type_assemble_workspace), intent(inout) :: workspace
-        logical, intent(in) :: do_thermal, do_hydraulic
-        type(type_matrix_dense), intent(inout) :: K_TT, K_TH, K_HH, K_HT
-        type(type_vector_dp), intent(inout) :: F_T, F_H
-        type(type_matrix_dense), intent(inout) :: fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT
-        type(type_vector_dp), intent(inout) :: fine_F_T, fine_F_H
+        !> Active physics ids of this element
+        logical, intent(in) :: active(:)
+        type(type_assemble_blocks), intent(inout) :: blocks, fine
         integer(int32), intent(inout) :: selected_depth
         logical, intent(inout) :: unresolved
 
@@ -315,70 +324,82 @@ contains
         unresolved = .false.
         call workspace%subcell_quadrature%get_max_depth(max_depth)
         call workspace%set_subcell_depth(selected_depth)
-        call self%assemble_local(workspace, K_TT, K_TH, K_HH, K_HT, F_T, F_H)
+        call assemble_local_blocks(self, workspace, blocks)
 
         if (.not. workspace%is_cut .or. .not. workspace%is_sign_mixed .or. max_depth == 0) return
 
         do fine_depth = 1, max_depth
-            call initialize_local_system(workspace%num_fe_nodes, fine_K_TT, fine_K_TH, &
-                                         fine_K_HH, fine_K_HT, fine_F_T, fine_F_H)
+            call initialize_local_system(workspace%num_fe_nodes, active, fine)
             call workspace%set_subcell_depth(fine_depth)
-            call self%assemble_local(workspace, fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
-                                     fine_F_T, fine_F_H)
+            call assemble_local_blocks(self, workspace, fine)
 
-            if (local_systems_agree(do_thermal, do_hydraulic, &
-                                    K_TT, K_TH, K_HH, K_HT, F_T, F_H, &
-                                    fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
-                                    fine_F_T, fine_F_H)) then
+            if (local_systems_agree(active, blocks, fine)) then
                 call workspace%set_subcell_depth(selected_depth)
                 return
             end if
 
             selected_depth = fine_depth
-            call copy_local_system(fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
-                                   fine_F_T, fine_F_H, K_TT, K_TH, K_HH, K_HT, F_T, F_H)
+            call copy_local_system(active, fine, blocks)
         end do
 
         unresolved = .true.
         call workspace%set_subcell_depth(selected_depth)
     end subroutine select_subcell_depth
 
-    subroutine initialize_local_system(num_nodes, K_TT, K_TH, K_HH, K_HT, F_T, F_H)
+    !> Unpack the indexed blocks into the named arguments assemble_local still
+    !> takes. Removing this shim is the next slice of the DOF generalization.
+    subroutine assemble_local_blocks(self, workspace, blocks)
+        implicit none
+        class(type_ftcms), intent(inout) :: self
+        type(type_assemble_workspace), intent(inout) :: workspace
+        type(type_assemble_blocks), intent(inout) :: blocks
+
+        integer(int32), parameter :: ID_THERMAL = PHYSICS_TYPES%THERMAL%ID
+        integer(int32), parameter :: ID_HYDRAULIC = PHYSICS_TYPES%HYDRAULIC%ID
+
+        call self%assemble_local(workspace, &
+                                 blocks%K(ID_THERMAL, ID_THERMAL), &
+                                 blocks%K(ID_THERMAL, ID_HYDRAULIC), &
+                                 blocks%K(ID_HYDRAULIC, ID_HYDRAULIC), &
+                                 blocks%K(ID_HYDRAULIC, ID_THERMAL), &
+                                 blocks%F(ID_THERMAL), blocks%F(ID_HYDRAULIC))
+    end subroutine assemble_local_blocks
+
+    subroutine initialize_local_system(num_nodes, active, blocks)
         implicit none
         integer(int32), intent(in) :: num_nodes
-        type(type_matrix_dense), intent(inout) :: K_TT, K_TH, K_HH, K_HT
-        type(type_vector_dp), intent(inout) :: F_T, F_H
+        !> Active physics ids of this element
+        logical, intent(in) :: active(:)
+        type(type_assemble_blocks), intent(inout) :: blocks
 
-        call check_initialize_matrix(K_TT, num_nodes)
-        call check_initialize_matrix(K_TH, num_nodes)
-        call check_initialize_matrix(K_HH, num_nodes)
-        call check_initialize_matrix(K_HT, num_nodes)
-        call check_initialize_vector(F_T, num_nodes)
-        call check_initialize_vector(F_H, num_nodes)
+        integer(int32) :: r, c
+
+        do r = 1, PHYSICS_TYPES%NUM_ID
+            if (.not. active(r)) cycle
+            call check_initialize_vector(blocks%F(r), num_nodes)
+            do c = 1, PHYSICS_TYPES%NUM_ID
+                if (.not. active(c)) cycle
+                call check_initialize_matrix(blocks%K(r, c), num_nodes)
+            end do
+        end do
     end subroutine initialize_local_system
 
-    logical function local_systems_agree(do_thermal, do_hydraulic, &
-                                         K_TT, K_TH, K_HH, K_HT, F_T, F_H, &
-                                         fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT, &
-                                         fine_F_T, fine_F_H) result(agree)
+    logical function local_systems_agree(active, coarse, fine) result(agree)
         implicit none
-        logical, intent(in) :: do_thermal, do_hydraulic
-        type(type_matrix_dense), intent(in) :: K_TT, K_TH, K_HH, K_HT
-        type(type_vector_dp), intent(in) :: F_T, F_H
-        type(type_matrix_dense), intent(in) :: fine_K_TT, fine_K_TH, fine_K_HH, fine_K_HT
-        type(type_vector_dp), intent(in) :: fine_F_T, fine_F_H
+        logical, intent(in) :: active(:)
+        type(type_assemble_blocks), intent(in) :: coarse, fine
+
+        integer(int32) :: r, c
 
         agree = .true.
-        if (do_thermal) then
-            agree = agree .and. matrices_agree(K_TT, fine_K_TT)
-            agree = agree .and. vectors_agree(F_T, fine_F_T)
-            if (do_hydraulic) agree = agree .and. matrices_agree(K_TH, fine_K_TH)
-        end if
-        if (do_hydraulic) then
-            agree = agree .and. matrices_agree(K_HH, fine_K_HH)
-            agree = agree .and. vectors_agree(F_H, fine_F_H)
-            if (do_thermal) agree = agree .and. matrices_agree(K_HT, fine_K_HT)
-        end if
+        do r = 1, PHYSICS_TYPES%NUM_ID
+            if (.not. active(r)) cycle
+            agree = agree .and. vectors_agree(coarse%F(r), fine%F(r))
+            do c = 1, PHYSICS_TYPES%NUM_ID
+                if (.not. active(c)) cycle
+                agree = agree .and. matrices_agree(coarse%K(r, c), fine%K(r, c))
+            end do
+        end do
     end function local_systems_agree
 
     logical function matrices_agree(coarse, fine) result(agree)
@@ -419,21 +440,22 @@ contains
         agree = difference_norm <= SUBCELL_ADAPTIVE_RELATIVE_TOLERANCE * value_norm
     end function arrays_agree
 
-    subroutine copy_local_system(source_K_TT, source_K_TH, source_K_HH, source_K_HT, &
-                                 source_F_T, source_F_H, target_K_TT, target_K_TH, &
-                                 target_K_HH, target_K_HT, target_F_T, target_F_H)
+    subroutine copy_local_system(active, source, target)
         implicit none
-        type(type_matrix_dense), intent(in), target :: source_K_TT, source_K_TH, source_K_HH, source_K_HT
-        type(type_vector_dp), intent(in), target :: source_F_T, source_F_H
-        type(type_matrix_dense), intent(inout), target :: target_K_TT, target_K_TH, target_K_HH, target_K_HT
-        type(type_vector_dp), intent(inout), target :: target_F_T, target_F_H
+        logical, intent(in) :: active(:)
+        type(type_assemble_blocks), intent(in) :: source
+        type(type_assemble_blocks), intent(inout) :: target
 
-        call copy_matrix(source_K_TT, target_K_TT)
-        call copy_matrix(source_K_TH, target_K_TH)
-        call copy_matrix(source_K_HH, target_K_HH)
-        call copy_matrix(source_K_HT, target_K_HT)
-        call copy_vector(source_F_T, target_F_T)
-        call copy_vector(source_F_H, target_F_H)
+        integer(int32) :: r, c
+
+        do r = 1, PHYSICS_TYPES%NUM_ID
+            if (.not. active(r)) cycle
+            call copy_vector(source%F(r), target%F(r))
+            do c = 1, PHYSICS_TYPES%NUM_ID
+                if (.not. active(c)) cycle
+                call copy_matrix(source%K(r, c), target%K(r, c))
+            end do
+        end do
     end subroutine copy_local_system
 
     subroutine copy_matrix(source, target)
@@ -460,17 +482,18 @@ contains
         target_values = source_values
     end subroutine copy_vector
 
-    subroutine destroy_local_system(K_TT, K_TH, K_HH, K_HT, F_T, F_H)
+    subroutine destroy_local_system(blocks)
         implicit none
-        type(type_matrix_dense), intent(inout) :: K_TT, K_TH, K_HH, K_HT
-        type(type_vector_dp), intent(inout) :: F_T, F_H
+        type(type_assemble_blocks), intent(inout) :: blocks
 
-        if (K_TT%is_initialized()) call K_TT%destroy()
-        if (K_TH%is_initialized()) call K_TH%destroy()
-        if (K_HH%is_initialized()) call K_HH%destroy()
-        if (K_HT%is_initialized()) call K_HT%destroy()
-        if (F_T%is_initialized()) call F_T%destroy()
-        if (F_H%is_initialized()) call F_H%destroy()
+        integer(int32) :: r, c
+
+        do r = 1, PHYSICS_TYPES%NUM_ID
+            if (blocks%F(r)%is_initialized()) call blocks%F(r)%destroy()
+            do c = 1, PHYSICS_TYPES%NUM_ID
+                if (blocks%K(r, c)%is_initialized()) call blocks%K(r, c)%destroy()
+            end do
+        end do
     end subroutine destroy_local_system
 
     module subroutine assemble_initialize_ftcms(self, element_id, workspace, local_K_TT, local_K_TH, &
