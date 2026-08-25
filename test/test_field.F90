@@ -111,28 +111,23 @@ contains
     subroutine test_monolithic_sizes(error)
         type(error_type), allocatable :: error
         type(type_system_topology) :: topology
-        type(type_jacobian_matrix) :: K
         type(type_residual_vector) :: F
-        integer(int32) :: jac_size, ndof
 
         call build_fixture_topology(topology, 2)
 
-        call K%initialize(topology, COUPLING_MODES%MONOLITHIC)
+        ! The Jacobian is not exercised here any more: its dof numbering and
+        ! its matrix now come from the DM, so a synthetic topology with no mesh
+        ! behind it cannot build one. The residual vector still owns its own
+        ! layout and is checked as before.
         call F%initialize(topology, COUPLING_MODES%MONOLITHIC)
 
         ! 3 nodes * (thermal + hydraulic) = 6 DOFs total.
-        call K%get_size(jac_size)
-        call check(error, jac_size, 6)
-        if (allocated(error)) return
-
-        call K%get_num_dofs_per_node(ndof)
-        call check(error, ndof, 2)
-        if (allocated(error)) return
-
         call check(error, F%get_size(), 6)
         if (allocated(error)) return
 
-        call K%destroy()
+        call check(error, F%get_num_dofs_per_node(), 2)
+        if (allocated(error)) return
+
         call F%destroy()
         call topology%destroy()
     end subroutine test_monolithic_sizes
@@ -143,12 +138,10 @@ contains
     subroutine test_staggered_sizes(error)
         type(error_type), allocatable :: error
         type(type_system_topology) :: topology
-        type(type_jacobian_matrix) :: K
         type(type_residual_vector) :: F
 
         call build_fixture_topology(topology, 2)
 
-        call K%initialize(topology, COUPLING_MODES%STAGGERED)
         call F%initialize(topology, COUPLING_MODES%STAGGERED)
 
         ! In staggered mode num_dofs_per_node collapses to 0 (per-physics blocks).
@@ -159,7 +152,6 @@ contains
         call check(error, F%get_size(), 6)
         if (allocated(error)) return
 
-        call K%destroy()
         call F%destroy()
         call topology%destroy()
     end subroutine test_staggered_sizes

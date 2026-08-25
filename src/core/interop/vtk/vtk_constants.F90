@@ -7,6 +7,72 @@ module core_interop_vtk_constants
 
     public :: vtk_constants
 
+    !> VTK cell type numbers, shared with readers of other mesh formats.
+    public :: VTK_EMPTY_CELL
+    public :: VTK_VERTEX
+    public :: VTK_POLY_VERTEX
+    public :: VTK_LINE
+    public :: VTK_POLY_LINE
+    public :: VTK_TRIANGLE
+    public :: VTK_TRIANGLE_STRIP
+    public :: VTK_POLYGON
+    public :: VTK_PIXEL
+    public :: VTK_QUAD
+    public :: VTK_TETRA
+    public :: VTK_VOXEL
+    public :: VTK_HEXAHEDRON
+    public :: VTK_WEDGE
+    public :: VTK_PYRAMID
+    public :: VTK_PENTAGONAL_PRISM
+    public :: VTK_HEXAGONAL_PRISM
+    public :: VTK_QUADRATIC_EDGE
+    public :: VTK_QUADRATIC_TRIANGLE
+    public :: VTK_QUADRATIC_QUAD
+    public :: VTK_QUADRATIC_POLYGON
+    public :: VTK_QUADRATIC_TETRA
+    public :: VTK_QUADRATIC_HEXAHEDRON
+    public :: VTK_QUADRATIC_WEDGE
+    public :: VTK_QUADRATIC_PYRAMID
+    public :: VTK_BIQUADRATIC_QUAD
+    public :: VTK_TRIQUADRATIC_HEXAHEDRON
+    public :: VTK_TRIQUADRATIC_PYRAMID
+    public :: VTK_QUADRATIC_LINEAR_QUAD
+    public :: VTK_QUADRATIC_LINEAR_WEDGE
+    public :: VTK_BIQUADRATIC_QUADRATIC_WEDGE
+    public :: VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON
+    public :: VTK_BIQUADRATIC_TRIANGLE
+    public :: VTK_CUBIC_LINE
+    public :: VTK_CONVEX_POINT_SET
+    public :: VTK_POLYHEDRON
+    public :: VTK_PARAMETRIC_CURVE
+    public :: VTK_PARAMETRIC_SURFACE
+    public :: VTK_PARAMETRIC_TRI_SURFACE
+    public :: VTK_PARAMETRIC_QUAD_SURFACE
+    public :: VTK_PARAMETRIC_TETRA_REGION
+    public :: VTK_PARAMETRIC_HEX_REGION
+    public :: VTK_HIGHER_ORDER_EDGE
+    public :: VTK_HIGHER_ORDER_TRIANGLE
+    public :: VTK_HIGHER_ORDER_QUAD
+    public :: VTK_HIGHER_ORDER_POLYGON
+    public :: VTK_HIGHER_ORDER_TETRAHEDRON
+    public :: VTK_HIGHER_ORDER_WEDGE
+    public :: VTK_HIGHER_ORDER_PYRAMID
+    public :: VTK_HIGHER_ORDER_HEXAHEDRON
+    public :: VTK_LAGRANGE_CURVE
+    public :: VTK_LAGRANGE_TRIANGLE
+    public :: VTK_LAGRANGE_QUADRILATERAL
+    public :: VTK_LAGRANGE_TETRAHEDRON
+    public :: VTK_LAGRANGE_HEXAHEDRON
+    public :: VTK_LAGRANGE_WEDGE
+    public :: VTK_LAGRANGE_PYRAMID
+    public :: VTK_BEZIER_CURVE
+    public :: VTK_BEZIER_TRIANGLE
+    public :: VTK_BEZIER_QUADRILATERAL
+    public :: VTK_BEZIER_TETRAHEDRON
+    public :: VTK_BEZIER_HEXAHEDRON
+    public :: VTK_BEZIER_WEDGE
+    public :: VTK_BEZIER_PYRAMID
+
     type :: type_vtk_constants_local
         character(:), allocatable :: cell_name
         integer(int32) :: cell_type

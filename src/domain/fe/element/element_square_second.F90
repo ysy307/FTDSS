@@ -253,10 +253,9 @@ contains
                     exit newton_loop
                 end if
 
-                call self%calc_jacobian_determinant(r, node_coords, det_j)
-                if (abs(det_j) < 1.0e-12) exit newton_loop
-
                 call self%calc_jacobian(r, node_coords, jac)
+                det_j = jac(1, 1) * jac(2, 2) - jac(1, 2) * jac(2, 1)
+                if (abs(det_j) < 1.0e-12) exit newton_loop
                 inv_det = 1.0d0 / det_j
 
                 ! Calculate inverse Jacobian * residual

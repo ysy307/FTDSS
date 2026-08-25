@@ -99,12 +99,12 @@ contains
         self%basic%parent => self
         self%conditions%parent => self
         self%output_settings%parent => self
-        self%geometry%parent => self
 
         call self%basic%initialize()
         call self%conditions%initialize()
-        call self%output_settings%initialize()
+        self%geometry%parent => self
         call self%geometry%initialize()
+        call self%output_settings%initialize()
 
     end subroutine initialize_type_input
 

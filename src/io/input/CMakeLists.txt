@@ -68,6 +68,7 @@ target_include_directories(SOLVER_INPUT PUBLIC
 # ------------------------------------------------------------
 target_link_libraries(SOLVER_INPUT PUBLIC
     SOLVER::CORE
+    SOLVER::DOMAIN
 )
 
 # ------------------------------------------------------------

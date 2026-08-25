@@ -202,10 +202,9 @@ contains
                 return
             end if
 
-            call self%calc_jacobian_determinant(r_loc, node_coords, det_j)
-            if (abs(det_j) < 1.0e-12) return
-
             call self%calc_jacobian(r_loc, node_coords, jac)
+            det_j = jac(1, 1) * jac(2, 2) - jac(1, 2) * jac(2, 1)
+            if (abs(det_j) < 1.0e-12) return
             inv_det = 1.0d0 / det_j
 
             r_loc%x = r_loc%x + (jac(2, 2) * dx - jac(1, 2) * dy) * inv_det

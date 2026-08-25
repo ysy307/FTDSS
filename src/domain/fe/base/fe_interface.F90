@@ -60,6 +60,10 @@ module domain_base_fe
         !> Calculates shape functions, physical gradients, and Jacobian determinant
         !> at a given local coordinate.
         !>
+        !> Basis values and reference gradients of every node at one reference
+        !> point. The default walks calc_psi/calc_dpsi; a discretisation that
+        !> can tabulate its whole basis at once overrides this.
+        procedure, public, pass(self) :: tabulate => tabulate_abst_fe
         procedure, public, pass(self) :: calc_shape_function => calc_shape_function_abst_fe
         procedure, public, pass(self) :: calc_inverse_jacobian => calc_inverse_jacobian_abst_fe
         procedure, public, pass(self) :: calc_dpsi_dx => calc_dpsi_dx_abst_fe
@@ -351,6 +355,14 @@ module domain_base_fe
     end interface
 
     interface
+        module subroutine tabulate_abst_fe(self, r, psi, dpsi_ref)
+            implicit none
+            class(abst_fe), intent(in) :: self
+            type(type_coordinate_dp), intent(in) :: r
+            real(real64), intent(inout), optional :: psi(:)
+            real(real64), intent(inout), optional :: dpsi_ref(:, :)
+        end subroutine tabulate_abst_fe
+
         module subroutine calc_shape_function_abst_fe(self, r, node_coords, psi, dpsi_dx, inverse_jacobian, determinant_jacobian)
             implicit none
             class(abst_fe), intent(in) :: self

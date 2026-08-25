@@ -266,8 +266,8 @@ contains
         class(type_input), intent(in) :: input
         type(type_config_iteration), intent(inout) :: config
 
-        ! Nonlinear strategy is fixed to Picard for this project profile.
-        config%nonlinear_solver_type = NONLINEAR_SOLVER%PICARD
+        config%nonlinear_solver_type = &
+            NONLINEAR_SOLVER%to_object(input%basic%solver_settings%nonlinear_solver%method)
         call execute_basic_iteration_nonlinear(input, config%nonlinear)
 
     end subroutine execute_basic_iteration
@@ -355,7 +355,7 @@ contains
         integer(int32) :: num_unique_regions
         integer(int32) :: max_region_id
 
-        call input%geometry%vtk%get_active_region_info(config%unique_material_ids)
+        call input%geometry%mesh%get_active_region_info(config%unique_material_ids)
 
         if (.not. allocated(config%unique_material_ids) .or. size(config%unique_material_ids) == 0) then
             print *, "Error: No active material regions found."

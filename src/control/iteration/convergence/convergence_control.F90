@@ -1,4 +1,5 @@
 submodule(control_iteration_convergence) convergence_control
+    use :: core_parallel_reduce
     implicit none
 
     !> Floor for the adaptive under-relaxation factor of the globalized modified
@@ -403,7 +404,7 @@ contains
         has_residual_norm = .false.
 
         ! Divergence guard: NaN in the conserved fields
-        if (any(enthalpy /= enthalpy) .or. any(density /= density)) then
+        if (reduce_any(any(enthalpy /= enthalpy) .or. any(density /= density))) then
             is_diverged = .true.
             return
         end if
@@ -453,12 +454,12 @@ contains
                 residual_ok = residual_ok .and. (e_localT <= 1.0d0)
             else
                 floorT = residual_floor(self%atol_enthalpy, self%residual_volume_total, &
-                                        self%residual_dt, size(residual_thermal))
+                                        self%residual_dt, owned_node_count(size(residual_thermal)))
                 residual_ok = residual_ok .and. &
                               (rT <= floorT + self%residual_eps * self%residual0_thermal)
             end if
 
-            driftT = sum(residual_thermal) * self%residual_dt
+            driftT = reduce_sum_nodal(residual_thermal) * self%residual_dt
             self%pending_drift_thermal = driftT
             self%pending_drift_thermal_valid = .true.
             ! Budget in the same primary-variable currency as the local gate
@@ -489,12 +490,12 @@ contains
                 residual_ok = residual_ok .and. (e_localH <= 1.0d0)
             else
                 floorH = residual_floor(self%atol_density, self%residual_volume_total, &
-                                        self%residual_dt, size(residual_hydraulic))
+                                        self%residual_dt, owned_node_count(size(residual_hydraulic)))
                 residual_ok = residual_ok .and. &
                               (rH <= floorH + self%residual_eps * self%residual0_hydraulic)
             end if
 
-            driftH = sum(residual_hydraulic) * self%residual_dt
+            driftH = reduce_sum_nodal(residual_hydraulic) * self%residual_dt
             self%pending_drift_hydraulic = driftH
             self%pending_drift_hydraulic_valid = .true.
             ! Same integrated-tolerance budget as the thermal block above.
@@ -555,6 +556,8 @@ contains
         ! Conserved changes and global balance cannot replace the assembled
         ! field equations. All three are hard acceptance gates.
         is_ok = dq_ok .and. residual_ok .and. balance_ok
+        ! No rank may accept a step another rank rejects.
+        is_ok = reduce_all(is_ok)
 
         ! Globalize the coupled Picard update using the freshly assembled nonlinear
         ! residual. The conserved-quantity increment can alternate while the true
@@ -599,6 +602,8 @@ contains
                 is_diverged = .true.
             end if
         end if
+
+        is_diverged = reduce_any(is_diverged)
 
         ! Publish the gates the decision above used. ratioT/ratioH are not
         ! among them: they are R0-normalized control diagnostics that drive
@@ -747,9 +752,9 @@ contains
         real(real64), intent(inout) :: floor_hydraulic
 
         floor_thermal = residual_floor(self%atol_enthalpy, self%residual_volume_total, &
-                                       self%residual_dt, num_nodes)
+                                       self%residual_dt, owned_node_count(num_nodes))
         floor_hydraulic = residual_floor(self%atol_density, self%residual_volume_total, &
-                                         self%residual_dt, num_nodes)
+                                         self%residual_dt, owned_node_count(num_nodes))
     end subroutine get_residual_floors_convergence_control
 
     module subroutine set_residual_scale_convergence_control(self, volume_total, dt, nodal_volume, &
@@ -821,31 +826,40 @@ contains
             return
         end if
 
-        norm = vector_norm2(r)
+        ! Not vector_norm2: that reduces every local entry, so a node shared by
+        ! two ranks enters the sum twice.
+        norm = sqrt(reduce_sum_squares_nodal(r))
     end function block_residual_norm
 
     !> Weighted root-mean-square norm (PDF eq 6.2.3) of a conserved-quantity
     !> increment (dH, drho) using weights w = atol + rtol*|Q|.
-    pure function weighted_rms_conserved(self, dH, drho, H, rho) result(norm)
+    function weighted_rms_conserved(self, dH, drho, H, rho) result(norm)
         implicit none
         type(type_convergence_control), intent(in) :: self
         real(real64), intent(in) :: dH(:), drho(:), H(:), rho(:)
         real(real64) :: norm
 
         integer(int32) :: j, n
-        real(real64) :: wH, wR, acc
+        real(real64) :: wH, wR, acc, count_owned
+        logical, allocatable :: owned(:)
 
         n = min(size(dH), size(drho), size(H), size(rho))
+        owned = ownership_mask(n)
         acc = 0.0d0
+        count_owned = 0.0d0
         do j = 1, n
+            if (.not. owned(j)) cycle
+            count_owned = count_owned + 1.0d0
             wH = self%atol_enthalpy + self%rtol_conserved * abs(H(j))
             wR = self%atol_density + self%rtol_conserved * abs(rho(j))
             if (wH > 0.0d0) acc = acc + (dH(j) / wH)**2
             if (wR > 0.0d0) acc = acc + (drho(j) / wR)**2
         end do
 
-        if (n > 0) then
-            norm = sqrt(acc / real(2 * n, real64))
+        acc = reduce_sum(acc)
+        count_owned = reduce_sum(count_owned)
+        if (count_owned > 0.0d0) then
+            norm = sqrt(acc / (2.0d0 * count_owned))
         else
             norm = 0.0d0
         end if
@@ -865,22 +879,36 @@ contains
         real(real64) :: e_local
 
         integer(int32) :: n
+        logical :: is_thermal, available
 
         e_local = -1.0d0
-        if (self%residual_dt <= 0.0d0) return
-        if (.not. allocated(self%nodal_volume)) return
         n = size(residual)
-        if (size(self%nodal_volume) /= n) return
+        is_thermal = (physics_type%ID == PHYSICS_TYPES%THERMAL%ID)
 
-        if (physics_type%ID == PHYSICS_TYPES%THERMAL%ID) then
-            if (.not. allocated(self%q_thermal)) return
-            if (size(self%q_thermal) /= n) return
+        available = (self%residual_dt > 0.0d0) .and. allocated(self%nodal_volume)
+        if (available) available = (size(self%nodal_volume) == n)
+        if (available) then
+            if (is_thermal) then
+                available = allocated(self%q_thermal)
+                if (available) available = (size(self%q_thermal) == n)
+            else if (physics_type%ID == PHYSICS_TYPES%HYDRAULIC%ID) then
+                available = allocated(self%q_hydraulic)
+                if (available) available = (size(self%q_hydraulic) == n)
+            else
+                available = .false.
+            end if
+        end if
+
+        ! local_error_wrms reduces across ranks. Every rank must agree on
+        ! whether it runs, or the ranks that skip it leave the others waiting.
+        available = reduce_all(available)
+        if (.not. available) return
+
+        if (is_thermal) then
             e_local = local_error_wrms(residual, self%nodal_volume, self%q_thermal, &
                                        self%q_span_thermal, self%atol_enthalpy, self%rtol_u, &
                                        self%residual_dt)
-        else if (physics_type%ID == PHYSICS_TYPES%HYDRAULIC%ID) then
-            if (.not. allocated(self%q_hydraulic)) return
-            if (size(self%q_hydraulic) /= n) return
+        else
             e_local = local_error_wrms(residual, self%nodal_volume, self%q_hydraulic, &
                                        self%q_span_hydraulic, self%atol_density, self%rtol_u, &
                                        self%residual_dt)
@@ -899,19 +927,23 @@ contains
     !> sensible capacity - two orders of magnitude. Measured: an iterate whose
     !> local error was 0.117 (eight times inside tolerance) was rejected by a
     !> balance gate reading 2.16.
-    pure function integrated_tolerance(volume, q, q_span, atol_q, rtol) result(budget)
+    function integrated_tolerance(volume, q, q_span, atol_q, rtol) result(budget)
         implicit none
         real(real64), intent(in) :: volume(:), q(:)
         real(real64), intent(in) :: q_span, atol_q, rtol
         real(real64) :: budget
 
         integer(int32) :: i, n
+        logical, allocatable :: owned(:)
 
         n = min(size(volume), size(q))
+        owned = ownership_mask(n)
         budget = 0.0d0
         do i = 1, n
+            if (.not. owned(i)) cycle
             budget = budget + volume(i) * conserved_weight(q(i), q_span, atol_q, rtol)
         end do
+        budget = reduce_sum(budget)
     end function integrated_tolerance
 
     module subroutine report_local_error_nodes_convergence_control(self, physics_type, residual, label, &
@@ -1029,24 +1061,31 @@ contains
     !> node balances it through pressure instead. Measured at the wall: node
     !> 150 needed 0.178 K (326x its temperature tolerance) or 198 Pa, and the
     !> gate read only the first.
-    pure function local_error_wrms(residual, volume, q, q_span, atol_q, rtol, dt) result(e_local)
+    function local_error_wrms(residual, volume, q, q_span, atol_q, rtol, dt) result(e_local)
         implicit none
         real(real64), intent(in) :: residual(:), volume(:), q(:)
         real(real64), intent(in) :: q_span, atol_q, rtol, dt
         real(real64) :: e_local
 
         integer(int32) :: i, n
-        real(real64) :: denom, acc
+        real(real64) :: denom, acc, count_owned
+        logical, allocatable :: owned(:)
 
         n = min(size(residual), size(volume), size(q))
+        owned = ownership_mask(n)
         acc = 0.0d0
+        count_owned = 0.0d0
         do i = 1, n
+            if (.not. owned(i)) cycle
+            count_owned = count_owned + 1.0d0
             denom = volume(i) * conserved_weight(q(i), q_span, atol_q, rtol)
             if (denom > 0.0d0) acc = acc + (residual(i) * dt / denom)**2
         end do
 
-        if (n > 0) then
-            e_local = sqrt(acc / real(n, real64))
+        acc = reduce_sum(acc)
+        count_owned = reduce_sum(count_owned)
+        if (count_owned > 0.0d0) then
+            e_local = sqrt(acc / count_owned)
         else
             e_local = 0.0d0
         end if

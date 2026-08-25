@@ -1,4 +1,6 @@
 submodule(app_ftcms) ftcms_base
+    use :: core_parallel_reduce, only:set_node_ownership
+    use :: domain_mesh_plex, only:type_dof_layout
     use :: core_types_topology_system_topology, only:type_system_topology
     use :: module_linalg, only:vector_norm2
     implicit none
@@ -75,7 +77,7 @@ contains
     module subroutine initialize_type_ftcms(self)
         implicit none
         class(type_ftcms), intent(inout) :: self
-        type(type_input), save :: input
+        type(type_input), save, target :: input
         type(type_ic_manager) :: ic
 
         integer(int32) :: max_bdf_order
@@ -86,9 +88,6 @@ contains
         integer(int32) :: computation_dimension
         integer(int32) :: num_total_dofs
         integer(int32) :: ierr
-        integer(int32) :: solver_type_selected, preconditioner_type_selected, m_restart_selected
-        integer(int32) :: projection_offset_selected, projection_stride_selected
-        logical :: projection_enabled_selected
         real(real64), pointer, contiguous, dimension(:) :: phase_values
 
         type(type_config_control_manager) :: config_control_manager
@@ -108,7 +107,6 @@ contains
         type(type_config_elements), allocatable :: config_boundary_elements(:)
 
         type(type_solver_settings) :: solver_info
-        type(type_preconditioner_settings) :: pc_info
 
         type(type_config_output) :: config_output
         type(type_config_observation) :: config_observation
@@ -186,6 +184,12 @@ contains
                                     input%basic%simulation_settings%calculate_type, config_control_manager%coupling_mode, &
                                     config_control_manager%compute_active)
 
+        ! The DM the input layer read stays the one source of geometry.
+        call self%domain%attach_mesh(input%geometry%mesh)
+
+        ! Every global reduction from here on counts a shared node once.
+        call set_node_ownership(input%geometry%mesh%node_is_owned)
+
         ! The mesh (connectivity, materials, adjacency) is static for the run:
         ! build the per-node distinct-material table once, right after the
         ! domain is fully built, for use by update_nodal_phases.
@@ -212,9 +216,11 @@ contains
             type(type_system_topology) :: topology
 
             call self%domain%export_topology(topology)
-            call self%K%initialize(topology, config_control_manager%coupling_mode)
-            call self%K%build_scatter_map(topology)
+            ! The DM supplies the dof numbering and the matrix; there is no
+            ! scatter map to build any more.
+            call self%K%initialize(topology, config_control_manager%coupling_mode, input%geometry%mesh)
             call self%F%initialize(topology, config_control_manager%coupling_mode)
+            call self%dirichlet_marker%initialize(topology, config_control_manager%coupling_mode)
             call self%du%initialize(topology, config_control_manager%coupling_mode)
         end block
 
@@ -238,7 +244,7 @@ contains
         call self%Qv%initialize(num_nodes, max_bdf_order)
 
         call self%domain%get_computation_dimension(computation_dimension)
-        call input%geometry%vtk%get_active_region_info(active_region_ids, target_dim=computation_dimension)
+        call input%geometry%mesh%get_active_region_info(active_region_ids, target_dim=computation_dimension)
 
         call self%thermal%initialize(input, active_region_ids)
         call self%hydraulic%initialize(input, active_region_ids)
@@ -248,21 +254,6 @@ contains
 
         ! Initialize solver strictly from input settings.
         associate (linear_solver_settings => input%basic%solver_settings%linear_solver)
-            solver_type_selected = linear_solver_settings%solver_type
-            preconditioner_type_selected = linear_solver_settings%preconditioner_type
-            m_restart_selected = linear_solver_settings%m_restarts
-            projection_enabled_selected = .false.
-            projection_offset_selected = 0
-            projection_stride_selected = 0
-
-            write (*, '(A,I0,A,I0)') 'Notice: linear solver type=', solver_type_selected, &
-                ', preconditioner type=', preconditioner_type_selected
-
-            ! Mean-zero nullspace projection is never enabled automatically: the
-            ! transient hydraulic block is nonsingular (BDF storage term with
-            ! C_eq >= L-scheme capacity > 0), and projecting a nonsingular
-            ! system discards the global water-mass balance (the mean residual
-            ! component) every Krylov iteration, biasing the solution.
             block
                 integer(int32) :: solver_size
                 if (self%control%is_staggered()) then
@@ -270,64 +261,26 @@ contains
                 else
                     solver_size = num_total_dofs
                 end if
-                call solver_info%set(solver_type_selected, &
-                                     solver_size, &
+                call solver_info%set(solver_size, &
                                      linear_solver_settings%tolerance, &
                                      linear_solver_settings%max_iterations, &
-                                     m_restart_selected, &
-                                     projection_enabled=projection_enabled_selected, &
-                                     projection_offset=projection_offset_selected, &
-                                     projection_stride=projection_stride_selected)
+                                     petsc_options=trim(linear_solver_settings%petsc_options))
             end block
-            if (.not. self%control%is_staggered() .and. &
-                (preconditioner_type_selected == PRECONDITIONER_TYPES%ILU%ID .or. &
-                 preconditioner_type_selected == PRECONDITIONER_TYPES%ILUT%ID .or. &
-                 preconditioner_type_selected == PRECONDITIONER_TYPES%SAAMG%ID)) then
-                block
-                    integer(int32) :: dofs_per_node_local
-                    call self%K%get_num_dofs_per_node(dofs_per_node_local)
-                    call pc_info%set(preconditioner_type_selected, num_nodes, dofs_per_node_local, &
-                                     amg_strength_threshold=linear_solver_settings%amg_strength_threshold, &
-                                     amg_smoother_sweeps=linear_solver_settings%amg_smoother_sweeps, &
-                                     amg_max_agg_size=linear_solver_settings%amg_max_agg_size, &
-                                     amg_drop_tolerance=linear_solver_settings%amg_drop_tolerance, &
-                                     amg_drop_strategy=linear_solver_settings%amg_drop_strategy, &
-                                     amg_smoother_type=linear_solver_settings%amg_smoother_type, &
-                                     amg_rebuild_frequency=linear_solver_settings%amg_rebuild_frequency, &
-                                     amg_rebuild_threshold=linear_solver_settings%amg_rebuild_threshold)
-                end block
-            else
-                call pc_info%set(preconditioner_type_selected, &
-                                 merge(num_nodes, num_total_dofs, self%control%is_staggered()))
-            end if
-            call create_solver(self%solver, solver_info, pc_info, ierr)
+            call create_solver(self%solver, solver_info, ierr)
+            call hand_dof_map_to_solver(self%solver, self%K)
 
             if (self%is_active_thermal()) then
                 if (self%control%is_staggered()) then
-                    call pc_info%set(preconditioner_type_selected, num_nodes)
-                    call solver_info%set(solver_type_selected, num_nodes, &
+                    call solver_info%set(num_nodes, &
                                          linear_solver_settings%tolerance, &
                                          linear_solver_settings%max_iterations, &
-                                         m_restart_selected, &
-                                         relative_tolerance=5.0d-2)
-                else
-                    call pc_info%set(PRECONDITIONER_TYPES%JACOBI%ID, num_total_dofs)
+                                         relative_tolerance=5.0d-2, &
+                                         petsc_options=trim(linear_solver_settings%petsc_options))
                 end if
-                call create_solver(self%solver_thermal, solver_info, pc_info, ierr)
+                call create_solver(self%solver_thermal, solver_info, ierr)
+                call hand_dof_map_to_solver(self%solver_thermal, self%K, PHYSICS_TYPES%THERMAL)
             end if
         end associate
-
-        ! Capture initial mean pressure for steady-state all-Neumann null-mode anchoring only.
-        if (self%is_active_hydraulic() .and. (.not. self%hydraulic_has_dirichlet_bc) &
-            .and. projection_enabled_selected) then
-            nullify (phase_values)
-            call self%pressure%get_current(phase_values)
-            if (associated(phase_values) .and. size(phase_values) > 0) then
-                self%hydraulic_ref_mean = sum(phase_values) / real(size(phase_values), real64)
-                self%hydraulic_ref_mean_set = .true.
-            end if
-            nullify (phase_values)
-        end if
 
         ! Populate initial phase variables from initial T/P/porosity before first output.
         call self%update_variables()
@@ -372,7 +325,8 @@ contains
             end if
         end if
 
-        call self%output%initialize(config_output, config_observation, config_overall)
+        call self%output%initialize(config_output, config_observation, config_overall, &
+                                    input%geometry%mesh)
         call self%output_fields()
         call self%output_history()
 
@@ -563,14 +517,16 @@ contains
                                                ice_content=ice_pore, &
                                                vapor_content=vapor_content, &
                                                pressure=pressure, &
-                                               water_flux=water_flux_arr)
+                                               water_flux=water_flux_arr, &
+                                               time=current_time)
             else
                 call self%output%output_fields(file_counts=iter, &
                                                temperature=temperature, &
                                                water_content=water_content, &
                                                ice_content=ice_pore, &
                                                vapor_content=vapor_content, &
-                                               pressure=pressure)
+                                               pressure=pressure, &
+                                               time=current_time)
             end if
 
             call self%control%update_output(OUTPUT_TYPES%FIELD, current_time)
@@ -790,6 +746,11 @@ contains
                     nullify (F)
                 end if
             end if
+
+            ! This rank assembled only its own cells, so a node on a partition
+            ! boundary holds a partial residual. Every convergence gate reads
+            ! this array, so it is completed here rather than at each gate.
+            if (associated(self%domain%mesh)) call self%domain%mesh%halo_sum_nodal(variable)
         else
             call allocate_array(variable, 0)
         end if
@@ -846,6 +807,8 @@ contains
                        temperature_history=temperature_history(1:bdf_order + 1))
 
         start_dof_hydraulic = self%hydraulic_start_dof
+        ! No hydraulic dof means no liquid-pressure field; the closure then sees
+        ! zero matric suction, which is what makes freezing temperature-driven.
         if (start_dof_hydraulic > 0) then
             call self%pressure%get_current(node_id, pressure)
             call self%pressure%get_current_gradient(node_id, grad_P)
@@ -2045,7 +2008,9 @@ contains
         max_current_ice = current_ice_values(max_node)
         max_projected_ice = projected_ice_values(max_node)
         call self%temperature%get_current(max_node, max_temperature)
-        call self%pressure%get_current(max_node, max_pressure)
+        ! A thermal-only run never allocates the pressure field.
+        max_pressure = 0.0d0
+        if (self%is_active_hydraulic()) call self%pressure%get_current(max_node, max_pressure)
 
         if (apply_update) then
             do node_id = 1, num_nodes
@@ -2631,4 +2596,36 @@ contains
         if (allocated(self%subcell_depth_unresolved)) deallocate (self%subcell_depth_unresolved)
 
     end subroutine destroy_type_ftcms
+    !> Give the solver the dof numbering the DM produced, so it can place this
+    !> rank's right-hand side into the distributed vectors. The numbering is
+    !> the matrix's own, which is what keeps the two consistent.
+    subroutine hand_dof_map_to_solver(solver, jacobian, physics_type)
+        implicit none
+        class(abst_solver), allocatable, intent(inout) :: solver
+        type(type_jacobian_matrix), intent(in) :: jacobian
+        type(type_constant_id), intent(in), optional :: physics_type
+
+        type(type_dof_layout) :: layout
+        integer(int32), allocatable :: global_dof(:)
+        integer(int32) :: node, block_offset, index
+
+        if (.not. allocated(solver)) return
+
+        call jacobian%get_dof_layout(layout, physics_type)
+        if (.not. allocated(layout%node_dof_base)) return
+        if (layout%num_dofs_per_node <= 0) return
+
+        allocate (global_dof(size(layout%node_dof_base) * layout%num_dofs_per_node))
+        index = 0
+        do node = 1, size(layout%node_dof_base)
+            do block_offset = 1, layout%num_dofs_per_node
+                index = index + 1
+                global_dof(index) = layout%node_dof_base(node) + block_offset - 1
+            end do
+        end do
+
+        call solver%set_dof_map(global_dof)
+        deallocate (global_dof)
+    end subroutine hand_dof_map_to_solver
+
 end submodule ftcms_base

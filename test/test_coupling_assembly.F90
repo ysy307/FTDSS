@@ -1,15 +1,15 @@
+#include <petsc/finclude/petscmat.h>
+
 program test_coupling_assembly
     use, intrinsic :: iso_fortran_env, only:error_unit, int32, output_unit, real64
-#ifdef _MPI
-    use :: mpi_f08
-#endif
-    use :: module_core, only:PHYSICS_TYPES, abst_matrix, type_matrix_bsr
+    use :: petscmat
+    use :: module_core, only:PHYSICS_TYPES
     use :: module_ftcms, only:type_ftcms
     implicit none
 
     type(type_ftcms) :: ftcms
-    class(abst_matrix), pointer :: matrix
-    real(real64), pointer :: values(:, :, :)
+    Mat :: matrix
+    integer(int32) :: num_dofs_per_node
     real(real64), pointer, contiguous :: field(:)
     real(real64) :: norm_th, norm_ht
     real(real64) :: thermal_sum_before, thermal_sum_after
@@ -36,7 +36,7 @@ program test_coupling_assembly
     if (.not. mpi_is_initialized) call MPI_Init(ierr)
 #endif
 
-    nullify (matrix, values, field)
+    nullify (field)
     call ftcms%initialize()
 
     ! ------------------------------------------------------------------
@@ -104,26 +104,18 @@ program test_coupling_assembly
     write (output_unit, '(A)') "PASS: residual-only assembly reused the selected subcell depth"
     deallocate (active_depth_before)
 
-    matrix => ftcms%K%get_matrix()
-    if (.not. associated(matrix)) then
-        write (error_unit, '(A)') "FAIL: monolithic Jacobian matrix is not associated"
+    call ftcms%K%assemble()
+    matrix = ftcms%K%get_matrix()
+    if (matrix%v == PETSC_NULL_MAT%v) then
+        write (error_unit, '(A)') "FAIL: monolithic Jacobian matrix does not exist"
         error stop 1
     end if
+    call ftcms%K%get_num_dofs_per_node(num_dofs_per_node)
 
-    select type (matrix)
-    type is (type_matrix_bsr)
-        values => matrix%get_val()
-    class default
-        write (error_unit, '(A)') "FAIL: monolithic Jacobian is not BSR"
-        error stop 1
-    end select
-    if (.not. associated(values)) then
-        write (error_unit, '(A)') "FAIL: monolithic Jacobian values are not associated"
-        error stop 1
-    end if
-
-    norm_th = maxval(abs(values(PHYSICS_TYPES%THERMAL%ID, PHYSICS_TYPES%HYDRAULIC%ID, :)))
-    norm_ht = maxval(abs(values(PHYSICS_TYPES%HYDRAULIC%ID, PHYSICS_TYPES%THERMAL%ID, :)))
+    norm_th = block_extreme(matrix, num_dofs_per_node, PHYSICS_TYPES%THERMAL%ID, &
+                            PHYSICS_TYPES%HYDRAULIC%ID, .true.)
+    norm_ht = block_extreme(matrix, num_dofs_per_node, PHYSICS_TYPES%HYDRAULIC%ID, &
+                            PHYSICS_TYPES%THERMAL%ID, .true.)
     if (norm_th <= tiny(1.0d0)) then
         write (error_unit, '(A,ES12.5)') "FAIL: K_TH is zero, max norm=", norm_th
         error stop 1
@@ -143,9 +135,12 @@ program test_coupling_assembly
     ! very diagonal the condition supplies, which is invisible in a max-norm
     ! check but flips the sign of this sum.
     ! ------------------------------------------------------------------
-    thermal_sum_before = sum(values(PHYSICS_TYPES%THERMAL%ID, PHYSICS_TYPES%THERMAL%ID, :))
+    thermal_sum_before = block_extreme(matrix, num_dofs_per_node, PHYSICS_TYPES%THERMAL%ID, &
+                                       PHYSICS_TYPES%THERMAL%ID, .false.)
     call ftcms%apply_bc(prescribed=.false.)
-    thermal_sum_after = sum(values(PHYSICS_TYPES%THERMAL%ID, PHYSICS_TYPES%THERMAL%ID, :))
+    call ftcms%K%assemble()
+    thermal_sum_after = block_extreme(matrix, num_dofs_per_node, PHYSICS_TYPES%THERMAL%ID, &
+                                      PHYSICS_TYPES%THERMAL%ID, .false.)
     if (thermal_sum_after <= thermal_sum_before) then
         write (error_unit, '(A,2(1X,ES13.5))') &
             "FAIL: Robin boundary weakens the thermal block; sum before/after=", &
@@ -176,7 +171,6 @@ program test_coupling_assembly
     write (output_unit, '(A,ES12.5)') "PASS: K_TH matches the finite-difference tangent, mean rel err=", &
         block_error(5)
 
-    nullify (values, matrix)
     call ftcms%destroy()
 
 #ifdef _MPI
@@ -184,5 +178,42 @@ program test_coupling_assembly
     call MPI_Finalized(mpi_is_finalized, ierr)
     if (mpi_is_initialized .and. (.not. mpi_is_finalized)) call MPI_Finalize(ierr)
 #endif
+
+contains
+
+    !> Walk the assembled matrix and reduce one physics block of it: the largest
+    !> magnitude when want_max is true, the plain sum otherwise. The block a
+    !> matrix entry belongs to follows from its position inside the node block.
+    function block_extreme(A, num_dofs_per_node, row_offset, col_offset, want_max) result(value)
+        implicit none
+        Mat, intent(in) :: A
+        integer(int32), intent(in) :: num_dofs_per_node, row_offset, col_offset
+        logical, intent(in) :: want_max
+        real(real64) :: value
+
+        PetscErrorCode :: ierr_local
+        PetscInt :: first_row, last_row, row, num_cols
+        PetscInt, pointer :: cols(:)
+        PetscScalar, pointer :: vals(:)
+        integer(int32) :: k
+
+        value = 0.0d0
+        call MatGetOwnershipRange(A, first_row, last_row, ierr_local)
+        do row = first_row, last_row - 1
+            if (int(mod(row, int(num_dofs_per_node, PETSC_INT_KIND)), int32) + 1 /= row_offset) cycle
+            nullify (cols)
+            nullify (vals)
+            call MatGetRow(A, row, num_cols, cols, vals, ierr_local)
+            do k = 1, int(num_cols, int32)
+                if (int(mod(cols(k), int(num_dofs_per_node, PETSC_INT_KIND)), int32) + 1 /= col_offset) cycle
+                if (want_max) then
+                    value = max(value, abs(real(vals(k), real64)))
+                else
+                    value = value + real(vals(k), real64)
+                end if
+            end do
+            call MatRestoreRow(A, row, num_cols, cols, vals, ierr_local)
+        end do
+    end function block_extreme
 
 end program test_coupling_assembly

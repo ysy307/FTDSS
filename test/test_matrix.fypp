@@ -1,4 +1,4 @@
-#:set MATRIX_TYPES = ['dense', 'csr', 'coo', 'bsr', 'dia']
+#:set MATRIX_TYPES = ['dense']
 #:set TOL = '1.0e-14_real64'
 !>
 !> Fypp-generated integration test for all matrix types.
@@ -81,7 +81,6 @@ contains
 
             integer(int32) :: ierr
             integer(int32) :: n_flat
-            logical :: mkl_ready
             real(real64), pointer :: dp(:)
 
             #:if TYPE == 'bsr'
@@ -318,10 +317,6 @@ contains
             call mat%set_value_at(MATRIX_OPS%INS, n_flat + 1, 1.0_real64)
             cur_status = mat%get_status()
             call check(error, cur_status == MATRIX_STATUS%OUT_OF_MEMORY); if (allocated(error)) return
-
-            ! ---- commit_to_mkl + is_mkl_handle_ready ----
-            call mat%commit_to_mkl(ierr)
-            mkl_ready = mat%is_mkl_handle_ready()
 
             ! ---- destroy ----
             call mat%destroy()

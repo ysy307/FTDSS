@@ -3,6 +3,7 @@
 !>
 module domain_domain_manager
     use, intrinsic :: iso_fortran_env
+    use :: domain_mesh_plex, only: type_mesh_plex
     use :: core_parallel_mpi
     use :: stdlib_logger
     use :: stdlib_strings, only:strip
@@ -35,6 +36,9 @@ module domain_domain_manager
         type(type_constant_id) :: computation_type = type_constant_id("COMP_TYPE", "unknown", -1)
         !> The type of coupling (e.g., staggered or monolithic).
         type(type_constant_id) :: coupling_mode = type_constant_id("COUPLING_MODE", "unknown", -1)
+        !> The mesh, still held by the input layer that read it. The domain
+        !> points at it rather than owning a second copy.
+        type(type_mesh_plex), pointer :: mesh => null()
         !> Manages the degree of freedom layout.
         type(type_dof_map) :: dof_map
         !> Manages all nodal data.
@@ -53,6 +57,7 @@ module domain_domain_manager
         ! ---- Lifecycle ----
         ! initialize, destroy, reset, etc.
         procedure, public, pass(self) :: initialize => initialize_type_domain
+        procedure, public, pass(self) :: attach_mesh => attach_mesh_domain
 
         ! ---- Mutator ----
         ! set_XXX, increment_XXX, update_XXX, etc.
@@ -246,6 +251,17 @@ contains
         call self%elements%get_fe_connectivity(element_id, connectivity)
 
     end subroutine get_fe_connectivity_domain
+
+    !> Take the mesh the input layer read. Everything the domain reports about
+    !> geometry is answered by that DM.
+    subroutine attach_mesh_domain(self, mesh)
+        class(type_domain), intent(inout) :: self
+        !> intent(inout), not intent(in): the DM caches its halo-exchange
+        !> objects on first use, so the domain must hold a modifiable pointer.
+        type(type_mesh_plex), intent(inout), target :: mesh
+
+        self%mesh => mesh
+    end subroutine attach_mesh_domain
 
     subroutine get_num_dof_per_node_domain(self, num_dofs_per_node)
         implicit none
@@ -566,11 +582,22 @@ contains
         integer(int32), pointer, contiguous, dimension(:) :: p_conn => null()
         class(abst_fe), pointer :: fe => null()
 
+        config%fe_id = 0
         call self%find_element(config%coordinate, config%coordinate_normalized, config%fe_id)
+
+        ! Under domain decomposition an observation point usually lies outside
+        ! this rank, and find_element leaves fe_id at 0. Leaving the element and
+        ! its connectivity unset is the "not on this rank" state the output layer
+        ! already expects; dereferencing the null connectivity crashed instead.
+        if (config%fe_id <= 0) then
+            nullify (config%fe)
+            return
+        end if
+
         call self%get_fe(config%fe_id, fe)
         config%fe => fe
         call self%get_fe_connectivity(config%fe_id, p_conn)
-        call allocate_array(config%connectivity, p_conn)
+        if (associated(p_conn)) call allocate_array(config%connectivity, p_conn)
 
     end subroutine get_config_domain
 

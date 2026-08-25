@@ -8,20 +8,10 @@
         "calculate_hydraulic": true,
         "calculate_mechanical": false,
         "enable_vapor_transport": false,
-        "coupling_mode": "monolithic",
-        "partitioning": true
+        "coupling_mode": "monolithic"
     },
     "geometry_settings": {
-        "mesh_file_name": "Mizoguchi_unsaturated_v_@RANK@.vtu",
-        "global_node_id_key": "global_node_id",
-        "node_type_key": "node_type",
-        "num_sharing_ranks_key": "num_sharing_ranks",
-        "owner_ranks_key": "owner_ranks",
-        "communication_partners_key": "communication_partners",
-        "cell_id_key": "CellEntityIds",
-        "rank_key": "rank",
-        "original_id_key": "original_id",
-        "color_key": "color",
+        "mesh_file_name": "Mizoguchi_unsaturated_v.msh",
         "integration": {
             "integration_type": "full",
             "integration_order": 3,
@@ -54,10 +44,10 @@
             },
             "volumetric_heat_capacity": {
                 "value": [
-                    2.5536e6,
-                    4.18e6,
-                    1.9257e6,
-                    1.259e6
+                    2553600.0,
+                    4180000.0,
+                    1925700.0,
+                    1259000.0
                 ],
                 "params": [
                     1.0,
@@ -79,7 +69,7 @@
                 ],
                 "params": [
                     0.55,
-                    0.80,
+                    0.8,
                     3.07,
                     0.13,
                     13.05,
@@ -103,13 +93,13 @@
             },
             "hydraulic_conductivity_model": {
                 "model_number": 4,
-                "saturated_conductivity": 3.2e-6,
+                "saturated_conductivity": 3.2e-06,
                 "impedance_factor": 7,
                 "water_viscosity_model": 1,
                 "gain_factor": 1.0
             },
             "hydraulic_storage": {
-                "specific_storage": 2.3e-6
+                "specific_storage": 2.3e-06
             }
         }
     ],
@@ -134,11 +124,8 @@
         }
     },
     "linear_solver": {
-        "type": 26,
-        "preconditioner_type": 0,
         "max_iterations": 10000,
         "tolerance": 1e-06,
-        "restart_size": 1000,
         "amg_strength_threshold": 0.25,
         "amg_smoother_sweeps": 2,
         "amg_max_agg_size": 8,
@@ -146,7 +133,9 @@
         "amg_drop_strategy": "RELATIVE",
         "amg_smoother_type": "HYBRID",
         "amg_rebuild_frequency": 5,
-        "amg_rebuild_threshold": 0.01
+        "amg_rebuild_threshold": 0.01,
+        "ksp_type": "preonly",
+        "pc_type": "lu"
     },
     "parallel_settings": {
         "threads": {

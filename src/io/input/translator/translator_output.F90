@@ -169,28 +169,44 @@ contains
             end if
         end associate
 
-        associate (overall => input%geometry%vtk)
-            config%num_points = overall%num_points
-            config%num_cells = overall%num_total_cells
-            config%coordinate = overall%POINTS
+        associate (mesh => input%geometry%mesh)
+            config%num_points = mesh%num_nodes
+            config%num_cells = mesh%num_cells
 
-            call allocate_array(config%offsets, overall%num_total_cells)
-            call allocate_array(config%cell_types, overall%num_total_cells)
+            call config%coordinate%initialize(mesh%num_nodes)
+            block
+                real(real64), allocatable :: node_points(:, :)
+                integer(int32), allocatable :: connectivity(:)
+                integer(int32) :: count
 
-            do i = 1, overall%num_total_cells
-                config%offsets(i) = overall%CELLS(i)%num_nodes_in_cell
-                config%cell_types(i) = int(overall%CELLS(i)%cell_type, int8)
-            end do
-            total = sum(config%offsets(:))
+                allocate (node_points(3, mesh%num_nodes))
+                call mesh%get_node_coordinates(node_points)
+                config%coordinate%x(1:mesh%num_nodes) = node_points(1, :)
+                config%coordinate%y(1:mesh%num_nodes) = node_points(2, :)
+                config%coordinate%z(1:mesh%num_nodes) = node_points(3, :)
+                deallocate (node_points)
 
-            call allocate_array(config%connectivities, total)
-            idx = 0
-            do i = 1, overall%num_total_cells
-                do j = 1, overall%CELLS(i)%num_nodes_in_cell
-                    idx = idx + 1
-                    config%connectivities(idx) = overall%CELLS(i)%connectivity(j) - 1
+                call allocate_array(config%offsets, mesh%num_cells)
+                call allocate_array(config%cell_types, mesh%num_cells)
+                do i = 1, mesh%num_cells
+                    config%offsets(i) = mesh%cell_num_nodes(i)
+                    ! FE_TYPE ids follow the VTK cell-type numbering.
+                    config%cell_types(i) = int(mesh%cell_fe_type(i), int8)
                 end do
-            end do
+                total = sum(config%offsets(:))
+
+                call allocate_array(config%connectivities, total)
+                idx = 0
+                do i = 1, mesh%num_cells
+                    call mesh%get_cell_connectivity(i, connectivity, count)
+                    do j = 1, count
+                        idx = idx + 1
+                        ! VTK numbers nodes from zero.
+                        config%connectivities(idx) = connectivity(j) - 1
+                    end do
+                end do
+                if (allocated(connectivity)) deallocate (connectivity)
+            end block
         end associate
 
         ! --- Convert simulation period to seconds ---

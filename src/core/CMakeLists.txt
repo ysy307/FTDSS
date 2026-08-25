@@ -6,6 +6,7 @@ add_library(SOLVER_CORE STATIC)
 
 target_sources(SOLVER_CORE PRIVATE
     parallel_mpi.F90
+    parallel_reduce.F90
 )
 
 # ============================================================
@@ -99,11 +100,6 @@ target_sources(SOLVER_CORE PRIVATE
     # Algebra
     ${CORE_MATRIX_IFACE_GENERATED}
     types/algebra/matrix/matrix_dense.F90
-    types/algebra/matrix/matrix_coo.F90
-    types/algebra/matrix/matrix_csr.F90
-    types/algebra/matrix/matrix_bsr.F90
-    types/algebra/matrix/matrix_dia.F90
-    types/algebra/matrix/matrix_factory.F90
     types/algebra/matrix/matrix.F90
     ${CORE_VECTOR_GENERATED}
     types/algebra/vector/vector.F90
@@ -160,6 +156,7 @@ target_sources(SOLVER_CORE PRIVATE
 target_sources(SOLVER_CORE PRIVATE
 
     # --- Utils ---
+    interop/petscfe/petscfe_wrapper.F90
     interop/interop_utils.F90
 
     # --- Memory Profiling ---
@@ -178,23 +175,16 @@ target_sources(SOLVER_CORE PRIVATE
     interop/system_info/system_info_wrapper.F90
 
     # --- VTK (C++) ---
-    interop/vtk/reader_vtk.cpp
-    interop/vtk/reader_vtu.cpp
+    interop/petscfe/petscfe_shim.c
     interop/vtk/writer_vtk.cpp
     interop/vtk/writer_vtu.cpp
     interop/vtk/c_wrapper.cpp
 
     # --- VTK (Fortran) ---
-    interop/vtk/vtk_wrapper.F90
-    interop/vtk/vtu_wrapper.F90
     interop/vtk/vtk_writer_base.F90
     interop/vtk/vtk_writer_wrapper.F90
     interop/vtk/vtu_writer_wrapper.F90
     interop/vtk/vtk_constants.F90
-    interop/vtk/vtk_initialize.F90
-    interop/vtk/vtu_initialize.F90
-    interop/vtk/vtk_base.F90
-    interop/vtk/vtk.F90
     interop/interop.F90
 )
 
@@ -249,3 +239,13 @@ enable_thirdparty(SOLVER_CORE)
 # ============================================================
 
 add_library(SOLVER::CORE ALIAS SOLVER_CORE)
+
+
+# ------------------------------------------------------------
+# PETSc: DMPlex reads, partitions and labels the mesh
+# ------------------------------------------------------------
+set(FTCMS_PETSC_FOR_CORE ON)
+find_package(PkgConfig REQUIRED)
+set(ENV{PKG_CONFIG_PATH} "${PROJECT_SOURCE_DIR}/third_party/.local/${COMPILER_DIR}/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
+pkg_check_modules(PETSC_CORE REQUIRED IMPORTED_TARGET PETSc)
+target_link_libraries(SOLVER_CORE PUBLIC PkgConfig::PETSC_CORE)

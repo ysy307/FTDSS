@@ -27,10 +27,7 @@ submodule(io_input_basic) input_basic_solver_settings
     character(*), parameter :: key_residual_eps = "residual_eps"
     character(*), parameter :: linear_solver = "linear_solver"
     character(*), parameter :: iterative_solver = "iterative_solver"
-    character(*), parameter :: solver_type = "type"
-    character(*), parameter :: preconditioner_type = "preconditioner_type"
     character(*), parameter :: tolerance = "tolerance"
-    character(*), parameter :: restart_size = "restart_size"
 
     character(*), parameter :: parallel_settings = "parallel_settings"
     character(*), parameter :: threads = "threads"
@@ -104,9 +101,16 @@ contains
         buffer(1) = solver_settings
         buffer(2) = t_nonlinear_solver
 
-        ! Nonlinear iteration is fixed to Picard in this project.
-        self%solver_settings%nonlinear_solver%method = NONLINEAR_SOLVER%PICARD%ID
-        self%solver_settings%nonlinear_solver%update_frequency = 1
+        buffer(3) = method
+        call get_json_value(json, join(buffer(1:3)), temp_string, &
+                            is_required=.false., default_value="picard", &
+                            valid_list=valid_nonlinear_solver_methods_str)
+        self%solver_settings%nonlinear_solver%method = NONLINEAR_SOLVER%to_id(temp_string)
+
+        buffer(3) = update_frequency
+        call get_json_value(json, join(buffer(1:3)), &
+                            self%solver_settings%nonlinear_solver%update_frequency, &
+                            is_required=.false., default_value=1, valid_range=[1, huge(1)])
 
         buffer(3) = max_iterations
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%nonlinear_solver%max_iterations, &
@@ -259,92 +263,78 @@ contains
         character(256) :: buffer(3)
         character(256) :: legacy_buffer(2)
         character(:), allocatable :: temp_string
+        integer(int32) :: legacy_int
+        real(real64) :: legacy_real
+        logical :: legacy_found
 
         buffer(1) = solver_settings
         buffer(2) = linear_solver
-        buffer(3) = solver_type
 
-        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%solver_type, &
-                    is_required=.true., default_value=4, valid_range=[1, 26])
-        buffer(3) = preconditioner_type
-        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%preconditioner_type, &
-                            is_required=.true., default_value=1, valid_range=[0, 11])
         buffer(3) = max_iterations
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%max_iterations, &
-                            is_required=.true., default_value=10000, valid_range=[1, huge(1)])
+                    is_required=.false., default_value=10000, valid_range=[1, huge(1)])
         buffer(3) = tolerance
         call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%tolerance, &
-                            is_required=.true., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
-        buffer(3) = restart_size
-        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%m_restarts, &
-                    is_required=.false., default_value=30, valid_range=[1, huge(1)])
+                    is_required=.false., default_value=1.0d-6, valid_range=[0.0d0, huge(0.0d0)])
 
-        ! Optional SA-AMG parameters. These defaults are used when the keys are omitted.
-        buffer(3) = "amg_strength_threshold"
-        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_strength_threshold, &
-                    is_required=.false., default_value=0.25d0, valid_range=[0.0d0, huge(0.0d0)])
-
-        buffer(3) = "amg_smoother_sweeps"
-        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_smoother_sweeps, &
-                    is_required=.false., default_value=2, valid_range=[1, huge(1)])
-
-        buffer(3) = "amg_max_agg_size"
-        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_max_agg_size, &
-                    is_required=.false., default_value=8, valid_range=[1, huge(1)])
-
-        buffer(3) = "amg_drop_tolerance"
-        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_drop_tolerance, &
-                    is_required=.false., default_value=1.0d-4, valid_range=[0.0d0, huge(0.0d0)])
-
-        buffer(3) = "amg_drop_strategy"
+        buffer(3) = "petsc_options"
         call get_json_value(json, join(buffer(1:3)), temp_string, &
-                is_required=.false., default_value="RELATIVE")
-        self%solver_settings%linear_solver%amg_drop_strategy = temp_string
+                    is_required=.false., default_value="")
+        self%solver_settings%linear_solver%petsc_options = temp_string
 
-        buffer(3) = "amg_smoother_type"
+        ! `ksp_type` / `pc_type` name a PETSc type directly. They are folded into
+        ! the option string, which KSPSetFromOptions applies after the numeric
+        ! id has set its default, so a name always wins over an id.
+        buffer(3) = "ksp_type"
         call get_json_value(json, join(buffer(1:3)), temp_string, &
-                is_required=.false., default_value="HYBRID")
-        self%solver_settings%linear_solver%amg_smoother_type = temp_string
+                    is_required=.false., default_value="")
+        call append_petsc_option(self%solver_settings%linear_solver%petsc_options, "-ksp_type", temp_string)
 
-        buffer(3) = "amg_rebuild_frequency"
-        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_rebuild_frequency, &
-                    is_required=.false., default_value=5, valid_range=[1, huge(1)])
+        buffer(3) = "pc_type"
+        call get_json_value(json, join(buffer(1:3)), temp_string, &
+                    is_required=.false., default_value="")
+        call append_petsc_option(self%solver_settings%linear_solver%petsc_options, "-pc_type", temp_string)
 
-        buffer(3) = "amg_rebuild_threshold"
-        call get_json_value(json, join(buffer(1:3)), self%solver_settings%linear_solver%amg_rebuild_threshold, &
-                    is_required=.false., default_value=1.0d-2, valid_range=[0.0d0, huge(0.0d0)])
-
-        ! Backward compatibility: also accept legacy top-level "linear_solver".
+        ! Also accept a top-level "linear_solver" block.
         legacy_buffer(1) = linear_solver
 
-        legacy_buffer(2) = solver_type
-        call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%solver_type, &
-                    is_required=.false., default_value=self%solver_settings%linear_solver%solver_type, &
-                    valid_range=[1, 26])
-
-        legacy_buffer(2) = preconditioner_type
-        call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%preconditioner_type, &
-                    is_required=.false., default_value=self%solver_settings%linear_solver%preconditioner_type, &
-                    valid_range=[0, 11])
-
         legacy_buffer(2) = max_iterations
-        call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%max_iterations, &
-                    is_required=.false., default_value=self%solver_settings%linear_solver%max_iterations, &
-                    valid_range=[1, huge(1)])
+        call get_json_value(json, join(legacy_buffer), legacy_int, found=legacy_found, &
+                    is_required=.false., valid_range=[1, huge(1)])
+        if (legacy_found) self%solver_settings%linear_solver%max_iterations = legacy_int
 
         legacy_buffer(2) = tolerance
-        call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%tolerance, &
-                    is_required=.false., default_value=self%solver_settings%linear_solver%tolerance, &
-                    valid_range=[0.0d0, huge(0.0d0)])
+        call get_json_value(json, join(legacy_buffer), legacy_real, found=legacy_found, &
+                    is_required=.false., valid_range=[0.0d0, huge(0.0d0)])
+        if (legacy_found) self%solver_settings%linear_solver%tolerance = legacy_real
 
-        legacy_buffer(2) = restart_size
-        call get_json_value(json, join(legacy_buffer), self%solver_settings%linear_solver%m_restarts, &
-                    is_required=.false., default_value=self%solver_settings%linear_solver%m_restarts, &
-                    valid_range=[1, huge(1)])
+        legacy_buffer(2) = "petsc_options"
+        call get_json_value(json, join(legacy_buffer), temp_string, is_required=.false., &
+                    default_value=trim(self%solver_settings%linear_solver%petsc_options))
+        self%solver_settings%linear_solver%petsc_options = temp_string
+
+        legacy_buffer(2) = "ksp_type"
+        call get_json_value(json, join(legacy_buffer), temp_string, is_required=.false., default_value="")
+        call append_petsc_option(self%solver_settings%linear_solver%petsc_options, "-ksp_type", temp_string)
+
+        legacy_buffer(2) = "pc_type"
+        call get_json_value(json, join(legacy_buffer), temp_string, is_required=.false., default_value="")
+        call append_petsc_option(self%solver_settings%linear_solver%petsc_options, "-pc_type", temp_string)
 
         if (allocated(temp_string)) deallocate (temp_string)
 
     end subroutine read_solver_settings_linear
+
+    !> Append `name value` to a PETSc option string, ignoring an empty value.
+    subroutine append_petsc_option(options, name, value)
+        implicit none
+        character(len=*), intent(inout) :: options
+        character(len=*), intent(in) :: name
+        character(len=*), intent(in) :: value
+
+        if (len_trim(value) == 0) return
+        options = trim(options)//' '//name//' '//trim(adjustl(value))
+    end subroutine append_petsc_option
 
     subroutine read_solver_parallel_settings(self, json)
         implicit none

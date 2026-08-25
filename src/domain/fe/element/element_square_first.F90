@@ -182,10 +182,9 @@ contains
                 exit
             end if
 
-            call self%calc_jacobian_determinant(r, node_coords, det_j)
-            if (abs(det_j) < epsilon(det_j)) exit
-
             call self%calc_jacobian(r, node_coords, jac)
+            det_j = jac(1, 1) * jac(2, 2) - jac(1, 2) * jac(2, 1)
+            if (abs(det_j) < epsilon(det_j)) exit
 
             ! Inverse Jacobian Update:
             ! dxi = (J22*dx - J12*dy) / det

@@ -1,6 +1,59 @@
 # Ensure log output directory exists
 file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/log)
 
+# PETSc smoke test dependency
+find_package(PkgConfig REQUIRED)
+
+set(PETSC_PREFIX "${PROJECT_SOURCE_DIR}/third_party/.local/${COMPILER_DIR}")
+set(ENV{PKG_CONFIG_PATH} "${PETSC_PREFIX}/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
+
+pkg_check_modules(PETSC REQUIRED IMPORTED_TARGET PETSc)
+
+add_executable(petsc_smoke test_petsc_smoke.F90)
+set_target_properties(petsc_smoke PROPERTIES
+    LINKER_LANGUAGE Fortran
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+)
+target_link_libraries(petsc_smoke PRIVATE
+    PkgConfig::PETSC
+    MPI::MPI_Fortran
+)
+
+add_test(NAME petsc_smoke_serial COMMAND $<TARGET_FILE:petsc_smoke>)
+
+add_executable(petscfe_probe petscfe_probe.F90)
+target_link_libraries(petscfe_probe PRIVATE SOLVER::CORE PkgConfig::PETSC MPI::MPI_Fortran)
+set_target_properties(petscfe_probe PROPERTIES LINKER_LANGUAGE Fortran)
+
+add_executable(vtu_probe vtu_probe.F90)
+target_link_libraries(vtu_probe PRIVATE PkgConfig::PETSC MPI::MPI_Fortran)
+
+add_executable(dmplex_probe test_dmplex_probe.F90)
+set_target_properties(dmplex_probe PROPERTIES
+    LINKER_LANGUAGE Fortran
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
+)
+target_link_libraries(dmplex_probe PRIVATE PkgConfig::PETSC MPI::MPI_Fortran)
+
+add_executable(freezing_plex test_freezing_plex.F90)
+set_target_properties(freezing_plex PROPERTIES
+    LINKER_LANGUAGE Fortran
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
+)
+target_link_libraries(freezing_plex PRIVATE
+    PkgConfig::PETSC
+    MPI::MPI_Fortran
+)
+
+if(ENABLE_MPI AND MPI_Fortran_FOUND)
+    add_test(NAME petsc_smoke_mpi_2
+        COMMAND
+            ${MPIEXEC_EXECUTABLE}
+            ${MPIEXEC_NUMPROC_FLAG} 2
+            $<TARGET_FILE:petsc_smoke>
+    )
+endif()
+
 # ====================================================================
 # Function: add_solver_test
 # ====================================================================
@@ -67,14 +120,7 @@ endfunction()
 # Register each test with its specific dependencies
 # --------------------------------------------------------------------
 
-# test_mkl: BSR assembly + MKL Inspector-Executor SpMV integration test
-add_solver_test(mkl
-    LIBS
-        SOLVER::CORE
-        SOLVER::LINALG
-)
-
-# test_matrix: Fypp-generated lifecycle + assembly + MKL handle-state tests
+# test_matrix: Fypp-generated lifecycle and assembly tests
 fypp_F90("" "test_matrix.fypp" TEST_MATRIX_GENERATED)
 add_solver_test(matrix
     SOURCES
@@ -144,7 +190,6 @@ add_solver_test(main
     LIBS
         SOLVER::CORE
         SOLVER::LINALG
-        SOLVER::PARALLEL
         SOLVER::SOLVER
         SOLVER::SYSTEM
         SOLVER::DOMAIN
@@ -159,7 +204,6 @@ add_solver_test(coupling_assembly
     LIBS
         SOLVER::CORE
         SOLVER::LINALG
-        SOLVER::PARALLEL
         SOLVER::SOLVER
         SOLVER::SYSTEM
         SOLVER::DOMAIN

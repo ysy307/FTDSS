@@ -10,7 +10,6 @@ submodule(io_input_basic) input_basic_analysis_controls
     character(*), parameter :: enable_vapor_transport = "enable_vapor_transport"
     character(*), parameter :: coupling_mode = "coupling_mode"
     character(*), parameter :: coupling_modes_strings(2) = [character(len=16) :: "staggered", "monolithic"]
-    character(*), parameter :: partitioning = "partitioning"
     character(*), parameter :: enable_fringe_subcell_quadrature = "enable_fringe_subcell_quadrature"
     !!------------------------------------------------------------------------------------------------------------------------------
 contains
@@ -49,9 +48,6 @@ contains
         call get_json_value(json, join(buffer), self%analysis_controls%coupling_mode, &
                             is_required=.true., default_value="monolithic", valid_list=coupling_modes_strings)
 
-        buffer(2) = partitioning
-        call get_json_value(json, join(buffer), self%analysis_controls%partitioning, &
-                            is_required=.true., default_value=.false.)
 
     end subroutine read_analysis_controls
 
@@ -64,7 +60,6 @@ contains
         write (*, '(a)') "Calculate Mechanical: "//to_string(self%is_active(PHYSICS_TYPES%MECHANICAL%ID))
         write (*, '(a)') "Enable Vapor Transport: "//to_string(self%enable_vapor_transport)
         write (*, '(a)') "Coupling Mode: "//strip(self%coupling_mode)
-        write (*, '(a)') "Partitioning: "//to_string(self%partitioning)
 
     end subroutine display_analysis_controls
 end submodule input_basic_analysis_controls

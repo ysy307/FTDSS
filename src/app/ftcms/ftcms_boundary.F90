@@ -91,11 +91,7 @@ contains
         class(type_ftcms), intent(inout) :: self
         type(type_constant_id), intent(in) :: physics_type
 
-        real(real64) :: diag_val
-        integer(int32) :: i_node, num_nodes, dof_index, k, row_start, row_end
-        integer(int32), pointer :: ptr(:) => null(), ind(:) => null()
-        real(real64), pointer :: val(:, :, :) => null()
-        class(abst_matrix), pointer :: matrix_ptr => null()
+        integer(int32) :: i_node, num_nodes, dof_index
 
         ! In staggered coupling each physics owns a separate matrix; freezing
         ! the inactive one is structurally unnecessary and would touch the wrong
@@ -105,51 +101,13 @@ contains
         call self%domain%get_num_nodes(num_nodes)
         call self%domain%get_start_dof_index(physics_type, dof_index)
 
-        matrix_ptr => self%K%get_matrix()
-        select type (matrix_ptr)
-        type is (type_matrix_bsr)
-            ptr => matrix_ptr%get_ptr()
-            ind => matrix_ptr%get_ind()
-            val => matrix_ptr%get_val()
-            if (associated(ptr) .and. associated(ind) .and. associated(val)) then
-                do i_node = 1, num_nodes
-                    row_start = ptr(i_node)
-                    row_end = ptr(i_node + 1) - 1
-                    do k = row_start, row_end
-                        val(:, dof_index, k) = 0.0d0
-                    end do
-
-                    diag_val = 0.0d0
-                    do k = row_start, row_end
-                        if (ind(k) == i_node) then
-                            diag_val = val(dof_index, dof_index, k)
-                            exit
-                        end if
-                    end do
-
-                    do k = row_start, row_end
-                        val(dof_index, :, k) = 0.0d0
-                    end do
-
-                    if (abs(diag_val) < 1.0d-12) diag_val = 1.0d0
-                    do k = row_start, row_end
-                        if (ind(k) == i_node) then
-                            val(dof_index, dof_index, k) = diag_val
-                            exit
-                        end if
-                    end do
-
-                    call self%F%set(physics_type%ID, i_node, 0.0d0)
-                end do
-            end if
-            nullify (ptr)
-            nullify (ind)
-            nullify (val)
-        class default
-            continue
-        end select
-        nullify (matrix_ptr)
-
+        ! Row and column of the frozen physics go to the identity. Recording
+        ! the rows lets the matrix impose them when it assembles, which is also
+        ! where the columns are cleared.
+        do i_node = 1, num_nodes
+            call self%K%zero(i_node, physics_type%ID)
+            call self%F%set(physics_type%ID, i_node, 0.0d0)
+        end do
     end subroutine freeze_physics_dofs_ftcms
 
     !> Zero the increment (du) entries for the frozen physics DOFs.
@@ -397,6 +355,7 @@ contains
 
                 ! 2. Set Residual/Force vector
                 call self%F%set(physics_type%ID, glob_node_id, 0.0d0)
+                call self%dirichlet_marker%set(physics_type%ID, glob_node_id, 1.0d0)
                 num_dirichlet_nodes = num_dirichlet_nodes + 1
 
                 if (first_dirichlet_node == 0) then

@@ -11,6 +11,7 @@ module linalg_mkl_backend
 #ifdef _MPI
     use :: core_parallel_mpi
 #endif
+    use :: core_parallel_reduce, only:ownership_mask
 #ifdef _MKL
     use :: linalg_mkl_interface
 #endif
@@ -53,7 +54,14 @@ contains
         integer(int32) :: ierr
 #endif
 
-        local_norm = dasum(int(size(x), int32), x, 1)
+        ! Summed over the entries this rank owns: a node on a partition
+        ! boundary is stored on every rank that touches it, so summing every
+        ! local entry would count it more than once.
+        block
+            logical, allocatable :: owned(:)
+            owned = ownership_mask(int(size(x), int32))
+            local_norm = sum(abs(x), mask=owned)
+        end block
 #ifdef _MPI
         call MPI_Allreduce(local_norm, norm_value, 1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, ierr)
 #else
@@ -80,21 +88,29 @@ contains
 
         call ieee_get_halting_mode(ieee_overflow, halt_overflow)
         call ieee_set_halting_mode(ieee_overflow, .false.)
-        if (size(x) > 0) then
-            local_scale = maxval(abs(x))
-        else
-            local_scale = 0.0d0
-        end if
+        block
+            logical, allocatable :: owned(:)
+            owned = ownership_mask(int(size(x), int32))
+            if (size(x) > 0) then
+                local_scale = maxval(abs(x), mask=owned)
+            else
+                local_scale = 0.0d0
+            end if
+        end block
 #ifdef _MPI
         call MPI_Allreduce(local_scale, global_scale, 1, MPI_REAL8, MPI_MAX, MPI_COMM_WORLD, ierr)
 #else
         global_scale = local_scale
 #endif
-        if (global_scale > 0.0d0) then
-            local_sum = sum((x / global_scale)**2)
-        else
-            local_sum = 0.0d0
-        end if
+        block
+            logical, allocatable :: owned(:)
+            owned = ownership_mask(int(size(x), int32))
+            if (global_scale > 0.0d0) then
+                local_sum = sum((x / global_scale)**2, mask=owned)
+            else
+                local_sum = 0.0d0
+            end if
+        end block
 #ifdef _MPI
         call MPI_Allreduce(local_sum, global_sum, 1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, ierr)
 #else
@@ -162,11 +178,12 @@ contains
     call ieee_set_halting_mode(ieee_overflow, .false.)
     call ieee_set_halting_mode(ieee_invalid, .false.)
 
-        if (is_contiguous(x) .and. is_contiguous(y)) then
-            local_prod = ddot(int(size(x), int32), x, 1, y, 1)
-        else
-            local_prod = sum(x * y)
-        end if
+        ! Over the entries this rank owns, for the same reason as the norms.
+        block
+            logical, allocatable :: owned(:)
+            owned = ownership_mask(int(size(x), int32))
+            local_prod = sum(x * y, mask=owned)
+        end block
 #ifdef _MPI
         call MPI_Allreduce(local_prod, global_prod, 1, MPI_REAL8, MPI_SUM, MPI_COMM_WORLD, ierr)
         product = global_prod

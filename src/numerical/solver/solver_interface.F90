@@ -1,3 +1,7 @@
+#ifdef _PETSC
+#include <petsc/finclude/petscksp.h>
+#endif
+
 module numerical_solver_interface
     use, intrinsic :: iso_fortran_env, only: int32, real64, output_unit
     use, intrinsic :: iso_c_binding, only: c_int
@@ -5,17 +9,16 @@ module numerical_solver_interface
     use :: stdlib_strings, only:strip
     use :: module_core
     use :: module_linalg
-    use :: numerical_solver_preconditioner
-#ifdef _MKL
-    use :: linalg_mkl_interface, only: mkl_pardiso_handle
+#ifdef _PETSC
+    use :: petscksp, only: tKSP, tMat, tVec, tVecScatter
 #endif
     implicit none
     private
 
     public :: abst_solver
-    public :: type_solver_bicgstab
-    public :: type_solver_gmres
-    public :: type_solver_pardiso
+#ifdef _PETSC
+    public :: type_solver_petsc
+#endif
 
     public :: type_solver_settings
     public :: create_solver
@@ -23,17 +26,12 @@ module numerical_solver_interface
     type :: type_solver_settings
         private
         integer(int32) :: id
-        integer(int32) :: preconditioner_id
         real(real64) :: tolerance
         real(real64) :: relative_tolerance = 1.0d-6
         integer(int32) :: max_iterations
-        integer(int32) :: m_restart
-        logical :: projection_enabled = .false.
-        integer(int32) :: projection_offset = 0
-        integer(int32) :: projection_stride = 0
-
         integer(int32) :: num_nodes
-        integer(int32) :: num_dofs_per_node
+        !> Raw PETSc option string from the project file.
+        character(len=512) :: petsc_options = ''
     contains
         procedure :: set => set_solver_settings
     end type type_solver_settings
@@ -41,30 +39,29 @@ module numerical_solver_interface
     type, abstract :: abst_solver
         private
         ! Solver basic info
-        !> Solver ID.
-        integer(int32) :: id = -1
         !> Name of the solver.
         character(:), allocatable :: name
         !> Status of the solver after execution.
         integer(int32) :: status = SOLVER_STATUS%SUCCESS%ID
 
         integer(int32) :: num_nodes = -1
-        integer(int32) :: num_dofs_per_node = -1
         real(real64) :: tolerance = 0.0d0
         real(real64) :: relative_tolerance = 1.0d-6
         integer(int32) :: max_iterations = 0
-        logical :: projection_enabled = .false.
-        integer(int32) :: projection_offset = 0
-        integer(int32) :: projection_stride = 0
+        character(len=512) :: petsc_options = ''
+
+        !> Global index of every local degree of freedom, in the order the
+        !> local right-hand side uses. It is the dof layout the DM built, and
+        !> it is what places a local entry in the distributed vector.
+        integer(int32), allocatable :: global_dof(:)
 
         type(type_vector_dp) :: residual_history
         integer(int32) :: current_iteration = 0
 
-        !> Preconditioner associated with the solver.
-        class(abst_preconditioner), allocatable :: pc
     contains
         procedure(abst_solver_initialize), pass(self), public, deferred :: initialize !&
         procedure(abst_solver_solve),      pass(self), public, deferred :: solve !&
+        procedure,                         pass(self), public           :: set_dof_map => set_dof_map_solver !&
         procedure,                         pass(self), public           :: check => check_solver !&
         procedure,                         pass(self), public           :: is_success => is_success_solver !&
         procedure,                         pass(self), public           :: display_rhistory => display_residual_history_solver !&
@@ -72,20 +69,19 @@ module numerical_solver_interface
     end type abst_solver
 
     abstract interface
-        subroutine abst_solver_initialize(self, solver_settings, preconditioner_settings)
-            import :: abst_solver, type_solver_settings, type_preconditioner_settings
+        subroutine abst_solver_initialize(self, solver_settings)
+            import :: abst_solver, type_solver_settings
             implicit none
             class(abst_solver), intent(inout) :: self
             type(type_solver_settings), intent(in) :: solver_settings
-            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
-
         end subroutine abst_solver_initialize
 
         subroutine abst_solver_solve(self, A, b, x)
-            import :: abst_solver, abst_matrix, type_vector_dp, int32
+            import :: abst_solver, tMat, type_vector_dp, int32
             implicit none
             class(abst_solver), intent(inout) :: self
-            class(abst_matrix), intent(in) :: A
+            !> The assembled PETSc operator. It is solved in place, never copied.
+            Mat, intent(in) :: A
             type(type_vector_dp), intent(in) :: b
             type(type_vector_dp), intent(inout) :: x
 
@@ -100,179 +96,90 @@ module numerical_solver_interface
 
     end interface
 
-    type, extends(abst_solver) :: type_solver_bicgstab
-        type(type_vector_dp) :: p
-        type(type_vector_dp) :: phat
-        type(type_vector_dp) :: s
-        type(type_vector_dp) :: shat
-        type(type_vector_dp) :: r
-        type(type_vector_dp) :: r0
-        type(type_vector_dp) :: t
-        type(type_vector_dp) :: v
-        type(type_vector_dp) :: x
-
+#ifdef _PETSC
+    !> KSP-backed solver. The JSON supplies the tolerances and a default
+    !> KSP/PC pair; everything else comes from the PETSc option database, so
+    !> -ksp_type / -pc_type / -ksp_monitor work without new JSON keys.
+    !>
+    !> The operator arrives already assembled and already distributed, so this
+    !> solver only has to supply the right-hand side and read the solution back.
+    !> The vectors are created from the matrix, which is what guarantees they
+    !> share its layout.
+    type, extends(abst_solver) :: type_solver_petsc
+        KSP :: ksp
+        Vec :: b_petsc
+        Vec :: x_petsc
+        VecScatter :: gather
+        Vec :: x_local
+        logical :: objects_ready = .false.
+        logical :: ksp_ready = .false.
+        !> Cached layout signature; a mismatch forces the vectors to be rebuilt.
+        integer(int32) :: cached_local_size = -1
     contains
-        procedure :: initialize => initialize_type_solver_bicgstab !&
-        procedure :: solve      => solve_type_solver_bicgstab !&
-        procedure :: destroy    => destroy_type_solver_bicgstab !&
-    end type type_solver_bicgstab
-
-    interface
-        module subroutine initialize_type_solver_bicgstab(self, solver_settings, preconditioner_settings)
-            implicit none
-            class(type_solver_bicgstab), intent(inout) :: self
-            type(type_solver_settings), intent(in) :: solver_settings
-            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
-
-        end subroutine initialize_type_solver_bicgstab
-
-        module subroutine solve_type_solver_bicgstab(self, A, b, x)
-            implicit none
-            class(type_solver_bicgstab), intent(inout) :: self
-            class(abst_matrix), intent(in) :: A
-            type(type_vector_dp), intent(in) :: b
-            type(type_vector_dp), intent(inout) :: x
-        end subroutine solve_type_solver_bicgstab
-
-        module subroutine destroy_type_solver_bicgstab(self)
-            implicit none
-            class(type_solver_bicgstab), intent(inout) :: self
-
-        end subroutine destroy_type_solver_bicgstab
-    end interface
-
-    type, extends(abst_solver) :: type_solver_gmres
-        integer(int32) :: m_restart = 30
-
-        ! --- Vector objects (system size N) ---
-        type(type_vector_dp), allocatable :: v(:) ! Basis vectors V (m+1)
-        type(type_vector_dp) :: r ! Residual vector
-        type(type_vector_dp) :: z ! Work vector (after preconditioning)
-        type(type_vector_dp) :: w ! Work vector (after preconditioning)
-        type(type_vector_dp) :: x_update ! Solution update vector
-
-        ! --- Scalar / small arrays (size m) ---
-        ! Small (m x m) arrays use Fortran native arrays for efficiency and simplicity
-        real(real64), allocatable :: h(:, :) ! Hessenberg matrix (m+1, m)
-        real(real64), allocatable :: g(:) ! Right-hand side vector g (m+1)
-        real(real64), allocatable :: cs(:) ! Givens rotation cosine (m)
-        real(real64), allocatable :: sn(:) ! Givens rotation sine (m)
-        real(real64), allocatable :: y(:) ! Least-squares solution (m)
-
-    contains
-        procedure :: initialize => initialize_type_solver_gmres
-        procedure :: solve => solve_type_solver_gmres
-        procedure :: destroy => destroy_type_solver_gmres
-    end type type_solver_gmres
-
-    type, extends(abst_solver) :: type_solver_pardiso
-        integer(int32) :: mtype = 11
-        integer(int32) :: maxfct = 1
-        integer(int32) :: mnum = 1
-        integer(int32) :: msglvl = 0
-        integer(int32) :: nrhs = 1
-        integer(int32) :: last_error = 0
-#ifdef _MKL
-        type(mkl_pardiso_handle) :: pt(64)
-        integer(c_int), allocatable :: analyzed_ia(:)
-        integer(c_int), allocatable :: analyzed_ja(:)
+        procedure :: initialize => initialize_type_solver_petsc
+        procedure :: solve => solve_type_solver_petsc
+        procedure :: destroy => destroy_type_solver_petsc
+    end type type_solver_petsc
 #endif
-        integer(c_int) :: iparm(64) = 0
-        logical :: analysis_ready = .false.
-    contains
-        procedure :: initialize => initialize_type_solver_pardiso
-        procedure :: solve => solve_type_solver_pardiso
-        procedure :: destroy => destroy_type_solver_pardiso
-    end type type_solver_pardiso
 
+#ifdef _PETSC
     interface
-        module subroutine initialize_type_solver_gmres(self, solver_settings, preconditioner_settings)
+        module subroutine initialize_type_solver_petsc(self, solver_settings)
             implicit none
-            class(type_solver_gmres), intent(inout) :: self
+            class(type_solver_petsc), intent(inout) :: self
             type(type_solver_settings), intent(in) :: solver_settings
-            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
+        end subroutine initialize_type_solver_petsc
 
-        end subroutine initialize_type_solver_gmres
-
-        module subroutine solve_type_solver_gmres(self, A, b, x)
+        module subroutine solve_type_solver_petsc(self, A, b, x)
             implicit none
-            class(type_solver_gmres), intent(inout) :: self
-            class(abst_matrix), intent(in) :: A
+            class(type_solver_petsc), intent(inout) :: self
+            Mat, intent(in) :: A
             type(type_vector_dp), intent(in) :: b
             type(type_vector_dp), intent(inout) :: x
-        end subroutine solve_type_solver_gmres
+        end subroutine solve_type_solver_petsc
 
-        module subroutine destroy_type_solver_gmres(self)
+        module subroutine destroy_type_solver_petsc(self)
             implicit none
-            class(type_solver_gmres), intent(inout) :: self
+            class(type_solver_petsc), intent(inout) :: self
 
-        end subroutine destroy_type_solver_gmres
+        end subroutine destroy_type_solver_petsc
+
     end interface
-
-    interface
-        module subroutine initialize_type_solver_pardiso(self, solver_settings, preconditioner_settings)
-            implicit none
-            class(type_solver_pardiso), intent(inout) :: self
-            type(type_solver_settings), intent(in) :: solver_settings
-            type(type_preconditioner_settings), intent(in) :: preconditioner_settings
-
-        end subroutine initialize_type_solver_pardiso
-
-        module subroutine solve_type_solver_pardiso(self, A, b, x)
-            implicit none
-            class(type_solver_pardiso), intent(inout) :: self
-            class(abst_matrix), intent(in) :: A
-            type(type_vector_dp), intent(in) :: b
-            type(type_vector_dp), intent(inout) :: x
-        end subroutine solve_type_solver_pardiso
-
-        module subroutine destroy_type_solver_pardiso(self)
-            implicit none
-            class(type_solver_pardiso), intent(inout) :: self
-
-        end subroutine destroy_type_solver_pardiso
-    end interface
+#endif
 
 contains
-    subroutine set_solver_settings(self, id, num_nodes, tolerance, max_iterations, m_restart, &
-                                   projection_enabled, projection_offset, projection_stride, &
-                                   relative_tolerance)
+    subroutine set_solver_settings(self, num_nodes, tolerance, max_iterations, &
+                                   relative_tolerance, petsc_options)
         implicit none
         class(type_solver_settings), intent(inout) :: self
-        integer(int32), intent(in) :: id
         integer(int32), intent(in) :: num_nodes
         real(real64), intent(in) :: tolerance
         integer(int32), intent(in) :: max_iterations
-        integer(int32), intent(in), optional :: m_restart
-        logical, intent(in), optional :: projection_enabled
-        integer(int32), intent(in), optional :: projection_offset
-        integer(int32), intent(in), optional :: projection_stride
         real(real64), intent(in), optional :: relative_tolerance
+        character(len=*), intent(in), optional :: petsc_options
 
-        self%ID = id
         self%num_nodes = num_nodes
         self%tolerance = tolerance
         self%relative_tolerance = 1.0d-6
         if (present(relative_tolerance)) self%relative_tolerance = relative_tolerance
         self%max_iterations = max_iterations
-        self%projection_enabled = .false.
-        self%projection_offset = 0
-        self%projection_stride = 0
+        self%petsc_options = ''
+        if (present(petsc_options)) self%petsc_options = petsc_options
 
-        if (present(projection_enabled)) self%projection_enabled = projection_enabled
-        if (present(projection_offset)) self%projection_offset = projection_offset
-        if (present(projection_stride)) self%projection_stride = projection_stride
-
-        select case (self%ID)
-        case (LINEAR_SOLVER_TYPES%GMRES_M%ID)
-            if (present(m_restart)) then
-                self%m_restart = m_restart
-            else
-                self%m_restart = 100
-            end if
-        case default
-        end select
     end subroutine set_solver_settings
+
+    !> Hand the solver the node numbering of a distributed mesh. The back-end
+    !> uses it to assemble one global system instead of one system per rank.
+    !> Install the dof numbering the DM produced. Without it the solver has no
+    !> way to place a local entry into the distributed vectors.
+    subroutine set_dof_map_solver(self, global_dof)
+        implicit none
+        class(abst_solver), intent(inout) :: self
+        integer(int32), intent(in) :: global_dof(:)
+
+        if (allocated(self%global_dof)) deallocate (self%global_dof)
+        allocate (self%global_dof, source=global_dof)
+    end subroutine set_dof_map_solver
 
     subroutine check_solver(self, time, unit_display)
         implicit none
@@ -350,121 +257,23 @@ contains
 
     end subroutine display_residual_history_solver
 
-    !> Project the constant-vector null-mode out of `vec` on a strided DOF component.
-    !>
-    !> For an all-Neumann physics block the matrix is singular with a constant
-    !> null-space; registering that as the null-space and orthogonalising every
-    !> residual/matvec to it keeps Krylov iterations stable. `offset`/`stride`
-    !> address a single physics field inside a coupled DOF layout.
-    subroutine project_component_mean_zero(vec, enabled, offset, stride)
-        implicit none
-        type(type_vector_dp), intent(inout) :: vec
-        logical, intent(in) :: enabled
-        integer(int32), intent(in) :: offset, stride
-
-        real(real64), pointer :: data(:)
-        real(real64) :: mean_val
-        integer(int32) :: i, count, first_idx
-
-        if (.not. enabled) return
-        if (stride <= 0 .or. offset <= 0) return
-
-        data => vec%get_data()
-        if (.not. associated(data)) return
-
-        first_idx = offset
-        if (first_idx > size(data)) return
-
-        mean_val = 0.0d0
-        count = 0
-        do i = first_idx, size(data), stride
-            mean_val = mean_val + data(i)
-            count = count + 1
-        end do
-        if (count <= 0) return
-
-        mean_val = mean_val / real(count, real64)
-        do i = first_idx, size(data), stride
-            data(i) = data(i) - mean_val
-        end do
-
-        nullify (data)
-    end subroutine project_component_mean_zero
-
-    subroutine create_solver(solver, solver_settings, preconditioner_settings, ierr)
+    !> Build the linear solver. PETSc is the only back-end; the algorithm is
+    !> named in the project file and applied through the PETSc option database.
+    subroutine create_solver(solver, solver_settings, ierr)
         implicit none
         class(abst_solver), allocatable, intent(inout) :: solver
         type(type_solver_settings), intent(in) :: solver_settings
-        type(type_preconditioner_settings), intent(in) :: preconditioner_settings
         integer(int32), intent(inout) :: ierr
 
-        if (allocated(solver)) then
-            deallocate (solver)
-        end if
+        if (allocated(solver)) deallocate (solver)
 
-        select case (solver_settings%ID)
-        case (LINEAR_SOLVER_TYPES%CG%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%BICG%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%CGS%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%BICGSTAB%ID)
-            allocate (type_solver_bicgstab :: solver)
-            call solver%initialize(solver_settings, preconditioner_settings)
-            ierr = solver%status
-        case (LINEAR_SOLVER_TYPES%BICGSTAB_L%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%GPBICG%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%TFQMR%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%ORTHOMIN_M%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%GMRES_M%ID)
-            allocate (type_solver_gmres :: solver)
-            call solver%initialize(solver_settings, preconditioner_settings)
-            ierr = solver%status
-        case (LINEAR_SOLVER_TYPES%JACOBI%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%GAUSS_SEIDEL%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%SOR%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%BICGSAFE%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%CR%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%BICR%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%CRS%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%BICRSTAB%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%GPBICR%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%BICRSAFE%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%FGMRES_M%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%IDR_S%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%IDR1%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%MINRES%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%COCG%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%COCR%ID)
-            ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
-        case (LINEAR_SOLVER_TYPES%PARDISO%ID)
-            allocate (type_solver_pardiso :: solver)
-            call solver%initialize(solver_settings, preconditioner_settings)
-            ierr = solver%status
-        case default
-            ierr = SOLVER_STATUS%ILL_OPTIONS%ID
-        end select
-
+#ifdef _PETSC
+        allocate (type_solver_petsc :: solver)
+        call solver%initialize(solver_settings)
+        ierr = solver%status
+#else
+        ierr = SOLVER_STATUS%NOT_IMPLEMENTED%ID
+#endif
     end subroutine create_solver
 
 end module numerical_solver_interface

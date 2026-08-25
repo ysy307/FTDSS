@@ -4,7 +4,8 @@ submodule(io_input_output_conditions) input_output_conditions_fields
     !! JSON key names for field output
     !!------------------------------------------------------------------------------------------------------------------------------
     character(*), parameter :: field_output = "field_output"
-    character(*), parameter :: valid_field_file_formats(3) = [character(len=16) :: "none", "vtk", "vtu"]
+    character(*), parameter :: valid_field_file_formats(5) = &
+                                       [character(len=16) :: "none", "vtk", "vtu", "hdf5", "petsc_vtu"]
     character(*), parameter :: output_time_unit = "output_time_unit"
     character(*), parameter :: output_time_offset_key = "output_time_offset"
     !!------------------------------------------------------------------------------------------------------------------------------

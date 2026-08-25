@@ -3,11 +3,13 @@ submodule(io_output_overall) output_overall_vtk
 
 contains
 
-    module subroutine initialize_type_output_overall_vtk(self, dir_output, config)
+    module subroutine initialize_type_output_overall_vtk(self, dir_output, config, mesh)
         implicit none
         class(type_output_overall_vtk), intent(inout) :: self
         character(*), intent(in) :: dir_output
         type(type_config_overall), intent(in) :: config
+        !> Unused: this writer transcribes the mesh from config.
+        type(type_mesh_plex), intent(inout), optional, target :: mesh
 
         self%dir_output_field = dir_output
         self%file_format = config%file_format
@@ -29,7 +31,7 @@ contains
     end subroutine initialize_type_output_overall_vtk
 
     module subroutine write_fields_vtk(self, file_counts, temperature, water_content, ice_content, &
-                                       vapor_content, pressure, water_flux)
+                                       vapor_content, pressure, water_flux, time)
         implicit none
         class(type_output_overall_vtk), intent(inout) :: self
         integer(int32), intent(in) :: file_counts
@@ -39,6 +41,7 @@ contains
         real(real64), intent(in), optional :: vapor_content(:)
         real(real64), intent(in), optional :: pressure(:)
         type(type_coordinate_array_dp), intent(in), optional :: water_flux
+        real(real64), intent(in), optional :: time
 
         integer(int32) :: iostat
         integer(int32) :: unit

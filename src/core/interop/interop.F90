@@ -14,9 +14,6 @@ module core_interop
         get_cpu_architecture, &
         get_openmp_version
 
-    use :: core_interop_vtk, only: &
-        type_vtk, &
-        type_vtk_cell
     use :: core_interop_vtk_constants, only: &
         vtk_constants
     use :: core_interop_vtu_writer_wrapper, only: &

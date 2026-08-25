@@ -9,32 +9,31 @@ add_library(SOLVER_SOLVE STATIC)
 target_sources(SOLVER_SOLVE PRIVATE
     # --- Interfaces ---
     solver_interface.F90
-    precondition_interface.F90
-
-    # --- Iterative solvers ---
-    iterative/solve_bicgstab.F90
-    iterative/solve_gmres.F90
-    # Keep only solvers declared in solver_interface.F90.
-
-    # --- Direct solvers ---
-    direct/solve_pardiso.F90
-
-    # --- Preconditioners ---
-    preconditioner/preconditioner_none.F90
-    preconditioner/preconditioner_jacobi.F90
-    preconditioner/preconditioner_iluk.F90
-    preconditioner/preconditioner_ssor.F90
-    preconditioner/preconditioner_ilut.F90
-    preconditioner/preconditioner_saamg.F90
-    preconditioner/preconditioner_iluc.F90
-    preconditioner/preconditioner_is.F90
-    preconditioner/preconditioner_sainv.F90
-    preconditioner/preconditioner_hybrid.F90
-    preconditioner/preconditioner_adds.F90
 
     # --- Factory / Entry ---
     solver.F90
 )
+
+# --- PETSc KSP back-end (LINEAR_SOLVER_TYPES%PETSC, id 27) ---
+# Optional: a toolchain without a PETSc install still configures, and
+# create_solver then reports NOT_IMPLEMENTED for id 27.
+if(ENABLE_PETSC)
+    find_package(PkgConfig)
+    if(PkgConfig_FOUND)
+        set(FTCMS_PETSC_PREFIX "${PROJECT_SOURCE_DIR}/third_party/.local/${COMPILER_DIR}")
+        set(ENV{PKG_CONFIG_PATH} "${FTCMS_PETSC_PREFIX}/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
+        pkg_check_modules(PETSC IMPORTED_TARGET PETSc)
+    endif()
+
+    if(PETSC_FOUND)
+        target_sources(SOLVER_SOLVE PRIVATE petsc/solve_petsc.F90)
+        target_link_libraries(SOLVER_SOLVE PUBLIC PkgConfig::PETSC)
+        target_compile_definitions(SOLVER_SOLVE PUBLIC _PETSC)
+        message(STATUS "PETSc KSP back-end enabled (${PETSC_VERSION})")
+    else()
+        message(STATUS "PETSc not found; the KSP back-end is disabled")
+    endif()
+endif()
 
 # ------------------------------------------------------------
 # Fortran module output
@@ -53,15 +52,6 @@ target_link_libraries(SOLVER_SOLVE PUBLIC
 
 enable_build_flags(SOLVER_SOLVE)
 enable_thirdparty(SOLVER_SOLVE)
-
-# MKL PARDISO uses sNaN internally; override -init=snan per-file.
-if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel|IntelLLVM")
-    set_source_files_properties(direct/solve_pardiso.F90
-        PROPERTIES COMPILE_OPTIONS "-init=zero")
-elseif(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-    set_source_files_properties(direct/solve_pardiso.F90
-        PROPERTIES COMPILE_OPTIONS "-finit-real=zero")
-endif()
 
 # ------------------------------------------------------------
 # Namespaced alias

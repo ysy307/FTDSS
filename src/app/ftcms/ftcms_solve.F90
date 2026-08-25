@@ -1,4 +1,5 @@
 submodule(app_ftcms) ftcms_solve
+    use :: core_parallel_reduce, only:reduce_sum, reduce_any
     use :: models_phase_change_chemical_potential, only:calc_T_high_celsius
     use :: control_homotopy_manager, only:HOMOTOPY_STAGE_ITERATIONS
     implicit none
@@ -124,6 +125,8 @@ contains
                     call self%domain%calc_measure(i_elem, measure)
                     self%domain_measure_total = self%domain_measure_total + abs(measure)
                 end do
+                ! Each rank measured only its own cells.
+                self%domain_measure_total = reduce_sum(self%domain_measure_total)
                 call build_nodal_volume(self, num_elements)
             end if
             call self%control%get_dt(dt_now)
@@ -581,6 +584,7 @@ contains
         real(real64), allocatable :: residual_thermal(:)
         real(real64), allocatable :: residual_hydraulic(:)
         logical :: check_thermal, check_hydraulic
+        logical :: hit_wall
         real(real64), pointer, contiguous, dimension(:) :: field
         ! Wall-contact tolerances: the bounded update lands exactly ON the wall
         ! when it binds, so a small absolute buffer is sufficient to detect it.
@@ -597,24 +601,36 @@ contains
         nullify (field)
         if (check_thermal) then
             call self%temperature%get_current(field)
+            ! The verdict is reduced before it is acted on: returning here on a
+            ! rank-local test would leave the other ranks waiting in the
+            ! collective convergence gate below.
+            hit_wall = .false.
             if (associated(field)) then
-                if (minval(field) <= WALL_TEMP_MIN_C + TEMP_WALL_TOL .or. &
-                    maxval(field) >= WALL_TEMP_MAX_C - TEMP_WALL_TOL) then
+                hit_wall = (minval(field) <= WALL_TEMP_MIN_C + TEMP_WALL_TOL .or. &
+                            maxval(field) >= WALL_TEMP_MAX_C - TEMP_WALL_TOL)
+            end if
+            if (reduce_any(hit_wall)) then
+                if (hit_wall) then
                     write (*, '(A,2(ES11.3,1X))') '   [GUARD] temperature pinned at validity wall; T min/max = ', &
                         minval(field), maxval(field)
-                    call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
-                    call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
-                    nullify (field)
-                    return
                 end if
+                call self%control%set_converged(PHYSICS_TYPES%THERMAL, .false.)
+                call self%control%set_diverged(PHYSICS_TYPES%THERMAL, .true.)
+                nullify (field)
+                return
             end if
             nullify (field)
         end if
         if (check_hydraulic) then
             call self%pressure%get_current(field)
+            hit_wall = .false.
             if (associated(field)) then
-                if (minval(field) <= WALL_PRESS_MIN_PA + PRESS_WALL_TOL .or. &
-                    maxval(field) >= WALL_PRESS_MAX_PA - PRESS_WALL_TOL) then
+                hit_wall = (minval(field) <= WALL_PRESS_MIN_PA + PRESS_WALL_TOL .or. &
+                            maxval(field) >= WALL_PRESS_MAX_PA - PRESS_WALL_TOL)
+            end if
+            ! Same reason as the thermal wall above: reduce, then act.
+            if (reduce_any(hit_wall)) then
+                if (hit_wall) then
                     block
                         integer(int32) :: node_lo, node_hi
                         real(real64), pointer, contiguous, dimension(:) :: T_dbg
@@ -635,11 +651,11 @@ contains
                             minval(field), maxval(field), ' node_min=', node_lo, ' T=', T_lo, &
                             ' node_max=', node_hi, ' T=', T_hi
                     end block
-                    call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
-                    call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
-                    nullify (field)
-                    return
                 end if
+                call self%control%set_converged(PHYSICS_TYPES%HYDRAULIC, .false.)
+                call self%control%set_diverged(PHYSICS_TYPES%HYDRAULIC, .true.)
+                nullify (field)
+                return
             end if
             nullify (field)
         end if
@@ -1092,6 +1108,10 @@ contains
             end do nonlinear
 
             is_step_converged = self%control%is_converged()
+            ! A NONE scheme is one linearised solve per step by definition, so
+            ! there is no iteration whose convergence could be tested; asking
+            ! the nonlinear gate would reject every step.
+            if (self%control%is_none()) is_step_converged = .true.
             call self%control%get_nonlinear_iter(iter_nl)
             self%last_inner_iterations = iter_nl
             self%last_nonlinear_work = self%last_nonlinear_work + max(1_int32, iter_nl)
@@ -2107,7 +2127,9 @@ contains
         worst_node = 0
         do node_id = 1, min(num_nodes, size(liquid))
             call self%temperature%get_current(node_id, temperature)
-            call self%pressure%get_current(node_id, pressure)
+            ! A thermal-only run never allocates the pressure field.
+            pressure = 0.0d0
+            if (self%is_active_hydraulic()) call self%pressure%get_current(node_id, pressure)
             suction_matric = -pressure
             suction_freezing = 0.0d0
             if (temperature < Tf0) suction_freezing = CLAPEYRON_SLOPE * (Tf0 - temperature)
@@ -2133,7 +2155,9 @@ contains
                 call self%domain%get_material_id(repr_elem, material_id)
                 call self%set_state(worst_node, repr_elem, state, calc_physics=.true., include_fluxes=.false.)
                 call self%temperature%get_current(worst_node, temperature)
-                call self%pressure%get_current(worst_node, pressure)
+                ! A thermal-only run never allocates the pressure field.
+                pressure = 0.0d0
+                if (self%is_active_hydraulic()) call self%pressure%get_current(worst_node, pressure)
                 suction_matric = -pressure
                 suction_freezing = 0.0d0
                 if (temperature < Tf0) suction_freezing = CLAPEYRON_SLOPE * (Tf0 - temperature)
@@ -2266,7 +2290,9 @@ contains
 
         if (node_id < 1) return
         call self%temperature%get_current(node_id, temperature)
-        call self%pressure%get_current(node_id, pressure)
+        ! A thermal-only run never allocates the pressure field.
+        pressure = 0.0d0
+        if (self%is_active_hydraulic()) call self%pressure%get_current(node_id, pressure)
         call self%Qi%get_current(node_id, ice)
         call self%Qw%get_current(node_id, water)
         call self%porosity%get_current(node_id, porosity)
@@ -2887,6 +2913,10 @@ contains
                                                           + elem_volume(i_node, i_node)
             end do
         end do
+
+        ! A node on a partition boundary has so far collected only the cells
+        ! this rank holds; its control volume is completed here.
+        if (associated(self%domain%mesh)) call self%domain%mesh%halo_sum_nodal(self%nodal_volume)
 
         nullify (fe)
         nullify (connectivity)

@@ -1,5 +1,8 @@
+#include <petsc/finclude/petscdm.h>
+
 module domain_fe_integration
     use, intrinsic :: iso_fortran_env, only: int32, real64
+    use :: petscdm
     use :: module_core
     implicit none
     private
@@ -31,6 +34,47 @@ module domain_fe_integration
     end type type_gauss_integration_rule
 
 contains
+
+    !> Tensor-product Gauss-Legendre points and weights on [-1,1]^dim, taken
+    !> from PETSc rather than from a table maintained here.
+    subroutine tensor_gauss_rule(self, dimension, points_per_direction)
+        implicit none
+        class(type_gauss_integration_rule), intent(inout) :: self
+        integer(int32), intent(in) :: dimension
+        integer(int32), intent(in) :: points_per_direction
+
+        PetscErrorCode :: ierr
+        PetscQuadrature :: quadrature
+        PetscInt :: quad_dim, num_components, num_points
+        PetscReal, pointer :: points(:), weights(:)
+        real(real64) :: coordinate(3)
+        integer(int32) :: point, axis
+
+        call PetscDTGaussTensorQuadrature(int(dimension, PETSC_INT_KIND), 1_PETSC_INT_KIND, &
+                                          int(points_per_direction, PETSC_INT_KIND), &
+                                          -1.0_PETSC_REAL_KIND, 1.0_PETSC_REAL_KIND, quadrature, ierr)
+        if (ierr /= 0) error stop "PETSc could not build the tensor quadrature rule"
+
+        nullify (points)
+        nullify (weights)
+        call PetscQuadratureGetData(quadrature, quad_dim, num_components, num_points, points, weights, ierr)
+        if (ierr /= 0) error stop "PETSc quadrature data is unavailable"
+
+        self%num_gauss = int(num_points, int32)
+        call self%initial_setup(self%num_gauss)
+
+        do point = 1, self%num_gauss
+            coordinate = 0.0d0
+            do axis = 1, dimension
+                coordinate(axis) = real(points((point - 1) * dimension + axis), real64)
+            end do
+            self%weight(point) = real(weights(point), real64)
+            call self%gauss(point)%set(coordinate(1), coordinate(2), coordinate(3))
+        end do
+
+        call PetscQuadratureDestroy(quadrature, ierr)
+    end subroutine tensor_gauss_rule
+
 
     !>
     !> Initializes the Gauss integration rule for the given cell type and integration order.
@@ -231,25 +275,7 @@ contains
         class(type_gauss_integration_rule), intent(inout) :: self
         integer(int32), intent(in) :: order
 
-        integer(int32) :: n_1d, i, j, k
-        real(real64) :: w_i, p_i, w_j, p_j
-
-        n_1d = max(2, order)
-        self%num_gauss = n_1d * n_1d
-        call self%initial_setup(self%num_gauss)
-
-        k = 0
-        do j = 1, n_1d
-            call get_legendre_point(n_1d, j, w_j, p_j)
-
-            do i = 1, n_1d
-                call get_legendre_point(n_1d, i, w_i, p_i)
-
-                k = k + 1
-                self%weight(k) = w_i * w_j
-                call self%gauss(k)%set(p_i, p_j, 0.0d0)
-            end do
-        end do
+        call tensor_gauss_rule(self, 2, max(2, order))
     end subroutine compute_quad_rule_gauss_integration
 
     !>
@@ -260,18 +286,7 @@ contains
         class(type_gauss_integration_rule), intent(inout) :: self
         integer(int32), intent(in) :: order
 
-        integer(int32) :: n, i
-        real(real64) :: w_i, p_i
-
-        n = max(2, order)
-        self%num_gauss = n
-        call self%initial_setup(self%num_gauss)
-
-        do i = 1, n
-            call get_legendre_point(n, i, w_i, p_i)
-            self%weight(i) = w_i
-            call self%gauss(i)%set(p_i, 0.0d0, 0.0d0)
-        end do
+        call tensor_gauss_rule(self, 1, max(2, order))
     end subroutine compute_line_rule_gauss_integration
 
     !>
@@ -389,111 +404,7 @@ contains
         class(type_gauss_integration_rule), intent(inout) :: self
         integer(int32), intent(in) :: order
 
-        integer(int32) :: n_1d, i, j, k, idx
-        real(real64) :: w_i, p_i, w_j, p_j, w_k, p_k
-
-        n_1d = max(2, order)
-        self%num_gauss = n_1d * n_1d * n_1d
-        call self%initial_setup(self%num_gauss)
-
-        idx = 0
-        do k = 1, n_1d
-            call get_legendre_point(n_1d, k, w_k, p_k)
-            do j = 1, n_1d
-                call get_legendre_point(n_1d, j, w_j, p_j)
-                do i = 1, n_1d
-                    call get_legendre_point(n_1d, i, w_i, p_i)
-                    idx = idx + 1
-                    self%weight(idx) = w_i * w_j * w_k
-                    call self%gauss(idx)%set(p_i, p_j, p_k)
-                end do
-            end do
-        end do
+        call tensor_gauss_rule(self, 3, max(2, order))
     end subroutine compute_hexa_rule_gauss_integration
-
-    !>
-    !> Returns the weight and point for a 1D Gauss-Legendre quadrature rule at a given index.
-    !>
-    pure subroutine get_legendre_point(n, idx, w, p)
-        implicit none
-        integer(int32), intent(in) :: n
-        integer(int32), intent(in) :: idx
-        real(real64), intent(inout) :: w, p
-
-        real(real64), parameter :: s3 = sqrt(1.0d0 / 3.0d0)
-        real(real64), parameter :: s35 = sqrt(3.0d0 / 5.0d0)
-        ! 4-point Gauss-Legendre
-        real(real64), parameter :: p4a = sqrt((3.0d0 - 2.0d0 * sqrt(6.0d0 / 5.0d0)) / 7.0d0)
-        real(real64), parameter :: p4b = sqrt((3.0d0 + 2.0d0 * sqrt(6.0d0 / 5.0d0)) / 7.0d0)
-        real(real64), parameter :: w4a = (18.0d0 + sqrt(30.0d0)) / 36.0d0
-        real(real64), parameter :: w4b = (18.0d0 - sqrt(30.0d0)) / 36.0d0
-        ! 5-point Gauss-Legendre
-        real(real64), parameter :: p5a = sqrt(5.0d0 - 2.0d0 * sqrt(10.0d0 / 7.0d0)) / 3.0d0
-        real(real64), parameter :: p5b = sqrt(5.0d0 + 2.0d0 * sqrt(10.0d0 / 7.0d0)) / 3.0d0
-        real(real64), parameter :: w5a = (322.0d0 + 13.0d0 * sqrt(70.0d0)) / 900.0d0
-        real(real64), parameter :: w5b = (322.0d0 - 13.0d0 * sqrt(70.0d0)) / 900.0d0
-        real(real64), parameter :: w5c = 128.0d0 / 225.0d0
-
-        select case (n)
-        case (1)
-            p = 0.0d0
-            w = 2.0d0
-        case (2)
-            if (idx == 1) then
-                p = -s3
-                w = 1.0d0
-            else
-                p = s3
-                w = 1.0d0
-            end if
-        case (3)
-            select case (idx)
-            case (1)
-                p = -s35
-                w = 5.0d0 / 9.0d0
-            case (2)
-                p = 0.0d0
-                w = 8.0d0 / 9.0d0
-            case (3)
-                p = s35
-                w = 5.0d0 / 9.0d0
-            case default
-                p = 0.0d0
-                w = 0.0d0
-            end select
-        case (4)
-            select case (idx)
-            case (1)
-                p = -p4b; w = w4b
-            case (2)
-                p = -p4a; w = w4a
-            case (3)
-                p = p4a; w = w4a
-            case (4)
-                p = p4b; w = w4b
-            case default
-                p = 0.0d0; w = 0.0d0
-            end select
-        case (5)
-            select case (idx)
-            case (1)
-                p = -p5b; w = w5b
-            case (2)
-                p = -p5a; w = w5a
-            case (3)
-                p = 0.0d0; w = w5c
-            case (4)
-                p = p5a; w = w5a
-            case (5)
-                p = p5b; w = w5b
-            case default
-                p = 0.0d0; w = 0.0d0
-            end select
-        case default
-            ! Fallback
-            p = 0.0d0
-            w = 2.0d0
-        end select
-    end subroutine get_legendre_point
 
 end module domain_fe_integration

@@ -5,14 +5,6 @@ submodule(io_input_basic) input_basic_geometry_settings
     !!------------------------------------------------------------------------------------------------------------------------------
     character(*), parameter :: geometry_settings = "geometry_settings"
     character(*), parameter :: mesh_file_name = "mesh_file_name"
-    character(*), parameter :: global_node_id_key = "global_node_id_key"
-    character(*), parameter :: node_type_key = "node_type_key"
-    character(*), parameter :: num_sharing_ranks_key = "num_sharing_ranks_key"
-    character(*), parameter :: owner_ranks_key = "owner_ranks_key"
-    character(*), parameter :: communication_partners_key = "communication_partners_key"
-    character(*), parameter :: cell_id_key = "cell_id_key"
-    character(*), parameter :: rank_key = "rank_key"
-    character(*), parameter :: color_key = "color_key"
     character(*), parameter :: integration = "integration"
     character(*), parameter :: integration_order = "integration_order"
     character(*), parameter :: integration_type = "integration_type"
@@ -29,37 +21,6 @@ contains
         buffer(2) = mesh_file_name
         call get_json_value(json, join(buffer), self%geometry_settings%file_name, &
                             is_required=.true.)
-
-        buffer(2) = global_node_id_key
-        call get_json_value(json, join(buffer), self%geometry_settings%global_node_id_key, &
-                            is_required=.true., default_value=global_node_id_key)
-        buffer(2) = node_type_key
-        call get_json_value(json, join(buffer), self%geometry_settings%node_type_key, &
-                            is_required=.true., default_value=node_type_key)
-
-        buffer(2) = num_sharing_ranks_key
-        call get_json_value(json, join(buffer), self%geometry_settings%num_sharing_ranks_key, &
-                            is_required=.true., default_value=num_sharing_ranks_key)
-
-        buffer(2) = owner_ranks_key
-        call get_json_value(json, join(buffer), self%geometry_settings%owner_ranks_key, &
-                            is_required=.true., default_value=owner_ranks_key)
-
-        buffer(2) = communication_partners_key
-        call get_json_value(json, join(buffer), self%geometry_settings%communication_partners_key, &
-                            is_required=.true., default_value=communication_partners_key)
-
-        buffer(2) = cell_id_key
-        call get_json_value(json, join(buffer), self%geometry_settings%cell_id_key, &
-                            is_required=.true., default_value=cell_id_key)
-
-        buffer(2) = rank_key
-        call get_json_value(json, join(buffer), self%geometry_settings%rank_key, &
-                            is_required=.true., default_value=rank_key)
-
-        buffer(2) = color_key
-        call get_json_value(json, join(buffer), self%geometry_settings%color_key, &
-                            is_required=.true., default_value=color_key)
 
         buffer(2) = integration
         buffer(3) = integration_order
@@ -84,13 +45,6 @@ contains
         integer(int32) :: i
 
         write (*, '(a)') "Mesh File Name: "//strip(self%file_name)
-        write (*, '(a)') "Global Node ID Key: "//strip(self%global_node_id_key)
-        write (*, '(a)') "Node Type Key: "//strip(self%node_type_key)
-        write (*, '(a)') "Owner Ranks Key: "//strip(self%owner_ranks_key)
-        write (*, '(a)') "Communication Partners Key: "//strip(self%communication_partners_key)
-        write (*, '(a)') "Cell ID Key: "//strip(self%cell_id_key)
-        write (*, '(a)') "Rank Key: "//strip(self%rank_key)
-        write (*, '(a)') "Color Key: "//strip(self%color_key)
         write (*, '(a)') "Integration Type: "//strip(self%integration_type)
         if (strip(self%integration_type) == "free") then
             do i = 1, size(self%integration_points)

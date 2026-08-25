@@ -25,7 +25,7 @@ contains
 
         real(real64) :: mu
 
-        call self%calc_viscosity(temperature, mu)
+        call self%calc_mu(temperature, mu)
         kr = self%mu_zero / mu
 
     end subroutine calc_kr_abst_hcf_viscosity

@@ -7,6 +7,7 @@ add_library(SOLVER_DOMAIN STATIC)
 # Sources
 # ------------------------------------------------------------
 target_sources(SOLVER_DOMAIN PRIVATE
+    mesh/mesh_plex.F90
     # ====================================================
     # 1. Mesh (Finite Element Core)
     # ====================================================
@@ -93,3 +94,8 @@ enable_thirdparty(SOLVER_DOMAIN)
 # Namespaced alias
 # ------------------------------------------------------------
 add_library(SOLVER::DOMAIN ALIAS SOLVER_DOMAIN)
+
+find_package(PkgConfig REQUIRED)
+set(ENV{PKG_CONFIG_PATH} "${PROJECT_SOURCE_DIR}/third_party/.local/${COMPILER_DIR}/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
+pkg_check_modules(PETSC_DOMAIN REQUIRED IMPORTED_TARGET PETSc)
+target_link_libraries(SOLVER_DOMAIN PUBLIC PkgConfig::PETSC_DOMAIN)

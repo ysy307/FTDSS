@@ -4,12 +4,7 @@ module core_types
     !-----------------------------------------------------------------
     use :: core_types_matrix, only: &
         abst_matrix, &
-        type_matrix_coo, &
-        type_matrix_csr, &
         type_matrix_dense, &
-        type_matrix_bsr, &
-        type_matrix_dia, &
-        create_matrix, &
         type_matrix_info
     use :: core_types_vector, only: &
         type_vector_dp, &

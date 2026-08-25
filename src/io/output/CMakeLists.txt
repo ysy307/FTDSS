@@ -16,6 +16,7 @@ target_sources(SOLVER_OUTPUT PRIVATE
     overall/overall_interface.F90
     overall/overall_vtk.F90
     overall/overall_vtu.F90
+    overall/overall_hdf5.F90
     output_manager.F90
     output.F90
 )

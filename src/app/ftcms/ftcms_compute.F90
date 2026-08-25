@@ -1,3 +1,5 @@
+#include <petsc/finclude/petscmat.h>
+
 !> Implementation overview
 !>
 !> Algorithm:
@@ -6,9 +8,9 @@
 !> - L2 projection (lumped mass) for nodal gradient calculations
 !> - Evaluation of water and vapor fluxes based on the Darcy law
 submodule(app_ftcms) ftcms_compute
+    use :: petscmat
     use :: core_types_topology_system_topology, only:type_system_topology
     use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
-    use :: module_core, only:type_matrix_bsr, type_matrix_info
     implicit none
 
     !> Verify that the linear solve returns an increment that actually satisfies
@@ -101,7 +103,7 @@ contains
         implicit none
         class(type_ftcms), intent(inout) :: self
 
-        class(abst_matrix), pointer :: K_ptr => null()
+        Mat :: K_ptr
         type(type_vector_dp), pointer :: F_ptr => null()
         type(type_vector_dp), pointer :: du_ptr => null()
         real(real64), pointer :: tmp_data_ptr(:) => null()
@@ -113,10 +115,13 @@ contains
         character(len=16) :: solve_phase
 
         ! Symmetric Jacobi equilibration locals (A~ = D A D, b~ = D b, du = D y)
-        real(real64), allocatable :: equil_scale(:)
         real(real64), pointer :: dudat(:)
 
         call self%control%profiler_start(PROFILER_TYPES%SOLVE)
+
+        ! Flush the element loop into the matrix and impose the prescribed rows
+        ! before anything reads the operator.
+        call self%K%assemble()
 
         if (self%control%is_staggered()) then
             if (self%current_physics_id > 0) then
@@ -130,20 +135,20 @@ contains
                     end if
                 end do
             end if
-            K_ptr => self%K%get_matrix(active_physics)
+            K_ptr = self%K%get_matrix(active_physics)
             sys_id = active_physics%ID
             F_ptr => self%F%get_vector(sys_id)
             du_ptr => self%du%get_vector(sys_id)
             solve_phase = trim(active_physics%name)
         else
-            K_ptr => self%K%get_matrix()
+            K_ptr = self%K%get_matrix()
             F_ptr => self%F%get_vector()
             du_ptr => self%du%get_vector()
             sys_id = 1
             solve_phase = 'monolithic'
         end if
 
-        if (.not. (associated(K_ptr) .and. associated(F_ptr) .and. associated(du_ptr))) then
+        if (K_ptr%v == PETSC_NULL_MAT%v .or. .not. (associated(F_ptr) .and. associated(du_ptr))) then
             call self%control%profiler_stop(PROFILER_TYPES%SOLVE)
             return
         end if
@@ -172,20 +177,12 @@ contains
         ! inferred from row magnitudes. Written BEFORE equilibration so the
         ! matrix is the one the physics produced; the equilibration scale is
         ! written alongside it.
-        if (JACOBIAN_DUMP .and. .not. jacobian_dump_done) then
-            block
-                integer(int32) :: dump_iter
-                call self%control%get_nonlinear_iter(dump_iter)
-                if (dump_iter >= JACOBIAN_DUMP_ITER) then
-                    jacobian_dump_done = .true.
-                    call dump_linear_system(K_ptr, F_ptr, dump_iter)
-                end if
-            end block
-        end if
 
-        call jacobi_equilibrate_bsr(K_ptr, F_ptr, equil_scale)
+        ! The ill-conditioned T/p column scales are handled by KSP's own
+        ! diagonal scaling (-ksp_diagonal_scale), which works on the assembled
+        ! operator and unscales the solution itself, so no increment leaves
+        ! here in scaled variables.
         matrix_ierr = MATRIX_STATUS%SUCCESS%ID
-        call K_ptr%commit_to_mkl(matrix_ierr)
 
         linear_failed = .false.
         if (self%control%is_staggered()) then
@@ -214,49 +211,6 @@ contains
         ! finite-difference tangent audit - assumes it did, so the assumption is
         ! checked here rather than inferred. Measured on the equilibrated system,
         ! which is the one passed to the solver.
-        if (LINEAR_RESIDUAL_CHECK .and. .not. linear_failed) then
-            block
-                type(type_vector_dp) :: product_work
-                real(real64), pointer :: product_data(:), rhs_data(:)
-                real(real64) :: norm_defect, norm_rhs
-                integer(int32) :: matvec_ierr
-
-                nullify (product_data, rhs_data)
-                ! get_size() reports nodes, not degrees of freedom; the coupled
-                ! vector carries one entry per (node, physics).
-                rhs_data => F_ptr%get_data()
-                if (associated(rhs_data)) call product_work%initialize(size(rhs_data))
-                matvec_ierr = 0
-                call matvec(K_ptr, du_ptr, product_work, matvec_ierr)
-                product_data => product_work%get_data()
-                if (associated(product_data) .and. associated(rhs_data)) then
-                    norm_defect = sqrt(sum((product_data - rhs_data)**2))
-                    norm_rhs = sqrt(sum(rhs_data**2))
-                    if (norm_rhs > 0.0d0 .and. norm_defect > LINEAR_RESIDUAL_WARN * norm_rhs) then
-                        write (*, '(A,ES11.3,A,ES11.3)') '   [LINEAR] inaccurate solve: ||K du - F||/||F|| = ', &
-                            norm_defect / norm_rhs, ', ||F|| = ', norm_rhs
-                    end if
-                end if
-                nullify (product_data, rhs_data)
-                call product_work%destroy()
-            end block
-        end if
-
-        ! Recover the pore-pressure increment from the total-potential one:
-        ! du_p = du_g + c du_T (see transform_to_total_potential). Done before
-        ! the equilibration unscaling would be wrong - the stored increments are
-        ! still in the scaled variable there - so it follows it below.
-
-        ! Unscale the equilibrated solution: the solver returned y = D^-1 du, so the
-        ! physical increment is du = D y.
-        if (allocated(equil_scale)) then
-            nullify (dudat)
-            dudat => du_ptr%get_data()
-            if (associated(dudat)) then
-                if (size(dudat) == size(equil_scale)) dudat(:) = dudat(:) * equil_scale(:)
-            end if
-        end if
-
         if (allocated(self%cryo_slope) .and. .not. self%control%is_staggered()) then
             block
                 real(real64), pointer :: increment(:)
@@ -284,72 +238,6 @@ contains
 
         call self%control%profiler_stop(PROFILER_TYPES%SOLVE)
     end subroutine solve_ftcms
-
-    !> Symmetric Jacobi (diagonal) equilibration of a BSR linear system in place:
-    !> with D_i = 1/sqrt(|A_ii|), form A <- D A D and b <- D b, returning D so the
-    !> solution can be unscaled as x = D y. This restores conditioning of the strongly
-    !> unit-disparate coupled (T, p_w) system (cond ~ 1e13 -> O(1)) so that even a
-    !> direct solver returns an accurate increment. No-op for non-BSR matrices.
-    subroutine jacobi_equilibrate_bsr(K, F, D)
-        implicit none
-        class(abst_matrix), intent(inout) :: K
-        class(type_vector_dp), intent(inout) :: F
-        real(real64), allocatable, intent(inout) :: D(:)
-
-        integer(int32), pointer :: ptr(:), ind(:)
-        real(real64), pointer :: val(:, :, :)
-        real(real64), pointer :: fdat(:)
-        type(type_matrix_info) :: info
-        integer(int32) :: nb, n_brows, n, i, kb, r, c, bc, g
-
-        if (allocated(D)) deallocate (D)
-
-        select type (K)
-        type is (type_matrix_bsr)
-            ptr => K%get_ptr()
-            ind => K%get_ind()
-            val => K%get_val()
-            call K%get_info(info)
-            if (.not. (associated(ptr) .and. associated(ind) .and. associated(val))) return
-            nb = info%num_block_rows
-            n_brows = size(ptr) - 1
-            n = n_brows * nb
-            if (n <= 0) return
-            allocate (D(n))
-            D = 1.0d0
-
-            ! D_i = 1 / sqrt(|A_ii|) from the diagonal blocks
-            do i = 1, n_brows
-                do kb = ptr(i), ptr(i + 1) - 1
-                    if (ind(kb) == i) then
-                        do r = 1, nb
-                            g = (i - 1) * nb + r
-                            if (abs(val(r, r, kb)) > 0.0d0) D(g) = 1.0d0 / sqrt(abs(val(r, r, kb)))
-                        end do
-                    end if
-                end do
-            end do
-
-            ! A <- D A D (scale every stored block entry)
-            do i = 1, n_brows
-                do kb = ptr(i), ptr(i + 1) - 1
-                    bc = ind(kb)
-                    do c = 1, nb
-                        do r = 1, nb
-                            val(r, c, kb) = val(r, c, kb) * D((i - 1) * nb + r) * D((bc - 1) * nb + c)
-                        end do
-                    end do
-                end do
-            end do
-
-            ! b <- D b
-            nullify (fdat)
-            fdat => F%get_data()
-            if (associated(fdat)) then
-                if (size(fdat) == n) fdat(:) = fdat(:) * D(:)
-            end if
-        end select
-    end subroutine jacobi_equilibrate_bsr
 
     !> Implementation strategy: replicate exactly the geometry evaluations
     !> the direct projection performed per call -- same element order, same
@@ -699,58 +587,5 @@ contains
             water_flux%z = -K_vT * grad_T%z - K_vP * grad_P%z
         end select
     end subroutine calc_vapor_flux_ftcms
-
-    !> Write the assembled coupled system to a plain-text triplet file.
-    !>
-    !> Row/column indices are global DOFs in the solver's own ordering, so the
-    !> file can be read back without knowing the FE numbering: what matters for
-    !> a spectral study is the operator, not which node a row belongs to. The
-    !> block size is in the header so the thermal and hydraulic sub-blocks can
-    !> be separated offline.
-    subroutine dump_linear_system(K, F, iteration)
-        implicit none
-        class(abst_matrix), intent(in) :: K
-        type(type_vector_dp), intent(in) :: F
-        integer(int32), intent(in) :: iteration
-
-        real(real64), pointer :: rhs(:)
-        integer(int32) :: br, i, gi, gj, nb, ncb, ios, unit_dump, j
-        character(len=256) :: filename
-
-        select type (K)
-        type is (type_matrix_bsr)
-            write (filename, '(A,I0,A)') 'jacobian_dump_iter', iteration, '.txt'
-            open (newunit=unit_dump, file=trim(filename), status='replace', &
-                  action='write', iostat=ios)
-            if (ios /= 0) return
-            nb = K%num_block_rows
-            ncb = K%num_block_cols
-            nullify (rhs)
-            rhs => F%get_data()
-            write (unit_dump, '(A,3(1X,I0))') '# nrows nnz_blocks block_size', &
-                K%num_rows, K%nnz, nb
-            do br = 1, K%num_ptrs - 1
-                do i = K%ptr(br), K%ptr(br + 1) - 1
-                    do gi = 1, nb
-                        do gj = 1, ncb
-                            if (K%val(gi, gj, i) == 0.0d0) cycle
-                            write (unit_dump, '(2(1X,I0),1X,ES23.16)') &
-                                (br - 1) * nb + gi, (K%ind(i) - 1) * ncb + gj, &
-                                K%val(gi, gj, i)
-                        end do
-                    end do
-                end do
-            end do
-            write (unit_dump, '(A)') '# rhs'
-            if (associated(rhs)) then
-                do j = 1, size(rhs)
-                    write (unit_dump, '(1X,I0,1X,ES23.16)') j, rhs(j)
-                end do
-            end if
-            close (unit_dump)
-            write (*, '(A,A)') '   [DUMP] linear system written to ', trim(filename)
-            nullify (rhs)
-        end select
-    end subroutine dump_linear_system
 
 end submodule ftcms_compute

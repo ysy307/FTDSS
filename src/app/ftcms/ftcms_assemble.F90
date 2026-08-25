@@ -99,6 +99,7 @@ contains
         assemble_matrix = .not. optval(residual_only, .false.)
         if (assemble_matrix) call self%K%zero()
         call self%F%zero()
+        call self%dirichlet_marker%zero()
 
         if (assemble_matrix .and. TOTAL_POTENTIAL_UNKNOWN) then
             block
@@ -178,22 +179,22 @@ contains
                     active_elem(ID_THERMAL) = do_thermal_elem
                     active_elem(ID_HYDRAULIC) = do_hydraulic_elem
 
+                    ! Base quadrature only. The adaptive search assembled the
+                    ! element once per candidate depth, which is the bulk of the
+                    ! assembly cost, and a fixed depth also makes the residual a
+                    ! function of the state alone.
+                    selected_subcell_depth = 0
+                    subcell_depth_unresolved = .false.
+                    call workspace%set_subcell_depth(selected_subcell_depth)
                     if (assemble_matrix) then
-                        call select_subcell_depth(self, workspace, active_elem, &
-                                                  local_blocks, fine_blocks, selected_subcell_depth, &
-                                                  subcell_depth_unresolved)
-                        if (allocated(self%subcell_active_depth)) then
-                            self%subcell_active_depth(elem_id) = selected_subcell_depth
-                            self%subcell_depth_unresolved(elem_id) = subcell_depth_unresolved
-                        end if
+                        call assemble_local_blocks(self, workspace, local_blocks)
                     else
-                        selected_subcell_depth = 0
-                        if (allocated(self%subcell_active_depth)) then
-                            selected_subcell_depth = self%subcell_active_depth(elem_id)
-                        end if
-                        call workspace%set_subcell_depth(selected_subcell_depth)
                         call self%assemble_local(workspace, local_F_T=local_blocks%F(ID_THERMAL), &
                                                  local_F_H=local_blocks%F(ID_HYDRAULIC))
+                    end if
+                    if (allocated(self%subcell_active_depth)) then
+                        self%subcell_active_depth(elem_id) = selected_subcell_depth
+                        self%subcell_depth_unresolved(elem_id) = subcell_depth_unresolved
                     end if
 
                     ! An element where only one physics is active has no

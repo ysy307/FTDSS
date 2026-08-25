@@ -1,7 +1,4 @@
 add_subdirectory(math)
 add_subdirectory(linalg)
-if(ENABLE_MPI)
-    add_subdirectory(parallel)
-endif()
 add_subdirectory(solver)
 add_subdirectory(system)

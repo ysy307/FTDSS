@@ -9,6 +9,7 @@ option(BUILD_TESTING "Build the testing tree" OFF)
 option(ENABLE_OPENMP "Enable OpenMP support" ON)
 option(ENABLE_MKL "Enable MKL support" ON)
 option(ENABLE_MPI "Enable MPI support" ON)
+option(ENABLE_PETSC "Enable the PETSc KSP linear solver back-end" ON)
 option(FTCMS_PORTABLE_BUILD "Avoid host-specific CPU instructions" OFF)
 option(FTCMS_BUNDLE_RUNTIME "Bundle non-system runtime libraries when installing" OFF)
 

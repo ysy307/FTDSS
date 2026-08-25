@@ -20,65 +20,25 @@ contains
 
             fullpath = trim(p%input_path)//trim(p%basic%geometry_settings%file_name)
 
-            ! Check array size > 0 instead of using allocated
-            if (size(fields_to_read) > 0) then
-                if (ends_with(p%basic%geometry_settings%file_name, '.vtk')) then
-                    call self%vtk%initialize_vtk( &
-                        file_name=strip(fullpath), &
-                        global_node_id_key=strip(p%basic%geometry_settings%global_node_id_key), &
-                        node_type_key=strip(p%basic%geometry_settings%node_type_key), &
-                        num_sharing_ranks_key=strip(p%basic%geometry_settings%num_sharing_ranks_key), &
-                        owner_ranks_key=strip(p%basic%geometry_settings%owner_ranks_key), &
-                        communication_partners_key=strip(p%basic%geometry_settings%communication_partners_key), &
-                        cell_id_key=strip(p%basic%geometry_settings%cell_id_key), &
-                        rank_key=strip(p%basic%geometry_settings%rank_key), &
-                        color_key=strip(p%basic%geometry_settings%color_key), &
-                        point_field_names=fields_to_read)
-
-                else if (ends_with(p%basic%geometry_settings%file_name, '.vtu')) then
-                    call self%vtk%initialize_vtu( &
-                        file_name=strip(fullpath), &
-                        global_node_id_key=strip(p%basic%geometry_settings%global_node_id_key), &
-                        node_type_key=strip(p%basic%geometry_settings%node_type_key), &
-                        num_sharing_ranks_key=strip(p%basic%geometry_settings%num_sharing_ranks_key), &
-                        owner_ranks_key=strip(p%basic%geometry_settings%owner_ranks_key), &
-                        communication_partners_key=strip(p%basic%geometry_settings%communication_partners_key), &
-                        cell_id_key=strip(p%basic%geometry_settings%cell_id_key), &
-                        rank_key=strip(p%basic%geometry_settings%rank_key), &
-                        color_key=strip(p%basic%geometry_settings%color_key), &
-                        point_field_names=fields_to_read)
-                end if
-
-                ! Save loaded field names for later reference
-                allocate (self%point_data_names, source=fields_to_read)
-                ! Moved deallocate(fields_to_read) to end of block
-
-            else
-                if (ends_with(p%basic%geometry_settings%file_name, '.vtk')) then
-                    call self%vtk%initialize_vtk( &
-                        file_name=strip(fullpath), &
-                        global_node_id_key=strip(p%basic%geometry_settings%global_node_id_key), &
-                        node_type_key=strip(p%basic%geometry_settings%node_type_key), &
-                        num_sharing_ranks_key=strip(p%basic%geometry_settings%num_sharing_ranks_key), &
-                        owner_ranks_key=strip(p%basic%geometry_settings%owner_ranks_key), &
-                        communication_partners_key=strip(p%basic%geometry_settings%communication_partners_key), &
-                        cell_id_key=strip(p%basic%geometry_settings%cell_id_key), &
-                        rank_key=strip(p%basic%geometry_settings%rank_key), &
-                        color_key=strip(p%basic%geometry_settings%color_key))
-
-                else if (ends_with(p%basic%geometry_settings%file_name, '.vtu')) then
-                    call self%vtk%initialize_vtu( &
-                        file_name=strip(fullpath), &
-                        global_node_id_key=strip(p%basic%geometry_settings%global_node_id_key), &
-                        node_type_key=strip(p%basic%geometry_settings%node_type_key), &
-                        num_sharing_ranks_key=strip(p%basic%geometry_settings%num_sharing_ranks_key), &
-                        owner_ranks_key=strip(p%basic%geometry_settings%owner_ranks_key), &
-                        communication_partners_key=strip(p%basic%geometry_settings%communication_partners_key), &
-                        cell_id_key=strip(p%basic%geometry_settings%cell_id_key), &
-                        rank_key=strip(p%basic%geometry_settings%rank_key), &
-                        color_key=strip(p%basic%geometry_settings%color_key))
-                end if
+            if (.not. ends_with(p%basic%geometry_settings%file_name, '.msh')) then
+                call global_logger%log_error("Only Gmsh .msh meshes are read; got " &
+                                             //strip(p%basic%geometry_settings%file_name))
+                error stop "Unsupported mesh file"
             end if
+
+            ! Node fields carried in the mesh file are not read: PETSc's Gmsh
+            ! reader takes the mesh, not the data blocks written beside it.
+            if (size(fields_to_read) > 0) then
+                call global_logger%log_error("Initial conditions cannot be read from the mesh file: " &
+                                             //strip(fields_to_read(1)))
+                error stop "Unsupported initial condition source"
+            end if
+
+            call self%mesh%load(strip(fullpath))
+
+            call global_logger%log_message("Mesh read: nodes="//to_string(self%mesh%num_nodes) &
+                                           //", cells="//to_string(self%mesh%num_cells) &
+                                           //", colours="//to_string(self%mesh%num_colors))
 
             ! Always deallocate here
             if (allocated(fields_to_read)) deallocate (fields_to_read)

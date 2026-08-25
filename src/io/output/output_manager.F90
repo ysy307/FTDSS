@@ -5,13 +5,15 @@ module io_output_manager
     use :: stdlib_io, only:open
     use :: module_core
     use :: module_domain
+    use :: domain_mesh_plex, only:type_mesh_plex
 
     use :: io_output_base, only: &
         setup_directory
     use :: io_output_overall, only: &
         abst_output_overall, &
         type_output_overall_vtk, &
-        type_output_overall_vtu
+        type_output_overall_vtu, &
+        type_output_overall_hdf5
     use :: io_output_observation, only:type_output_observation
     use :: io_output_logging, only:type_output_log
 
@@ -41,16 +43,18 @@ module io_output_manager
 
 contains
 
-    subroutine initialize_type_output_manager(self, config_output, config_observation, config_overall)
+    subroutine initialize_type_output_manager(self, config_output, config_observation, config_overall, mesh)
         implicit none
         class(type_output_manager), intent(inout) :: self
         type(type_config_output), intent(in) :: config_output
         type(type_config_observation), intent(in) :: config_observation
         type(type_config_overall), intent(in) :: config_overall
+        !> The mesh, for a writer that describes the geometry from the DM.
+        type(type_mesh_plex), intent(inout), optional, target :: mesh
 
         character(:), allocatable :: project_path_env
         character(8) :: output_extentions(3) = [".dat", ".csv", ".log"]
-        character(8) :: output_file_extentions(5) = [".dat", ".csv", ".vtk", ".vtu", ".log"]
+        character(8) :: output_file_extentions(7) = [".dat", ".csv", ".vtk", ".vtu", ".log", ".h5", ".xmf"]
         character(*), parameter :: PROJECT_ENV = "FTCMS_PROJECT_PATH"
 
         character(:), allocatable :: dir_output
@@ -72,16 +76,19 @@ contains
             allocate (type_output_overall_vtk :: self%overall)
         case (FILE_FORMATS%VTU%ID)
             allocate (type_output_overall_vtu :: self%overall)
+        case (FILE_FORMATS%HDF5%ID, FILE_FORMATS%PETSC_VTU%ID)
+            ! Both are written by PETSc; the writer picks the file from the format.
+            allocate (type_output_overall_hdf5 :: self%overall)
         end select
         if (allocated(self%overall)) then
-            call self%overall%initialize(dir_output_field, config_overall)
+            call self%overall%initialize(dir_output_field, config_overall, mesh)
         end if
 
         call self%log%initialize(dir_output)
     end subroutine initialize_type_output_manager
 
     subroutine output_fields_output_manager(self, file_counts, temperature, water_content, ice_content, &
-                                            vapor_content, pressure, water_flux)
+                                            vapor_content, pressure, water_flux, time)
         implicit none
         class(type_output_manager), intent(inout) :: self
         integer(int32), intent(in) :: file_counts
@@ -91,6 +98,7 @@ contains
         real(real64), intent(in), optional :: vapor_content(:)
         real(real64), intent(in), optional :: pressure(:)
         type(type_coordinate_array_dp), intent(in), optional :: water_flux
+        real(real64), intent(in), optional :: time
 
         if (.not. allocated(self%overall)) return
 
@@ -100,7 +108,8 @@ contains
                                        ice_content=ice_content, &
                                        vapor_content=vapor_content, &
                                        pressure=pressure, &
-                                       water_flux=water_flux)
+                                       water_flux=water_flux, &
+                                       time=time)
     end subroutine output_fields_output_manager
 
     subroutine output_history_output_manager(self, time, temperature, water_content, ice_content, &

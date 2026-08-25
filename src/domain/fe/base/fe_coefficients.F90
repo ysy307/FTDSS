@@ -6,6 +6,33 @@ contains
     !> Computes shape functions, their global gradients, and the Jacobian determinant.
     !> Optimized to avoid redundant Jacobian calculations.
     !>
+    !> Default tabulation: ask the element for one basis at a time. A
+    !> discretisation that can produce its whole basis in one call overrides
+    !> this and avoids the per-basis round trip.
+    module subroutine tabulate_abst_fe(self, r, psi, dpsi_ref)
+        implicit none
+        class(abst_fe), intent(in) :: self
+        type(type_coordinate_dp), intent(in) :: r
+        real(real64), intent(inout), optional :: psi(:)
+        real(real64), intent(inout), optional :: dpsi_ref(:, :)
+
+        integer(int32) :: i, j
+
+        if (present(psi)) then
+            do i = 1, self%num_nodes
+                call self%calc_psi(i, r, psi(i))
+            end do
+        end if
+
+        if (present(dpsi_ref)) then
+            do i = 1, self%num_nodes
+                do j = 1, self%dimension
+                    call self%calc_dpsi(i, j, r, dpsi_ref(j, i))
+                end do
+            end do
+        end if
+    end subroutine tabulate_abst_fe
+
     module subroutine calc_shape_function_abst_fe(self, r, node_coords, psi, dpsi_dx, inverse_jacobian, determinant_jacobian)
         implicit none
         class(abst_fe), intent(in) :: self
@@ -23,6 +50,7 @@ contains
         real(real64) :: local_inv_J(self%dimension, self%dimension)
         real(real64) :: local_det_J
         real(real64) :: dpsi_dxi(self%dimension)
+        real(real64) :: reference_gradient(self%dimension, self%num_nodes)
         logical :: need_jacobian, need_inverse
 
         dim = self%dimension
@@ -30,9 +58,7 @@ contains
         ! 1. Evaluate Shape Functions (Requires no Jacobian)
         if (present(psi)) then
             psi(:) = 0.0d0
-            do i = 1, self%num_nodes
-                call self%calc_psi(i, r, psi(i))
-            end do
+            call self%tabulate(r, psi=psi)
         end if
 
         ! Determine whether Jacobian computation is needed
@@ -94,11 +120,10 @@ contains
         if (present(dpsi_dx)) then
             dpsi_dx(:, :) = 0.0d0
 
+            call self%tabulate(r, dpsi_ref=reference_gradient)
+
             do i = 1, self%num_nodes
-                ! Get local gradients (dpsi/dxi, dpsi/deta, ...)
-                do j = 1, dim
-                    call self%calc_dpsi(i, j, r, dpsi_dxi(j))
-                end do
+                dpsi_dxi(1:dim) = reference_gradient(1:dim, i)
 
                 ! Transform to physical gradients: multiply by J^{-T}
                 ! dpsi_dx(k, i) = sum_l ( invJ(l, k) * dpsi_dxi(l) )

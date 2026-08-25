@@ -3,11 +3,13 @@ submodule(io_output_overall) output_overall_vtu
     implicit none
 
 contains
-    module subroutine initialize_type_output_overall_vtu(self, dir_output, config)
+    module subroutine initialize_type_output_overall_vtu(self, dir_output, config, mesh)
         implicit none
         class(type_output_overall_vtu), intent(inout) :: self
         character(*), intent(in) :: dir_output
         type(type_config_overall), intent(in) :: config
+        !> Unused: this writer transcribes the mesh from config.
+        type(type_mesh_plex), intent(inout), optional, target :: mesh
 
         integer(int32) :: i
         integer(int32) :: conn_size
@@ -55,7 +57,7 @@ contains
     end subroutine initialize_type_output_overall_vtu
 
     module subroutine write_fields_vtu(self, file_counts, temperature, water_content, &
-                                       ice_content, vapor_content, pressure, water_flux)
+                                       ice_content, vapor_content, pressure, water_flux, time)
         implicit none
         class(type_output_overall_vtu), intent(inout) :: self
         integer(int32), intent(in) :: file_counts
@@ -65,6 +67,7 @@ contains
         real(real64), intent(in), optional :: vapor_content(:)
         real(real64), intent(in), optional :: pressure(:)
         type(type_coordinate_array_dp), intent(in), optional :: water_flux
+        real(real64), intent(in), optional :: time
 
         type(type_vtu_writer) :: writer
         real(c_double), allocatable :: water_flux_vec(:, :)

@@ -44,7 +44,6 @@ module io_input_basic
         !> interface (parameter-free; disable only for A/B comparison runs).
         logical :: enable_fringe_subcell_quadrature = .true.
         character(:), allocatable :: coupling_mode
-        logical :: partitioning
     contains
         procedure, pass(self) :: display => display_analysis_controls
     end type type_analysis_controls
@@ -58,14 +57,6 @@ module io_input_basic
     !!------------------------------------------------------------------------------------------------------------------------------
     type :: type_geometry_settings
         character(:), allocatable :: file_name
-        character(:), allocatable :: global_node_id_key
-        character(:), allocatable :: node_type_key
-        character(:), allocatable :: num_sharing_ranks_key
-        character(:), allocatable :: owner_ranks_key
-        character(:), allocatable :: communication_partners_key
-        character(:), allocatable :: cell_id_key
-        character(:), allocatable :: rank_key
-        character(:), allocatable :: color_key
         integer(int32) :: integration_order
         character(:), allocatable :: integration_type
         real(real64), allocatable :: integration_points(:)
@@ -254,35 +245,12 @@ module io_input_basic
         type(type_convergence) :: convergence
     end type type_nonlinear_solver
 
-    type :: type_linear_solver_iterative
-        integer(int32) :: solver_type
-        integer(int32) :: preconditioner_type
-        integer(int32) :: max_iterations
-        real(real64) :: tolerance
-    end type type_linear_solver_iterative
-
     type :: type_linear_solver
-        integer(int32) :: solver_type
-        integer(int32) :: preconditioner_type
-        integer(int32) :: max_iterations
-        real(real64) :: tolerance
-        integer(int32) :: m_restarts = 30
-        !> Optional AMG strength threshold for SA-AMG; default 0.25.
-        real(real64) :: amg_strength_threshold = 0.25d0
-        !> Optional AMG smoother sweeps for SA-AMG; default 2.
-        integer(int32) :: amg_smoother_sweeps = 2
-        !> Optional AMG maximum aggregate size for SA-AMG; default 8.
-        integer(int32) :: amg_max_agg_size = 8
-        !> Optional AMG coarse-matrix drop tolerance for SA-AMG; default 1.0e-4.
-        real(real64) :: amg_drop_tolerance = 1.0d-4
-        !> Optional AMG drop strategy for SA-AMG; default 'RELATIVE'.
-        character(len=32) :: amg_drop_strategy = 'RELATIVE'
-        !> Optional AMG smoother type for SA-AMG; default 'JACOBI'.
-        character(len=32) :: amg_smoother_type = 'JACOBI'
-        !> Optional AMG rebuild frequency for SA-AMG; default 5.
-        integer(int32) :: amg_rebuild_frequency = 5
-        !> Optional AMG rebuild threshold for SA-AMG; default 1.0e-2.
-        real(real64) :: amg_rebuild_threshold = 1.0d-2
+        integer(int32) :: max_iterations = 10000
+        real(real64) :: tolerance = 1.0d-6
+        !> Raw PETSc option string, inserted into the option database before
+        !> KSPSetFromOptions. Anything -ksp_*/-pc_* accepts can be set here.
+        character(len=512) :: petsc_options = ''
     end type type_linear_solver
 
     type :: type_parallel_threads

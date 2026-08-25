@@ -6,6 +6,7 @@ module io_input_geometry
     use :: stdlib_logger
     use :: json_module, only:json_file
     use :: module_core
+    use :: domain_mesh_plex, only:type_mesh_plex
     use :: io_input_base, only:get_json_value, abst_input
     implicit none
     private
@@ -21,7 +22,8 @@ module io_input_geometry
 
     type :: type_input_geometry
         class(abst_input), pointer :: parent => null()
-        type(type_vtk) :: vtk
+        !> The mesh itself, held as a PETSc DM. Nothing is copied out of it.
+        type(type_mesh_plex) :: mesh
         character(:), allocatable :: point_data_names(:)
     contains
         procedure, pass(self), public :: initialize => initialize_type_input_geometry

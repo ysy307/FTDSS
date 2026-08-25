@@ -153,22 +153,9 @@ contains
             if (config%ic_kind == IC_METHODS%UNIFORM) then
                 config%value = condition_data%value
             else if (config%ic_kind == IC_METHODS%FROM_FILE) then
-                block
-                    integer(int32) :: k, field_idx
-                    field_idx = -1
-                    if (allocated(input%geometry%point_data_names)) then
-                        do k = 1, size(input%geometry%point_data_names)
-                            if (trim(input%geometry%point_data_names(k)) == &
-                                trim(condition_data%field_name)) then
-                                field_idx = k
-                                exit
-                            end if
-                        end do
-                    end if
-                    if (field_idx > 0) then
-                        allocate (config%values, source=input%geometry%vtk%point_field_values(:, field_idx))
-                    end if
-                end block
+                ! The mesh reader rejects this earlier: PETSc reads the mesh
+                ! from the Gmsh file, not the node data written beside it.
+                error stop "Initial conditions cannot be read from the mesh file"
             end if
         end associate
 
@@ -180,7 +167,7 @@ contains
         class(type_input), intent(in) :: input
         type(type_config_acceleration), intent(inout) :: config
 
-        config%num_dofs = input%geometry%vtk%num_points
+        config%num_dofs = input%geometry%mesh%num_nodes
         config%method = ACCELERATION_METHODS%NONE
         config%min_relaxation = 0.1d0
         config%max_relaxation = 1.0d0

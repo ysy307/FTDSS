@@ -211,6 +211,8 @@ module app_ftcms
 
         type(type_jacobian_matrix) :: K
         type(type_residual_vector) :: F
+        !> 1.0 at every Dirichlet degree of freedom, in the same layout as F.
+        type(type_residual_vector) :: dirichlet_marker
         type(type_residual_vector) :: du
 
         type(type_thermal) :: thermal
@@ -243,8 +245,6 @@ module app_ftcms
         ! Reference mean pressure captured from the initial condition.
         ! Used to pin the null-mode of all-Neumann hydraulic systems without
         ! distorting the absolute pressure level (WRF relies on absolute P).
-        logical :: hydraulic_ref_mean_set = .false.
-        real(real64) :: hydraulic_ref_mean = 0.0d0
 
         ! DOF column scaling factors for variable non-dimensionalization
         real(real64), allocatable :: col_scale(:)
